@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - 80:4242
+      - 443:4243
+    networks:
+      - the-pong-net
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    restart: unless-stopped
+    networks:
+      - the-pong-net
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    networks:
+      - the-pong-net
+    volumes:
+      - redis:/data
+
+  backend:
+    container_name: backend
+    build: ./backend
+    restart: unless-stopped
+    networks:
+      - the-pong-net
+    depends_on:
+      - postgres
+      - redis
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    restart: unless-stopped
+    networks:
+      - the-pong-net
+    depends_on:
+      - backend
+
+networks:
+  the-pong-net:
+
+volumes:
+  postgres:
+  redis:
