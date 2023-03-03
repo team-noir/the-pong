@@ -41,6 +41,14 @@
   },
   "devDependencies": {
     "@types/testing-library__jest-dom": "^5.14.5",
-    "eslint-config-react-app": "^7.0.1"
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "@yarnpkg/sdks": "^3.0.0-rc.39",
+    "eslint": "^8.35.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-react": "latest",
+    "prettier": "^2.8.4"
   }
 }
