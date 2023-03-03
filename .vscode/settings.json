@@ -1,0 +1,3 @@
+{
+  "typescript.tsdk": "./the-pong/frontend/.yarn/sdks/typescript/lib"
+}
