@@ -4,15 +4,17 @@ import LoginPage from 'pages/LoginPage';
 import OnBoardingPage from 'pages/OnBoardingPage';
 import Root from 'pages/Root';
 import MainPage from 'pages/MainPage';
+import ErrorPage from 'pages/ErrorPage';
 import GamePage from 'pages/GamePage';
 import ChannelPage from 'pages/ChannelPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
 
-const router = createBrowserRouter([
+export const routerConfig = [
   {
     path: '/',
     element: <Root />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
@@ -44,8 +46,10 @@ const router = createBrowserRouter([
       },
     ],
   },
-]);
+];
 
-export default function App() {
+const router = createBrowserRouter(routerConfig);
+
+export function App() {
   return <RouterProvider router={router} />;
 }
