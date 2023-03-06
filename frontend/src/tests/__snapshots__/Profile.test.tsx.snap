@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Profile /> matches snapshot 1`] = `
+<div>
+  <h1>
+    Profile
+  </h1>
+  <img
+    alt="profile image"
+    class="img"
+    src="https://placekitten.com/800/800"
+  />
+  <p>
+    nickname
+  </p>
+</div>
+`;
