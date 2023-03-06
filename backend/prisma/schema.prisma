@@ -1,0 +1,90 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  key             String
+  imageUrl        String
+  nickname        String
+  rank            Int
+  isTwoFactor     Boolean
+  createdAt       DateTime  @default(now())
+}
+
+model Friend {
+  id              String    @id @default(uuid())
+  followerId      String
+  followeeId      String
+  createdAt       DateTime  @default(now())
+}
+
+model BlockUser {
+  id              String    @id @default(uuid())
+  userId          String
+  blockedId       String
+  createdAt       DateTime  @default(now())
+}
+
+
+model Channel {
+  id              String    @id @default(uuid())
+  title           String
+  idPublic        Boolean
+  password        String
+  key             String
+  isDm            Boolean
+  createdAt       DateTime  @default(now())
+  deletedAt       DateTime 
+}
+
+model Message {
+  id              String    @id @default(uuid())
+  senderId        String    @id
+  channelId       String    @id
+  text            String
+  createdAt       DateTime  @default(now())
+}
+
+model Channel_User {
+  id              String    @id @default(uuid())
+  userId          String    @id
+  userType        String    @id
+  status          String    @id
+  createdAt       DateTime  @default(now())
+}
+
+model GameResult {
+  id              String    @id @default(uuid())
+  winnerId        String    @id
+  loserId         String    @id
+  score           Int
+  isLadder        Boolean
+  createdAt       DateTime  @default(now())
+}
+
+model Achievement {
+  id              String    @id @default(uuid())
+  name            String
+}
+
+model Achievement_User {
+  id              String    @id @default(uuid())
+  userId          String    @id
+  achievementId   String    @id
+  createdAt       DateTime  @default(now())
+}
+
+model Channel {
+  id              String    @id @default(uuid())
+  createdAt       DateTime  @default(now())
+}
+
