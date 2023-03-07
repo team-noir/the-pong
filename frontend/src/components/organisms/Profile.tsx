@@ -7,12 +7,12 @@ interface Props extends UserType {
   profileImageUrl: string;
 }
 
-export default function Profile({ nickname, profileImageUrl }: Props) {
+export default function Profile({ id, nickname, profileImageUrl }: Props) {
   return (
     <>
       <h1>Profile</h1>
       <img src={profileImageUrl} alt="profile image" className={styles.img} />
-      <p>{nickname}</p>
+      <p data-testid={id}>{nickname}</p>
     </>
   );
 }
