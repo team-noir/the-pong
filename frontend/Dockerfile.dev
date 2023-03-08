@@ -7,7 +7,6 @@ COPY package.json ./
 RUN yarn set version berry
 RUN yarn plugin import typescript
 COPY yarn.lock .yarn .yarnrc.yml ./
-RUN yarn install
 
 COPY ./ ./
 
