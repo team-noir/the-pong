@@ -11,80 +11,119 @@ datasource db {
 }
 
 model User {
-  id              String    @id @default(uuid())
-  key             String
+  id              Int       @id @default(autoincrement())
   imageUrl        String
-  nickname        String
+  nickname        String    @unique
   rank            Int
   isTwoFactor     Boolean
+  ftId            String
+  ftUsername      String
+  ftDisplayName   String
+  ftAccessToken   String
+  ftRefreshToken  String
   createdAt       DateTime  @default(now())
-}
+  updatedAt       DateTime
+  deletedAt       DateTime
 
-model Friend {
-  id              String    @id @default(uuid())
-  followerId      String
-  followeeId      String
-  createdAt       DateTime  @default(now())
-}
+  winLogs         GameResult[]  @relation("WinLog")
+  loseLogs        GameResult[]  @relation("LoseLog")
 
-model BlockUser {
-  id              String    @id @default(uuid())
-  userId          String
-  blockedId       String
-  createdAt       DateTime  @default(now())
-}
+  followers       FollowUser[]  @relation("Follower")
+  followees       FollowUser[]  @relation("Followee")
 
+  blockers        BlockUser[]   @relation("Blocker")
+  blockeds        BlockUser[]   @relation("Blocked")
 
-model Channel {
-  id              String    @id @default(uuid())
-  title           String
-  idPublic        Boolean
-  password        String
-  key             String
-  isDm            Boolean
-  createdAt       DateTime  @default(now())
-  deletedAt       DateTime 
-}
-
-model Message {
-  id              String    @id @default(uuid())
-  senderId        String    @id
-  channelId       String    @id
-  text            String
-  createdAt       DateTime  @default(now())
-}
-
-model Channel_User {
-  id              String    @id @default(uuid())
-  userId          String    @id
-  userType        String    @id
-  status          String    @id
-  createdAt       DateTime  @default(now())
+  channels        Channel_User[]
+  achievements    Achievement_User[]
+  messages        Message[]
 }
 
 model GameResult {
-  id              String    @id @default(uuid())
-  winnerId        String    @id
-  loserId         String    @id
+  id              Int       @id @default(autoincrement())
   score           Int
   isLadder        Boolean
+  winnerId        Int    
+  loserId         Int    
   createdAt       DateTime  @default(now())
+
+  winner          User      @relation("WinLog", fields: [winnerId], references: [id]) 
+  loser           User      @relation("LoseLog", fields: [loserId], references: [id])
 }
 
-model Achievement {
-  id              String    @id @default(uuid())
-  name            String
+model FollowUser {
+  id              Int       @id @default(autoincrement())
+  followerId      Int       
+  followeeId      Int       
+  createdAt       DateTime  @default(now())
+
+  follewer        User      @relation("Follower", fields: [followerId], references: [id])
+  follewee        User      @relation("Followee", fields: [followeeId], references: [id])
 }
 
-model Achievement_User {
-  id              String    @id @default(uuid())
-  userId          String    @id
-  achievementId   String    @id
+model BlockUser {
+  id              Int       @id @default(autoincrement())
+  blockerId       Int       
+  blockedId       Int       
   createdAt       DateTime  @default(now())
+
+  blocker         User      @relation("Blocker", fields: [blockerId], references: [id])
+  blocked         User      @relation("Blocked", fields: [blockedId], references: [id])
 }
 
 model Channel {
-  id              String    @id @default(uuid())
+  id              Int       @id @default(autoincrement())
+  title           String
+  channelCode     String    @unique
+  password        String
+  idPublic        Boolean
+  isDm            Boolean
   createdAt       DateTime  @default(now())
+  updatedAt       DateTime
+  deletedAt       DateTime 
+
+  users           Channel_User[]
+  messages        Message[]
+}
+
+model Channel_User {
+  id              Int       @id @default(autoincrement())
+  channelId       Int       
+  userId          Int       
+  userType        Int 
+  status          Int
+  createdAt       DateTime  @default(now())
+
+  channel         Channel   @relation(fields: [channelId], references: [id])
+  user            User      @relation(fields: [userId], references: [id])
+}
+
+model Message {
+  id              Int       @id @default(autoincrement())
+  senderId        Int       
+  channelId       Int       
+  text            String
+  createdAt       DateTime  @default(now())
+
+  sender          User      @relation(fields: [senderId], references: [id])
+  channel         Channel   @relation(fields: [channelId], references: [id])
+}
+
+model Achievement {
+  id              Int       @id @default(autoincrement())
+  name            String
+  description     String
+
+  users           Achievement_User[]
+}
+
+model Achievement_User {
+  id              Int         @id @default(autoincrement())
+  userId          Int       
+  achievementId   Int       
+  createdAt       DateTime    @default(now())
+
+  achievement     Achievement @relation(fields: [achievementId], references: [id])
+  user            User        @relation(fields: [userId], references: [id])
 }
 
