@@ -55,5 +55,5 @@
     "identity-obj-proxy": "^3.0.0",
     "prettier": "^2.8.4"
   },
-  "packageManager": "yarn@3.1.1"
+  "packageManager": "yarn@3.4.1"
 }
