@@ -22,7 +22,7 @@ export default function Root() {
           <Link to="/channel">Channel</Link>
         </li>
         <li>
-          <Link to="/profile">Profile</Link>
+          <Link to="/profile/1">Profile</Link>
         </li>
         <li>
           <Link to="/setting">Setting</Link>

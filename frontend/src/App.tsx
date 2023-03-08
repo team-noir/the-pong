@@ -9,6 +9,7 @@ import GamePage from 'pages/GamePage';
 import ChannelPage from 'pages/ChannelPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
+import { loader as profileLoader } from 'pages/ProfilePage';
 
 export const routerConfig = [
   {
@@ -37,8 +38,9 @@ export const routerConfig = [
         element: <ChannelPage />,
       },
       {
-        path: '/profile',
+        path: '/profile/:userId',
         element: <ProfilePage />,
+        loader: profileLoader,
       },
       {
         path: '/setting',

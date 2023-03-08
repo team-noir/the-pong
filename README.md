@@ -18,6 +18,7 @@ $ docker compose down --rmi all --volumes --remove-orphans
 ```
 
 ## Development
+
 ```shell
-$ docker-compose -f docker-compose-dev-frontend.yml up -d --build
+$ docker compose -f docker-compose-dev-frontend.yml up -d --build
 ```
