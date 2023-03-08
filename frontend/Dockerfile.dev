@@ -1,0 +1,14 @@
+FROM node:alpine
+
+EXPOSE 3000
+WORKDIR /usr/src/app
+
+COPY package.json ./
+RUN yarn set version berry
+RUN yarn plugin import typescript
+COPY yarn.lock .yarn .yarnrc.yml ./
+RUN yarn install
+
+COPY ./ ./
+
+ENTRYPOINT ["yarn", "start"]
