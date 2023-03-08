@@ -2,17 +2,21 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { App, routerConfig } from 'App';
+import { App, routes } from 'App';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 
 test('메뉴에 있는 페이지들 렌더링', async () => {
-  render(<App />);
+  const route = '/';
+
+  const router = await createMemoryRouter(routes(true), {
+    initialEntries: [route],
+  });
+
+  render(<RouterProvider router={router} />);
   const user = userEvent.setup();
 
   expect(screen.getByText('MainPage')).toBeInTheDocument();
 
-  await user.click(screen.getByText(/login/i));
-  expect(screen.getByText(/LoginPage/i)).toBeInTheDocument();
   await user.click(screen.getByText(/On Boarding/i));
   expect(screen.getByText(/OnBoardingPage/i)).toBeInTheDocument();
   await user.click(screen.getByText(/game/i));
@@ -28,7 +32,7 @@ test('메뉴에 있는 페이지들 렌더링', async () => {
 test('존재하지 않는 루트에 대한 에러 페이지 렌더링', () => {
   const badRoute = '/some/bad/route';
 
-  const router = createMemoryRouter(routerConfig, {
+  const router = createMemoryRouter(routes(true), {
     initialEntries: [badRoute],
   });
 
