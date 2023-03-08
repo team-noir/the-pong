@@ -2499,6 +2499,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@testing-library/dom@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "@testing-library/dom@npm:9.0.0"
+  dependencies:
+    "@babel/code-frame": ^7.10.4
+    "@babel/runtime": ^7.12.5
+    "@types/aria-query": ^5.0.1
+    aria-query: ^5.0.0
+    chalk: ^4.1.0
+    dom-accessibility-api: ^0.5.9
+    lz-string: ^1.4.4
+    pretty-format: ^27.0.2
+  checksum: 5381bf9438f0ee35f795e7f9b203564aa455e7cd838b6677084c82dd56396779c38cc49ddffed4e57a8bcc3c62b4bc96ea684bb4b24d13655152db745327b2cd
+  languageName: node
+  linkType: hard
+
 "@testing-library/jest-dom@npm:^5.16.5":
   version: 5.16.5
   resolution: "@testing-library/jest-dom@npm:5.16.5"
@@ -12420,6 +12436,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "the-pong@workspace:."
   dependencies:
+    "@testing-library/dom": ^9.0.0
     "@testing-library/jest-dom": ^5.16.5
     "@testing-library/react": ^13.0.0
     "@testing-library/user-event": ^14
@@ -12680,11 +12697,11 @@ __metadata:
 
 "typescript@patch:typescript@^4.4.2#~builtin<compat/typescript>":
   version: 4.9.5
-  resolution: "typescript@patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=23ec76"
+  resolution: "typescript@patch:typescript@npm%3A4.9.5#~builtin<compat/typescript>::version=4.9.5&hash=ad5954"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: ab417a2f398380c90a6cf5a5f74badd17866adf57f1165617d6a551f059c3ba0a3e4da0d147b3ac5681db9ac76a303c5876394b13b3de75fdd5b1eaa06181c9d
+  checksum: 8f6260acc86b56bfdda6004bc53f32ea548f543e8baef7071c8e34d29d292f3e375c8416556c8de10b24deef6933cd1c16a8233dc84a3dd43a13a13265d0faab
   languageName: node
   linkType: hard
 
