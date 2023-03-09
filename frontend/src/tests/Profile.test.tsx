@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
-import { routerConfig } from 'App';
+import { routes } from 'App';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import Profile from 'components/organisms/Profile';
 
@@ -22,7 +22,7 @@ describe('Router - ProfilePage', () => {
   test('/profile/:userId로 접근하면 해당 회원의 프로필 페이지를 보여준다', async () => {
     const route = '/profile/1';
 
-    const router = createMemoryRouter(routerConfig, {
+    const router = createMemoryRouter(routes(true), {
       initialEntries: [route],
     });
 

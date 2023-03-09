@@ -1,7 +1,15 @@
 import React from 'react';
+import { useLogin } from 'hooks/useStore';
 import { Link, Outlet } from 'react-router-dom';
+import Button from 'components/atoms/Button';
 
 export default function Root() {
+  const logout = useLogin((state) => state.logout);
+
+  const handleLogout = (e: React.MouseEvent<HTMLElement>) => {
+    logout();
+  };
+
   return (
     <>
       <nav>
@@ -27,6 +35,9 @@ export default function Root() {
         <li>
           <Link to="/setting">Setting</Link>
         </li>
+        <Button type="button" onClick={handleLogout}>
+          Logout
+        </Button>
       </nav>
       {/* Header */}
       {/* Footer */}

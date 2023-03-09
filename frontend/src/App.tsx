@@ -1,5 +1,10 @@
 import React from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useRoutes,
+  Navigate,
+} from 'react-router-dom';
 import LoginPage from 'pages/LoginPage';
 import OnBoardingPage from 'pages/OnBoardingPage';
 import Root from 'pages/Root';
@@ -10,11 +15,17 @@ import ChannelPage from 'pages/ChannelPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
 import { loader as profileLoader } from 'pages/ProfilePage';
+import { useLogin } from 'hooks/useStore';
 
-export const routerConfig = [
+export const routes = (isLoggedin: boolean) => [
+  {
+    path: '/login',
+    element: !isLoggedin ? <LoginPage /> : <Navigate to="/" />,
+    errorElement: <ErrorPage />,
+  },
   {
     path: '/',
-    element: <Root />,
+    element: isLoggedin ? <Root /> : <Navigate to="/login" />,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -22,36 +33,33 @@ export const routerConfig = [
         element: <MainPage />,
       },
       {
-        path: 'login',
-        element: <LoginPage />,
-      },
-      {
-        path: '/on-boarding',
+        path: 'on-boarding',
         element: <OnBoardingPage />,
       },
       {
-        path: '/game',
+        path: 'game',
         element: <GamePage />,
       },
       {
-        path: '/channel',
+        path: 'channel',
         element: <ChannelPage />,
       },
       {
-        path: '/profile/:userId',
+        path: 'profile/:userId',
         element: <ProfilePage />,
         loader: profileLoader,
       },
       {
-        path: '/setting',
+        path: 'setting',
         element: <SettingPage />,
       },
     ],
   },
 ];
 
-const router = createBrowserRouter(routerConfig);
-
 export function App() {
+  const isLoggedIn = useLogin((state) => state.isLogin);
+  const router = createBrowserRouter(routes(isLoggedIn));
+
   return <RouterProvider router={router} />;
 }
