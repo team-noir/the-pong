@@ -16,3 +16,9 @@ $ docker compose rm
 # Stop and remove running containers, networks, images, and volumes
 $ docker compose down --rmi all --volumes --remove-orphans
 ```
+
+## Development
+
+```shell
+$ docker compose -f docker-compose-dev-frontend.yml up -d --build
+```

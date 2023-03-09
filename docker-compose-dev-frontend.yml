@@ -1,0 +1,14 @@
+version: '3'
+
+services:
+  frontend:
+    container_name: the-pong_frontend_dev
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - ./frontend/src:/usr/src/app/src:ro
+      - ./frontend/src/tests/__snapshots__:/usr/src/app/src/tests/__snapshots__:rw

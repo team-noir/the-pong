@@ -1,4 +1,9 @@
 {
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true
+  },
   "typescript.tsdk": "./the-pong/frontend/.yarn/sdks/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
   "prettier.prettierPath": "./the-pong/frontend/.yarn/sdks/prettier/index.js"
 }
