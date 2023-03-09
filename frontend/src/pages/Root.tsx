@@ -30,6 +30,9 @@ export default function Root() {
           <Link to="/channel">Channel</Link>
         </li>
         <li>
+          <Link to="/following">Following</Link>
+        </li>
+        <li>
           <Link to="/profile/1">Profile</Link>
         </li>
         <li>

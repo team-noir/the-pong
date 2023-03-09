@@ -1,0 +1,13 @@
+.ul {
+  list-style: none;
+}
+
+.li {
+  margin-bottom: 16px;
+}
+
+.img {
+  max-width: 52px;
+  max-height: 52px;
+  border-radius: 50%;
+}

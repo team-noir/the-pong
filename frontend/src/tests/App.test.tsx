@@ -25,6 +25,8 @@ test('메뉴에 있는 페이지들 렌더링', async () => {
   expect(screen.getByText(/GamePage/i)).toBeInTheDocument();
   await waitFor(async () => user.click(screen.getByText(/channel/i)));
   expect(screen.getByText(/ChannelPage/i)).toBeInTheDocument();
+  await waitFor(async () => user.click(screen.getByText(/following/i)));
+  screen.getByText(/FollowingPage/i);
   await waitFor(async () => user.click(screen.getByText(/profile/i)));
   expect(screen.getByText(/ProfilePage/i)).toBeInTheDocument();
   await waitFor(async () => user.click(screen.getByText(/setting/i)));
