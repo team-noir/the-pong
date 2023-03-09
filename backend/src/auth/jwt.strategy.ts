@@ -13,7 +13,7 @@ const fromAuthCookie = function () {
 }
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 	constructor() {
 		super({
 			jwtFromRequest: fromAuthCookie(),
@@ -23,6 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	}
 
 	async validate(payload: any) {
-		return { userId: payload.sub, nickname: payload.nickname };
+		const user = { id: payload.id, username: payload.username }
+		return user;
 	}
 }

@@ -17,4 +17,10 @@ export class UsersController {
 		await res.cookie('Authorization', access_token);
 		return req.user;
 	}
+
+	@Get('whoami')
+	@UseGuards(AuthGuard('jwt'))
+	async whoami(@Req() req) {
+		return req.user;
+	}
 }

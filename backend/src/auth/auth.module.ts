@@ -3,6 +3,7 @@ import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { FTStrategy } from './ft.strategy';
+import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { forwardRef } from '@nestjs/common';
 
@@ -17,7 +18,7 @@ import { forwardRef } from '@nestjs/common';
 			})
 		  }),
 	],
-	providers: [AuthService, FTStrategy],
+	providers: [AuthService, FTStrategy, JwtStrategy],
 	exports: [AuthService, JwtModule]
 })
 export class AuthModule {}
