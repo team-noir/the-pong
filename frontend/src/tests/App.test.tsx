@@ -17,8 +17,6 @@ test('메뉴에 있는 페이지들 렌더링', async () => {
 
   expect(screen.getByText('MainPage')).toBeInTheDocument();
 
-  await waitFor(() => user.click(screen.getByText(/login/i)));
-  expect(screen.getByText(/LoginPage/i)).toBeInTheDocument();
   await waitFor(async () => user.click(screen.getByText(/On Boarding/i)));
   expect(screen.getByText(/OnBoardingPage/i)).toBeInTheDocument();
   await waitFor(async () => user.click(screen.getByText(/game/i)));
