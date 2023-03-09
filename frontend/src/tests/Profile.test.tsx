@@ -28,7 +28,7 @@ describe('Router - ProfilePage', () => {
 
     render(<RouterProvider router={router} />);
 
-    await waitFor(() => screen.getByText('ProfilePage'));
+    await screen.findByText('ProfilePage');
     screen.getByTestId('1');
   });
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { App, routes } from 'App';
@@ -17,15 +17,17 @@ test('메뉴에 있는 페이지들 렌더링', async () => {
 
   expect(screen.getByText('MainPage')).toBeInTheDocument();
 
-  await user.click(screen.getByText(/On Boarding/i));
+  await waitFor(() => user.click(screen.getByText(/login/i)));
+  expect(screen.getByText(/LoginPage/i)).toBeInTheDocument();
+  await waitFor(async () => user.click(screen.getByText(/On Boarding/i)));
   expect(screen.getByText(/OnBoardingPage/i)).toBeInTheDocument();
-  await user.click(screen.getByText(/game/i));
+  await waitFor(async () => user.click(screen.getByText(/game/i)));
   expect(screen.getByText(/GamePage/i)).toBeInTheDocument();
-  await user.click(screen.getByText(/channel/i));
+  await waitFor(async () => user.click(screen.getByText(/channel/i)));
   expect(screen.getByText(/ChannelPage/i)).toBeInTheDocument();
-  await user.click(screen.getByText(/profile/i));
+  await waitFor(async () => user.click(screen.getByText(/profile/i)));
   expect(screen.getByText(/ProfilePage/i)).toBeInTheDocument();
-  await user.click(screen.getByText(/setting/i));
+  await waitFor(async () => user.click(screen.getByText(/setting/i)));
   expect(screen.getByText(/SettingPage/i)).toBeInTheDocument();
 });
 
