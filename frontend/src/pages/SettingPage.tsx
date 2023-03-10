@@ -1,5 +1,10 @@
-import React from 'react';
+import Setting from 'components/organisms/Setting';
 
 export default function SettingPage() {
-  return <div>SettingPage</div>;
+  return (
+    <>
+      <h1>SettingPage</h1>
+      <Setting />
+    </>
+  );
 }
