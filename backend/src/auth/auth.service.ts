@@ -19,7 +19,7 @@ export class AuthService {
 			id: user.ftId,
 			username: user.ftUsername,
 		};
-		return { access_token: this.jwtService.sign(payload) };
+		return { jwtToken: this.jwtService.sign(payload) };
 	}
 }
 

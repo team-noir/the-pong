@@ -6,11 +6,13 @@ import { FTStrategy } from './ft.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { forwardRef } from '@nestjs/common';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 @Module({
 	imports: [
 		forwardRef(() => UsersModule), 
 		PassportModule,
+		PrismaModule,
 		JwtModule.registerAsync({
 			useFactory: () => ({
 				secret: process.env.JWT_SECRET,
@@ -19,6 +21,6 @@ import { forwardRef } from '@nestjs/common';
 		  }),
 	],
 	providers: [AuthService, FTStrategy, JwtStrategy],
-	exports: [AuthService, JwtModule]
+	exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

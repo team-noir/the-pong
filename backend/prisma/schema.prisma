@@ -11,19 +11,19 @@ datasource db {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  imageUrl        String
-  nickname        String    @unique
-  rank            Int
-  isTwoFactor     Boolean
-  ftId            String
-  ftUsername      String
+  id              Int         @id @default(autoincrement())
+  imageUrl        String?
+  nickname        String?     @unique
+  rank            Int         @default(0)
+  isTwoFactor     Boolean     @default(false)
+  ftId            String      @unique
+  ftUsername      String      @unique
   ftDisplayName   String
-  ftAccessToken   String
+  ftAccessToken   String      @unique
   ftRefreshToken  String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime
-  deletedAt       DateTime
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime?
+  deletedAt       DateTime?
 
   winLogs         GameResult[]  @relation("WinLog")
   loseLogs        GameResult[]  @relation("LoseLog")
@@ -75,12 +75,12 @@ model Channel {
   id              Int       @id @default(autoincrement())
   title           String
   channelCode     String    @unique
-  password        String
+  password        String?
   idPublic        Boolean
   isDm            Boolean
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime
-  deletedAt       DateTime 
+  updatedAt       DateTime?
+  deletedAt       DateTime?
 
   users           Channel_User[]
   messages        Message[]

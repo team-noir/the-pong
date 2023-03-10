@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class UsersService {
+	constructor(
+		private prismaService: PrismaService
+	) {}
+
 	login(): string {
 		return 'Login';
 	}
@@ -10,14 +15,7 @@ export class UsersService {
 		return 'auth';
 	}
 
-	findFtUser(ftId: string) {
-
-		/*
-		prisma.user.findUnique({
-			where: userWhereUniqueInput,
-		});
-		*/
-
-		return true;
+	async findFtUser(ftId: string) {
+		return await this.prismaService.user.findUnique({ where: { ftId } });
 	}
 }

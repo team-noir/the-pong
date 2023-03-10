@@ -13,9 +13,18 @@ export class UsersController {
 	@Get('42/return')
 	@UseGuards(AuthGuard('42'))
 	async auth(@Req() req, @Res({ passthrough: true }) res) {
-		const access_token = await (await this.authService.login(req.user)).access_token;
-		await res.cookie('Authorization', access_token);
-		return req.user;
+		const jwtToken = await (await this.authService.login(req.user)).jwtToken;
+		await res.cookie('Authorization', jwtToken);
+		const user = {
+			ftId: req.user.ftId,
+			ftUsername: req.user.ftUsername,
+			ftDisplayName: req.user.ftDisplayName,
+			nickname: req.user.nickname,
+			imageUrl: req.user.imageUrl,
+			rank: req.user.rank,
+			isTwoFactor: req.user.isTwoFactor,
+		};
+		return user;
 	}
 
 	@Get('whoami')
