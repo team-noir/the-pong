@@ -25,11 +25,7 @@ export default function ProfilePage() {
   return (
     <>
       <div>ProfilePage</div>
-      <Profile
-        id={user.id}
-        nickname="nickname"
-        profileImageUrl="https://placekitten.com/800/800"
-      />
+      <Profile id={user.id} />
     </>
   );
 }
