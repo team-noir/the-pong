@@ -24,6 +24,8 @@ describe('Router - Nav에 있는 페이지들 렌더링', () => {
     screen.getByText(/GamePage/i);
     await waitFor(async () => user.click(screen.getByText(/channel/i)));
     screen.getByText(/ChannelPage/i);
+    await waitFor(async () => user.click(screen.getByText(/following/i)));
+    screen.getByText(/FollowingPage/i);
     await waitFor(async () => user.click(screen.getByText(/profile/i)));
     screen.getByText(/ProfilePage/i);
     await waitFor(async () => user.click(screen.getByText(/setting/i)));
