@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import Button from 'components/atoms/Button';
 import styles from 'assets/styles/FileInputWithImage.module.css';
 
@@ -34,6 +34,9 @@ export default function FileInputWithImage({
     e: React.MouseEvent<HTMLElement, MouseEvent>
   ) => {
     URL.revokeObjectURL(imagePreviewUrl);
+    if (fileInput.current) {
+      fileInput.current.value = '';
+    }
     onClickRemove();
     setImagePreviewUrl('');
   };
