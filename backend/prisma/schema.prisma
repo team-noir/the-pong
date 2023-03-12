@@ -11,32 +11,32 @@ datasource db {
 }
 
 model User {
-  id              Int         @id @default(autoincrement())
-  imageUrl        String?
-  nickname        String?     @unique
-  rank            Int         @default(0)
-  isTwoFactor     Boolean     @default(false)
-  ftId            String      @unique
-  ftUsername      String      @unique
-  ftDisplayName   String
-  ftAccessToken   String      @unique
-  ftRefreshToken  String
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime?
-  deletedAt       DateTime?
+  id                Int           @id @default(autoincrement())
+  imageUrl          String?
+  nickname          String?       @unique
+  rank              Int           @default(0)
+  isTwoFactor       Boolean       @default(false)
+  ftId              String        @unique
+  ftUsername        String?        
+  ftAccessToken     String?       @unique
+  ftRefreshToken    String?       @unique
+  ftTokenExpiresAt  DateTime?    
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime?
+  deletedAt         DateTime?
 
-  winLogs         GameResult[]  @relation("WinLog")
-  loseLogs        GameResult[]  @relation("LoseLog")
+  winLogs           GameResult[]  @relation("WinLog")
+  loseLogs          GameResult[]  @relation("LoseLog")
 
-  followers       FollowUser[]  @relation("Follower")
-  followees       FollowUser[]  @relation("Followee")
+  followers         FollowUser[]  @relation("Follower")
+  followees         FollowUser[]  @relation("Followee")
 
-  blockers        BlockUser[]   @relation("Blocker")
-  blockeds        BlockUser[]   @relation("Blocked")
+  blockers          BlockUser[]   @relation("Blocker")
+  blockeds          BlockUser[]   @relation("Blocked")
 
-  channels        Channel_User[]
-  achievements    Achievement_User[]
-  messages        Message[]
+  channels          Channel_User[]
+  achievements      Achievement_User[]
+  messages          Message[]
 }
 
 model GameResult {

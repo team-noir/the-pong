@@ -1,4 +1,4 @@
-import { Strategy } from 'passport-42';
+import { Strategy, Profile, VerifyCallback } from 'passport-42';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
@@ -11,31 +11,39 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
 		private authService: AuthService,
 		private prismaService: PrismaService
 	) {
-		super({
+		var options = {
 			clientID: process.env.FT_UID,
 			clientSecret: process.env.FT_SECRET,
 			callbackURL: process.env.FT_CB,
-		});
+			passReqToCallback: true,
+		};
+		super(options);
 	}
 
 	async validate(
+		request: Object,
 		accessToken: string, 
 		refreshToken: string, 
-		profile: any, 
-		done: any
+		profile: Profile, 
+		done: VerifyCallback
 	): Promise<any> {
-		const { id, username, displayName } = profile;
-		var user: User = await this.authService.validateUser(id);
-
-		if (!user) {
-			user = await this.prismaService.user.create({data: {
+		const { id, username } = profile;
+		const user = await this.prismaService.user.upsert({
+			create: {
 				ftId: id,
 				ftUsername: username,
-				ftDisplayName: displayName,
 				ftAccessToken: accessToken,
 				ftRefreshToken: refreshToken,
-			}});
-		}
+			},
+			update: {
+				ftAccessToken: accessToken,
+				ftRefreshToken: refreshToken,
+			},
+			where: {
+				ftId: id
+			}
+		})
+
 		done(null, user);
 	}
 }

@@ -1,10 +1,15 @@
-import { Controller, Get, Post, Res, Req, Session, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Res, Req, Session, Param, UseGuards, } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from './auth/auth.service';
+import { Request, Response } from 'express';
 
 @Controller('users')
 export class UsersController {
-	constructor(private authService: AuthService) {}
+	constructor(
+		private authService: AuthService,
+		private jwtService: JwtService,
+	) {}
 
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
@@ -13,18 +18,14 @@ export class UsersController {
 	@Get('42/return')
 	@UseGuards(AuthGuard('42'))
 	async auth(@Req() req, @Res({ passthrough: true }) res) {
-		const jwtToken = await (await this.authService.login(req.user)).jwtToken;
-		await res.cookie('Authorization', jwtToken);
-		const user = {
-			ftId: req.user.ftId,
-			ftUsername: req.user.ftUsername,
-			ftDisplayName: req.user.ftDisplayName,
-			nickname: req.user.nickname,
-			imageUrl: req.user.imageUrl,
-			rank: req.user.rank,
-			isTwoFactor: req.user.isTwoFactor,
-		};
-		return user;
+		this.authService.refreshToken(req.user.ftRefreshToken);
+		const jwt = this.jwtService.sign({ 
+			id: req.user.id, 
+			username: req.user.username 
+		});
+		await res.cookie('Authorization', jwt);
+		
+		return { id : req.user.id };
 	}
 
 	@Get('whoami')

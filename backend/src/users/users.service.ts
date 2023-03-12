@@ -14,8 +14,4 @@ export class UsersService {
 	auth(): string {
 		return 'auth';
 	}
-
-	async findFtUser(ftId: string) {
-		return await this.prismaService.user.findUnique({ where: { ftId } });
-	}
 }
