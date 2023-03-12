@@ -5,7 +5,7 @@ import Message from 'components/atoms/Message';
 
 interface Props {
   id: string;
-  label: string;
+  label?: string;
   value: string;
   placeholder?: string;
   setValue: (value: string) => void;
@@ -44,7 +44,7 @@ export default function TextInputWithMessage({
 
   return (
     <>
-      <Label id={id} label={label} />
+      {label && <Label id={id} label={label} />}
       <TextInput
         id={id}
         value={value}
