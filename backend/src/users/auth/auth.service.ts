@@ -26,13 +26,16 @@ export class AuthService {
 		refresh.requestNewAccessToken(
 			'refresh-42', 
 			refreshToken, 
-			function(err, newAccessToken, newRefreshToken, results) {
-				prisma.user.update({
+			async (err, newAccessToken, newRefreshToken, results) => {
+				const atExpiresAt = new Date((results.created_at + results.expires_in) * 1000);
+				const rtExpiresAt = new Date((results.created_at + results.expires_in * 84) * 1000);
+				const result = await prisma.user.update({
 					where: { ftRefreshToken: refreshToken },
 					data: { 
 						ftAccessToken: newAccessToken,
 						ftRefreshToken: newRefreshToken,
-						ftTokenExpiresAt: results.created_at + results.expires_in
+						ftATExpiresAt: atExpiresAt,
+						ftRTExpiresAt: rtExpiresAt
 					}
 				});
 			}

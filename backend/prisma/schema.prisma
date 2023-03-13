@@ -20,7 +20,8 @@ model User {
   ftUsername        String?        
   ftAccessToken     String?       @unique
   ftRefreshToken    String?       @unique
-  ftTokenExpiresAt  DateTime?    
+  ftATExpiresAt     DateTime?    
+  ftRTExpiresAt     DateTime?    
   createdAt         DateTime      @default(now())
   updatedAt         DateTime?
   deletedAt         DateTime?

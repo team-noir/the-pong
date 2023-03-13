@@ -3,6 +3,8 @@ import { JwtService } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth/auth.service';
 import { Request, Response } from 'express';
+import { FtOauthGuard } from './guards/ft-oauth.guard';
+import { AuthenticatedGuard } from './guards/authenticated.guard';
 
 @Controller('users')
 export class UsersController {
@@ -12,11 +14,11 @@ export class UsersController {
 	) {}
 
 	@Get('42')
-	@UseGuards(AuthGuard('42'))
+	@UseGuards(FtOauthGuard)
 	async ftAuth() {}
 
 	@Get('42/return')
-	@UseGuards(AuthGuard('42'))
+	@UseGuards(FtOauthGuard)
 	async auth(@Req() req, @Res({ passthrough: true }) res) {
 		this.authService.refreshToken(req.user.ftRefreshToken);
 		const jwt = this.jwtService.sign({ 
@@ -24,12 +26,12 @@ export class UsersController {
 			username: req.user.username 
 		});
 		await res.cookie('Authorization', jwt);
-		
+
 		return { id : req.user.id };
 	}
 
 	@Get('whoami')
-	@UseGuards(AuthGuard('jwt'))
+	@UseGuards(AuthenticatedGuard)
 	async whoami(@Req() req) {
 		return req.user;
 	}
