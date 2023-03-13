@@ -1,5 +1,10 @@
-import React from 'react';
+import OnBoarding from 'components/organisms/OnBoarding';
 
 export default function OnBoardingPage() {
-  return <div>OnBoardingPage</div>;
+  return (
+    <>
+      <div>OnBoardingPage</div>
+      <OnBoarding />
+    </>
+  );
 }

@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import Button from 'components/atoms/Button';
 import FileInputWithImage from 'components/molecule/FileInputWithImage';
+import { validateNickname } from 'utils/validatorUtils';
 
 interface UserForm {
   nickname: string;
@@ -29,12 +30,6 @@ export default function Setting() {
       nickname: '닉네임',
     });
   }, []);
-
-  const validateNickname = (nickname: string) => {
-    // 2자 이상 16자 이하, 영어 또는 숫자 또는 한글
-    const nicknameRegex = /^(?=.*[a-z0-9가-힣])[a-z0-9가-힣]{2,16}$/;
-    return nicknameRegex.test(nickname);
-  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
