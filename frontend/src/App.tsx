@@ -1,8 +1,6 @@
-import React from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
-  useRoutes,
   Navigate,
 } from 'react-router-dom';
 import LoginPage from 'pages/LoginPage';
@@ -18,6 +16,9 @@ import SettingPage from 'pages/SettingPage';
 import SearchResultPage from 'pages/SearchResultPage';
 import { loader as profileLoader } from 'pages/ProfilePage';
 import { useLogin } from 'hooks/useStore';
+import SettingProfile from 'components/organisms/SettingProfile';
+import Setting2FA from 'components/organisms/Setting2FA';
+import SettingBlocks from 'components/organisms/SettingBlocks';
 
 export const routes = (isLoggedin: boolean) => [
   {
@@ -58,6 +59,20 @@ export const routes = (isLoggedin: boolean) => [
       {
         path: 'setting',
         element: <SettingPage />,
+        children: [
+          {
+            path: 'profile',
+            element: <SettingProfile />,
+          },
+          {
+            path: '2fa',
+            element: <Setting2FA />,
+          },
+          {
+            path: 'blocks',
+            element: <SettingBlocks />,
+          },
+        ],
       },
       {
         path: 'search',

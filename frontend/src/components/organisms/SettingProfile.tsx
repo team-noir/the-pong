@@ -9,7 +9,7 @@ interface UserForm {
   imageFile: File | null;
 }
 
-export default function Setting() {
+export default function SettingProfile() {
   const dummyUser = {
     id: 1,
     profileimageUrl: 'https://placekitten.com/800/800',
@@ -50,7 +50,7 @@ export default function Setting() {
 
   return (
     <>
-      <h1>Setting</h1>
+      <h1>Setting profile</h1>
       <form>
         <FileInputWithImage
           imageUrl={dummyUser.profileimageUrl}
