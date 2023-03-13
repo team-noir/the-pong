@@ -20,7 +20,7 @@ export default function Setting2FA() {
       <h1>Setting2FA</h1>
       <h2>Two-Factor Authentication (2FA)</h2>
       <p>
-        2단계 보안 인증을 설정하고 계정을 더욱 강력하게 보호하세요.{' '}
+        2단계 보안 인증을 설정하고 계정을 더욱 강력하게 보호하세요.
         <a href="">더 알아보기</a>
       </p>
       {!isTwoFactor && <Button type="button">설정하기</Button>}
