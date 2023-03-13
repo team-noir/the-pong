@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { UsersService } from '../users.service';
 import * as refresh from 'passport-oauth2-refresh';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Strategy } from 'passport-42';
-import { Response } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -27,15 +25,15 @@ export class AuthService {
 			'refresh-42', 
 			refreshToken, 
 			async (err, newAccessToken, newRefreshToken, results) => {
-				const atExpiresAt = new Date((results.created_at + results.expires_in) * 1000);
-				const rtExpiresAt = new Date((results.created_at + results.expires_in * 84) * 1000);
-				const result = await prisma.user.update({
+				const accessExpiresAt = new Date((results.created_at + results.expires_in) * 1000);
+				const refreshExpiresAt = new Date((results.created_at + results.expires_in * 84) * 1000);
+				await prisma.user.update({
 					where: { ftRefreshToken: refreshToken },
 					data: { 
 						ftAccessToken: newAccessToken,
 						ftRefreshToken: newRefreshToken,
-						ftATExpiresAt: atExpiresAt,
-						ftRTExpiresAt: rtExpiresAt
+						ftAccessExpiresAt: accessExpiresAt,
+						ftRefreshExpiresAt: refreshExpiresAt
 					}
 				});
 			}

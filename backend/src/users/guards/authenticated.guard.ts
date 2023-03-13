@@ -22,9 +22,9 @@ export class AuthenticatedGuard implements CanActivate {
     const user = await this.prismaService.user.findUnique({ where: { id: userId }});
     const now: Date = new Date(Date.now());
 
-    if (now > user.ftATExpiresAt && now < user.ftRTExpiresAt)
+    if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt)
       this.authService.refreshToken(user.ftRefreshToken);
-    else if (now > user.ftRTExpiresAt)
+    else if (now > user.ftRefreshExpiresAt)
       return false;
     return true;
   }

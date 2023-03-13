@@ -1,14 +1,11 @@
 import { Strategy, Profile, VerifyCallback } from 'passport-42';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
-import { User } from '@prisma/client';
 
 @Injectable()
 export class FTStrategy extends PassportStrategy(Strategy, '42') {
 	constructor(
-		private authService: AuthService,
 		private prismaService: PrismaService
 	) {
 		var options = {
