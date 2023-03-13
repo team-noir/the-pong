@@ -6,7 +6,7 @@ interface Props {
   users: UserType[] | null;
 }
 
-export default function FollowingList({ users }: Props) {
+export default function SearchResultList({ users }: Props) {
   return (
     <ul className={styles.ul}>
       {users &&
