@@ -5,4 +5,5 @@ export interface UserType {
   profileImageUrl?: string;
   createdAt?: string;
   updatedAt?: string;
+  status?: 'on' | 'off' | 'game';
 }
