@@ -11,32 +11,30 @@ datasource db {
 }
 
 model User {
-  id              Int       @id @default(autoincrement())
-  imageUrl        String
-  nickname        String    @unique
-  rank            Int
-  isTwoFactor     Boolean
-  ftId            String
-  ftUsername      String
-  ftDisplayName   String
-  ftAccessToken   String
-  ftRefreshToken  String
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime
-  deletedAt       DateTime
+  id                    Int           @id @default(autoincrement())
+  imageUrl              String?
+  nickname              String?       @unique
+  rank                  Int           @default(0)
+  isTwoFactor           Boolean       @default(false)
+  ftId                  String        @unique
+  ftUsername            String?        
+  ftAccessToken         String?       @unique
+  ftRefreshToken        String?       @unique
+  ftAccessExpiresAt     DateTime?    
+  ftRefreshExpiresAt    DateTime?    
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime?
+  deletedAt             DateTime?
 
-  winLogs         GameResult[]  @relation("WinLog")
-  loseLogs        GameResult[]  @relation("LoseLog")
-
-  followers       FollowUser[]  @relation("Follower")
-  followees       FollowUser[]  @relation("Followee")
-
-  blockers        BlockUser[]   @relation("Blocker")
-  blockeds        BlockUser[]   @relation("Blocked")
-
-  channels        Channel_User[]
-  achievements    Achievement_User[]
-  messages        Message[]
+  winLogs               GameResult[]  @relation("WinLog")
+  loseLogs              GameResult[]  @relation("LoseLog")
+  followers             FollowUser[]  @relation("Follower")
+  followees             FollowUser[]  @relation("Followee")
+  blockers              BlockUser[]   @relation("Blocker")
+  blockeds              BlockUser[]   @relation("Blocked")
+  channels              Channel_User[]
+  achievements          Achievement_User[]
+  messages              Message[]
 }
 
 model GameResult {
@@ -75,12 +73,12 @@ model Channel {
   id              Int       @id @default(autoincrement())
   title           String
   channelCode     String    @unique
-  password        String
+  password        String?
   idPublic        Boolean
   isDm            Boolean
   createdAt       DateTime  @default(now())
-  updatedAt       DateTime
-  deletedAt       DateTime 
+  updatedAt       DateTime?
+  deletedAt       DateTime?
 
   users           Channel_User[]
   messages        Message[]
