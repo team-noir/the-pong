@@ -1,6 +1,7 @@
 import React from 'react';
 import { useLogin } from 'hooks/useStore';
 import { Link, Outlet } from 'react-router-dom';
+import SearchBar from 'components/molecule/SearchBar';
 import Button from 'components/atoms/Button';
 
 export default function Root() {
@@ -13,6 +14,7 @@ export default function Root() {
   return (
     <>
       <nav>
+        <SearchBar />
         <h5>Nav to test</h5>
         <li>
           <Link to="/">Main</Link>
