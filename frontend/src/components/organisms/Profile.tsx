@@ -42,7 +42,12 @@ export default function Profile({ id }: UserType) {
       />
       <p data-testid={id}>{user?.nickname}</p>
       {isMyPage && <Link to="/setting">프로필 수정하기</Link>}
-      {!isMyPage && <Button type="button">팔로우하기</Button>}
+      {!isMyPage && (
+        <div>
+          <Button type="button">팔로우하기</Button>
+          <Button type="button">차단하기</Button>
+        </div>
+      )}
     </>
   );
 }
