@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as refresh from 'passport-oauth2-refresh';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Strategy } from 'passport-42';
+const ONESECOND = 1000;
 
 @Injectable()
 export class AuthService {
@@ -25,8 +26,9 @@ export class AuthService {
 			'refresh-42', 
 			refreshToken, 
 			async (err, newAccessToken, newRefreshToken, results) => {
-				const accessExpiresAt = new Date((results.created_at + results.expires_in) * 1000);
-				const refreshExpiresAt = new Date((results.created_at + results.expires_in * 84) * 1000);
+				const accessExpiresAt = new Date((results.created_at + results.expires_in) * ONESECOND);	// 2 hours later
+				const refreshExpiresAt = new Date((results.created_at + results.expires_in * 84) * ONESECOND);	// 7 days later
+
 				await prisma.user.update({
 					where: { ftRefreshToken: refreshToken },
 					data: { 
