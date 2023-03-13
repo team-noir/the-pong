@@ -1,4 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
+import SearchResult from 'components/organisms/SearchResult';
 
 export default function SearchResultPage() {
   const [searchParams] = useSearchParams();
@@ -6,7 +7,8 @@ export default function SearchResultPage() {
   return (
     <>
       <h1>SearchResultPage</h1>
-      <p>{searchParams.get('q')}</p>
+      <p>검색어: {searchParams.get('q')}</p>
+      <SearchResult />
     </>
   );
 }
