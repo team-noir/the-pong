@@ -6,4 +6,5 @@ export interface UserType {
   createdAt?: string;
   updatedAt?: string;
   status?: 'on' | 'off' | 'game';
+  isTwoFactor?: boolean;
 }
