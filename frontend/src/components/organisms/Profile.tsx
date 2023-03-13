@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { UserType } from 'types/userType';
-import styles from 'assets/styles/Profile.module.css';
 import Button from 'components/atoms/Button';
 import { Link, useParams } from 'react-router-dom';
+import ProfileImage from 'components/atoms/ProfileImage';
 
 const dummyMyData = {
   id: '1',
@@ -35,10 +35,10 @@ export default function Profile({ id }: UserType) {
   return (
     <>
       <h1>Profile</h1>
-      <img
-        src={user?.profileImageUrl}
+      <ProfileImage
+        profileImageUrl={user?.profileImageUrl}
         alt="profile image"
-        className={styles.img}
+        size={320}
       />
       <p data-testid={id}>{user?.nickname}</p>
       {isMyPage && <Link to="/setting">프로필 수정하기</Link>}
