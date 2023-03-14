@@ -220,7 +220,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/chanul/Desktop/BornToCode/r/backend/prisma",
+      "value": "/Users/chanul/Desktop/BornToCode/a/backend/prisma",
       "fromEnvVar": null
     },
     "config": {
