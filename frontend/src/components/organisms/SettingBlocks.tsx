@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import BlocksList from './BlocksList';
 import { UserType } from 'types/userType';
+import styles from 'assets/styles/Blocks.module.css';
+import Button from 'components/atoms/Button';
+import UserList from '../molecule/UserList';
 
 const dummyBlocks: UserType[] = [
   {
@@ -31,10 +33,23 @@ export default function SettingBlocks() {
     setBlockedUsers(dummyBlocks);
   }, []);
 
+  const handleClickUnblock = () => {
+    // TODO: call unblock API
+  };
+
   return (
     <>
       <h1>SettingBlocks</h1>
-      <BlocksList blockedUsers={blockedUsers} />
+      <UserList
+        styles={styles}
+        users={blockedUsers}
+        imageSize={52}
+        buttons={[
+          <Button key="button0" type="button" onClick={handleClickUnblock}>
+            차단 해제
+          </Button>,
+        ]}
+      />
     </>
   );
 }
