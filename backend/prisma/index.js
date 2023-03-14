@@ -220,7 +220,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "/Users/chanul/Desktop/BornToCode/b/backend/prisma",
+      "value": "/Users/chanul/Desktop/BornToCode/g/backend/prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -231,8 +231,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../.env",
-    "schemaEnvPath": "../.env"
+    "rootEnvPath": null
   },
   "relativePath": "",
   "clientVersion": "4.11.0",
