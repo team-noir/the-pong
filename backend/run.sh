@@ -1,3 +1,3 @@
 yarn prisma migrate dev
-yarn prisma generate
+yarn pnpify prisma generate
 yarn start:dev

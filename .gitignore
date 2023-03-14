@@ -195,3 +195,7 @@ sketch
 # Ignore redis binary dump (dump.rdb) files
 
 *.rdb
+
+# prisma build files 
+prisma/*
+!prisma/schema.prisma
