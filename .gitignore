@@ -166,6 +166,14 @@ frontend/.yarn/*
 !frontend/.yarn/sdks
 !frontend/.yarn/versions
 
+backend/.yarn/*
+!backend/.yarn/cache
+!backend/.yarn/patches
+!backend/.yarn/plugins
+!backend/.yarn/releases
+!backend/.yarn/sdks
+!backend/.yarn/versions
+
 ### Node Patch ###
 # Serverless Webpack directories
 .webpack/
