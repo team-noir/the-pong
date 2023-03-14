@@ -21,20 +21,19 @@ const dummyAchievementData: AchievementType[] = [
   },
 ];
 
-export default function Achievements({ id }: UserType) {
+export default function Achievements({ id: userId }: UserType) {
   const [achievements, setAchievements] = useState<AchievementType[] | null>(
     null
   );
 
-  // TODO: 업적 목록 API에서 가져오기
+  // TODO: 업적 목록 API에서 가져오기(userId 필요)
   useEffect(() => {
-    console.log('id', id);
     setAchievements(dummyAchievementData);
   }, []);
 
   return (
     <>
-      <h1>Following</h1>
+      <h1>Achievements</h1>
       <AchievementList achievements={achievements} />
     </>
   );
