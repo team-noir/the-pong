@@ -1,6 +1,4 @@
 import { render, screen } from '@testing-library/react';
-import { routes } from 'App';
-import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 import Profile from 'components/organisms/Profile';
 
 describe('Component - Profile 렌더링', () => {
