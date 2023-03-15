@@ -6,9 +6,13 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    
+    "prebuild": "yarn prisma:generate",
+    "build": "yarn prebuild && yarn tsc",
+    "prisma:generate": "yarn pnpify prisma generate",
+
+    "start": "yarn build && nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
