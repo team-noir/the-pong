@@ -24,15 +24,11 @@ export default function FileInputWithImage({
     setImagePreviewUrl(URL.createObjectURL(files[0]));
   };
 
-  const handleClickFileUpload = (
-    e: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
+  const handleClickFileUpload = () => {
     fileInput.current?.click();
   };
 
-  const handleClickFileRemove = (
-    e: React.MouseEvent<HTMLElement, MouseEvent>
-  ) => {
+  const handleClickFileRemove = () => {
     URL.revokeObjectURL(imagePreviewUrl);
     if (fileInput.current) {
       fileInput.current.value = '';

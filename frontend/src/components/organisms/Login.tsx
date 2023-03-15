@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLogin } from 'hooks/useStore';
 import Button from 'components/atoms/Button';
 import logo42 from 'assets/images/logo_42.svg';
@@ -7,7 +6,7 @@ export default function Login() {
   const isLogin = useLogin((state) => state.isLogin);
   const login = useLogin((state) => state.login);
 
-  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+  const handleClick = () => {
     login();
   };
 

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useLoaderData, LoaderFunctionArgs } from 'react-router-dom';
 import Profile from 'components/organisms/Profile';
 import Achievements from 'components/organisms/Achievements';

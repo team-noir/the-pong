@@ -1,4 +1,3 @@
-import React from 'react';
 import MainGames from 'components/organisms/MainGames';
 import MainChannels from 'components/organisms/MainChannels';
 
