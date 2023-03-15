@@ -6,9 +6,13 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "nest start",
+    
+    "prebuild": "yarn prisma:generate",
+    "build": "yarn prebuild && yarn tsc",
+    "prisma:generate": "yarn pnpify prisma generate",
+
+    "start": "yarn build && nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -22,13 +26,14 @@
   "dependencies": {
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.3.1",
-    "@nestjs/core": "^9.0.0",
+    "@nestjs/core": "^9.3.9",
     "@nestjs/jwt": "^10.0.2",
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^9.0.3",
     "@nestjs/platform-express": "^9.0.0",
     "@prisma/client": "^4.11.0",
     "@types/passport-jwt": "^3.0.8",
+    "@yarnpkg/pnpify": "^4.0.0-rc.40",
     "bcrypt": "^5.1.0",
     "connect-ensure-login": "^0.1.1",
     "cookie-parser": "^1.4.6",
@@ -41,10 +46,11 @@
     "passport-local": "^1.0.0",
     "passport-oauth2-refresh": "^2.1.0",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.2.0"
+    "rxjs": "^7.2.0",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
-    "@nestjs/cli": "^9.0.0",
+    "@nestjs/cli": "^9.2.0",
     "@nestjs/schematics": "^9.0.0",
     "@nestjs/testing": "^9.0.0",
     "@types/express": "^4.17.13",
@@ -86,5 +92,6 @@
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
-  }
+  },
+  "packageManager": "yarn@3.4.1"
 }

@@ -1,15 +1,11 @@
 FROM node:alpine
 
-WORKDIR /usr/src/app
+RUN mkdir backend
+WORKDIR /backend
+COPY ./ ./
 
-EXPOSE 8000
+RUN apk add nodejs yarn
+RUN yarn set version berry
+RUN yarn install
 
-# COPY package*.json ./
-
-# RUN yarn install
-
-# COPY . .
-
-# RUN yarn run build
-
-# CMD [ "node", "dist/main.js" ]
+ENTRYPOINT [ "yarn", "start" ]
