@@ -1,7 +1,7 @@
 import Button from 'components/atoms/Button';
 
 export default function MainGames() {
-  const handleClickStartGame = (e: React.MouseEvent<HTMLElement>) => {
+  const handleClickStartGame = () => {
     // TODO: call api to start game
   };
 

@@ -20,5 +20,8 @@ $ docker compose down --rmi all --volumes --remove-orphans
 ## Development
 
 ```shell
-$ docker compose -f docker-compose-dev-frontend.yml up -d --build
+$ cp .env.development.example .env.development
+$ vi .env.development # edit file
+$ docker compose -f docker-compose-dev.yml --env-file .env.development build --no-cache
+$ docker compose -f docker-compose-dev.yml --env-file .env.development up -d
 ```

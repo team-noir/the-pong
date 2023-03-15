@@ -1,11 +1,9 @@
 FROM node:alpine
 
-RUN mkdir backend
-WORKDIR /backend
-COPY ./ ./
+WORKDIR /usr/src/app
 
-RUN apk add nodejs yarn
+COPY ./ ./
 RUN yarn set version berry
 RUN yarn install
 
-ENTRYPOINT [ "yarn", "start" ]
+ENTRYPOINT [ "/bin/sh", "run.sh" ]

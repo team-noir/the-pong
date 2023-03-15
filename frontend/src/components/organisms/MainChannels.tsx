@@ -1,7 +1,7 @@
 import Button from 'components/atoms/Button';
 
 export default function MainChannels() {
-  const handleClickCreateChannel = (e: React.MouseEvent<HTMLElement>) => {
+  const handleClickCreateChannel = () => {
     // TODO: call api to create channel
   };
 
