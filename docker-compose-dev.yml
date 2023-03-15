@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: the-pong_postgres_dev
+    restart: unless-stopped
+    networks:
+      - the-pong-dev-net
+    volumes:
+      - postgres-dev:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    expose:
+      - '5432'
+
+  backend:
+    container_name: the-pong_backend_dev
+    build: ./backend
+    restart: unless-stopped
+    networks:
+      - the-pong-dev-net
+    ports:
+      - '8000:8000'
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      FT_UID: ${FT_UID}
+      FT_SECRET: ${FT_SECRET}
+      FT_CB: ${FT_CB}
+      JWT_SECRET: ${JWT_SECRET}
+    volumes:
+      - ./backend/src:/usr/src/app/src
+
+  frontend:
+    container_name: the-pong_frontend_dev
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    networks:
+      - the-pong-dev-net
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/usr/src/app/src:ro
+      - ./frontend/src/tests/__snapshots__:/usr/src/app/src/tests/__snapshots__:rw
+
+networks:
+  the-pong-dev-net:
+
+volumes:
+  postgres-dev:
