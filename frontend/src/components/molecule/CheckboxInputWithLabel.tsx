@@ -4,7 +4,7 @@ import Label from 'components/atoms/Label';
 interface Props {
   id: string;
   label: string;
-  checked?: boolean;
+  checked: boolean;
   setValue: (value: boolean) => void;
   message?: string;
 }
@@ -12,7 +12,7 @@ interface Props {
 export default function CheckboxInputWithLabel({
   id,
   label,
-  checked = false,
+  checked,
   setValue,
 }: Props) {
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
