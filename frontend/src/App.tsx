@@ -16,15 +16,32 @@ import SettingPage from 'pages/SettingPage';
 import SearchResultPage from 'pages/SearchResultPage';
 import { loader as profileLoader } from 'pages/ProfilePage';
 import { useLogin } from 'hooks/useStore';
-import SettingProfile from 'components/organisms/SettingProfile';
-import Setting2FA from 'components/organisms/Setting2FA';
-import SettingBlocks from 'components/organisms/SettingBlocks';
+import SettingProfilePage from 'pages/SettingProfilePage';
+import Setting2FAPage from 'pages/Setting2FAPage';
+import SettingBlocksPage from 'pages/SettingBlocksPage';
 
 export const routes = (isLoggedin: boolean) => [
   {
     path: '/login',
     element: !isLoggedin ? <LoginPage /> : <Navigate to="/" />,
     errorElement: <ErrorPage />,
+  },
+  {
+    path: '/setting/*',
+    children: [
+      {
+        path: 'profile',
+        element: <SettingProfilePage />,
+      },
+      {
+        path: '2fa',
+        element: <Setting2FAPage />,
+      },
+      {
+        path: 'blocks',
+        element: <SettingBlocksPage />,
+      },
+    ],
   },
   {
     path: '/',
@@ -59,20 +76,6 @@ export const routes = (isLoggedin: boolean) => [
       {
         path: 'setting',
         element: <SettingPage />,
-        children: [
-          {
-            path: 'profile',
-            element: <SettingProfile />,
-          },
-          {
-            path: '2fa',
-            element: <Setting2FA />,
-          },
-          {
-            path: 'blocks',
-            element: <SettingBlocks />,
-          },
-        ],
       },
       {
         path: 'search',
