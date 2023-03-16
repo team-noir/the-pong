@@ -34,6 +34,7 @@ export default function TextInputWithMessage({
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
+    setIsTouched(true);
     setValue(value);
     setIsValid(validate(value));
   };
