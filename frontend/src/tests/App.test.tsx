@@ -1,8 +1,7 @@
-import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import { App, routes } from 'App';
+import { routes } from 'App';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
 
 describe('Router - Nav에 있는 페이지들 렌더링', () => {
@@ -23,7 +22,7 @@ describe('Router - Nav에 있는 페이지들 렌더링', () => {
     await waitFor(async () => user.click(screen.getByText(/game/i)));
     screen.getByText(/GamePage/i);
     await waitFor(async () => user.click(screen.getByText(/channel/i)));
-    screen.getByText(/ChannelPage/i);
+    screen.getByText(/ChannelLobbyPage/i);
     await waitFor(async () => user.click(screen.getByText(/following/i)));
     screen.getByText(/FollowingPage/i);
     await waitFor(async () => user.click(screen.getByText(/profile/i)));
