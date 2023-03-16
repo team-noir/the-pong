@@ -9,7 +9,6 @@ import Root from 'pages/Root';
 import MainPage from 'pages/MainPage';
 import ErrorPage from 'pages/ErrorPage';
 import GamePage from 'pages/GamePage';
-import ChannelPage from 'pages/ChannelPage';
 import FollowingPage from 'pages/FollowingPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
@@ -19,6 +18,10 @@ import { useLogin } from 'hooks/useStore';
 import SettingProfilePage from 'pages/SettingProfilePage';
 import Setting2FAPage from 'pages/Setting2FAPage';
 import SettingBlocksPage from 'pages/SettingBlocksPage';
+import ChannelLobbyPage from 'pages/ChannelLobbyPage';
+import ChannelBrowsePage from 'pages/ChannelBrowsePage';
+import ChannelNewPage from 'pages/ChannelNewPage';
+import ChannelPage from 'pages/ChannelPage';
 
 export const routes = (isLoggedin: boolean) => [
   {
@@ -44,6 +47,23 @@ export const routes = (isLoggedin: boolean) => [
     ],
   },
   {
+    path: '/channel/*',
+    children: [
+      {
+        path: 'browse',
+        element: <ChannelBrowsePage />,
+      },
+      {
+        path: 'new',
+        element: <ChannelNewPage />,
+      },
+      {
+        path: ':channelCode',
+        element: <ChannelPage />,
+      },
+    ],
+  },
+  {
     path: '/',
     element: isLoggedin ? <Root /> : <Navigate to="/login" />,
     errorElement: <ErrorPage />,
@@ -62,7 +82,7 @@ export const routes = (isLoggedin: boolean) => [
       },
       {
         path: 'channel',
-        element: <ChannelPage />,
+        element: <ChannelLobbyPage />,
       },
       {
         path: 'following',
