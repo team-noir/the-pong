@@ -8,7 +8,7 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
 	constructor(
 		private prismaService: PrismaService,
 	) {
-		var options = {
+		const options = {
 			clientID: process.env.FT_UID,
 			clientSecret: process.env.FT_SECRET,
 			callbackURL: process.env.FT_CB,

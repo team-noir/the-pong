@@ -25,7 +25,7 @@ export class UsersController {
 			id: req.user.id, 
 			username: req.user.username 
 		});
-		await res.cookie('Authorization', jwt);
+		await res.cookie('Authorization', jwt, { httpOnly: true });
 		res.redirect(process.env.REACT_APP_API_URL);
 	}
 

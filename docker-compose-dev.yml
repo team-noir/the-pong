@@ -1,22 +1,22 @@
 version: '3'
 
 services:
-  # nginx:
-  #   image: nginx:latest
-  #   container_name: nginx
-  #   restart: unless-stopped
-  #   ports:
-  #     - 8080:8080
-  #   depends_on:
-  #     - backend
-  #     - frontend
-  #     - postgres
-  #   networks:
-  #     - the-pong-dev-net
-  #   volumes:
-  #     - ./nginx/proxy.conf:/etc/nginx/conf.d/proxy.conf
-  #   environment:
-  #     - TZ=Asia/Seoul
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on:
+      - backend
+      - frontend
+      - postgres
+    networks:
+      - the-pong-dev-net
+    volumes:
+      - ./nginx/proxy.conf:/etc/nginx/conf.d/proxy.conf
+    environment:
+      - TZ=Asia/Seoul
 
   postgres:
     image: postgres:latest
@@ -51,19 +51,19 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       REACT_APP_API_URL: $(REACT_APP_API_URL)
 
-  # frontend:
-  #   container_name: the-pong_frontend_dev
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile.dev
-  #   restart: unless-stopped
-  #   networks:
-  #     - the-pong-dev-net
-  #   ports:
-  #     - '3000:3000'
-  #   volumes:
-  #     - ./frontend/src:/usr/src/app/src:ro
-  #     - ./frontend/src/tests/__snapshots__:/usr/src/app/src/tests/__snapshots__:rw
+  frontend:
+    container_name: the-pong_frontend_dev
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    networks:
+      - the-pong-dev-net
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./frontend/src:/usr/src/app/src:ro
+      - ./frontend/src/tests/__snapshots__:/usr/src/app/src/tests/__snapshots__:rw
 
 networks:
   the-pong-dev-net:
