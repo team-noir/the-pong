@@ -49,7 +49,7 @@ services:
       FT_SECRET: ${FT_SECRET}
       FT_CB: ${FT_CB}
       JWT_SECRET: ${JWT_SECRET}
-      APP_API_URL: $(APP_API_URL)
+      CLIENT_APP_URL: ${CLIENT_APP_URL}
 
   frontend:
     container_name: the-pong_frontend_dev
