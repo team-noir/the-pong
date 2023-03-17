@@ -1,31 +1,27 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
-import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { PrismaService } from '../../prisma/prisma.service';
 import { AuthService } from '../auth/auth.service';
+import { UsersService } from '../users.service';
 
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {
-  constructor(
+	constructor(
 		private jwtService: JwtService,
-    private prismaService: PrismaService,
-    private authService: AuthService,
+		private prismaService: PrismaService,
+		private authService: AuthService,
+		private usersService: UsersService
 	) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req: Request = context.switchToHttp().getRequest();
-    const jwt: string = req.cookies['Authorization'];
-    if (!jwt)
-      return false;
-
-    const userId: number = this.jwtService.decode(jwt)['id'];    
-    const user = await this.prismaService.user.findUnique({ where: { id: userId }});
-    const now: Date = new Date(Date.now());
-
-    if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt)
-      this.authService.refreshToken(user.ftRefreshToken);
-    else if (now > user.ftRefreshExpiresAt)
-      return false;
-    return true;
-  }
+	async canActivate(context: ExecutionContext): Promise<boolean> {
+		const jwt: string = this.usersService.getJwt(context.switchToHttp().getRequest());
+		const user = await this.usersService.getUserFromJwt(jwt);
+		const now: Date = new Date(Date.now());
+		
+		if (user == null || now > user.ftRefreshExpiresAt)
+			return false;
+		else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt)
+			this.authService.refreshToken(user.ftRefreshToken);
+		return true;
+	}
 }

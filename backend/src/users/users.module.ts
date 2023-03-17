@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { PrismaModule } from '../prisma/prisma.module';
 import { UsersController } from './users.controller';
+import { MyController } from './my.controller';
 
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
@@ -24,7 +25,10 @@ import { FTStrategy } from './auth/ft.strategy';
     AuthService, 
     FTStrategy, 
   ],
-  controllers: [UsersController],
+  controllers: [
+    UsersController,
+    MyController
+  ],
   exports: [UsersService],
 })
 export class UsersModule {}
