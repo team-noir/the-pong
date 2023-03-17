@@ -26,7 +26,7 @@ export class UsersController {
 			username: req.user.username 
 		});
 		await res.cookie('Authorization', jwt, { httpOnly: true });
-		res.redirect(process.env.REACT_APP_API_URL);
+		res.redirect(process.env.APP_API_URL);
 	}
 
 	@Get('whoami')

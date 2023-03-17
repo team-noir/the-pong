@@ -13,7 +13,7 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
 			clientSecret: process.env.FT_SECRET,
 			callbackURL: process.env.FT_CB,
 			passReqToCallback: true,
-			failureRedirect: process.env.REACT_APP_API_URL,
+			failureRedirect: process.env.APP_API_URL,
 		};
 		super(options);
 	}	
