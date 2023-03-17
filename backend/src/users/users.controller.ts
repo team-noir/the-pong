@@ -25,9 +25,8 @@ export class UsersController {
 			id: req.user.id, 
 			username: req.user.username 
 		});
-		await res.cookie('Authorization', jwt);
-
-		return { id : req.user.id };
+		await res.cookie('Authorization', jwt, { httpOnly: true });
+		res.redirect(process.env.APP_API_URL);
 	}
 
 	@Get('whoami')
