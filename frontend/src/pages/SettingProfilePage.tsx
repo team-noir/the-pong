@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import AppTemplate from 'components/templates/AppTemplate';
+import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import Button from 'components/atoms/Button';
 import FileInputWithImage from 'components/molecule/FileInputWithImage';
@@ -9,7 +11,7 @@ interface UserForm {
   imageFile: File | null;
 }
 
-export default function SettingProfile() {
+export default function SettingProfilePage() {
   const dummyUser = {
     id: 1,
     profileimageUrl: 'https://placekitten.com/800/800',
@@ -49,8 +51,7 @@ export default function SettingProfile() {
   };
 
   return (
-    <>
-      <h1>Setting profile</h1>
+    <AppTemplate header={<HeaderWithBackButton title={'프로필 수정'} />}>
       <form>
         <FileInputWithImage
           imageUrl={dummyUser.profileimageUrl}
@@ -79,6 +80,6 @@ export default function SettingProfile() {
           <Button type="submit">저장하기</Button>
         </div>
       </form>
-    </>
+    </AppTemplate>
   );
 }

@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
-import { UserType } from 'types/userType';
-import styles from 'assets/styles/Blocks.module.css';
+import AppTemplate from 'components/templates/AppTemplate';
+import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
-import UserList from '../molecule/UserList';
+import styles from 'assets/styles/Blocks.module.css';
+import { UserType } from 'types/userType';
 
 const dummyBlocks: UserType[] = [
   {
@@ -25,7 +27,7 @@ const dummyBlocks: UserType[] = [
   },
 ];
 
-export default function SettingBlocks() {
+export default function SettingBlocksPage() {
   const [blockedUsers, setBlockedUsers] = useState<UserType[] | null>(null);
 
   // TODO: 차단 목록 API에서 가져오기
@@ -38,8 +40,7 @@ export default function SettingBlocks() {
   };
 
   return (
-    <>
-      <h1>SettingBlocks</h1>
+    <AppTemplate header={<HeaderWithBackButton title={'차단 관리'} />}>
       <UserList
         styles={styles}
         users={blockedUsers}
@@ -50,6 +51,6 @@ export default function SettingBlocks() {
           </Button>,
         ]}
       />
-    </>
+    </AppTemplate>
   );
 }

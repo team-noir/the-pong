@@ -1,4 +1,2 @@
-#!/bin/sh
-
-yarn prisma migrate dev --name=thepong
+yarn prisma migrate dev --name=thepong --preview-feature
 yarn start

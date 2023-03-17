@@ -1,6 +1,23 @@
 version: '3'
 
 services:
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+    depends_on:
+      - backend
+      - frontend
+      - postgres
+    networks:
+      - the-pong-dev-net
+    volumes:
+      - ./nginx/proxy.conf:/etc/nginx/conf.d/proxy.conf
+    environment:
+      - TZ=Asia/Seoul
+
   postgres:
     image: postgres:latest
     container_name: the-pong_postgres_dev
@@ -32,8 +49,7 @@ services:
       FT_SECRET: ${FT_SECRET}
       FT_CB: ${FT_CB}
       JWT_SECRET: ${JWT_SECRET}
-    volumes:
-      - ./backend/src:/usr/src/app/src
+      CLIENT_APP_URL: ${CLIENT_APP_URL}
 
   frontend:
     container_name: the-pong_frontend_dev
