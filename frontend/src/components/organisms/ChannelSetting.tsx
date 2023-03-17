@@ -8,11 +8,17 @@ interface Props {
   channel: ChannelType;
 }
 
+const dummyUserType = {
+  owner: 0,
+  admin: 1,
+  normal: 2,
+};
+
 export interface DummyChannelUserType {
   id: string;
   nickname: string;
   profileImageUrl: string;
-  userType: string;
+  userType: number;
 }
 
 const dummyChannelUsers: DummyChannelUserType[] = [
@@ -20,29 +26,38 @@ const dummyChannelUsers: DummyChannelUserType[] = [
     id: '0',
     nickname: 'sarchoi',
     profileImageUrl: 'https://placekitten.com/800/800',
-    userType: 'admin',
+    userType: dummyUserType.admin,
   },
   {
     id: '1',
     nickname: 'heehkim',
     profileImageUrl: 'https://placekitten.com/800/800',
-    userType: 'owner',
+    userType: dummyUserType.owner,
   },
   {
     id: '2',
     nickname: 'cpak',
     profileImageUrl: 'https://placekitten.com/800/800',
-    userType: 'normal',
+    userType: dummyUserType.normal,
   },
   {
     id: '3',
     nickname: 'hello',
     profileImageUrl: 'https://placekitten.com/800/800',
-    userType: 'admin',
+    userType: dummyUserType.admin,
   },
 ];
 
 const currentUserId = '1';
+
+// 내가 가장 위, 다음으로 owner, admin, normal 순, 각 userType끼리는 nickname 순
+const compare = (user1: DummyChannelUserType, user2: DummyChannelUserType) => {
+  if (user1.id === currentUserId) return -1;
+  if (user1.userType !== user2.userType) {
+    return user1.userType - user2.userType;
+  }
+  return user1.nickname.localeCompare(user2.nickname);
+};
 
 export default function ChannelSetting({ channel }: Props) {
   const [channelUsers, setChannelUsers] = useState<
@@ -59,7 +74,7 @@ export default function ChannelSetting({ channel }: Props) {
 
   useEffect(() => {
     // TODO: 채널 유저 정보를 가져오는 API 호출
-    setChannelUsers(dummyChannelUsers);
+    setChannelUsers(dummyChannelUsers.sort(compare));
   }, []);
 
   useEffect(() => {
@@ -68,7 +83,7 @@ export default function ChannelSetting({ channel }: Props) {
   }, [channelUsers]);
 
   useEffect(() => {
-    if (currentUser && ['owner', 'admin'].includes(currentUser.userType)) {
+    if (currentUser && currentUser.userType >= dummyUserType.admin) {
       setButtons([
         <Button key="button0" type="button">
           게임 초대
@@ -88,7 +103,7 @@ export default function ChannelSetting({ channel }: Props) {
 
   return (
     <div>
-      {currentUser?.userType === 'owner' && (
+      {currentUser?.userType === dummyUserType.owner && (
         <Button type="button">채팅방 설정</Button>
       )}
       <h2>참가자</h2>
