@@ -1,16 +1,10 @@
-import Button from 'components/atoms/Button';
+import { Link } from 'react-router-dom';
 
 export default function MainChannels() {
-  const handleClickCreateChannel = () => {
-    // TODO: call api to create channel
-  };
-
   return (
     <section>
       <h2>Channels</h2>
-      <Button type="button" onClick={handleClickCreateChannel}>
-        채널 만들기
-      </Button>
+      <Link to="/channel/new">채널 만들기</Link>
     </section>
   );
 }

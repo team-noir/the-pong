@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import Label from 'components/atoms/Label';
-import TextInput from 'components/atoms/TextInput';
+import PasswordInput from 'components/atoms/PasswordInput';
 import Message from 'components/atoms/Message';
 
 interface Props {
   id: string;
   label?: string;
   value: string;
-  placeholder?: string;
   setValue: (value: string) => void;
   isValid: boolean;
   setIsValid: (value: boolean) => void;
@@ -15,11 +14,10 @@ interface Props {
   message: string;
 }
 
-export default function TextInputWithMessage({
+export default function PasswordInputWithMessage({
   id,
   label,
   value,
-  placeholder,
   setValue,
   isValid,
   setIsValid,
@@ -46,10 +44,9 @@ export default function TextInputWithMessage({
   return (
     <>
       {label && <Label id={id} label={label} />}
-      <TextInput
+      <PasswordInput
         id={id}
         value={value}
-        placeholder={placeholder}
         onChange={handleChange}
         onBlur={handleBlur}
       />
