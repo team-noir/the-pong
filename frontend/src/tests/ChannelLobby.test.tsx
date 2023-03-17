@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import ChannelLobby from 'components/organisms/ChannelLobby';
 import { BrowserRouter } from 'react-router-dom';
 
-describe('Component - Channel 렌더링', () => {
+describe('Component - ChannelLobby 렌더링', () => {
   test('채널 목록을 보여준다', () => {
     render(
       <BrowserRouter>
