@@ -10,7 +10,6 @@ interface Props {
 
 export interface DummyChannelUserType {
   id: string;
-  userId: string;
   nickname: string;
   profileImageUrl: string;
   userType: string;
@@ -19,31 +18,27 @@ export interface DummyChannelUserType {
 const dummyChannelUsers: DummyChannelUserType[] = [
   {
     id: '0',
-    userId: '1',
-    nickname: 'heehkim',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    userType: 'owner',
-  },
-  {
-    id: '1',
-    userId: '0',
     nickname: 'sarchoi',
     profileImageUrl: 'https://placekitten.com/800/800',
     userType: 'admin',
   },
   {
-    id: '2',
-    userId: '3',
-    nickname: 'hello',
+    id: '1',
+    nickname: 'heehkim',
     profileImageUrl: 'https://placekitten.com/800/800',
-    userType: 'admin',
+    userType: 'owner',
   },
   {
-    id: '3',
-    userId: '2',
+    id: '2',
     nickname: 'cpak',
     profileImageUrl: 'https://placekitten.com/800/800',
     userType: 'normal',
+  },
+  {
+    id: '3',
+    nickname: 'hello',
+    profileImageUrl: 'https://placekitten.com/800/800',
+    userType: 'admin',
   },
 ];
 
@@ -68,7 +63,7 @@ export default function ChannelSetting({ channel }: Props) {
   }, []);
 
   useEffect(() => {
-    const user = channelUsers?.find((user) => user.userId === currentUserId);
+    const user = channelUsers?.find((user) => user.id === currentUserId);
     user && setCurrentUser(user);
   }, [channelUsers]);
 
@@ -102,6 +97,7 @@ export default function ChannelSetting({ channel }: Props) {
         users={channelUsers}
         imageSize={52}
         buttons={buttons}
+        currentUserId={currentUserId}
       />
     </div>
   );

@@ -9,6 +9,7 @@ interface Props {
   imageSize: number;
   buttons?: ReactElement[];
   hasStatus?: boolean;
+  currentUserId?: string;
 }
 
 export default function UserList({
@@ -17,6 +18,7 @@ export default function UserList({
   imageSize,
   buttons,
   hasStatus = false,
+  currentUserId,
 }: Props) {
   return (
     <ul className={styles.ul}>
@@ -30,6 +32,7 @@ export default function UserList({
               imageSize={imageSize}
               buttons={buttons}
               hasStatus={hasStatus}
+              currentUserId={currentUserId}
             />
           );
         })}
