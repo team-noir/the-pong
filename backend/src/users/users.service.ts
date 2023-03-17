@@ -17,7 +17,7 @@ export class UsersService {
 		this.authService.refreshToken(req.user.ftRefreshToken);
 		const jwt = this.signJwt(req.user.userId, req.user.username);
 		await this.setJwt(res, jwt);
-		return { id : req.user.id };
+		res.redirect(process.env.CLIENT_APP_URL);
 	}
 
 	/* my */

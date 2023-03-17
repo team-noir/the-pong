@@ -20,11 +20,6 @@ export class UsersController {
 	@ApiOperation({ summary: '42 api callback' })
 	@ApiResponse({ status: 200, description: 'Get access token' })
 	@ApiHeader({ name: 'Authorization', description: 'jwt' })
-	@ApiBody({ description: 'userid', examples: {
-		example1: { 
-			value: { id: 1 } 
-		}
-	}})
 	@UseGuards(FtOauthGuard)
 	async auth(@Req() req, @Res({ passthrough: true }) res) {
 		return this.usersService.auth(req, res);
