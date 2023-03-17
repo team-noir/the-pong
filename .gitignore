@@ -198,5 +198,5 @@ sketch
 *.rdb
 
 # prisma build files 
-prisma/*
-!prisma/schema.prisma
+backend/prisma/*
+!backend/prisma/schema.prisma

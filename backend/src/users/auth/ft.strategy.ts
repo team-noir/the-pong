@@ -6,16 +6,17 @@ import { PrismaService } from '../../prisma/prisma.service';
 @Injectable()
 export class FTStrategy extends PassportStrategy(Strategy, '42') {
 	constructor(
-		private prismaService: PrismaService
+		private prismaService: PrismaService,
 	) {
 		var options = {
 			clientID: process.env.FT_UID,
 			clientSecret: process.env.FT_SECRET,
 			callbackURL: process.env.FT_CB,
 			passReqToCallback: true,
+			failureRedirect: process.env.REACT_APP_API_URL,
 		};
 		super(options);
-	}
+	}	
 
 	async validate(
 		request: Object,
