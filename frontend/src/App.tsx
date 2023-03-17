@@ -1,8 +1,14 @@
+import { useEffect } from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
 } from 'react-router-dom';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
 import LoginPage from 'pages/LoginPage';
 import OnBoardingPage from 'pages/OnBoardingPage';
 import Root from 'pages/Root';
@@ -105,9 +111,35 @@ export const routes = (isLoggedin: boolean) => [
   },
 ];
 
+const queryClient = new QueryClient();
+
 export function App() {
   const isLoggedIn = useLogin((state) => state.isLogin);
+
   const router = createBrowserRouter(routes(isLoggedIn));
 
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Init />
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
+}
+
+function Init() {
+  const login = useLogin((state) => state.login);
+
+  // TODO: error handling
+  const { data, isSuccess } = useQuery({
+    queryKey: ['whoami'],
+    queryFn: () => fetch(`api/v1/users/whoami`),
+  });
+
+  useEffect(() => {
+    if (isSuccess && data.ok) {
+      login();
+    }
+  }, [isSuccess]);
+
+  return <></>;
 }
