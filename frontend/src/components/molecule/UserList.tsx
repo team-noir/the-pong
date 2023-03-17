@@ -1,10 +1,11 @@
 import { ReactElement } from 'react';
 import UserItem from 'components/molecule/UserItem';
 import { UserType } from 'types/userType';
+import { DummyChannelUserType } from 'components/organisms/ChannelSetting';
 
 interface Props {
   styles: { readonly [key: string]: string };
-  users: UserType[] | null;
+  users: UserType[] | DummyChannelUserType[] | null;
   imageSize: number;
   buttons?: ReactElement[];
   hasStatus?: boolean;
