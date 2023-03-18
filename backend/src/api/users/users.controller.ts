@@ -1,5 +1,5 @@
 import { Controller, Res, Req, Get, Post, UseGuards, } from '@nestjs/common';
-import { FtOauthGuard } from './guards/ft-oauth.guard';
+import { FtOauthGuard } from '../../guards/ft-oauth.guard';
 import { ApiOperation, ApiTags, ApiResponse, ApiProperty, ApiHeader, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 

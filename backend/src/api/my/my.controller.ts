@@ -1,14 +1,13 @@
 import { Controller, Get, Post, Patch, Res, Req, UseGuards, } from '@nestjs/common';
 import { ApiTags, ApiBody } from '@nestjs/swagger';
-import { AuthenticatedGuard } from './guards/authenticated.guard';
-
-import { UsersService } from './users.service';
+import { AuthenticatedGuard } from '../../guards/authenticated.guard';
+import { MyService } from './my.service';
 
 @ApiTags('my')
 @Controller('my')
 export class MyController {
 	constructor(
-		private usersService: UsersService,
+		private myService: MyService,
 	) {}
 
 	@Get('whoami')
@@ -28,6 +27,6 @@ export class MyController {
 	}})
 	@UseGuards(AuthenticatedGuard)
 	async whoami(@Req() req) {
-		return this.usersService.whoami(req);
+		return this.myService.whoami(req);
 	}
 }
