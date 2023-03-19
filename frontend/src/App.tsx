@@ -20,6 +20,7 @@ import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
 import SearchResultPage from 'pages/SearchResultPage';
 import { loader as profileLoader } from 'pages/ProfilePage';
+import { loader as channelLoader } from 'pages/ChannelPage';
 import { useLogin } from 'hooks/useStore';
 import SettingProfilePage from 'pages/SettingProfilePage';
 import Setting2FAPage from 'pages/Setting2FAPage';
@@ -66,6 +67,7 @@ export const routes = (isLoggedin: boolean) => [
       {
         path: ':channelCode',
         element: <ChannelPage />,
+        loader: channelLoader,
       },
     ],
   },
