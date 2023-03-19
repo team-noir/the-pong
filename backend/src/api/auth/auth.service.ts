@@ -19,6 +19,12 @@ export class AuthService {
 		res.redirect(process.env.CLIENT_APP_URL);
 	}
 
+	async logout(@Req() req, @Res({ passthrough: true }) res) {
+		const jwt = this.getJwt(req);
+		await this.removeJwt(res, jwt);
+		res.redirect(process.env.CLIENT_APP_URL);
+	}
+
 	signJwt(id: number, username: string): string {
 		return this.jwtService.sign({ id, username });
 	}
@@ -29,6 +35,10 @@ export class AuthService {
 
 	async setJwt(@Res({ passthrough: true }) res, jwt: string) {
 		await res.cookie('Authorization', jwt);
+	}
+
+	async removeJwt(@Res({ passthrough: true }) res, jwt: string) {
+		await res.clearCookie('Authorization', { path: '/' });
 	}
 
 	async getUserFromJwt(jwt: string) {
