@@ -10,7 +10,7 @@ import { AuthModule } from './api/auth/auth.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    UsersModule, 
+    UsersModule,
     MyModule,
     PrismaModule,
     AuthModule,

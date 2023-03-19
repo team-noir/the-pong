@@ -3,13 +3,11 @@ import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class MyService {
-	constructor(
-		private authService: AuthService,
-	) {}
+  constructor(private authService: AuthService) {}
 
-	async whoami(@Req() req) {
-		const jwt: string = this.authService.getJwt(req);
-		const user = await this.authService.getUserFromJwt(jwt);
-		return user;
-	}
+  async whoami(@Req() req) {
+    const jwt: string = this.authService.getJwt(req);
+    const user = await this.authService.getUserFromJwt(jwt);
+    return user;
+  }
 }

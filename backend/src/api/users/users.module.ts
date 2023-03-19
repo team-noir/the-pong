@@ -8,18 +8,9 @@ import { FTStrategy } from '../auth/ft.strategy';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-  imports: [
-    PrismaModule,
-    PassportModule,
-    AuthModule,
-  ],
-  providers: [
-    UsersService, 
-    FTStrategy, 
-  ],
-  controllers: [
-    UsersController,
-  ],
+  imports: [PrismaModule, PassportModule, AuthModule],
+  providers: [UsersService, FTStrategy],
+  controllers: [UsersController],
   exports: [UsersService],
 })
 export class UsersModule {}

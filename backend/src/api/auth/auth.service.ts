@@ -7,83 +7,93 @@ const ONESECOND = 1000;
 
 @Injectable()
 export class AuthService {
-	constructor(
-		private jwtService: JwtService,
-		private prismaService: PrismaService,
-	) {}
+  constructor(
+    private jwtService: JwtService,
+    private prismaService: PrismaService
+  ) {}
 
-	async auth(@Req() req, @Res({ passthrough: true }) res) {
-		this.refreshToken(req.user.ftRefreshToken);
-		const userId = req.user.id;
-		const username = req.user.nickname ? req.user.nickname : req.user.ftUsername;
-		const jwt = this.signJwt(userId, username);
-		await this.setJwt(res, jwt);
-		res.redirect(process.env.CLIENT_APP_URL);
-	}
+  async auth(@Req() req, @Res({ passthrough: true }) res) {
+    this.refreshToken(req.user.ftRefreshToken);
+    const userId = req.user.id;
+    const username = req.user.nickname
+      ? req.user.nickname
+      : req.user.ftUsername;
+    const jwt = this.signJwt(userId, username);
+    await this.setJwt(res, jwt);
+    res.redirect(process.env.CLIENT_APP_URL);
+  }
 
-	async logout(@Req() req, @Res({ passthrough: true }) res) {
-		const jwt = this.getJwt(req);
-		await this.removeJwt(res, jwt);
-		res.redirect(process.env.CLIENT_APP_URL);
-	}
+  async logout(@Res({ passthrough: true }) res) {
+    await this.removeJwt(res);
+    res.redirect(process.env.CLIENT_APP_URL);
+  }
 
-	signJwt(id: number, username: string): string {
-		return this.jwtService.sign({ id, username });
-	}
+  signJwt(id: number, username: string): string {
+    return this.jwtService.sign({ id, username });
+  }
 
-	getJwt(@Req() req): string {
-		return req.cookies['Authorization'];
-	}
+  getJwt(@Req() req): string {
+    return req.cookies['Authorization'];
+  }
 
-	async setJwt(@Res({ passthrough: true }) res, jwt: string) {
-		await res.cookie('Authorization', jwt);
-	}
+  async setJwt(@Res({ passthrough: true }) res, jwt: string) {
+    await res.cookie('Authorization', jwt);
+  }
 
-	async removeJwt(@Res({ passthrough: true }) res, jwt: string) {
-		await res.clearCookie('Authorization', { path: '/' });
-	}
+  async removeJwt(@Res({ passthrough: true }) res) {
+    await res.clearCookie('Authorization', { path: '/' });
+  }
 
-	async getUserFromJwt(jwt: string) {
-		if (jwt.length == 0) { return null; }
-		const userId: number = this.jwtService.decode(jwt)['id'];   
-		if (!userId) { return null; }
-		const user = await this.prismaService.user.findUnique({ 
-			where: { id: userId }
-		});
-		
-		return user;
-	}
+  async getUserFromJwt(jwt: string) {
+    if (jwt.length == 0) {
+      return null;
+    }
+    const userId: number = this.jwtService.decode(jwt)['id'];
+    if (!userId) {
+      return null;
+    }
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
 
-	refreshToken(refreshToken: string) {
-		const prisma = this.prismaService;
+    return user;
+  }
 
-		refresh.use(
-			'refresh-42', 
-			new Strategy({
-				clientID: process.env.FT_UID,
-				clientSecret: process.env.FT_SECRET,
-				callbackURL: process.env.FT_CB,
-			}, function() {} )
-		);
+  refreshToken(refreshToken: string) {
+    const prisma = this.prismaService;
 
-		refresh.requestNewAccessToken(
-			'refresh-42', 
-			refreshToken, 
-			async (err, newAccessToken, newRefreshToken, results) => {
-				const accessExpiresAt = new Date((results.created_at + results.expires_in) * ONESECOND);	// 2 hours later
-				const refreshExpiresAt = new Date((results.created_at + results.expires_in * 84) * ONESECOND);	// 7 days later
+    refresh.use(
+      'refresh-42',
+      new Strategy(
+        {
+          clientID: process.env.FT_UID,
+          clientSecret: process.env.FT_SECRET,
+          callbackURL: process.env.FT_CB,
+        }, () => {}
+      )
+    );
 
-				await prisma.user.update({
-					where: { ftRefreshToken: refreshToken },
-					data: { 
-						ftAccessToken: newAccessToken,
-						ftRefreshToken: newRefreshToken,
-						ftAccessExpiresAt: accessExpiresAt,
-						ftRefreshExpiresAt: refreshExpiresAt
-					}
-				});
-			}
-		);
-	}
+    refresh.requestNewAccessToken(
+      'refresh-42',
+      refreshToken,
+      async (err, newAccessToken, newRefreshToken, results) => {
+        const accessExpiresAt = new Date(
+          (results.created_at + results.expires_in) * ONESECOND
+        ); // 2 hours later
+        const refreshExpiresAt = new Date(
+          (results.created_at + results.expires_in * 84) * ONESECOND
+        ); // 7 days later
+
+        await prisma.user.update({
+          where: { ftRefreshToken: refreshToken },
+          data: {
+            ftAccessToken: newAccessToken,
+            ftRefreshToken: newRefreshToken,
+            ftAccessExpiresAt: accessExpiresAt,
+            ftRefreshExpiresAt: refreshExpiresAt,
+          },
+        });
+      }
+    );
+  }
 }
-
