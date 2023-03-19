@@ -3,7 +3,7 @@ version: '3'
 services:
   nginx:
     image: nginx:latest
-    container_name: nginx
+    container_name: the-pong_nginx_dev
     restart: unless-stopped
     ports:
       - 8080:8080
