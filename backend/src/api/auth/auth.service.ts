@@ -14,7 +14,9 @@ export class AuthService {
 
 	async auth(@Req() req, @Res({ passthrough: true }) res) {
 		this.refreshToken(req.user.ftRefreshToken);
-		const jwt = this.signJwt(req.user.userId, req.user.username);
+		const userId = req.user.id;
+		const username = req.user.nickname ? req.user.nickname : req.user.ftUsername;
+		const jwt = this.signJwt(userId, username);
 		await this.setJwt(res, jwt);
 		res.redirect(process.env.CLIENT_APP_URL);
 	}
@@ -43,10 +45,12 @@ export class AuthService {
 
 	async getUserFromJwt(jwt: string) {
 		if (jwt.length == 0) { return null; }
-		const userId: number = this.jwtService.decode(jwt)['id'];    
+		const userId: number = this.jwtService.decode(jwt)['id'];   
+		if (!userId) { return null; }
 		const user = await this.prismaService.user.findUnique({ 
 			where: { id: userId }
 		});
+		
 		return user;
 	}
 

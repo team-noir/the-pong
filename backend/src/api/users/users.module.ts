@@ -5,11 +5,13 @@ import { UsersController } from './users.controller';
 
 import { PassportModule } from '@nestjs/passport';
 import { FTStrategy } from '../auth/ft.strategy';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [
     PrismaModule,
-    PassportModule, 
+    PassportModule,
+    AuthModule,
   ],
   providers: [
     UsersService, 
