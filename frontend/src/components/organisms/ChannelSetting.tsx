@@ -48,11 +48,11 @@ const dummyChannelUsers: DummyChannelUserType[] = [
   },
 ];
 
-const currentUserId = '1';
+const myUserId = '1';
 
 // 내가 가장 위, 다음으로 owner, admin, normal 순, 각 userType끼리는 nickname 순
 const compare = (user1: DummyChannelUserType, user2: DummyChannelUserType) => {
-  if (user1.id === currentUserId) return -1;
+  if (user1.id === myUserId) return -1;
   if (user1.userType !== user2.userType) {
     return user1.userType - user2.userType;
   }
@@ -78,7 +78,7 @@ export default function ChannelSetting({ channel }: Props) {
   }, []);
 
   useEffect(() => {
-    const user = channelUsers?.find((user) => user.id === currentUserId);
+    const user = channelUsers?.find((user) => user.id === myUserId);
     user && setCurrentUser(user);
   }, [channelUsers]);
 
@@ -112,7 +112,7 @@ export default function ChannelSetting({ channel }: Props) {
         users={channelUsers}
         imageSize={52}
         buttons={buttons}
-        currentUserId={currentUserId}
+        myUserId={myUserId}
       />
     </div>
   );

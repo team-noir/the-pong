@@ -6,20 +6,20 @@ interface Props {
   messages: DummyMessageType[] | null;
 }
 
-const currentUserId = '1';
+const myUsrId = '1';
 
 export default function MessageList({ messages }: Props) {
   return (
     <ul className={styles.ul}>
       {messages?.map((message, index) => {
-        const isMyMessage = message.userId === currentUserId;
+        const isMyMessage = message.userId === myUsrId;
+        const isContinuousMessage =
+          messages[index - 1]?.userId === message.userId;
         return (
           <MessageItem
             key={message.id}
             message={message}
-            isShowProfile={
-              !isMyMessage && messages[index - 1]?.userId !== message.userId
-            }
+            isShowProfile={!isMyMessage && isContinuousMessage}
             className={isMyMessage ? styles.my : styles.other}
           />
         );

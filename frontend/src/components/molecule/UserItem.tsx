@@ -10,7 +10,7 @@ interface Props {
   imageSize: number;
   buttons?: ReactElement[];
   hasStatus: boolean;
-  currentUserId?: string;
+  myUserId?: string;
 }
 
 export default function UserItem({
@@ -19,7 +19,7 @@ export default function UserItem({
   imageSize,
   buttons,
   hasStatus,
-  currentUserId,
+  myUserId,
 }: Props) {
   return (
     <li className={styles.li}>
@@ -40,7 +40,7 @@ export default function UserItem({
       <Link to={`/profile/${user.id}`}>
         <span>{user.nickname}</span>
       </Link>
-      {user.id !== currentUserId && buttons && <div>{buttons}</div>}
+      {user.id !== myUserId && buttons && <div>{buttons}</div>}
     </li>
   );
 }
