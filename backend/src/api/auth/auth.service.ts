@@ -12,6 +12,13 @@ export class AuthService {
 		private prismaService: PrismaService,
 	) {}
 
+	async auth(@Req() req, @Res({ passthrough: true }) res) {
+		this.refreshToken(req.user.ftRefreshToken);
+		const jwt = this.signJwt(req.user.userId, req.user.username);
+		await this.setJwt(res, jwt);
+		res.redirect(process.env.CLIENT_APP_URL);
+	}
+
 	signJwt(id: number, username: string): string {
 		return this.jwtService.sign({ id, username });
 	}
