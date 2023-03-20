@@ -20,21 +20,25 @@ export class MyService {
     return this.userToMyDto(user);
   }
 
-  async setMyProfile(@Req() req, data: SettingDto): Promise<MyDto> {
+  async setMyProfile(@Req() req, newData: SettingDto): Promise<MyDto> {
     const user: User = await this.authService.getUserFromJwt(req);
-
-    return this.userToMyDto(user);
+    if (!user) {
+      return null;
+    }
+    const newUser: User = await this.setUser(user.id, newData);
+    return this.userToMyDto(newUser);
   }
 
-  async setUser(userId: number, content: SettingDto): Promise<User> {
-    const result: User = await this.prismaService.user.update({
+  async setUser(userId: number, newData: SettingDto): Promise<User> {
+    const { nickname } = newData;
+    const user: User = await this.prismaService.user.update({
       where: { id: userId },
       data: {
-        ...content,
+        nickname,
         updatedAt: new Date(),
       },
     });
-    return result;
+    return user;
   }
 
   userToMyDto(user: User): MyDto {
