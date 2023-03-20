@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Req, Res } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import * as refresh from 'passport-oauth2-refresh';
 import { PrismaService } from '../../prisma/prisma.service';
 import { Strategy } from 'passport-42';
@@ -7,8 +8,37 @@ const ONESECOND = 1000;
 @Injectable()
 export class AuthService {
 	constructor(
+		private jwtService: JwtService,
 		private prismaService: PrismaService,
 	) {}
+
+	async auth(@Req() req, @Res({ passthrough: true }) res) {
+		this.refreshToken(req.user.ftRefreshToken);
+		const jwt = this.signJwt(req.user.userId, req.user.username);
+		await this.setJwt(res, jwt);
+		res.redirect(process.env.CLIENT_APP_URL);
+	}
+
+	signJwt(id: number, username: string): string {
+		return this.jwtService.sign({ id, username });
+	}
+
+	getJwt(@Req() req): string {
+		return req.cookies['Authorization'];
+	}
+
+	async setJwt(@Res({ passthrough: true }) res, jwt: string) {
+		await res.cookie('Authorization', jwt);
+	}
+
+	async getUserFromJwt(jwt: string) {
+		if (jwt.length == 0) { return null; }
+		const userId: number = this.jwtService.decode(jwt)['id'];    
+		const user = await this.prismaService.user.findUnique({ 
+			where: { id: userId }
+		});
+		return user;
+	}
 
 	refreshToken(refreshToken: string) {
 		const prisma = this.prismaService;
