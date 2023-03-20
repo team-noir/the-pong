@@ -2,7 +2,10 @@ import { Injectable, Req, Res } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as refresh from 'passport-oauth2-refresh';
 import { PrismaService } from '../../prisma/prisma.service';
+import { User } from '@prisma';
 import { Strategy } from 'passport-42';
+import { Response } from 'express';
+import { JwtPayloadDto } from './dtos/jwtPayload.dto';
 const ONESECOND = 1000;
 
 @Injectable()
@@ -28,34 +31,43 @@ export class AuthService {
     res.redirect(process.env.CLIENT_APP_URL);
   }
 
-  signJwt(id: number, username: string): string {
-    return this.jwtService.sign({ id, username });
+  signJwt(id: number, nickname: string): string {
+    return this.jwtService.sign({ id, nickname });
   }
 
   getJwt(@Req() req): string {
     return req.cookies['Authorization'];
   }
 
-  async setJwt(@Res({ passthrough: true }) res, jwt: string) {
+  async setJwt(@Res({ passthrough: true }) res: Response, jwt: string) {
     await res.cookie('Authorization', jwt);
   }
 
-  async removeJwt(@Res({ passthrough: true }) res) {
+  async removeJwt(@Res({ passthrough: true }) res: Response) {
     await res.clearCookie('Authorization', { path: '/' });
   }
 
-  async getUserFromJwt(jwt: string) {
-    if (jwt.length == 0) {
+  async getJwtPayload(@Req() req: Request): Promise<JwtPayloadDto> {
+    const jwt: string = this.getJwt(req);
+    if (!jwt) {
       return null;
     }
-    const userId: number = this.jwtService.decode(jwt)['id'];
-    if (!userId) {
+    const payload = this.jwtService.decode(jwt);
+    const result = {
+      id: payload['id'],
+      nickname: payload['nickname'],
+    };
+    return result;
+  }
+
+  async getUserFromJwt(@Req() req: Request): Promise<User> {
+    const payload: JwtPayloadDto = await this.getJwtPayload(req);
+    if (!payload) {
       return null;
     }
     const user = await this.prismaService.user.findUnique({
-      where: { id: userId },
+      where: { id: payload.id },
     });
-
     return user;
   }
 
@@ -69,7 +81,10 @@ export class AuthService {
           clientID: process.env.FT_UID,
           clientSecret: process.env.FT_SECRET,
           callbackURL: process.env.FT_CB,
-        }, () => {}
+        },
+        () => {
+          return;
+        }
       )
     );
 

@@ -1,7 +1,18 @@
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Req,
+  Res,
+  Body,
+  UseGuards,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiTags, ApiBody } from '@nestjs/swagger';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { MyService } from './my.service';
+import { MyDto } from './dtos/my.dto';
+import { SettingDto } from './dtos/setting.dto';
 
 @ApiTags('my')
 @Controller('my')
@@ -15,7 +26,6 @@ export class MyController {
       ftOauth: {
         value: {
           id: 1,
-          imageUrl: null,
           nickname: null,
           rank: 0,
           isTwoFactor: false,
@@ -28,7 +38,17 @@ export class MyController {
     },
   })
   @UseGuards(AuthenticatedGuard)
-  async whoami(@Req() req) {
-    return this.myService.whoami(req);
+  async whoami(@Req() req, @Res() res) {
+    const user: MyDto = await this.myService.whoami(req);
+    const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+    res.status(statusCode).send(user);
+  }
+
+  @Patch('settings')
+  @UseGuards(AuthenticatedGuard)
+  async setMyProfile(@Req() req, @Body() body: SettingDto, @Res() res) {
+    const user: MyDto = await this.myService.setMyProfile(req, body);
+    const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+    res.status(statusCode).send(user);
   }
 }
