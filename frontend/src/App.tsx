@@ -29,6 +29,7 @@ import ChannelLobbyPage from 'pages/ChannelLobbyPage';
 import ChannelBrowsePage from 'pages/ChannelBrowsePage';
 import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
+import { getWhoami, getHealthCheck } from 'api/api.v1';
 
 export const routes = (isLoggedin: boolean) => [
   {
@@ -134,16 +135,16 @@ function Init() {
   // TODO: error handling
   const { data, isSuccess } = useQuery({
     queryKey: ['whoami'],
-    queryFn: () => fetch(`api/v1/my/whoami`),
+    queryFn: getWhoami,
   });
 
   const mockApi = useQuery({
     queryKey: ['mock-health-check'],
-    queryFn: () => fetch(`api/v1/health-check`).then((res) => res.json()),
+    queryFn: getHealthCheck,
   });
 
   useEffect(() => {
-    if (isSuccess && data.ok) {
+    if (isSuccess && data.status === 200) {
       login();
     }
   }, [isSuccess]);
