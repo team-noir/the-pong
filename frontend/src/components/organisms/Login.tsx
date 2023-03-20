@@ -6,7 +6,7 @@ export default function Login() {
   const isLogin = useLogin((state) => state.isLogin);
 
   const handleClick = () => {
-    window.location.href = '/api/v1/users/42';
+    window.location.href = '/api/v1/auth/42';
   };
 
   return (

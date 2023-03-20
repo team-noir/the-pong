@@ -134,7 +134,7 @@ function Init() {
   // TODO: error handling
   const { data, isSuccess } = useQuery({
     queryKey: ['whoami'],
-    queryFn: () => fetch(`api/v1/users/whoami`),
+    queryFn: () => fetch(`api/v1/my/whoami`),
   });
 
   const mockApi = useQuery({
