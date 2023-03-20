@@ -22,7 +22,7 @@ export default function UserItem({
   myUserId,
 }: Props) {
   return (
-    <li className={styles.li}>
+    <li className={styles.li} data-user-id={user.id}>
       <Link to={`/profile/${user.id}`}>
         <div className={userItemStyles.container}>
           <ProfileImage
