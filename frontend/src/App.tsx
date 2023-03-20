@@ -137,11 +137,20 @@ function Init() {
     queryFn: () => fetch(`api/v1/users/whoami`),
   });
 
+  const mockApi = useQuery({
+    queryKey: ['mock-health-check'],
+    queryFn: () => fetch(`api/v1/health-check`).then((res) => res.json()),
+  });
+
   useEffect(() => {
     if (isSuccess && data.ok) {
       login();
     }
   }, [isSuccess]);
+
+  useEffect(() => {
+    console.log('mock: ', mockApi.data);
+  }, [mockApi.isSuccess]);
 
   return <></>;
 }
