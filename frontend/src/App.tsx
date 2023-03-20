@@ -1,8 +1,14 @@
+import { useEffect } from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
 } from 'react-router-dom';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
 import LoginPage from 'pages/LoginPage';
 import OnBoardingPage from 'pages/OnBoardingPage';
 import Root from 'pages/Root';
@@ -14,6 +20,7 @@ import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
 import SearchResultPage from 'pages/SearchResultPage';
 import { loader as profileLoader } from 'pages/ProfilePage';
+import { loader as channelLoader } from 'pages/ChannelPage';
 import { useLogin } from 'hooks/useStore';
 import SettingProfilePage from 'pages/SettingProfilePage';
 import Setting2FAPage from 'pages/Setting2FAPage';
@@ -60,6 +67,7 @@ export const routes = (isLoggedin: boolean) => [
       {
         path: ':channelCode',
         element: <ChannelPage />,
+        loader: channelLoader,
       },
     ],
   },
@@ -105,9 +113,35 @@ export const routes = (isLoggedin: boolean) => [
   },
 ];
 
+const queryClient = new QueryClient();
+
 export function App() {
   const isLoggedIn = useLogin((state) => state.isLogin);
+
   const router = createBrowserRouter(routes(isLoggedIn));
 
-  return <RouterProvider router={router} />;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Init />
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
+}
+
+function Init() {
+  const login = useLogin((state) => state.login);
+
+  // TODO: error handling
+  const { data, isSuccess } = useQuery({
+    queryKey: ['whoami'],
+    queryFn: () => fetch(`api/v1/users/whoami`),
+  });
+
+  useEffect(() => {
+    if (isSuccess && data.ok) {
+      login();
+    }
+  }, [isSuccess]);
+
+  return <></>;
 }

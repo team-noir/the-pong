@@ -1,4 +1,4 @@
-import styles from 'assets/styles/Channel.module.css';
+import styles from 'assets/styles/ChannelLobby.module.css';
 import ChannelList from 'components/molecule/ChannelList';
 import { ChannelType } from 'types/channelType';
 import { useEffect, useState } from 'react';
