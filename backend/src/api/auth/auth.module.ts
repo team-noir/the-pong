@@ -6,18 +6,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
-	imports: [
-		PrismaModule,
-		PassportModule,
-		JwtModule.registerAsync({
-			useFactory: () => ({
-			  secret: process.env.JWT_SECRET,
-			  signOptions: { expiresIn: 3600 },
-			})
-		}),
-	],
-	providers: [AuthService],
-	controllers: [AuthController],
-	exports: [AuthService],
+  imports: [
+    PrismaModule,
+    PassportModule,
+    JwtModule.registerAsync({
+      useFactory: () => ({
+        secret: process.env.JWT_SECRET,
+        signOptions: { expiresIn: 3600 },
+      }),
+    }),
+  ],
+  providers: [AuthService],
+  controllers: [AuthController],
+  exports: [AuthService],
 })
 export class AuthModule {}
