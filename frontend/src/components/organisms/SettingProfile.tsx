@@ -50,6 +50,7 @@ export default function SettingProfile({ user, onSubmit }: Props) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!isValidated.nickname) return;
     onSubmit(userFormData);
   };
 
