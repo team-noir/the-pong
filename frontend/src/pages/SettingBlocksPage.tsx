@@ -35,7 +35,7 @@ export default function SettingBlocksPage() {
       {getMyBlocksQuery.isSuccess && (
         <UserList
           styles={styles}
-          users={getMyBlocksQuery.data || []}
+          users={getMyBlocksQuery.data || null}
           imageSize={52}
           buttons={[
             <Button key="button0" type="button" onClick={handleClickUnblock}>
