@@ -10,11 +10,7 @@ interface Props {
 }
 
 export default function Profile({ user, myId }: Props) {
-  const [isMyPage, setIsMyPage] = useState(false);
-
-  useEffect(() => {
-    setIsMyPage(user.id.toString() === myId);
-  }, [user.id, myId]);
+  const isMyPage = user.id.toString() === myId;
 
   return (
     <>
