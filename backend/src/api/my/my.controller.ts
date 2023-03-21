@@ -51,4 +51,10 @@ export class MyController {
     const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
     res.status(statusCode).send(user);
   }
+
+  @Get('follwing')
+  @UseGuards(AuthenticatedGuard)
+  async following(@Req() req) {
+    return this.myService.following(req);
+  }
 }

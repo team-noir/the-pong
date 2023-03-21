@@ -12,6 +12,20 @@ export class MyService {
     private prismaService: PrismaService
   ) {}
 
+  userToMyDto(user: User): MyDto {
+    const my: MyDto = {
+      id: user.id,
+      nickname: user.nickname,
+      rank: user.rank,
+      isTwoFactor: user.isTwoFactor,
+      ftUsername: user.ftUsername,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+      deletedAt: user.deletedAt,
+    };
+    return my;
+  }
+
   async whoami(@Req() req): Promise<MyDto> {
     const user: User = await this.authService.getUserFromJwt(req);
     if (!user) {
@@ -41,17 +55,21 @@ export class MyService {
     return user;
   }
 
-  userToMyDto(user: User): MyDto {
-    const my: MyDto = {
-      id: user.id,
-      nickname: user.nickname,
-      rank: user.rank,
-      isTwoFactor: user.isTwoFactor,
-      ftUsername: user.ftUsername,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-      deletedAt: user.deletedAt,
-    };
-    return my;
+  async following(@Req() req) {
+    const { id: userId } = await this.authService.getJwtPayload(req);
+    if (!userId) {
+      return null;
+    }
+
+    const following = await this.prismaService.followUser
+      .findMany({
+        where: { followerId: userId },
+        select: {
+          follewee: { select: { id: true, nickname: true } },
+        },
+      })
+      .then((follows) => follows.map((follow) => follow.follewee));
+
+    return following;
   }
 }
