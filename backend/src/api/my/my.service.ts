@@ -29,6 +29,16 @@ export class MyService {
     return this.userToMyDto(newUser);
   }
 
+  async uploadProfileImage(userId: number, file) {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        imageUrl: file.filename,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
   async setUser(userId: number, newData: SettingDto): Promise<User> {
     const { nickname } = newData;
     const user: User = await this.prismaService.user.update({
