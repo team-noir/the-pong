@@ -12,7 +12,13 @@ describe('Component - Profile 렌더링', () => {
   };
 
   test('닉네임과 프로필 사진을 보여준다', () => {
-    render(<Profile user={profileUser} myId={'2'} />);
+    render(
+      <Profile
+        user={profileUser}
+        myId={'2'}
+        onClickFollow={(userId: number) => console.log(userId)}
+      />
+    );
     screen.getByText(`user1's nickname`);
     screen.getByAltText('profile image');
     screen.getByText('팔로우하기');

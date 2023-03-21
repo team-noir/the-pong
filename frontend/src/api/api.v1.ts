@@ -53,3 +53,11 @@ export const deleteMyBlocks = async (userId: number) => {
   }
   return res;
 };
+
+export const putMyFollowing = async (userId: number) => {
+  const res = await axios.put(`/my/following/${userId}`);
+  if (res.status !== 204) {
+    throw new Error('Failed to put my following');
+  }
+  return res;
+};
