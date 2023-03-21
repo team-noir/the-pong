@@ -6,7 +6,6 @@ import { validateNickname } from 'utils/validatorUtils';
 import { API_PREFIX } from 'api/api.v1';
 import { UserType } from 'types/userType';
 import { UserForm } from 'pages/SettingProfilePage';
-import { useNavigate } from 'react-router-dom';
 
 interface Props {
   user: UserType;
@@ -21,7 +20,6 @@ export default function SettingProfile({ user, onSubmit }: Props) {
   const [isValidated, setIsValidated] = useState({
     nickname: false,
   });
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user.nickname) return;
@@ -53,7 +51,6 @@ export default function SettingProfile({ user, onSubmit }: Props) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit(userFormData);
-    navigate(`/profile/${user.id}`);
   };
 
   return (
