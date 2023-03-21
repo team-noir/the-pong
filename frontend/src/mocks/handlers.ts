@@ -4,19 +4,19 @@ import { UserType } from 'types/userType';
 
 const mockBlocks: UserType[] = [
   {
-    id: '1',
+    id: 1,
     nickname: 'Mock Block Nickname1',
   },
   {
-    id: '2',
+    id: 2,
     nickname: 'Mock Block Nickname2',
   },
   {
-    id: '3',
+    id: 3,
     nickname: 'Mock Block Nickname3',
   },
   {
-    id: '4',
+    id: 4,
     nickname: 'Mock Block Nickname4',
   },
 ];
@@ -48,7 +48,7 @@ export const handlers = [
   }),
 
   rest.delete(`${API_PREFIX}/my/blocks/:userId`, (req, res, ctx) => {
-    const userId = req.params.userId;
+    const userId = parseInt(req.params.userId.toString());
     const index = mockBlocks.findIndex((user) => user.id === userId);
     if (index === -1) {
       return res(ctx.status(404));

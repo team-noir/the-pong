@@ -9,7 +9,7 @@ interface Props {
   imageSize: number;
   buttons?: ReactElement[];
   hasStatus?: boolean;
-  myUserId?: string;
+  myUserId?: number;
 }
 
 export default function UserList({

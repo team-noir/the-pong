@@ -5,11 +5,11 @@ import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types/userType';
 import { useLogin } from 'hooks/useStore';
+import { API_PREFIX } from 'api/api.v1';
 
 const dummyData = {
-  id: '1',
+  id: 1,
   nickname: '닉네임1',
-  profileImageUrl: 'https://placekitten.com/800/800',
 };
 
 export default function HeaderGnb() {
@@ -62,7 +62,7 @@ export default function HeaderGnb() {
       <div>로고</div>
       <Link to={`/profile/${user?.id}`}>
         <ProfileImage
-          profileImageUrl={user?.profileImageUrl}
+          profileImageUrl={`${API_PREFIX}/users/${user?.id}/profile-image`}
           alt="my profile image"
           size={52}
         />

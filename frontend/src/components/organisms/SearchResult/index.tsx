@@ -4,27 +4,23 @@ import SearchResultList from './SearchResultList';
 
 const dummyResultUsers: UserType[] = [
   {
-    id: '2',
+    id: 2,
     nickname: '결과닉네임2',
-    profileImageUrl: 'https://placekitten.com/800/800',
     status: 'on',
   },
   {
-    id: '3',
+    id: 3,
     nickname: '결과닉네임3',
-    profileImageUrl: 'https://placekitten.com/800/800',
     status: 'on',
   },
   {
-    id: '4',
+    id: 4,
     nickname: '결과닉네임4',
-    profileImageUrl: 'https://placekitten.com/800/800',
     status: 'off',
   },
   {
-    id: '5',
+    id: 5,
     nickname: '결과닉네임5',
-    profileImageUrl: 'https://placekitten.com/800/800',
     status: 'game',
   },
 ];

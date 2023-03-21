@@ -1,10 +1,10 @@
 export interface UserType {
-  id: string;
-  fortytwoId?: string;
+  id: number;
   nickname?: string;
-  profileImageUrl?: string;
+  rank?: number;
+  isTwoFactor?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  deletedAt?: string;
   status?: 'on' | 'off' | 'game';
-  isTwoFactor?: boolean;
 }
