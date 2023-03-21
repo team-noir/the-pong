@@ -29,7 +29,6 @@ export default function Profile({
         size={320}
       />
       <p data-testid={user.id}>{user.nickname}</p>
-      <Link to="/profile/2">user2</Link>
       {isMyPage && <Link to="/setting">프로필 수정하기</Link>}
       {!isMyPage && (
         <div>
