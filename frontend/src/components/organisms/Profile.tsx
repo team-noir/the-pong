@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react';
 import Button from 'components/atoms/Button';
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
@@ -7,9 +6,10 @@ import { API_PREFIX, ProfileType } from 'api/api.v1';
 interface Props {
   user: ProfileType;
   myId: string;
+  onClickBlock: (userId: number) => void;
 }
 
-export default function Profile({ user, myId }: Props) {
+export default function Profile({ user, myId, onClickBlock }: Props) {
   const isMyPage = user.id.toString() === myId;
 
   return (
@@ -25,7 +25,9 @@ export default function Profile({ user, myId }: Props) {
       {!isMyPage && (
         <div>
           <Button type="button">팔로우하기</Button>
-          <Button type="button">차단하기</Button>
+          <Button type="button" onClick={() => onClickBlock(user.id)}>
+            차단하기
+          </Button>
         </div>
       )}
     </>
