@@ -17,9 +17,9 @@ export default function SettingBlocksPage() {
   const deleteMyBlocksMutation = useMutation(deleteMyBlocks);
 
   const handleClickUnblock = (e: React.MouseEvent<HTMLElement>) => {
-    const parentElem = e.currentTarget.closest('[data-user-id]');
-    if (!(parentElem instanceof HTMLElement)) return;
-    const userId = parentElem.dataset.userId;
+    const ancestorElement = e.currentTarget.closest('[data-user-id]');
+    if (!(ancestorElement instanceof HTMLElement)) return;
+    const userId = ancestorElement.dataset.userId;
 
     const answer = confirm('차단을 해제하시겠습니까?');
     if (!answer) return;
