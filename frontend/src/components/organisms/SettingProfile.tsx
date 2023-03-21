@@ -15,7 +15,6 @@ interface Props {
 
 export default function SettingProfile({ user, onSubmit }: Props) {
   const [userFormData, setUserFormData] = useState<UserForm>({
-    id: user.id,
     nickname: '',
     imageFile: null,
   });

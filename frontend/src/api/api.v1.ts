@@ -54,11 +54,8 @@ export const deleteMyBlocks = async (userId: number) => {
   return res;
 };
 
-export const patchMyProfile = async ({
-  id,
-  nickname,
-}: UserType): Promise<UserType> => {
-  const res = await axios.patch(`/my/settings`, { id, nickname });
+export const patchMyProfile = async (nickname: string): Promise<UserType> => {
+  const res = await axios.patch(`/my/settings`, { nickname });
   if (res.status !== 200) {
     throw new Error('Failed to patch profile');
   }

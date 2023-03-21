@@ -58,10 +58,10 @@ export const handlers = [
   }),
 
   rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
-    const { id, nickname } = await req.json();
+    const { nickname } = await req.json();
     return res(
       ctx.json({
-        id: id,
+        id: 1,
         nickname: nickname,
         rank: 0,
         achievements: [],

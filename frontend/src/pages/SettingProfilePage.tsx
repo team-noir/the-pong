@@ -7,7 +7,6 @@ import { AxiosError } from 'axios';
 import SettingProfile from 'components/organisms/SettingProfile';
 
 export interface UserForm {
-  id: number;
   nickname: string;
   imageFile: File | null;
 }
@@ -24,11 +23,7 @@ export default function SettingProfilePage() {
     const answer = confirm('저장하시겠습니까?');
     if (!answer) return;
 
-    const newUser: UserType = {
-      id: userFormData.id,
-      nickname: userFormData.nickname,
-    };
-    patchMyProfileMutation.mutate(newUser);
+    patchMyProfileMutation.mutate(userFormData.nickname);
   };
 
   return (
