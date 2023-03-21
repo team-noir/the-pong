@@ -56,4 +56,17 @@ export const handlers = [
     mockBlocks.splice(index, 1);
     return res(ctx.status(204));
   }),
+
+  rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
+    const { id, nickname } = await req.json();
+    return res(
+      ctx.json({
+        id: id,
+        nickname: nickname,
+        rank: 0,
+        achievements: [],
+        games: [],
+      })
+    );
+  }),
 ];
