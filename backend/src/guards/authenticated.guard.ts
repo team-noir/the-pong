@@ -22,6 +22,7 @@ export class AuthenticatedGuard implements CanActivate {
     const user: User = await this.authService.getUserFromJwt(req);
     const now: Date = new Date(Date.now());
 
+    req.id = user.id;
     if (user == null || now > user.ftRefreshExpiresAt) {
       return false;
     } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt)

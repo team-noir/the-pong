@@ -1,18 +1,24 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Req,
   Res,
   Body,
   UseGuards,
   HttpStatus,
+  UploadedFile, 
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBody } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
+import { SettingDto } from './dtos/setting.dto';
 import { MyService } from './my.service';
 import { MyDto } from './dtos/my.dto';
-import { SettingDto } from './dtos/setting.dto';
 
 @ApiTags('my')
 @Controller('my')
@@ -50,5 +56,22 @@ export class MyController {
     const user: MyDto = await this.myService.setMyProfile(req, body);
     const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
     res.status(statusCode).send(user);
+  }
+
+  @Post('profile-image')
+  @UseGuards(AuthenticatedGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: './profile-images',
+        filename: (req, file, cb) => {
+          return cb(null, `${req.id}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
+  async uploadProfileImage(@Res() res, @UploadedFile() file) {
+    const statusCode = file ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+    res.status(statusCode).send();
   }
 }
