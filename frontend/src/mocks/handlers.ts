@@ -10,9 +10,10 @@ export const handlers = [
   }),
 
   rest.get('/api/v1/users/:userId', (req, res, ctx) => {
+    const userId = req.params.userId.toString();
     return res(
       ctx.json({
-        id: req.params.userId,
+        id: parseInt(userId),
         nickname: `user${req.params.userId}'s nickname`,
         rank: 0,
         achievements: [],

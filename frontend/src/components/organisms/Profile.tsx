@@ -6,15 +6,15 @@ import { API_PREFIX, ProfileType } from 'api/api.v1';
 
 interface Props {
   user: ProfileType;
-  myId: number;
+  myId: string;
 }
 
 export default function Profile({ user, myId }: Props) {
   const [isMyPage, setIsMyPage] = useState(false);
 
   useEffect(() => {
-    setIsMyPage(user.id === myId);
-  }, [user, myId]);
+    setIsMyPage(user.id.toString() === myId);
+  }, [user.id, myId]);
 
   return (
     <>

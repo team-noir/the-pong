@@ -29,7 +29,7 @@ export default function ProfilePage() {
       {profileQuery.isSuccess && whoamiQuery.isSuccess && (
         <>
           <div>ProfilePage</div>
-          <Profile user={profileQuery.data} myId={profileQuery.data.id} />
+          <Profile user={profileQuery.data} myId={`${whoamiQuery.data.id}`} />
           {/* <Achievements id={profileQuery.data.id} /> */}
         </>
       )}
