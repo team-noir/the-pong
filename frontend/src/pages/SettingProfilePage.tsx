@@ -5,6 +5,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { UserType } from 'types/userType';
 import { AxiosError } from 'axios';
 import SettingProfile from 'components/organisms/SettingProfile';
+import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 export interface UserForm {
   nickname: string;
@@ -16,15 +18,21 @@ export default function SettingProfilePage() {
     queryKey: ['whoami'],
     queryFn: getWhoami,
   });
-
   const patchMyProfileMutation = useMutation(patchMyProfile);
+  const navigate = useNavigate();
 
   const handleSubmit = (userFormData: UserForm) => {
-    const answer = confirm('저장하시겠습니까?');
-    if (!answer) return;
-
     patchMyProfileMutation.mutate(userFormData.nickname);
   };
+
+  useEffect(() => {
+    if (patchMyProfileMutation.isError) {
+      alert('다시 시도해주세요.');
+    }
+    if (patchMyProfileMutation.isSuccess && whoamiQuery.isSuccess) {
+      navigate(`/profile/${whoamiQuery.data.id}`);
+    }
+  }, [patchMyProfileMutation]);
 
   return (
     <AppTemplate header={<HeaderWithBackButton title={'프로필 수정'} />}>
