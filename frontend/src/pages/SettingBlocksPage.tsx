@@ -1,4 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { getMyBlocks, deleteMyBlocks } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import UserList from 'components/molecule/UserList';
@@ -6,51 +8,42 @@ import Button from 'components/atoms/Button';
 import styles from 'assets/styles/Blocks.module.css';
 import { UserType } from 'types/userType';
 
-const dummyBlocks: UserType[] = [
-  {
-    id: '2',
-    nickname: '닉네임2',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    status: 'on',
-  },
-  {
-    id: '3',
-    nickname: '닉네임3',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    status: 'on',
-  },
-  {
-    id: '4',
-    nickname: '닉네임4',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    status: 'off',
-  },
-];
-
 export default function SettingBlocksPage() {
-  const [blockedUsers, setBlockedUsers] = useState<UserType[] | null>(null);
+  const getMyBlocksQuery = useQuery<UserType[], AxiosError>({
+    queryKey: ['getMyBlocks'],
+    queryFn: getMyBlocks,
+  });
 
-  // TODO: 차단 목록 API에서 가져오기
-  useEffect(() => {
-    setBlockedUsers(dummyBlocks);
-  }, []);
+  const deleteMyBlocksMutation = useMutation(deleteMyBlocks);
 
-  const handleClickUnblock = () => {
-    // TODO: call unblock API
+  const handleClickUnblock = (e: React.MouseEvent<HTMLElement>) => {
+    const ancestorElement = e.currentTarget.closest('[data-user-id]');
+    if (!(ancestorElement instanceof HTMLElement)) return;
+    const userId = ancestorElement.dataset.userId;
+
+    const answer = confirm('차단을 해제하시겠습니까?');
+    if (!answer) return;
+    deleteMyBlocksMutation.mutate(Number(userId));
   };
 
   return (
     <AppTemplate header={<HeaderWithBackButton title={'차단 관리'} />}>
-      <UserList
-        styles={styles}
-        users={blockedUsers}
-        imageSize={52}
-        buttons={[
-          <Button key="button0" type="button" onClick={handleClickUnblock}>
-            차단 해제
-          </Button>,
-        ]}
-      />
+      {getMyBlocksQuery.isLoading && <div>loading...</div>}
+      {getMyBlocksQuery.isError && (
+        <div>error: {getMyBlocksQuery.error.message}</div>
+      )}
+      {getMyBlocksQuery.isSuccess && (
+        <UserList
+          styles={styles}
+          users={getMyBlocksQuery.data || null}
+          imageSize={52}
+          buttons={[
+            <Button key="button0" type="button" onClick={handleClickUnblock}>
+              차단 해제
+            </Button>,
+          ]}
+        />
+      )}
     </AppTemplate>
   );
 }

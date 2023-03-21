@@ -37,3 +37,19 @@ export const getProfile = async (userId: string): Promise<ProfileType> => {
   }
   return res.data;
 };
+
+export const getMyBlocks = async () => {
+  const res = await axios.get(`/my/blocks`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
+export const deleteMyBlocks = async (userId: number) => {
+  const res = await axios.delete(`/my/blocks/${userId}`);
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
