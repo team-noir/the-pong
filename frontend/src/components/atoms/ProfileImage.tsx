@@ -9,7 +9,7 @@ interface Props {
 export default function ProfileImage({ profileImageUrl, alt, size }: Props) {
   return (
     <img
-      src={profileImageUrl}
+      src={profileImageUrl || 'https://placekitten.com/800/800'}
       alt={alt}
       width={size}
       height={size}
