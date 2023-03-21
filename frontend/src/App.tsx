@@ -19,7 +19,6 @@ import FollowingPage from 'pages/FollowingPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
 import SearchResultPage from 'pages/SearchResultPage';
-import { loader as profileLoader } from 'pages/ProfilePage';
 import { loader as channelLoader } from 'pages/ChannelPage';
 import { useLogin } from 'hooks/useStore';
 import SettingProfilePage from 'pages/SettingProfilePage';
@@ -100,7 +99,6 @@ export const routes = (isLoggedin: boolean) => [
       {
         path: 'profile/:userId',
         element: <ProfilePage />,
-        loader: profileLoader,
       },
       {
         path: 'setting',
@@ -133,7 +131,7 @@ function Init() {
   const login = useLogin((state) => state.login);
 
   // TODO: error handling
-  const { data, isSuccess } = useQuery({
+  const { isSuccess } = useQuery({
     queryKey: ['whoami'],
     queryFn: getWhoami,
   });
@@ -144,7 +142,7 @@ function Init() {
   });
 
   useEffect(() => {
-    if (isSuccess && data.status === 200) {
+    if (isSuccess) {
       login();
     }
   }, [isSuccess]);
