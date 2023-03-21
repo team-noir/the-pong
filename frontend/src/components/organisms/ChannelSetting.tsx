@@ -15,7 +15,7 @@ const dummyUserType = {
 };
 
 export interface DummyChannelUserType {
-  id: string;
+  id: number;
   nickname: string;
   profileImageUrl: string;
   userType: number;
@@ -23,32 +23,32 @@ export interface DummyChannelUserType {
 
 const dummyChannelUsers: DummyChannelUserType[] = [
   {
-    id: '0',
+    id: 0,
     nickname: 'sarchoi',
     profileImageUrl: 'https://placekitten.com/800/800',
     userType: dummyUserType.admin,
   },
   {
-    id: '1',
+    id: 1,
     nickname: 'heehkim',
     profileImageUrl: 'https://placekitten.com/800/800',
     userType: dummyUserType.owner,
   },
   {
-    id: '2',
+    id: 2,
     nickname: 'cpak',
     profileImageUrl: 'https://placekitten.com/800/800',
     userType: dummyUserType.normal,
   },
   {
-    id: '3',
+    id: 3,
     nickname: 'hello',
     profileImageUrl: 'https://placekitten.com/800/800',
     userType: dummyUserType.admin,
   },
 ];
 
-const myUserId = '1';
+const myUserId = 1;
 
 // 내가 가장 위, 다음으로 owner, admin, normal 순, 각 userType끼리는 nickname 순
 const compare = (user1: DummyChannelUserType, user2: DummyChannelUserType) => {

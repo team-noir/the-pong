@@ -3,6 +3,7 @@ import { UserType } from 'types/userType';
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
 import userItemStyles from 'assets/styles/UserItem.module.css';
+import { API_PREFIX } from 'api/api.v1';
 
 interface Props {
   styles: { readonly [key: string]: string };
@@ -10,7 +11,7 @@ interface Props {
   imageSize: number;
   buttons?: ReactElement[];
   hasStatus: boolean;
-  myUserId?: string;
+  myUserId?: number;
 }
 
 export default function UserItem({
@@ -26,7 +27,7 @@ export default function UserItem({
       <Link to={`/profile/${user.id}`}>
         <div className={userItemStyles.container}>
           <ProfileImage
-            profileImageUrl={user.profileImageUrl}
+            profileImageUrl={`${API_PREFIX}/users/${user.id}/profile-image`}
             alt={`${user.nickname}'s profile image`}
             size={imageSize}
           />

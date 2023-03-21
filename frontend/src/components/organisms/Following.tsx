@@ -6,27 +6,23 @@ import Button from 'components/atoms/Button';
 
 const dummyFollowings: UserType[] = [
   {
-    id: '2',
+    id: 2,
     nickname: '닉네임2',
-    profileImageUrl: 'https://placekitten.com/800/800',
     status: 'on',
   },
   {
-    id: '3',
+    id: 3,
     nickname: '닉네임3',
-    profileImageUrl: 'https://placekitten.com/800/800',
     status: 'on',
   },
   {
-    id: '4',
+    id: 4,
     nickname: '닉네임4',
-    profileImageUrl: 'https://placekitten.com/800/800',
     status: 'off',
   },
   {
-    id: '5',
+    id: 5,
     nickname: '닉네임5',
-    profileImageUrl: 'https://placekitten.com/800/800',
     status: 'game',
   },
 ];
