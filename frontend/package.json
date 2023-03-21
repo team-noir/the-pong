@@ -62,5 +62,10 @@
   "packageManager": "yarn@3.4.1",
   "msw": {
     "workerDirectory": "public"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "axios": "axios/dist/node/axios.cjs"
+    }
   }
 }

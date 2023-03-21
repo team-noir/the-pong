@@ -54,6 +54,14 @@ export const deleteMyBlocks = async (userId: number) => {
   return res;
 };
 
+export const putMyBlocks = async (userId: number) => {
+  const res = await axios.put(`/my/blocks/${userId}`);
+  if (res.status !== 204) {
+    throw new Error('Failed to put my blocks');
+  }
+  return res;
+};
+
 export const patchMyProfile = async (nickname: string): Promise<UserType> => {
   const res = await axios.patch(`/my/settings`, { nickname });
   if (res.status !== 200) {
