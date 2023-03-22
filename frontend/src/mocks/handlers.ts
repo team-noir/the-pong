@@ -62,6 +62,19 @@ export const handlers = [
     );
   }),
 
+  rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
+    const { nickname } = await req.json();
+    return res(
+      ctx.json({
+        id: 1,
+        nickname: nickname,
+        rank: 0,
+        achievements: [],
+        games: [],
+      })
+    );
+  }),
+
   rest.get(`${API_PREFIX}/my/blocks`, (req, res, ctx) => {
     return res(ctx.json(mockBlocks));
   }),

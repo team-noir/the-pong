@@ -38,6 +38,14 @@ export const getProfile = async (userId: string): Promise<ProfileType> => {
   return res.data;
 };
 
+export const patchMyProfile = async (nickname: string): Promise<UserType> => {
+  const res = await axios.patch(`/my/settings`, { nickname });
+  if (res.status !== 200) {
+    throw new Error('Failed to patch profile');
+  }
+  return res.data;
+};
+
 export const getMyBlocks = async () => {
   const res = await axios.get(`/my/blocks`);
   if (res.status !== 200) {
