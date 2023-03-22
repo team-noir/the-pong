@@ -1,12 +1,15 @@
 import {
   Controller,
   Get,
+  Put,
   Patch,
   Req,
+  Param,
   Res,
   Body,
   UseGuards,
   HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import { ApiTags, ApiBody } from '@nestjs/swagger';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
@@ -54,7 +57,18 @@ export class MyController {
 
   @Get('follwing')
   @UseGuards(AuthenticatedGuard)
-  async following(@Req() req) {
-    return this.myService.following(req);
+  async getFollowing(@Req() req) {
+    return this.myService.getFollowing(req);
+  }
+
+  @Put('follwing/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async putFollowing(@Req() req, @Param('userId') userId: number, @Res() res) {
+    try {
+      await this.myService.putFollowing(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

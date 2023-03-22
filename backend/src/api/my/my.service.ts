@@ -55,7 +55,7 @@ export class MyService {
     return user;
   }
 
-  async following(@Req() req) {
+  async getFollowing(@Req() req) {
     const { id: userId } = await this.authService.getJwtPayload(req);
     if (!userId) {
       return null;
@@ -70,6 +70,40 @@ export class MyService {
       })
       .then((follows) => follows.map((follow) => follow.follewee));
 
+    return following;
+  }
+
+  async putFollowing(@Req() req) {
+    const { id: myId } = await this.authService.getJwtPayload(req);
+    if (!myId) {
+      throw new Error('not logged in');
+    }
+
+    // check if user exists
+    const { userId } = req.params;
+    const user = await this.prismaService.user.findUnique({
+      where: { id: Number(userId) },
+    });
+    if (!user) {
+      throw new Error('user not found');
+    }
+
+    const following = await this.prismaService.followUser.upsert({
+      where: {
+        id: {
+          followerId: myId,
+          followeeId: Number(userId),
+        },
+      },
+      create: {
+        followerId: myId,
+        followeeId: Number(userId),
+      },
+      update: {
+        followerId: myId,
+        followeeId: Number(userId),
+      },
+    });
     return following;
   }
 }
