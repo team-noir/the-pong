@@ -47,6 +47,22 @@ export const patchMyProfile = async (nickname: string): Promise<UserType> => {
   return res.data;
 };
 
+export const getMy2fa = async () => {
+  const res = await axios.get(`/my/2fa`);
+  if (res.status !== 200) {
+    throw new Error('Failed to get 2fa');
+  }
+  return res.data;
+};
+
+export const deleteMy2fa = async () => {
+  const res = await axios.delete(`/my/2fa`);
+  if (res.status !== 204) {
+    throw new Error('Failed to delete 2fa');
+  }
+  return res;
+};
+
 export const getMyBlocks = async () => {
   const res = await axios.get(`/my/blocks`);
   if (res.status !== 200) {
