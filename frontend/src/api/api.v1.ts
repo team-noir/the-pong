@@ -47,6 +47,14 @@ export const patchMyProfile = async (nickname: string): Promise<UserType> => {
   return res.data;
 };
 
+export const PostMyProfileImage = async (imageFile: File) => {
+  const res = await axios.post(`/my/profile-image`, imageFile);
+  if (res.status !== 204) {
+    throw new Error('Failed to post profile image');
+  }
+  return res;
+};
+
 export const getMyBlocks = async () => {
   const res = await axios.get(`/my/blocks`);
   if (res.status !== 200) {
