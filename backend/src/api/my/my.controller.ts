@@ -4,6 +4,7 @@ import {
   Put,
   Post,
   Patch,
+  Delete,
   Req,
   Param,
   Res,
@@ -89,6 +90,21 @@ export class MyController {
   async putFollowing(@Req() req, @Param('userId') userId: number, @Res() res) {
     try {
       await this.myService.putFollowing(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Delete('follwing/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async deleteFollowing(
+    @Req() req,
+    @Param('userId') userId: number,
+    @Res() res
+  ) {
+    try {
+      await this.myService.deleteFollowing(req);
       return res.status(HttpStatus.NO_CONTENT).send();
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
