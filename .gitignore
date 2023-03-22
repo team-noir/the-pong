@@ -201,4 +201,4 @@ sketch
 backend/prisma/*
 !backend/prisma/schema.prisma
 
-backend/profile-images
+backend/upload/profile-images
