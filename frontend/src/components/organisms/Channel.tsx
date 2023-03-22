@@ -14,7 +14,7 @@ interface FormData {
 
 export interface DummyMessageType {
   id: number;
-  userId: string;
+  userId: number;
   nickname: string;
   profileImageUrl: string;
   text: string;
@@ -25,7 +25,7 @@ let dummyId = 0;
 const dummyMessages: DummyMessageType[] = [
   {
     id: dummyId++,
-    userId: '0',
+    userId: 0,
     nickname: 'sarchoi',
     profileImageUrl: 'https://placekitten.com/800/800',
     text: '안녕하세요',
@@ -33,7 +33,7 @@ const dummyMessages: DummyMessageType[] = [
   },
   {
     id: dummyId++,
-    userId: '0',
+    userId: 0,
     nickname: 'sarchoi',
     profileImageUrl: 'https://placekitten.com/800/800',
     text: '반가워요~~~',
@@ -41,7 +41,7 @@ const dummyMessages: DummyMessageType[] = [
   },
   {
     id: dummyId++,
-    userId: '1',
+    userId: 1,
     nickname: 'heehkim',
     profileImageUrl: 'https://placekitten.com/800/800',
     text: '안녕하세요~!',
@@ -49,7 +49,7 @@ const dummyMessages: DummyMessageType[] = [
   },
   {
     id: dummyId++,
-    userId: '1',
+    userId: 1,
     nickname: 'heehkim',
     profileImageUrl: 'https://placekitten.com/800/800',
     text: '방가방가',
@@ -57,7 +57,7 @@ const dummyMessages: DummyMessageType[] = [
   },
   {
     id: dummyId++,
-    userId: '2',
+    userId: 2,
     nickname: 'cpak',
     profileImageUrl: 'https://placekitten.com/800/800',
     text: '반갑습니다',
