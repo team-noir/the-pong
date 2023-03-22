@@ -21,6 +21,25 @@ const mockBlocks: UserType[] = [
   },
 ];
 
+const mockFollowings: UserType[] = [
+  {
+    id: 1,
+    nickname: 'Mock Following Nickname1',
+  },
+  {
+    id: 2,
+    nickname: 'Mock Following Nickname2',
+  },
+  {
+    id: 3,
+    nickname: 'Mock Following Nickname3',
+  },
+  {
+    id: 4,
+    nickname: 'Mock Following Nickname4',
+  },
+];
+
 export const handlers = [
   rest.get(`${API_PREFIX}/health-check`, (req, res, ctx) => {
     return res(
@@ -64,6 +83,18 @@ export const handlers = [
       mockBlocks.push({
         id: userId,
         nickname: `Mock Block Nickname${userId}`,
+      });
+    }
+    return res(ctx.status(204));
+  }),
+
+  rest.put(`${API_PREFIX}/my/following/:userId`, (req, res, ctx) => {
+    const userId = Number(req.params.userId);
+    const index = mockFollowings.findIndex((user) => user.id === userId);
+    if (index == -1) {
+      mockFollowings.push({
+        id: userId,
+        nickname: `Mock Following Nickname${userId}`,
       });
     }
     return res(ctx.status(204));
