@@ -14,9 +14,11 @@ async function bootstrap() {
   SwaggerModule.setup('api/v1/docs', app, document);
 
   app.use(cookie_parser());
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+    })
+  );
   await app.listen(8000);
 }
 bootstrap();
