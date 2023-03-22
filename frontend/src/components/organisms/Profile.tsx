@@ -9,6 +9,7 @@ interface Props {
   onClickFollow: (userId: number) => void;
   onClickUnfollow: (userId: number) => void;
   onClickBlock: (userId: number) => void;
+  onClickUnblock: (userId: number) => void;
 }
 
 export default function Profile({
@@ -17,6 +18,7 @@ export default function Profile({
   onClickFollow,
   onClickUnfollow,
   onClickBlock,
+  onClickUnblock,
 }: Props) {
   const isMyPage = user.id.toString() === myId;
 
@@ -42,9 +44,16 @@ export default function Profile({
               팔로우하기
             </Button>
           )}
-          <Button type="button" onClick={() => onClickBlock(user.id)}>
-            차단하기
-          </Button>
+          {user.isBlocked && (
+            <Button type="button" onClick={() => onClickUnblock(user.id)}>
+              차단 해제
+            </Button>
+          )}
+          {!user.isBlocked && (
+            <Button type="button" onClick={() => onClickBlock(user.id)}>
+              차단하기
+            </Button>
+          )}
         </div>
       )}
     </>

@@ -29,6 +29,7 @@ export interface ProfileType {
   achievements: [];
   games: [];
   isFollowing: boolean;
+  isBlocked: boolean;
 }
 
 export const getProfile = async (userId: string): Promise<ProfileType> => {
