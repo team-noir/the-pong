@@ -18,6 +18,7 @@ import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { SettingDto } from './dtos/setting.dto';
 import { MyService } from './my.service';
 import { MyDto } from './dtos/my.dto';
+import { PROFILE_PATH } from '../../const';
 
 @ApiTags('my')
 @Controller('my')
@@ -62,7 +63,7 @@ export class MyController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: './profile-images',
+        destination: PROFILE_PATH,
         filename: (req, file, cb) => {
           const ext: string = file.mimetype.split('/')[1];
           return cb(null, `${req.user.id}.${ext}`);

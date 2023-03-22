@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { Response } from 'express';
+import { PROFILE_PATH } from '../../const';
 
 @Injectable()
 export class UsersService {
@@ -36,7 +37,7 @@ export class UsersService {
       return;
     }
     const file = createReadStream(
-      join(process.cwd(), `profile-images/${user.imageUrl}`)
+      join(process.cwd(), `${PROFILE_PATH}${user.imageUrl}`)
     );
     const mimetype = user.imageUrl.split('.')[1];
     res.set({
