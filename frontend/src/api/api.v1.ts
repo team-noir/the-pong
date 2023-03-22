@@ -28,6 +28,7 @@ export interface ProfileType {
   rank: number;
   achievements: [];
   games: [];
+  isFollowing: boolean;
 }
 
 export const getProfile = async (userId: string): Promise<ProfileType> => {

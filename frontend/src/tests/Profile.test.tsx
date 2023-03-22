@@ -9,6 +9,7 @@ const profileUser: ProfileType = {
   rank: 0,
   achievements: [],
   games: [],
+  isFollowing: false,
 };
 
 const mockFollowings: UserType[] = [
@@ -40,7 +41,6 @@ describe('Component - Profile 렌더링', () => {
       <Profile
         user={profileUser}
         myId={'2'}
-        followings={mockFollowings}
         onClickUnfollow={() => console.log('Unfollowed')}
       />
     );

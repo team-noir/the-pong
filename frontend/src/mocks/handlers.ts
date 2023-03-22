@@ -62,6 +62,9 @@ export const handlers = [
         rank: 0,
         achievements: [],
         games: [],
+        isFollowing: mockFollowings.some(
+          (user) => user.id === parseInt(userId)
+        ),
       })
     );
   }),

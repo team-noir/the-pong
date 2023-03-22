@@ -7,18 +7,11 @@ import { UserType } from 'types/userType';
 interface Props {
   user: ProfileType;
   myId: string;
-  followings: UserType[] | null;
   onClickUnfollow: (userId: number) => void;
 }
 
-export default function Profile({
-  user,
-  myId,
-  followings,
-  onClickUnfollow,
-}: Props) {
+export default function Profile({ user, myId, onClickUnfollow }: Props) {
   const isMyPage = user.id.toString() === myId;
-  const isFollowing = followings?.some((following) => following.id === user.id);
 
   return (
     <>
@@ -32,12 +25,12 @@ export default function Profile({
       {isMyPage && <Link to="/setting">프로필 수정하기</Link>}
       {!isMyPage && (
         <div>
-          {isFollowing && (
+          {user.isFollowing && (
             <Button type="button" onClick={() => onClickUnfollow(user.id)}>
               언팔로우
             </Button>
           )}
-          {!isFollowing && <Button type="button">팔로우하기</Button>}
+          {!user.isFollowing && <Button type="button">팔로우하기</Button>}
           <Button type="button">차단하기</Button>
         </div>
       )}

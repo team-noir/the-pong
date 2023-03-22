@@ -2,7 +2,6 @@ import Profile from 'components/organisms/Profile';
 import Achievements from 'components/organisms/Achievements';
 import {
   deleteMyFollowing,
-  getMyFollowing,
   getProfile,
   getWhoami,
   ProfileType,
@@ -23,11 +22,6 @@ export default function ProfilePage() {
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
     queryFn: getWhoami,
-  });
-
-  const getMyFollowingQuery = useQuery<UserType[], AxiosError>({
-    queryKey: ['getMyFollowing'],
-    queryFn: getMyFollowing,
   });
 
   const deleteMyFollowingMutation = useMutation(deleteMyFollowing);
@@ -51,7 +45,6 @@ export default function ProfilePage() {
           <Profile
             user={profileQuery.data}
             myId={`${whoamiQuery.data.id}`}
-            followings={getMyFollowingQuery.data || null}
             onClickUnfollow={handleClickUnfollow}
           />
           {/* <Achievements id={profileQuery.data.id} /> */}
