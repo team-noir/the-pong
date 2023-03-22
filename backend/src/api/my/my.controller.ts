@@ -46,16 +46,14 @@ export class MyController {
   @UseGuards(AuthenticatedGuard)
   async whoami(@Req() req, @Res() res) {
     const user: MyDto = await this.myService.whoami(req);
-    const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-    res.status(statusCode).send(user);
+    res.status(HttpStatus.OK).send(user);
   }
 
   @Patch('settings')
   @UseGuards(AuthenticatedGuard)
   async setMyProfile(@Req() req, @Body() body: SettingDto, @Res() res) {
     const user: MyDto = await this.myService.setMyProfile(req, body);
-    const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-    res.status(statusCode).send(user);
+    res.status(HttpStatus.OK).send(user);
   }
 
   @Post('profile-image')
@@ -71,13 +69,9 @@ export class MyController {
       }),
     })
   )
-  async uploadProfileImage(
-    @Req() req,
-    @Res({ passthrough: true }) res,
-    @UploadedFile() file
-  ) {
-    const statusCode = file ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-    res.status(statusCode);
-    return await this.myService.uploadProfileImage(req.user.id, file);
+  async uploadProfileImage(@Req() req, @Res() res, @UploadedFile() file) {
+    const statusCode = file ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST;
+    await this.myService.uploadProfileImage(req.user.id, file);
+    res.status(statusCode).send();
   }
 }
