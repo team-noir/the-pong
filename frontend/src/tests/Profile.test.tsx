@@ -16,7 +16,10 @@ describe('Component - Profile 렌더링', () => {
       <Profile
         user={profileUser}
         myId={'2'}
-        onClickFollow={(userId: number) => console.log(userId)}
+        onClickFollow={(userId: number) => console.log(`${userId} followed`)}
+        onClickBlock={(userId: number) => {
+          console.log(`${userId} blocked`);
+        }}
       />
     );
     screen.getByText(`user1's nickname`);

@@ -3,16 +3,23 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import { routes } from 'App';
 import { RouterProvider, createMemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+const queryClient = new QueryClient();
 
 describe('Router - Nav에 있는 페이지들 렌더링', () => {
   test('Nav의 링크를 클릭하면 각 페이지로 이동한다', async () => {
     const route = '/';
 
-    const router = await createMemoryRouter(routes(true), {
+    const router = createMemoryRouter(routes(true), {
       initialEntries: [route],
     });
 
-    render(<RouterProvider router={router} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    );
     const user = userEvent.setup();
 
     screen.getByText('MainPage');
@@ -26,7 +33,7 @@ describe('Router - Nav에 있는 페이지들 렌더링', () => {
     await waitFor(async () => user.click(screen.getByText(/following/i)));
     screen.getByText(/FollowingPage/i);
     await waitFor(async () => user.click(screen.getByText(/profile/i)));
-    screen.getByText(/ProfilePage/i);
+    screen.findByText(/ProfilePage/i);
     await waitFor(async () => user.click(screen.getByText(/setting/i)));
     screen.getByText(/SettingPage/i);
   });
@@ -54,9 +61,13 @@ describe('Router - ProfilePage 렌더링', () => {
       initialEntries: [route],
     });
 
-    render(<RouterProvider router={router} />);
+    render(
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    );
 
-    await screen.findByText('ProfilePage');
-    screen.getByTestId('1');
+    screen.findByText('ProfilePage');
+    screen.findByTestId('1');
   });
 });

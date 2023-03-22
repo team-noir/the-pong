@@ -1,6 +1,12 @@
 import Profile from 'components/organisms/Profile';
 import Achievements from 'components/organisms/Achievements';
-import { getProfile, getWhoami, ProfileType, putMyFollowing } from 'api/api.v1';
+import {
+  getProfile,
+  getWhoami,
+  ProfileType,
+  putMyFollowing,
+  putMyBlocks,
+} from 'api/api.v1';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { AxiosError } from 'axios';
@@ -20,11 +26,18 @@ export default function ProfilePage() {
   });
 
   const putMyFollowingMutation = useMutation(putMyFollowing);
+  const putMyBlocksMutation = useMutation(putMyBlocks);
 
   const handleClickFollow = (userId: number) => {
     const answer = confirm('팔로우하시겠습니까?');
     if (!answer) return;
     putMyFollowingMutation.mutate(userId);
+  };
+
+  const handleClickBlock = (userId: number) => {
+    const answer = confirm('정말 차단하시겠습니까?');
+    if (!answer) return;
+    putMyBlocksMutation.mutate(userId);
   };
 
   return (
@@ -41,6 +54,7 @@ export default function ProfilePage() {
             user={profileQuery.data}
             myId={`${whoamiQuery.data.id}`}
             onClickFollow={handleClickFollow}
+            onClickBlock={handleClickBlock}
           />
           {/* <Achievements id={profileQuery.data.id} /> */}
         </>
