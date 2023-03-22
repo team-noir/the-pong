@@ -5,6 +5,7 @@ import {
   getWhoami,
   ProfileType,
   putMyFollowing,
+  deleteMyFollowing,
   putMyBlocks,
 } from 'api/api.v1';
 import { useQuery, useMutation } from '@tanstack/react-query';
@@ -26,12 +27,19 @@ export default function ProfilePage() {
   });
 
   const putMyFollowingMutation = useMutation(putMyFollowing);
+  const deleteMyFollowingMutation = useMutation(deleteMyFollowing);
   const putMyBlocksMutation = useMutation(putMyBlocks);
 
   const handleClickFollow = (userId: number) => {
     const answer = confirm('팔로우하시겠습니까?');
     if (!answer) return;
     putMyFollowingMutation.mutate(userId);
+  };
+
+  const handleClickUnfollow = (userId: number) => {
+    const answer = confirm('언팔로우하시겠습니까?');
+    if (!answer) return;
+    deleteMyFollowingMutation.mutate(Number(userId));
   };
 
   const handleClickBlock = (userId: number) => {
@@ -54,6 +62,7 @@ export default function ProfilePage() {
             user={profileQuery.data}
             myId={`${whoamiQuery.data.id}`}
             onClickFollow={handleClickFollow}
+            onClickUnfollow={handleClickUnfollow}
             onClickBlock={handleClickBlock}
           />
           {/* <Achievements id={profileQuery.data.id} /> */}

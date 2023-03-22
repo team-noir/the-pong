@@ -28,6 +28,7 @@ export interface ProfileType {
   rank: number;
   achievements: [];
   games: [];
+  isFollowing: boolean;
 }
 
 export const getProfile = async (userId: string): Promise<ProfileType> => {
@@ -66,6 +67,22 @@ export const putMyBlocks = async (userId: number) => {
   const res = await axios.put(`/my/blocks/${userId}`);
   if (res.status !== 204) {
     throw new Error('Failed to put my blocks');
+  }
+  return res;
+};
+
+export const getMyFollowing = async () => {
+  const res = await axios.get(`/my/following`);
+  if (res.status !== 200) {
+    throw new Error('Failed to get my following');
+  }
+  return res.data;
+};
+
+export const deleteMyFollowing = async (userId: number) => {
+  const res = await axios.delete(`/my/following/${userId}`);
+  if (res.status !== 204) {
+    throw new Error('Failed to delete my following');
   }
   return res;
 };
