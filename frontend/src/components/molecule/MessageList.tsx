@@ -6,7 +6,7 @@ interface Props {
   messages: DummyMessageType[] | null;
 }
 
-const myUsrId = '1';
+const myUsrId = 1;
 
 export default function MessageList({ messages }: Props) {
   return (

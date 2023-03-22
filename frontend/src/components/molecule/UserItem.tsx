@@ -27,7 +27,7 @@ export default function UserItem({
       <Link to={`/profile/${user.id}`}>
         <div className={userItemStyles.container}>
           <ProfileImage
-            profileImageUrl={`${API_PREFIX}/users/${user.id}/profile-image`}
+            userId={user.id}
             alt={`${user.nickname}'s profile image`}
             size={imageSize}
           />
