@@ -6,10 +6,16 @@ import { API_PREFIX, ProfileType } from 'api/api.v1';
 interface Props {
   user: ProfileType;
   myId: string;
+  onClickFollow: (userId: number) => void;
   onClickBlock: (userId: number) => void;
 }
 
-export default function Profile({ user, myId, onClickBlock }: Props) {
+export default function Profile({
+  user,
+  myId,
+  onClickFollow,
+  onClickBlock,
+}: Props) {
   const isMyPage = user.id.toString() === myId;
 
   return (
@@ -24,7 +30,9 @@ export default function Profile({ user, myId, onClickBlock }: Props) {
       {isMyPage && <Link to="/setting">프로필 수정하기</Link>}
       {!isMyPage && (
         <div>
-          <Button type="button">팔로우하기</Button>
+          <Button type="button" onClick={() => onClickFollow(user.id)}>
+            팔로우하기
+          </Button>
           <Button type="button" onClick={() => onClickBlock(user.id)}>
             차단하기
           </Button>

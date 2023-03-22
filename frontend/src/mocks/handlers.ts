@@ -21,6 +21,25 @@ const mockBlocks: UserType[] = [
   },
 ];
 
+const mockFollowings: UserType[] = [
+  {
+    id: 1,
+    nickname: 'Mock Following Nickname1',
+  },
+  {
+    id: 2,
+    nickname: 'Mock Following Nickname2',
+  },
+  {
+    id: 3,
+    nickname: 'Mock Following Nickname3',
+  },
+  {
+    id: 4,
+    nickname: 'Mock Following Nickname4',
+  },
+];
+
 export const handlers = [
   rest.get(`${API_PREFIX}/health-check`, (req, res, ctx) => {
     return res(
@@ -36,6 +55,19 @@ export const handlers = [
       ctx.json({
         id: userId,
         nickname: `user${userId}'s nickname`,
+        rank: 0,
+        achievements: [],
+        games: [],
+      })
+    );
+  }),
+
+  rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
+    const { nickname } = await req.json();
+    return res(
+      ctx.json({
+        id: 1,
+        nickname: nickname,
         rank: 0,
         achievements: [],
         games: [],
@@ -69,16 +101,15 @@ export const handlers = [
     return res(ctx.status(204));
   }),
 
-  rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
-    const { nickname } = await req.json();
-    return res(
-      ctx.json({
-        id: 1,
-        nickname: nickname,
-        rank: 0,
-        achievements: [],
-        games: [],
-      })
-    );
+  rest.put(`${API_PREFIX}/my/following/:userId`, (req, res, ctx) => {
+    const userId = Number(req.params.userId);
+    const index = mockFollowings.findIndex((user) => user.id === userId);
+    if (index == -1) {
+      mockFollowings.push({
+        id: userId,
+        nickname: `Mock Following Nickname${userId}`,
+      });
+    }
+    return res(ctx.status(204));
   }),
 ];

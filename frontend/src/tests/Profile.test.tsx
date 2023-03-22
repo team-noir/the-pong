@@ -16,8 +16,9 @@ describe('Component - Profile 렌더링', () => {
       <Profile
         user={profileUser}
         myId={'2'}
+        onClickFollow={(userId: number) => console.log(`${userId} followed`)}
         onClickBlock={(userId: number) => {
-          console.log(userId);
+          console.log(`${userId} blocked`);
         }}
       />
     );
