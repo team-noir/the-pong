@@ -2,15 +2,22 @@ import Button from 'components/atoms/Button';
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { API_PREFIX, ProfileType } from 'api/api.v1';
-import { UserType } from 'types/userType';
 
 interface Props {
   user: ProfileType;
   myId: string;
+  onClickFollow: (userId: number) => void;
   onClickUnfollow: (userId: number) => void;
+  onClickBlock: (userId: number) => void;
 }
 
-export default function Profile({ user, myId, onClickUnfollow }: Props) {
+export default function Profile({
+  user,
+  myId,
+  onClickFollow,
+  onClickUnfollow,
+  onClickBlock,
+}: Props) {
   const isMyPage = user.id.toString() === myId;
 
   return (
@@ -30,8 +37,14 @@ export default function Profile({ user, myId, onClickUnfollow }: Props) {
               언팔로우
             </Button>
           )}
-          {!user.isFollowing && <Button type="button">팔로우하기</Button>}
-          <Button type="button">차단하기</Button>
+          {!user.isFollowing && (
+            <Button type="button" onClick={() => onClickFollow(user.id)}>
+              팔로우하기
+            </Button>
+          )}
+          <Button type="button" onClick={() => onClickBlock(user.id)}>
+            차단하기
+          </Button>
         </div>
       )}
     </>

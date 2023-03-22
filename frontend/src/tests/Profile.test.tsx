@@ -41,11 +41,17 @@ describe('Component - Profile 렌더링', () => {
       <Profile
         user={profileUser}
         myId={'2'}
-        onClickUnfollow={() => console.log('Unfollowed')}
+        onClickFollow={(userId: number) => console.log(`${userId} followed`)}
+        onClickUnfollow={(userId: number) =>
+          console.log(`${userId} unfollowed`)
+        }
+        onClickBlock={(userId: number) => {
+          console.log(`${userId} blocked`);
+        }}
       />
     );
-    screen.getByText(`user1's nickname`);
-    screen.getByAltText('profile image');
-    screen.getByText('팔로우하기');
+    screen.findByText(profileUser.nickname);
+    screen.findByAltText('profile image');
+    screen.findByText('팔로우하기');
   });
 });

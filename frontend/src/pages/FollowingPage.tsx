@@ -24,13 +24,13 @@ export default function FollowingPage() {
 
   return (
     <>
+      <h1>FollowingPage</h1>
       {getMyFollowingQuery.isLoading && <div>Loading...</div>}
       {getMyFollowingQuery.isError && (
         <div>{getMyFollowingQuery.error.message}</div>
       )}
       {getMyFollowingQuery.isSuccess && (
         <>
-          <h1>FollowingPage</h1>
           <Following
             users={getMyFollowingQuery.data}
             onClickUnfollow={handleClickUnfollow}
