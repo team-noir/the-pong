@@ -81,6 +81,10 @@ export const handlers = [
     );
   }),
 
+  rest.post(`${API_PREFIX}/my/profile-image`, async (_, res, ctx) => {
+    return res(ctx.status(204));
+  }),
+
   rest.get(`${API_PREFIX}/my/blocks`, (req, res, ctx) => {
     return res(ctx.json(mockBlocks));
   }),
