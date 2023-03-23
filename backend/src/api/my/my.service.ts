@@ -53,21 +53,56 @@ export class MyService {
     return user;
   }
 
-  async following(@Req() req) {
-    const { id: userId } = await this.authService.getJwtPayload(req);
-    if (!userId) {
+  async getFollowing(@Req() req) {
+    const myUserId = req.user.id;
+    if (!myUserId) {
       return null;
     }
 
     const following = await this.prismaService.followUser
       .findMany({
-        where: { followerId: userId },
+        where: { followerId: myUserId },
         select: {
           follewee: { select: { id: true, nickname: true } },
         },
       })
       .then((follows) => follows.map((follow) => follow.follewee));
 
+    return following;
+  }
+
+  async putFollowing(@Req() req) {
+    const myUserId = req.user.id;
+
+    if (!myUserId) {
+      throw new Error('not logged in');
+    }
+
+    // check if user exists
+    const { userId } = req.params;
+    const user = await this.prismaService.user.findUnique({
+      where: { id: Number(userId) },
+    });
+    if (!user) {
+      throw new Error('user not found');
+    }
+
+    const following = await this.prismaService.followUser.upsert({
+      where: {
+        id: {
+          followerId: myUserId,
+          followeeId: Number(userId),
+        },
+      },
+      create: {
+        followerId: myUserId,
+        followeeId: Number(userId),
+      },
+      update: {
+        followerId: myUserId,
+        followeeId: Number(userId),
+      },
+    });
     return following;
   }
 }

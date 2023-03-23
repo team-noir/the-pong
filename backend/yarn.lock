@@ -1211,7 +1211,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma/client@npm:^4.11.0":
+"@prisma/client@npm:4.11.0":
   version: 4.11.0
   resolution: "@prisma/client@npm:4.11.0"
   dependencies:
@@ -6511,7 +6511,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prisma@npm:^4.11.0":
+"prisma@npm:4.11.0":
   version: 4.11.0
   resolution: "prisma@npm:4.11.0"
   dependencies:
@@ -7400,7 +7400,7 @@ __metadata:
     "@nestjs/schematics": ^9.0.0
     "@nestjs/swagger": ^6.2.1
     "@nestjs/testing": ^9.0.0
-    "@prisma/client": ^4.11.0
+    "@prisma/client": 4.11.0
     "@types/express": ^4.17.13
     "@types/jest": 29.2.4
     "@types/node": ^18.14.6
@@ -7428,7 +7428,7 @@ __metadata:
     passport-local: ^1.0.0
     passport-oauth2-refresh: ^2.1.0
     prettier: ^2.8.4
-    prisma: ^4.11.0
+    prisma: 4.11.0
     reflect-metadata: ^0.1.13
     rxjs: ^7.2.0
     source-map-support: ^0.5.20
