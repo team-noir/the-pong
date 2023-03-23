@@ -74,4 +74,10 @@ export class MyController {
     await this.myService.uploadProfileImage(req.user.id, file);
     res.status(statusCode).send();
   }
+
+  @Get('follwing')
+  @UseGuards(AuthenticatedGuard)
+  async following(@Req() req) {
+    return this.myService.following(req);
+  }
 }
