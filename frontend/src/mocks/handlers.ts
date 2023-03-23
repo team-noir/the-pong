@@ -63,6 +63,7 @@ export const handlers = [
         achievements: [],
         games: [],
         isFollowing: mockFollowings.some((user) => user.id === userId),
+        isBlocked: mockBlocks.some((user) => user.id === userId),
       })
     );
   }),
