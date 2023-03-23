@@ -7,6 +7,7 @@ import {
   putMyFollowing,
   deleteMyFollowing,
   putMyBlocks,
+  deleteMyBlocks,
 } from 'api/api.v1';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
@@ -29,6 +30,7 @@ export default function ProfilePage() {
   const putMyFollowingMutation = useMutation(putMyFollowing);
   const deleteMyFollowingMutation = useMutation(deleteMyFollowing);
   const putMyBlocksMutation = useMutation(putMyBlocks);
+  const deleteMyBlocksMutation = useMutation(deleteMyBlocks);
 
   const handleClickFollow = (userId: number) => {
     const answer = confirm('팔로우하시겠습니까?');
@@ -48,6 +50,12 @@ export default function ProfilePage() {
     putMyBlocksMutation.mutate(userId);
   };
 
+  const handleClickUnblock = (userId: number) => {
+    const answer = confirm('차단을 해제하시겠습니까?');
+    if (!answer) return;
+    deleteMyBlocksMutation.mutate(userId);
+  };
+
   return (
     <>
       {(profileQuery.isLoading || whoamiQuery.isLoading) && (
@@ -64,6 +72,7 @@ export default function ProfilePage() {
             onClickFollow={handleClickFollow}
             onClickUnfollow={handleClickUnfollow}
             onClickBlock={handleClickBlock}
+            onClickUnblock={handleClickUnblock}
           />
           {/* <Achievements id={profileQuery.data.id} /> */}
         </>

@@ -18,7 +18,7 @@ export default function MessageItem({
       {isShowProfile && (
         <div>
           <ProfileImage
-            profileImageUrl={message.profileImageUrl}
+            userId={message.userId}
             alt={`${message.nickname}'s profile image`}
             size={52}
           />

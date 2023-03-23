@@ -1,16 +1,12 @@
 import { Injectable, Req } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthService } from '../auth/auth.service';
 import { SettingDto } from './dtos/setting.dto';
 import { MyDto } from './dtos/my.dto';
 import { User } from '@prisma';
 
 @Injectable()
 export class MyService {
-  constructor(
-    private authService: AuthService,
-    private prismaService: PrismaService
-  ) {}
+  constructor(private prismaService: PrismaService) {}
 
   userToMyDto(user: User): MyDto {
     const my: MyDto = {
@@ -27,20 +23,22 @@ export class MyService {
   }
 
   async whoami(@Req() req): Promise<MyDto> {
-    const user: User = await this.authService.getUserFromJwt(req);
-    if (!user) {
-      return null;
-    }
-    return this.userToMyDto(user);
+    return this.userToMyDto(req.user);
   }
 
   async setMyProfile(@Req() req, newData: SettingDto): Promise<MyDto> {
-    const user: User = await this.authService.getUserFromJwt(req);
-    if (!user) {
-      return null;
-    }
-    const newUser: User = await this.setUser(user.id, newData);
+    const newUser: User = await this.setUser(req.user.id, newData);
     return this.userToMyDto(newUser);
+  }
+
+  async uploadProfileImage(userId: number, file) {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        imageUrl: file.filename,
+        updatedAt: new Date(),
+      },
+    });
   }
 
   async setUser(userId: number, newData: SettingDto): Promise<User> {

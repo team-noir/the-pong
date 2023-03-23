@@ -63,6 +63,7 @@ export const handlers = [
         achievements: [],
         games: [],
         isFollowing: mockFollowings.some((user) => user.id === userId),
+        isBlocked: mockBlocks.some((user) => user.id === userId),
       })
     );
   }),
@@ -78,6 +79,10 @@ export const handlers = [
         games: [],
       })
     );
+  }),
+
+  rest.post(`${API_PREFIX}/my/profile-image`, async (_, res, ctx) => {
+    return res(ctx.status(204));
   }),
 
   rest.get(`${API_PREFIX}/my/blocks`, (req, res, ctx) => {

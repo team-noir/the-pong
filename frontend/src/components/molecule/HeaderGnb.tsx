@@ -61,11 +61,7 @@ export default function HeaderGnb() {
       <Button type="button">햄버거</Button>
       <div>로고</div>
       <Link to={`/profile/${user?.id}`}>
-        <ProfileImage
-          profileImageUrl={`${API_PREFIX}/users/${user?.id}/profile-image`}
-          alt="my profile image"
-          size={52}
-        />
+        <ProfileImage userId={user?.id} alt="my profile image" size={52} />
       </Link>
     </>
   );

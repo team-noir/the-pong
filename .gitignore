@@ -200,3 +200,5 @@ sketch
 # prisma build files 
 backend/prisma/*
 !backend/prisma/schema.prisma
+
+backend/upload/profile-images

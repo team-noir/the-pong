@@ -5,18 +5,22 @@ import StepNickname from 'components/organisms/OnBoarding/StepNickname';
 import StepProfileImage from 'components/organisms/OnBoarding/StepProfileImage';
 import StepWelcome from 'components/organisms/OnBoarding/StepWelcome';
 import { validateAgreements, validateNickname } from 'utils/validatorUtils';
+import { ProfileFormType } from 'types/profileFormType';
 
-export interface FormData {
+interface Props {
+  isSubmitted: boolean;
+  onSubmit: (formData: ProfileFormType) => void;
+}
+
+export interface FormData extends ProfileFormType {
   isCheckedAll: boolean;
   isCheckedAge: boolean;
   isCheckedTerms: boolean;
   isCheckedPrivacy: boolean;
   isCheckedMarketing: boolean;
-  nickname: string;
-  profileImage: File | null;
 }
 
-export default function OnBoarding() {
+export default function OnBoarding({ isSubmitted, onSubmit }: Props) {
   const [formData, setFormData] = useState<FormData>({
     isCheckedAll: false,
     isCheckedAge: false,
@@ -24,7 +28,7 @@ export default function OnBoarding() {
     isCheckedPrivacy: false,
     isCheckedMarketing: false,
     nickname: '',
-    profileImage: null,
+    imageFile: null,
   });
 
   return (
@@ -56,7 +60,9 @@ export default function OnBoarding() {
           () => validateNickname(formData.nickname),
           null,
         ]}
-        messages={['필수 약관에 동의해주세요.', '닉네임을 입력해주세요.', '']}
+        messages={['필수 약관에 동의해 주세요.', '닉네임을 확인해 주세요.', '']}
+        isSubmitted={isSubmitted}
+        onSubmit={onSubmit}
       />
     </>
   );

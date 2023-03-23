@@ -7,23 +7,16 @@ import { AxiosError } from 'axios';
 import SettingProfile from 'components/organisms/SettingProfile';
 import { useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-
-export interface UserForm {
-  nickname: string;
-  imageFile: File | null;
-}
+import { ProfileFormType } from 'types/profileFormType';
 
 export default function SettingProfilePage() {
+  const navigate = useNavigate();
+
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
     queryFn: getWhoami,
   });
   const patchMyProfileMutation = useMutation(patchMyProfile);
-  const navigate = useNavigate();
-
-  const handleSubmit = (userFormData: UserForm) => {
-    patchMyProfileMutation.mutate(userFormData.nickname);
-  };
 
   useEffect(() => {
     if (patchMyProfileMutation.isError) {
@@ -32,7 +25,11 @@ export default function SettingProfilePage() {
     if (patchMyProfileMutation.isSuccess && whoamiQuery.isSuccess) {
       navigate(`/profile/${whoamiQuery.data.id}`);
     }
-  }, [patchMyProfileMutation]);
+  }, [patchMyProfileMutation, whoamiQuery]);
+
+  const handleSubmit = (formData: ProfileFormType) => {
+    patchMyProfileMutation.mutate(formData.nickname);
+  };
 
   return (
     <AppTemplate header={<HeaderWithBackButton title={'프로필 수정'} />}>

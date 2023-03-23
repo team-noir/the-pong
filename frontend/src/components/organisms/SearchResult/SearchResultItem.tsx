@@ -13,7 +13,7 @@ export default function SearchResultItem({ user }: Props) {
     <Link to={`/profile/${user.id}`}>
       <li className={styles.li}>
         <ProfileImage
-          profileImageUrl={`${API_PREFIX}/users/${user.id}/profile-image`}
+          userId={user.id}
           alt={`${user.nickname}'s profile image`}
           size={52}
         />

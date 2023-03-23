@@ -29,6 +29,7 @@ export interface ProfileType {
   achievements: [];
   games: [];
   isFollowing: boolean;
+  isBlocked: boolean;
 }
 
 export const getProfile = async (userId: string): Promise<ProfileType> => {
@@ -45,6 +46,14 @@ export const patchMyProfile = async (nickname: string): Promise<UserType> => {
     throw new Error('Failed to patch profile');
   }
   return res.data;
+};
+
+export const PostMyProfileImage = async (imageFile: File) => {
+  const res = await axios.post(`/my/profile-image`, imageFile);
+  if (res.status !== 204) {
+    throw new Error('Failed to post profile image');
+  }
+  return res;
 };
 
 export const getMyBlocks = async () => {
