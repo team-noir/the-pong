@@ -15,6 +15,7 @@ export default function SearchBar() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!inputText.trim()) return;
     setInputText('');
     e.currentTarget.reset();
     navigate({

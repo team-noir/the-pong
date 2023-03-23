@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { UserType } from 'types/userType';
 
 export const API_PREFIX = `/api/v1`;
@@ -36,6 +36,24 @@ export const getProfile = async (userId: string): Promise<ProfileType> => {
   if (res.status !== 200) {
     throw new Error('Failed to get profile');
   }
+  return res.data;
+};
+
+export const getUsers = async (
+  q: string,
+  page = 1,
+  per_page = 30
+): Promise<UserType[]> => {
+  const res = await axios
+    .get(`/users`, {
+      params: { q, page, per_page },
+    })
+    .catch((error) => {
+      if (error.response.status === 404) {
+        throw new AxiosError('검색 결과가 없습니다.', '404');
+      }
+      throw error;
+    });
   return res.data;
 };
 

@@ -2,6 +2,25 @@ import { rest } from 'msw';
 import { API_PREFIX } from 'api/api.v1';
 import { UserType } from 'types/userType';
 
+const mockUsers: UserType[] = [
+  {
+    id: 1,
+    nickname: 'Mock User Nickname1',
+  },
+  {
+    id: 2,
+    nickname: 'Mock User Nickname2',
+  },
+  {
+    id: 3,
+    nickname: 'Mock User Nickname3',
+  },
+  {
+    id: 4,
+    nickname: 'Mock User Nickname4',
+  },
+];
+
 const mockBlocks: UserType[] = [
   {
     id: 1,
@@ -53,7 +72,7 @@ export const handlers = [
     );
   }),
 
-  rest.get('/api/v1/users/:userId', (req, res, ctx) => {
+  rest.get(`${API_PREFIX}/users/:userId`, (req, res, ctx) => {
     const userId = Number(req.params.userId);
     return res(
       ctx.json({
@@ -65,6 +84,15 @@ export const handlers = [
         isFollowing: mockFollowings.some((user) => user.id === userId),
       })
     );
+  }),
+
+  rest.get(`${API_PREFIX}/users`, (req, res, ctx) => {
+    const q = String(req.url.searchParams.get('q'));
+    const result = mockUsers.filter((user) => user.nickname?.includes(q));
+    if (result.length === 0) {
+      return res(ctx.status(404));
+    }
+    return res(ctx.json(result));
   }),
 
   rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
