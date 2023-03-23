@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { UserType } from 'types/userType';
 
 export const API_PREFIX = `/api/v1`;
@@ -97,10 +97,12 @@ export const putMyBlocks = async (userId: number) => {
 };
 
 export const getMyFollowing = async () => {
-  const res = await axios.get(`/my/following`);
-  if (res.status !== 200) {
-    throw new Error('Failed to get my following');
-  }
+  const res = await axios.get(`/my/following`).catch((error) => {
+    if (error.response.status === 404) {
+      throw new AxiosError('팔로잉한 회원이 없습니다', '404');
+    }
+    throw error;
+  });
   return res.data;
 };
 
