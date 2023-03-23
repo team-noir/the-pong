@@ -56,14 +56,14 @@ export class MyService {
   }
 
   async getFollowing(@Req() req) {
-    const { id: userId } = await this.authService.getJwtPayload(req);
-    if (!userId) {
+    const myUserId = req.user.id;
+    if (!myUserId) {
       return null;
     }
 
     const following = await this.prismaService.followUser
       .findMany({
-        where: { followerId: userId },
+        where: { followerId: myUserId },
         select: {
           follewee: { select: { id: true, nickname: true } },
         },
@@ -74,8 +74,9 @@ export class MyService {
   }
 
   async putFollowing(@Req() req) {
-    const { id: myId } = await this.authService.getJwtPayload(req);
-    if (!myId) {
+    const myUserId = req.user.id;
+
+    if (!myUserId) {
       throw new Error('not logged in');
     }
 
@@ -91,16 +92,16 @@ export class MyService {
     const following = await this.prismaService.followUser.upsert({
       where: {
         id: {
-          followerId: myId,
+          followerId: myUserId,
           followeeId: Number(userId),
         },
       },
       create: {
-        followerId: myId,
+        followerId: myUserId,
         followeeId: Number(userId),
       },
       update: {
-        followerId: myId,
+        followerId: myUserId,
         followeeId: Number(userId),
       },
     });
