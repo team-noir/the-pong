@@ -1,11 +1,14 @@
 import {
   Controller,
-  Req,
   Res,
   Get,
   UseGuards,
   Param,
   HttpStatus,
+  HttpException,
+  Query,
+  DefaultValuePipe,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
@@ -18,14 +21,30 @@ import { UserDto } from './dtos/users.dto';
 export class UsersController {
   constructor(private usersService: UsersService) {}
 
+  @Get()
+  @UseGuards(AuthenticatedGuard)
+  async requestUsers(
+    @Res() res: Response,
+    @Query('q') q?: string,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
+    @Query('per_page', new DefaultValuePipe(30), ParseIntPipe) per_page?: number
+  ) {
+    try {
+      const users: UserDto[] = await this.usersService.getUsers({
+        q,
+        page,
+        per_page,
+      });
+      res.status(HttpStatus.OK).send(users);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Get(':userId')
   @UseGuards(AuthenticatedGuard)
-  async requestProfile(
-    @Req() req: Request,
-    @Param('userId') userId: number,
-    @Res() res: Response
-  ) {
-    const user: UserDto = await this.usersService.getUser(req, Number(userId));
+  async requestProfile(@Param('userId') userId: number, @Res() res: Response) {
+    const user: UserDto = await this.usersService.getUser(Number(userId));
     const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
     res.status(statusCode).send(user);
   }

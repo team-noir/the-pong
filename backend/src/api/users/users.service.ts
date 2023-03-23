@@ -1,43 +1,95 @@
-import { Injectable, StreamableFile, Req } from '@nestjs/common';
+import { Injectable, StreamableFile, Req, Scope, Inject } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createReadStream } from 'fs';
 import { join } from 'path';
 import { Response } from 'express';
 import { PROFILE_PATH } from '../../const';
 
-@Injectable()
+interface RequestWithUser extends Request {
+  user: any;
+}
+
+interface getUsersQuery {
+  q?: string;
+  page?: number;
+  per_page?: number;
+}
+
+@Injectable({ scope: Scope.REQUEST })
 export class UsersService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    @Inject(REQUEST) private readonly request: RequestWithUser,
+    private prismaService: PrismaService
+  ) {}
 
   async checkFollowed(
     followerId: number,
     followeeId: number
   ): Promise<boolean> {
-    const isFollowed = await this.prismaService.followUser.findUnique({
-      where: {
-        id: {
-          followerId,
-          followeeId,
+    return await this.prismaService.followUser
+      .findUnique({
+        where: {
+          id: {
+            followerId,
+            followeeId,
+          },
         },
-      },
-    });
-    return !!isFollowed;
+      })
+      .then((follow) => !!follow);
   }
 
   async checkBlocked(blockerId: number, blockedId: number): Promise<boolean> {
-    const isBlocked = await this.prismaService.blockUser.findUnique({
-      where: {
-        id: {
-          blockerId,
-          blockedId,
+    return await this.prismaService.blockUser
+      .findUnique({
+        where: {
+          id: {
+            blockerId,
+            blockedId,
+          },
         },
-      },
-    });
-    return !!isBlocked;
+      })
+      .then((block) => !!block);
   }
 
-  async getUser(@Req() req, userId: number) {
-    const myUserId = req.user.id;
+  async getUsers({ q, page, per_page }: getUsersQuery) {
+    const myUserId = this.request.user.id;
+
+    const where = q && {
+      nickname: {
+        contains: q,
+      },
+    };
+
+    return await this.prismaService.user
+      .findMany({
+        where,
+        skip: (page - 1) * per_page,
+        take: per_page,
+        select: {
+          id: true,
+          nickname: true,
+          rank: true,
+        },
+      })
+      .then((users) =>
+        Promise.all(
+          users.map(async (user) => ({
+            id: user.id,
+            nickname: user.nickname,
+            rank: user.rank,
+            achievements: [],
+            games: [],
+            is_followed_by_myself: await this.checkFollowed(myUserId, user.id),
+            is_blocked_by_myself: await this.checkBlocked(myUserId, user.id),
+          }))
+        )
+      );
+  }
+
+  async getUser(userId: number) {
+    const myUserId = this.request.user.id;
 
     if (!userId) {
       return null;
@@ -53,8 +105,6 @@ export class UsersService {
     if (!user) {
       return null;
     }
-    const is_followed_by_myself = await this.checkFollowed(myUserId, userId);
-    const is_blocked_by_myself = await this.checkBlocked(myUserId, userId);
 
     return {
       id: user.id,
@@ -62,8 +112,8 @@ export class UsersService {
       rank: user.rank,
       achievements: [],
       games: [],
-      is_followed_by_myself,
-      is_blocked_by_myself,
+      is_followed_by_myself: await this.checkFollowed(myUserId, userId),
+      is_blocked_by_myself: await this.checkBlocked(myUserId, userId),
     };
   }
 
