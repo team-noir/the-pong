@@ -9,6 +9,33 @@ import { PROFILE_PATH } from '../../const';
 export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
+  async checkFollowed(
+    followerId: number,
+    followeeId: number
+  ): Promise<boolean> {
+    const isFollowed = await this.prismaService.followUser.findUnique({
+      where: {
+        id: {
+          followerId,
+          followeeId,
+        },
+      },
+    });
+    return !!isFollowed;
+  }
+
+  async checkBlocked(blockerId: number, blockedId: number): Promise<boolean> {
+    const isBlocked = await this.prismaService.blockUser.findUnique({
+      where: {
+        id: {
+          blockerId,
+          blockedId,
+        },
+      },
+    });
+    return !!isBlocked;
+  }
+
   async getUser(@Req() req, userId: number) {
     const myUserId = req.user.id;
 
@@ -26,27 +53,8 @@ export class UsersService {
     if (!user) {
       return null;
     }
-    const is_followed_by_myself = await this.prismaService.user
-      .findUnique({
-        where: { id: userId },
-      })
-      .followees({
-        where: {
-          followerId: myUserId,
-        },
-      })
-      .then((followees) => followees.length > 0);
-
-    const is_blocked_by_myself = await this.prismaService.user
-      .findUnique({
-        where: { id: userId },
-      })
-      .blockers({
-        where: {
-          blockerId: myUserId,
-        },
-      })
-      .then((blockers) => blockers.length > 0);
+    const is_followed_by_myself = await this.checkFollowed(myUserId, userId);
+    const is_blocked_by_myself = await this.checkBlocked(myUserId, userId);
 
     return {
       id: user.id,
