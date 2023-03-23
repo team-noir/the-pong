@@ -123,10 +123,6 @@ export const handlers = [
     return res(ctx.status(204));
   }),
 
-  rest.get(`${API_PREFIX}/my/following`, (_, res, ctx) => {
-    return res(ctx.json(mockFollowings));
-  }),
-
   rest.delete(`${API_PREFIX}/my/following/:userId`, (req, res, ctx) => {
     const userId = Number(req.params.userId);
     const index = mockFollowings.findIndex((user) => user.id === userId);
