@@ -4,6 +4,7 @@ import {
   Put,
   Post,
   Patch,
+  Delete,
   Req,
   Param,
   Res,
@@ -89,6 +90,34 @@ export class MyController {
   async putFollowing(@Req() req, @Param('userId') userId: number, @Res() res) {
     try {
       await this.myService.putFollowing(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('blocks')
+  @UseGuards(AuthenticatedGuard)
+  async getBlocks(@Req() req) {
+    return this.myService.getBlocks(req);
+  }
+
+  @Put('blocks/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async putBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
+    try {
+      await this.myService.putBlocks(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Delete('blocks/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async deleteBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
+    try {
+      await this.myService.deleteBlocks(req);
       return res.status(HttpStatus.NO_CONTENT).send();
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
