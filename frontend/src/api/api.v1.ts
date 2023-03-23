@@ -14,6 +14,7 @@ export const getWhoami = async (): Promise<UserType> => {
   if (res.status !== 200) {
     throw new Error('Failed to get whoami');
   }
+  console.log('whoami', res.data);
   return res.data;
 };
 
@@ -49,7 +50,13 @@ export const patchMyProfile = async (nickname: string): Promise<UserType> => {
 };
 
 export const PostMyProfileImage = async (imageFile: File) => {
-  const res = await axios.post(`/my/profile-image`, imageFile);
+  const formData = new FormData();
+  formData.append('file', imageFile);
+  const res = await axios.post(`/my/profile-image`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   if (res.status !== 204) {
     throw new Error('Failed to post profile image');
   }
