@@ -78,13 +78,13 @@ export class MyController {
     res.status(statusCode).send();
   }
 
-  @Get('follwing')
+  @Get('following')
   @UseGuards(AuthenticatedGuard)
   async getFollowing(@Req() req) {
     return this.myService.getFollowing(req);
   }
 
-  @Put('follwing/:userId')
+  @Put('following/:userId')
   @UseGuards(AuthenticatedGuard)
   async putFollowing(@Req() req, @Param('userId') userId: number, @Res() res) {
     try {
