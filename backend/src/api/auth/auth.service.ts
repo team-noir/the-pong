@@ -18,9 +18,7 @@ export class AuthService {
   async auth(@Req() req, @Res() res) {
     this.refreshToken(req.user.ftRefreshToken);
     const userId = req.user.id;
-    const username = req.user.nickname
-      ? req.user.nickname
-      : req.user.ftUsername;
+    const username = req.user.nickname;
     const jwt = this.signJwt(userId, username);
     await this.setJwt(res, jwt);
     res.redirect(process.env.CLIENT_APP_URL);
