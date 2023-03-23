@@ -68,23 +68,6 @@ export const handlers = [
     );
   }),
 
-  rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
-    const { nickname } = await req.json();
-    return res(
-      ctx.json({
-        id: 1,
-        nickname: nickname,
-        rank: 0,
-        achievements: [],
-        games: [],
-      })
-    );
-  }),
-
-  rest.post(`${API_PREFIX}/my/profile-image`, async (_, res, ctx) => {
-    return res(ctx.status(204));
-  }),
-
   rest.get(`${API_PREFIX}/my/blocks`, (req, res, ctx) => {
     return res(ctx.json(mockBlocks));
   }),
