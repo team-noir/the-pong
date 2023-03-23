@@ -33,7 +33,7 @@ export class UsersService {
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
     });
-    if (!user) {
+    if (!user || !user.imageUrl) {
       return;
     }
     const file = createReadStream(
