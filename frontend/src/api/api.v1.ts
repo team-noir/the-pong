@@ -14,7 +14,6 @@ export const getWhoami = async (): Promise<UserType> => {
   if (res.status !== 200) {
     throw new Error('Failed to get whoami');
   }
-  console.log('whoami', res.data);
   return res.data;
 };
 
