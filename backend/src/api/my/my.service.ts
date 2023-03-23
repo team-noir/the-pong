@@ -66,7 +66,12 @@ export class MyService {
           follewee: { select: { id: true, nickname: true } },
         },
       })
-      .then((follows) => follows.map((follow) => follow.follewee));
+      .then((follows) =>
+        follows.map((follow) => ({
+          ...follow.follewee,
+          status: 'offline', // TODO: implement ("online", "offline", "game")
+        }))
+      );
 
     return following;
   }
