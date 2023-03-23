@@ -19,12 +19,11 @@ export default function Setting2FA({
         <a href="">더 알아보기</a>
       </p>
       <div>
-        {!isTwoFactor && (
+        {!isTwoFactor ? (
           <Button type="button" onClick={onClickSet}>
             설정하기
           </Button>
-        )}
-        {isTwoFactor && (
+        ) : (
           <>
             <span>보안 활성화됨</span>
             <Button type="button" onClick={onClickUnset}>
