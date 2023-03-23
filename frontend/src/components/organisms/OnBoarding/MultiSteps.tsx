@@ -2,6 +2,7 @@ import Button from 'components/atoms/Button';
 import { useState } from 'react';
 import Message from 'components/atoms/Message';
 import { FormData } from 'components/organisms/OnBoarding';
+import { ProfileFormType } from 'types/profileFormType';
 
 type FunctionORNull = (() => any) | null;
 
@@ -11,6 +12,8 @@ interface Props {
   resultComponent: React.ReactElement;
   validators: FunctionORNull[];
   messages: string[];
+  isSubmitted: boolean;
+  onSubmit: (formData: ProfileFormType) => void;
 }
 
 export default function MultiSteps({
@@ -19,9 +22,10 @@ export default function MultiSteps({
   resultComponent,
   validators,
   messages,
+  isSubmitted,
+  onSubmit,
 }: Props) {
   const [stepIndex, setStepIndex] = useState<number>(0);
-  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isValid, setIsValid] = useState<boolean>(true);
   const isLastStep = stepIndex === stepComponents.length - 1;
 
@@ -31,9 +35,13 @@ export default function MultiSteps({
     setIsValid(true);
   };
 
-  const handleClickNextStep = () => {
+  const handleClickNextStep = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (isLastStep) {
-      setIsSubmitted(true);
+      onSubmit({
+        nickname: formData.nickname,
+        imageFile: formData.imageFile,
+      });
       return;
     }
     if (!validators[stepIndex]?.()) {
@@ -53,11 +61,11 @@ export default function MultiSteps({
       <Button type="button" onClick={handleClickPrevStep}>
         &lt;
       </Button>
-      <form>{stepComponents[stepIndex]}</form>
-      <Message isShow={!isValid} message={messages[stepIndex]} />
-      <Button type="button" onClick={handleClickNextStep}>
-        {isLastStep ? '완료' : '다음'}
-      </Button>
+      <form onSubmit={handleClickNextStep}>
+        {stepComponents[stepIndex]}
+        <Message isShow={!isValid} message={messages[stepIndex]} />
+        <Button type="submit">{isLastStep ? '완료' : '다음'}</Button>
+      </form>
     </>
   );
 }

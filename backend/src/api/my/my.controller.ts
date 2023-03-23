@@ -1,18 +1,27 @@
 import {
   Controller,
   Get,
+  Put,
+  Post,
   Patch,
   Req,
+  Param,
   Res,
   Body,
   UseGuards,
   HttpStatus,
+  HttpException,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBody } from '@nestjs/swagger';
+import { diskStorage } from 'multer';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
+import { SettingDto } from './dtos/setting.dto';
 import { MyService } from './my.service';
 import { MyDto } from './dtos/my.dto';
-import { SettingDto } from './dtos/setting.dto';
+import { PROFILE_PATH } from '../../const';
 
 @ApiTags('my')
 @Controller('my')
@@ -40,15 +49,49 @@ export class MyController {
   @UseGuards(AuthenticatedGuard)
   async whoami(@Req() req, @Res() res) {
     const user: MyDto = await this.myService.whoami(req);
-    const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-    res.status(statusCode).send(user);
+    res.status(HttpStatus.OK).send(user);
   }
 
   @Patch('settings')
   @UseGuards(AuthenticatedGuard)
   async setMyProfile(@Req() req, @Body() body: SettingDto, @Res() res) {
     const user: MyDto = await this.myService.setMyProfile(req, body);
-    const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-    res.status(statusCode).send(user);
+    res.status(HttpStatus.OK).send(user);
+  }
+
+  @Post('profile-image')
+  @UseGuards(AuthenticatedGuard)
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: PROFILE_PATH,
+        filename: (req, file, cb) => {
+          const ext: string = file.mimetype.split('/')[1];
+          return cb(null, `${req.user.id}.${ext}`);
+        },
+      }),
+    })
+  )
+  async uploadProfileImage(@Req() req, @Res() res, @UploadedFile() file) {
+    const statusCode = file ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST;
+    await this.myService.uploadProfileImage(req.user.id, file);
+    res.status(statusCode).send();
+  }
+
+  @Get('follwing')
+  @UseGuards(AuthenticatedGuard)
+  async getFollowing(@Req() req) {
+    return this.myService.getFollowing(req);
+  }
+
+  @Put('follwing/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async putFollowing(@Req() req, @Param('userId') userId: number, @Res() res) {
+    try {
+      await this.myService.putFollowing(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }

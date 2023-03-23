@@ -23,4 +23,15 @@ export class UsersController {
     const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
     res.status(statusCode).send(user);
   }
+
+  @Get(':userId/profile-image')
+  @UseGuards(AuthenticatedGuard)
+  async downloadProfileImage(
+    @Param('userId') userId: number,
+    @Res({ passthrough: true }) res: Response
+  ) {
+    const result = await this.usersService.downloadProfileImage(userId, res);
+    const statusCode = result ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+    res.status(statusCode).send(result);
+  }
 }

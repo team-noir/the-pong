@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { ProfileType } from 'api/api.v1';
 import Profile from 'components/organisms/Profile';
-import { UserType } from 'types/userType';
 
 const profileUser: ProfileType = {
   id: 1,
@@ -10,30 +9,11 @@ const profileUser: ProfileType = {
   achievements: [],
   games: [],
   isFollowing: false,
+  isBlocked: false,
 };
 
-const mockFollowings: UserType[] = [
-  {
-    id: 1,
-    nickname: 'Mock Following Nickname1',
-    status: 'on',
-  },
-  {
-    id: 2,
-    nickname: 'Mock Following Nickname2',
-    status: 'off',
-  },
-  {
-    id: 3,
-    nickname: 'Mock Following Nickname3',
-    status: 'game',
-  },
-  {
-    id: 4,
-    nickname: 'Mock Following Nickname4',
-    status: 'off',
-  },
-];
+const mockHandler = (userId: number, message: string) =>
+  console.log(`${userId} ${message}}`);
 
 describe('Component - Profile 렌더링', () => {
   test('닉네임과 프로필 사진을 보여준다', () => {
@@ -41,13 +21,10 @@ describe('Component - Profile 렌더링', () => {
       <Profile
         user={profileUser}
         myId={'2'}
-        onClickFollow={(userId: number) => console.log(`${userId} followed`)}
-        onClickUnfollow={(userId: number) =>
-          console.log(`${userId} unfollowed`)
-        }
-        onClickBlock={(userId: number) => {
-          console.log(`${userId} blocked`);
-        }}
+        onClickFollow={(userId: number) => mockHandler(userId, 'followed')}
+        onClickUnfollow={(userId: number) => mockHandler(userId, 'unfollowed')}
+        onClickBlock={(userId: number) => mockHandler(userId, 'blocked')}
+        onClickUnblock={(userId: number) => mockHandler(userId, 'unblocked')}
       />
     );
     screen.findByText(profileUser.nickname);

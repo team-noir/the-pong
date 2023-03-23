@@ -1,5 +1,14 @@
-import { Controller, Res, Req, Get, Post, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Res,
+  Req,
+  Get,
+  Post,
+  UseGuards,
+  HttpStatus,
+} from '@nestjs/common';
 import { FtOauthGuard } from '../../guards/ft-oauth.guard';
+import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import {
   ApiOperation,
   ApiTags,
@@ -32,7 +41,9 @@ export class AuthController {
   }
 
   @Post('logout')
-  async logout(@Req() req) {
-    return this.authService.logout(req);
+  @UseGuards(AuthenticatedGuard)
+  async logout(@Res() res) {
+    this.authService.logout(res);
+    res.status(HttpStatus.NO_CONTENT).send();
   }
 }

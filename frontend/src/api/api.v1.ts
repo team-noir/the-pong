@@ -29,6 +29,7 @@ export interface ProfileType {
   achievements: [];
   games: [];
   isFollowing: boolean;
+  isBlocked: boolean;
 }
 
 export const getProfile = async (userId: string): Promise<ProfileType> => {
@@ -59,6 +60,14 @@ export const deleteMy2fa = async () => {
   const res = await axios.delete(`/my/2fa`);
   if (res.status !== 204) {
     throw new Error('Failed to delete 2fa');
+  }
+  return res;
+};
+
+export const PostMyProfileImage = async (imageFile: File) => {
+  const res = await axios.post(`/my/profile-image`, imageFile);
+  if (res.status !== 204) {
+    throw new Error('Failed to post profile image');
   }
   return res;
 };

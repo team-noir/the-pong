@@ -24,8 +24,11 @@ export class AuthenticatedGuard implements CanActivate {
 
     if (user == null || now > user.ftRefreshExpiresAt) {
       return false;
-    } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt)
+    } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt) {
       this.authService.refreshToken(user.ftRefreshToken);
+    }
+    req.user = user;
+
     return true;
   }
 }
