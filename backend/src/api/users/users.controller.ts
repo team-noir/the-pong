@@ -1,5 +1,6 @@
 import {
   Controller,
+  Req,
   Res,
   Get,
   UseGuards,
@@ -9,7 +10,8 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import { UsersService } from './users.service';
-import { Response } from 'express';
+import { Request, Response } from 'express';
+import { UserDto } from './dtos/users.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -18,8 +20,12 @@ export class UsersController {
 
   @Get(':userId')
   @UseGuards(AuthenticatedGuard)
-  async requestProfile(@Param('userId') userId: number, @Res() res: Response) {
-    const user = await this.usersService.getUser(Number(userId));
+  async requestProfile(
+    @Req() req: Request,
+    @Param('userId') userId: number,
+    @Res() res: Response
+  ) {
+    const user: UserDto = await this.usersService.getUser(req, Number(userId));
     const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
     res.status(statusCode).send(user);
   }

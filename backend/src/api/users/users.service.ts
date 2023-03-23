@@ -1,4 +1,4 @@
-import { Injectable, StreamableFile } from '@nestjs/common';
+import { Injectable, StreamableFile, Req } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createReadStream } from 'fs';
 import { join } from 'path';
@@ -9,16 +9,44 @@ import { PROFILE_PATH } from '../../const';
 export class UsersService {
   constructor(private prismaService: PrismaService) {}
 
-  async getUser(userId: number) {
+  async getUser(@Req() req, userId: number) {
+    const myUserId = req.user.id;
+
     if (!userId) {
       return null;
     }
     const user = await this.prismaService.user.findUnique({
       where: { id: userId },
+      select: {
+        id: true,
+        nickname: true,
+        rank: true,
+      },
     });
     if (!user) {
       return null;
     }
+    const is_followed_by_myself = await this.prismaService.user
+      .findUnique({
+        where: { id: userId },
+      })
+      .followees({
+        where: {
+          followerId: myUserId,
+        },
+      })
+      .then((followees) => followees.length > 0);
+
+    const is_blocked_by_myself = await this.prismaService.user
+      .findUnique({
+        where: { id: userId },
+      })
+      .blockers({
+        where: {
+          blockerId: myUserId,
+        },
+      })
+      .then((blockers) => blockers.length > 0);
 
     return {
       id: user.id,
@@ -26,6 +54,8 @@ export class UsersService {
       rank: user.rank,
       achievements: [],
       games: [],
+      is_followed_by_myself,
+      is_blocked_by_myself,
     };
   }
 
