@@ -25,12 +25,12 @@ const mockFollowings: UserType[] = [
   {
     id: 1,
     nickname: 'Mock Following Nickname1',
-    status: 'on',
+    status: 'online',
   },
   {
     id: 2,
     nickname: 'Mock Following Nickname2',
-    status: 'off',
+    status: 'offline',
   },
   {
     id: 3,
@@ -40,7 +40,7 @@ const mockFollowings: UserType[] = [
   {
     id: 4,
     nickname: 'Mock Following Nickname4',
-    status: 'off',
+    status: 'offline',
   },
 ];
 
