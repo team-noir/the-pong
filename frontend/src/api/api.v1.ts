@@ -48,6 +48,24 @@ export const getProfile = async (userId: string): Promise<ProfileType> => {
   return res.data;
 };
 
+export const getUsers = async (
+  q: string,
+  page = 1,
+  per_page = 30
+): Promise<UserType[]> => {
+  const res = await axios
+    .get(`/users`, {
+      params: { q, page, per_page },
+    })
+    .catch((error) => {
+      if (error.response.status === 404) {
+        throw new AxiosError('검색 결과가 없습니다.', '404');
+      }
+      throw error;
+    });
+  return res.data;
+};
+
 export const patchMyProfile = async (nickname: string): Promise<UserType> => {
   const res = await axios.patch(`/my/settings`, { nickname });
   if (res.status !== 200) {
