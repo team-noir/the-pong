@@ -9,6 +9,14 @@ axios.defaults.withCredentials = true;
 
 /** Login **/
 
+export const postLogout = async () => {
+  const res = await axios.post(`/auth/logout`);
+  if (res.status !== 204) {
+    throw new Error('Failed to post logout');
+  }
+  return res;
+};
+
 export const getWhoami = async (): Promise<UserType> => {
   const res = await axios.get(`/my/whoami`);
   if (res.status !== 200) {
