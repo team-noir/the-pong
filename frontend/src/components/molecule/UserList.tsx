@@ -1,13 +1,15 @@
 import { ReactElement } from 'react';
 import UserItem from 'components/molecule/UserItem';
 import { UserType } from 'types/userType';
+import { DummyChannelUserType } from 'components/organisms/ChannelSetting';
 
 interface Props {
   styles: { readonly [key: string]: string };
-  users: UserType[] | null;
+  users: UserType[] | DummyChannelUserType[] | null;
   imageSize: number;
   buttons?: ReactElement[];
   hasStatus?: boolean;
+  myUserId?: number;
 }
 
 export default function UserList({
@@ -16,6 +18,7 @@ export default function UserList({
   imageSize,
   buttons,
   hasStatus = false,
+  myUserId,
 }: Props) {
   return (
     <ul className={styles.ul}>
@@ -29,6 +32,7 @@ export default function UserList({
               imageSize={imageSize}
               buttons={buttons}
               hasStatus={hasStatus}
+              myUserId={myUserId}
             />
           );
         })}

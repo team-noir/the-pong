@@ -1,8 +1,14 @@
+import { useEffect } from 'react';
 import {
   createBrowserRouter,
   RouterProvider,
   Navigate,
 } from 'react-router-dom';
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from '@tanstack/react-query';
 import LoginPage from 'pages/LoginPage';
 import OnBoardingPage from 'pages/OnBoardingPage';
 import Root from 'pages/Root';
@@ -13,8 +19,8 @@ import FollowingPage from 'pages/FollowingPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
 import SearchResultPage from 'pages/SearchResultPage';
-import { loader as profileLoader } from 'pages/ProfilePage';
-import { useLogin } from 'hooks/useStore';
+import { loader as channelLoader } from 'pages/ChannelPage';
+import { useLogin, useUser } from 'hooks/useStore';
 import SettingProfilePage from 'pages/SettingProfilePage';
 import Setting2FAPage from 'pages/Setting2FAPage';
 import SettingBlocksPage from 'pages/SettingBlocksPage';
@@ -22,12 +28,33 @@ import ChannelLobbyPage from 'pages/ChannelLobbyPage';
 import ChannelBrowsePage from 'pages/ChannelBrowsePage';
 import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
+import { getWhoami, getHealthCheck } from 'api/api.v1';
 
-export const routes = (isLoggedin: boolean) => [
+export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
   {
     path: '/login',
-    element: !isLoggedin ? <LoginPage /> : <Navigate to="/" />,
+    element: !isOnboarded ? (
+      !isLoggedin ? (
+        <LoginPage />
+      ) : (
+        <Navigate to="/on-boarding" />
+      )
+    ) : (
+      <Navigate to="/" />
+    ),
     errorElement: <ErrorPage />,
+  },
+  {
+    path: '/on-boarding',
+    element: isLoggedin ? (
+      !isOnboarded ? (
+        <OnBoardingPage />
+      ) : (
+        <Navigate to="/" />
+      )
+    ) : (
+      <Navigate to="/login" />
+    ),
   },
   {
     path: '/setting/*',
@@ -60,22 +87,28 @@ export const routes = (isLoggedin: boolean) => [
       {
         path: ':channelCode',
         element: <ChannelPage />,
+        loader: channelLoader,
       },
     ],
   },
   {
     path: '/',
-    element: isLoggedin ? <Root /> : <Navigate to="/login" />,
+    element: isLoggedin ? (
+      isOnboarded ? (
+        <Root />
+      ) : (
+        <Navigate to="/on-boarding" />
+      )
+    ) : (
+      <Navigate to="/login" />
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
         index: true,
         element: <MainPage />,
       },
-      {
-        path: 'on-boarding',
-        element: <OnBoardingPage />,
-      },
+
       {
         path: 'game',
         element: <GamePage />,
@@ -91,7 +124,6 @@ export const routes = (isLoggedin: boolean) => [
       {
         path: 'profile/:userId',
         element: <ProfilePage />,
-        loader: profileLoader,
       },
       {
         path: 'setting',
@@ -105,9 +137,49 @@ export const routes = (isLoggedin: boolean) => [
   },
 ];
 
+const queryClient = new QueryClient();
+
 export function App() {
   const isLoggedIn = useLogin((state) => state.isLogin);
-  const router = createBrowserRouter(routes(isLoggedIn));
+  const isOnboarded = useUser((state) => state.isOnboarded);
 
-  return <RouterProvider router={router} />;
+  const router = createBrowserRouter(routes(isLoggedIn, isOnboarded));
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Init />
+      <RouterProvider router={router} />
+    </QueryClientProvider>
+  );
+}
+
+function Init() {
+  const login = useLogin((state) => state.login);
+  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
+
+  // TODO: error handling
+  const { data, isSuccess } = useQuery({
+    queryKey: ['whoami'],
+    queryFn: getWhoami,
+  });
+
+  const mockApi = useQuery({
+    queryKey: ['mock-health-check'],
+    queryFn: getHealthCheck,
+  });
+
+  useEffect(() => {
+    if (!isSuccess) return;
+
+    login();
+    if (data.nickname) {
+      setIsOnboarded(true);
+    }
+  }, [isSuccess, data]);
+
+  useEffect(() => {
+    console.log('mock: ', mockApi.data);
+  }, [mockApi.isSuccess]);
+
+  return <></>;
 }

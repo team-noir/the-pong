@@ -6,7 +6,7 @@ import { User } from '@prisma';
 import { Strategy } from 'passport-42';
 import { Response } from 'express';
 import { JwtPayloadDto } from './dtos/jwtPayload.dto';
-const ONESECOND = 1000;
+import { ONESECOND } from '../../const';
 
 @Injectable()
 export class AuthService {
@@ -15,20 +15,17 @@ export class AuthService {
     private prismaService: PrismaService
   ) {}
 
-  async auth(@Req() req, @Res({ passthrough: true }) res) {
+  async auth(@Req() req, @Res() res) {
     this.refreshToken(req.user.ftRefreshToken);
     const userId = req.user.id;
-    const username = req.user.nickname
-      ? req.user.nickname
-      : req.user.ftUsername;
+    const username = req.user.nickname;
     const jwt = this.signJwt(userId, username);
     await this.setJwt(res, jwt);
     res.redirect(process.env.CLIENT_APP_URL);
   }
 
-  async logout(@Res({ passthrough: true }) res) {
+  async logout(@Res() res) {
     await this.removeJwt(res);
-    res.redirect(process.env.CLIENT_APP_URL);
   }
 
   signJwt(id: number, nickname: string): string {
@@ -39,11 +36,11 @@ export class AuthService {
     return req.cookies['Authorization'];
   }
 
-  async setJwt(@Res({ passthrough: true }) res: Response, jwt: string) {
+  async setJwt(@Res() res: Response, jwt: string) {
     await res.cookie('Authorization', jwt);
   }
 
-  async removeJwt(@Res({ passthrough: true }) res: Response) {
+  async removeJwt(@Res() res) {
     await res.clearCookie('Authorization', { path: '/' });
   }
 

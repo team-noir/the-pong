@@ -202,4 +202,8 @@ redis/user.acl
 backend/prisma/*
 !backend/prisma/schema.prisma
 
+<<<<<<< HEAD
 backend/uploads/profile-images
+=======
+backend/upload/profile-images
+>>>>>>> d3c7b42152e7683643064e593dd71bda153835c3

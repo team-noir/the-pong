@@ -1,28 +1,31 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SearchBar from 'components/molecule/SearchBar';
 import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types/userType';
 import { useLogin } from 'hooks/useStore';
-
-const dummyData = {
-  id: '1',
-  nickname: '닉네임1',
-  profileImageUrl: 'https://placekitten.com/800/800',
-};
+import { AxiosError } from 'axios';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { getWhoami, postLogout } from 'api/api.v1';
 
 export default function HeaderGnb() {
   const logout = useLogin((state) => state.logout);
-  const [user, setUser] = useState<UserType | null>(null);
+
+  const whoamiQuery = useQuery<UserType, AxiosError>({
+    queryKey: ['whoami'],
+    queryFn: getWhoami,
+  });
+  const postLogoutMutation = useMutation(postLogout);
 
   useEffect(() => {
-    // TODO: api에서 회원 정보 가져오기
-    setUser(dummyData);
-  }, []);
+    if (postLogoutMutation.isSuccess) {
+      logout();
+    }
+  }, [postLogoutMutation.isSuccess]);
 
   const handleLogout = () => {
-    logout();
+    postLogoutMutation.mutate();
   };
 
   return (
@@ -60,13 +63,15 @@ export default function HeaderGnb() {
       </nav>
       <Button type="button">햄버거</Button>
       <div>로고</div>
-      <Link to={`/profile/${user?.id}`}>
-        <ProfileImage
-          profileImageUrl={user?.profileImageUrl}
-          alt="my profile image"
-          size={52}
-        />
-      </Link>
+      {whoamiQuery.isSuccess && (
+        <Link to={`/profile/${whoamiQuery.data.id}`}>
+          <ProfileImage
+            userId={whoamiQuery.data.id}
+            alt="my profile image"
+            size={52}
+          />
+        </Link>
+      )}
     </>
   );
 }

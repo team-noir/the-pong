@@ -1,10 +1,12 @@
+type UserStatus = 'online' | 'offline' | 'game';
+
 export interface UserType {
-  id: string;
-  fortytwoId?: string;
+  id: number;
   nickname?: string;
-  profileImageUrl?: string;
+  rank?: number;
+  isTwoFactor?: boolean;
   createdAt?: string;
   updatedAt?: string;
-  status?: 'on' | 'off' | 'game';
-  isTwoFactor?: boolean;
+  deletedAt?: string;
+  status?: UserStatus;
 }

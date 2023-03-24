@@ -1263,7 +1263,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma/client@npm:^4.11.0":
+"@prisma/client@npm:4.11.0":
   version: 4.11.0
   resolution: "@prisma/client@npm:4.11.0"
   dependencies:
@@ -6773,7 +6773,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prisma@npm:^4.11.0":
+"prisma@npm:4.11.0":
   version: 4.11.0
   resolution: "prisma@npm:4.11.0"
   dependencies:

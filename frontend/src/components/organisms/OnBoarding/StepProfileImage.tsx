@@ -15,14 +15,14 @@ export default function StepProfileImage({ setFormData }: Props) {
 
     setFormData((prevState) => ({
       ...prevState,
-      profileImage: files[0],
+      imageFile: files[0],
     }));
   };
 
   const handleClickRemove = () => {
     setFormData((prevState) => ({
       ...prevState,
-      profileImage: null,
+      imageFile: null,
     }));
   };
 

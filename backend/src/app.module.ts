@@ -8,6 +8,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { MyModule } from './api/my/my.module';
 import { AuthModule } from './api/auth/auth.module';
 import { ChatEventsModule } from './api/chat/chat.events.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -27,5 +28,7 @@ import { ChatEventsModule } from './api/chat/chat.events.module';
     AuthModule,
     ChatEventsModule,
   ],
+  controllers: [AppController],
+  providers: [],
 })
 export class AppModule {}
