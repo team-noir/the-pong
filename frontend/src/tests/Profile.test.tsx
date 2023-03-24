@@ -8,8 +8,8 @@ const profileUser: ProfileUserType = {
   rank: 0,
   achievements: [],
   games: [],
-  isFollowing: false,
-  isBlocked: false,
+  isFollowedByMyself: false,
+  isBlockedByMyself: false,
 };
 
 const mockHandler = (userId: number, message: string) =>
