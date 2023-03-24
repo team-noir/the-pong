@@ -40,6 +40,16 @@ export class AuthService {
     await res.cookie('Authorization', jwt);
   }
 
+  async verifyJwt(@Res() res: Response, jwt: string): Promise<Boolean> {
+    try {
+      await this.jwtService.verify(jwt);
+      return true;
+    } catch (error) {
+      await this.removeJwt(res);
+      return false;
+    }
+  }
+
   async removeJwt(@Res() res) {
     await res.clearCookie('Authorization', { path: '/' });
   }
@@ -50,6 +60,9 @@ export class AuthService {
       return null;
     }
     const payload = this.jwtService.decode(jwt);
+    if (!payload) {
+      return null;
+    }
     const result = {
       id: payload['id'],
       nickname: payload['nickname'],
