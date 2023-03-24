@@ -1,5 +1,6 @@
 FROM redis:latest
 
-COPY user.acl /etc/redis/user.acl
+COPY users.acl /etc/redis/users.acl
+COPY redis.conf /etc/redis/redis.conf
 
-ENTRYPOINT [ "redis-server", "--aclfile /etc/redis/user.acl" ]
+ENTRYPOINT [ "redis-server", "/etc/redis/redis.conf"]

@@ -1,0 +1,2 @@
+user default on +@all ~* >thepongisthemostfungameintheworldthepongisthemostfungameinthewor
+user thepong on -@all +get +set +select ~* >thepongisthemostfungameintheworldthepongisthemostfungameinthewor

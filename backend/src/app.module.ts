@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
-import { RedisModule } from '@nestjs-modules/ioredis';
+// import { RedisModule } from '@nestjs-modules/ioredis';
 
 import { UsersModule } from './api/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -16,12 +16,12 @@ import { AppController } from './app.controller';
       isGlobal: true,
     }),
     MulterModule.register(),
-    RedisModule.forRoot({
-      config: {
-        url: process.env.REDIS_URL,
-        password: process.env.REDIS_PASSWORD,
-      },
-    }),
+    // RedisModule.forRoot({
+    //   config: {
+    //     url: process.env.REDIS_URL,
+    //     password: process.env.REDIS_PASSWORD,
+    //   },
+    // }),
     UsersModule,
     MyModule,
     PrismaModule,
