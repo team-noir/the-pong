@@ -1,38 +1,38 @@
-import { useState, useEffect } from 'react';
 import AppTemplate from 'components/templates/AppTemplate';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
-import Button from 'components/atoms/Button';
-
-const dummyUser = {
-  id: 1,
-  isTwoFactor: true,
-};
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { UserType } from 'types/userType';
+import { AxiosError } from 'axios';
+import { deleteMy2fa, getMy2fa, getWhoami } from 'api/api.v1';
+import Setting2FA from 'components/organisms/Setting2FA';
 
 export default function Setting2FAPage() {
-  const [isTwoFactor, setIsTwoFactor] = useState<boolean>(false);
+  const whoamiQuery = useQuery<UserType, AxiosError>({
+    queryKey: ['whoami'],
+    queryFn: getWhoami,
+  });
+  const getMy2faMutation = useMutation(getMy2fa);
+  const deleteMy2faMutation = useMutation(deleteMy2fa);
 
-  useEffect(() => {
-    // TODO: react-query 사용해서 회원 정보 로딩
-    // const user = react-query....
-    setIsTwoFactor(dummyUser.isTwoFactor);
-  }, []);
+  const handleClickSet = () => {
+    getMy2faMutation.mutate();
+  };
+
+  const handleClickUnset = () => {
+    deleteMy2faMutation.mutate();
+  };
 
   return (
     <AppTemplate header={<HeaderWithBackButton title={'2FA 보안 설정'} />}>
-      <h2>Two-Factor Authentication (2FA)</h2>
-      <p>
-        2단계 보안 인증을 설정하고 계정을 더욱 강력하게 보호하세요.
-        <a href="">더 알아보기</a>
-      </p>
-      <div>
-        {!isTwoFactor && <Button type="button">설정하기</Button>}
-        {isTwoFactor && (
-          <>
-            <span>보안 활성화됨</span>
-            <Button type="button">보안 해제하기</Button>
-          </>
-        )}
-      </div>
+      {whoamiQuery.isLoading && <div>Loading...</div>}
+      {whoamiQuery.isError && <div>{whoamiQuery.error.message}</div>}
+      {whoamiQuery.isSuccess && (
+        <Setting2FA
+          isTwoFactor={whoamiQuery.data.isTwoFactor}
+          onClickSet={handleClickSet}
+          onClickUnset={handleClickUnset}
+        />
+      )}
     </AppTemplate>
   );
 }

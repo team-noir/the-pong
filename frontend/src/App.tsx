@@ -20,7 +20,7 @@ import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
 import SearchResultPage from 'pages/SearchResultPage';
 import { loader as channelLoader } from 'pages/ChannelPage';
-import { useLogin } from 'hooks/useStore';
+import { useLogin, useUser } from 'hooks/useStore';
 import SettingProfilePage from 'pages/SettingProfilePage';
 import Setting2FAPage from 'pages/Setting2FAPage';
 import SettingBlocksPage from 'pages/SettingBlocksPage';
@@ -30,11 +30,31 @@ import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
 import { getWhoami, getHealthCheck } from 'api/api.v1';
 
-export const routes = (isLoggedin: boolean) => [
+export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
   {
     path: '/login',
-    element: !isLoggedin ? <LoginPage /> : <Navigate to="/" />,
+    element: !isOnboarded ? (
+      !isLoggedin ? (
+        <LoginPage />
+      ) : (
+        <Navigate to="/on-boarding" />
+      )
+    ) : (
+      <Navigate to="/" />
+    ),
     errorElement: <ErrorPage />,
+  },
+  {
+    path: '/on-boarding',
+    element: isLoggedin ? (
+      !isOnboarded ? (
+        <OnBoardingPage />
+      ) : (
+        <Navigate to="/" />
+      )
+    ) : (
+      <Navigate to="/login" />
+    ),
   },
   {
     path: '/setting/*',
@@ -73,17 +93,22 @@ export const routes = (isLoggedin: boolean) => [
   },
   {
     path: '/',
-    element: isLoggedin ? <Root /> : <Navigate to="/login" />,
+    element: isLoggedin ? (
+      isOnboarded ? (
+        <Root />
+      ) : (
+        <Navigate to="/on-boarding" />
+      )
+    ) : (
+      <Navigate to="/login" />
+    ),
     errorElement: <ErrorPage />,
     children: [
       {
         index: true,
         element: <MainPage />,
       },
-      {
-        path: 'on-boarding',
-        element: <OnBoardingPage />,
-      },
+
       {
         path: 'game',
         element: <GamePage />,
@@ -116,8 +141,9 @@ const queryClient = new QueryClient();
 
 export function App() {
   const isLoggedIn = useLogin((state) => state.isLogin);
+  const isOnboarded = useUser((state) => state.isOnboarded);
 
-  const router = createBrowserRouter(routes(isLoggedIn));
+  const router = createBrowserRouter(routes(isLoggedIn, isOnboarded));
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -129,9 +155,10 @@ export function App() {
 
 function Init() {
   const login = useLogin((state) => state.login);
+  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
 
   // TODO: error handling
-  const { isSuccess } = useQuery({
+  const { data, isSuccess } = useQuery({
     queryKey: ['whoami'],
     queryFn: getWhoami,
   });
@@ -142,10 +169,13 @@ function Init() {
   });
 
   useEffect(() => {
-    if (isSuccess) {
-      login();
+    if (!isSuccess) return;
+
+    login();
+    if (data.nickname) {
+      setIsOnboarded(true);
     }
-  }, [isSuccess]);
+  }, [isSuccess, data]);
 
   useEffect(() => {
     console.log('mock: ', mockApi.data);
