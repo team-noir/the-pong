@@ -4,6 +4,7 @@ import {
   Put,
   Post,
   Patch,
+  Delete,
   Req,
   Param,
   Res,
@@ -78,17 +79,60 @@ export class MyController {
     res.status(statusCode).send();
   }
 
-  @Get('follwing')
+  @Get('following')
   @UseGuards(AuthenticatedGuard)
   async getFollowing(@Req() req) {
     return this.myService.getFollowing(req);
   }
 
-  @Put('follwing/:userId')
+  @Put('following/:userId')
   @UseGuards(AuthenticatedGuard)
   async putFollowing(@Req() req, @Param('userId') userId: number, @Res() res) {
     try {
       await this.myService.putFollowing(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+  
+  @Delete('follwing/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async deleteFollowing(
+    @Req() req,
+    @Param('userId') userId: number,
+    @Res() res
+  ) {
+    try {
+      await this.myService.deleteFollowing(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('blocks')
+  @UseGuards(AuthenticatedGuard)
+  async getBlocks(@Req() req) {
+    return this.myService.getBlocks(req);
+  }
+
+  @Put('blocks/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async putBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
+    try {
+      await this.myService.putBlocks(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Delete('blocks/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async deleteBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
+    try {
+      await this.myService.deleteBlocks(req);
       return res.status(HttpStatus.NO_CONTENT).send();
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);

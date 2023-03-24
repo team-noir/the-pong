@@ -25,12 +25,12 @@ const mockFollowings: UserType[] = [
   {
     id: 1,
     nickname: 'Mock Following Nickname1',
-    status: 'on',
+    status: 'online',
   },
   {
     id: 2,
     nickname: 'Mock Following Nickname2',
-    status: 'off',
+    status: 'offline',
   },
   {
     id: 3,
@@ -40,7 +40,7 @@ const mockFollowings: UserType[] = [
   {
     id: 4,
     nickname: 'Mock Following Nickname4',
-    status: 'off',
+    status: 'offline',
   },
 ];
 
@@ -68,6 +68,35 @@ export const handlers = [
     );
   }),
 
+  rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
+    const { nickname } = await req.json();
+    return res(
+      ctx.json({
+        id: 1,
+        nickname: nickname,
+        rank: 0,
+        achievements: [],
+        games: [],
+      })
+    );
+  }),
+
+  rest.get(`${API_PREFIX}/my/2fa`, (_, res, ctx) => {
+    return res(
+      ctx.json({
+        twoFactorData: 'mock',
+      })
+    );
+  }),
+
+  rest.delete(`${API_PREFIX}/my/2fa`, (_, res, ctx) => {
+    return res(ctx.status(204));
+  }),
+
+  rest.post(`${API_PREFIX}/my/profile-image`, async (_, res, ctx) => {
+    return res(ctx.status(204));
+  }),
+
   rest.get(`${API_PREFIX}/my/blocks`, (req, res, ctx) => {
     return res(ctx.json(mockBlocks));
   }),
@@ -92,10 +121,6 @@ export const handlers = [
       });
     }
     return res(ctx.status(204));
-  }),
-
-  rest.get(`${API_PREFIX}/my/following`, (_, res, ctx) => {
-    return res(ctx.json(mockFollowings));
   }),
 
   rest.delete(`${API_PREFIX}/my/following/:userId`, (req, res, ctx) => {
