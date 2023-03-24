@@ -96,7 +96,7 @@ export class MyController {
     }
   }
   
-  @Delete('follwing/:userId')
+  @Delete('following/:userId')
   @UseGuards(AuthenticatedGuard)
   async deleteFollowing(
     @Req() req,
