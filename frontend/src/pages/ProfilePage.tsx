@@ -1,9 +1,9 @@
 import Profile from 'components/organisms/Profile';
 import Achievements from 'components/organisms/Achievements';
 import {
-  getProfile,
+  getUser,
   getWhoami,
-  ProfileType,
+  ProfileUserType,
   putMyFollowing,
   deleteMyFollowing,
   putMyBlocks,
@@ -17,9 +17,9 @@ import { UserType } from 'types/userType';
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };
 
-  const profileQuery = useQuery<ProfileType, AxiosError>({
+  const getUserQuery = useQuery<ProfileUserType, AxiosError>({
     queryKey: ['profile', userId],
-    queryFn: () => getProfile(userId),
+    queryFn: () => getUser(userId),
   });
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
@@ -58,16 +58,16 @@ export default function ProfilePage() {
 
   return (
     <>
-      {(profileQuery.isLoading || whoamiQuery.isLoading) && (
+      {(getUserQuery.isLoading || whoamiQuery.isLoading) && (
         <div>Loading...</div>
       )}
-      {profileQuery.isError && <div>{profileQuery.error.message}</div>}
+      {getUserQuery.isError && <div>{getUserQuery.error.message}</div>}
       {whoamiQuery.isError && <div>{whoamiQuery.error.message}</div>}
-      {profileQuery.isSuccess && whoamiQuery.isSuccess && (
+      {getUserQuery.isSuccess && whoamiQuery.isSuccess && (
         <>
           <div>ProfilePage</div>
           <Profile
-            user={profileQuery.data}
+            user={getUserQuery.data}
             myId={`${whoamiQuery.data.id}`}
             onClickFollow={handleClickFollow}
             onClickUnfollow={handleClickUnfollow}

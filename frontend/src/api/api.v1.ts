@@ -2,12 +2,18 @@ import axios, { AxiosError } from 'axios';
 import { UserType } from 'types/userType';
 
 export const API_PREFIX = `/api/v1`;
-export const API_LOGIN_FT = `${API_PREFIX}/auth/42`;
 
 axios.defaults.baseURL = API_PREFIX;
 axios.defaults.withCredentials = true;
 
-/** Login **/
+export const getHealthCheck = async () => {
+  const res = await axios.get(`/health-check`);
+  return res;
+};
+
+/** Login */
+
+export const API_LOGIN_FT = `${API_PREFIX}/auth/42`;
 
 export const postLogout = async () => {
   const res = await axios.post(`/auth/logout`);
@@ -17,6 +23,8 @@ export const postLogout = async () => {
   return res;
 };
 
+/** User */
+
 export const getWhoami = async (): Promise<UserType> => {
   const res = await axios.get(`/my/whoami`);
   if (res.status !== 200) {
@@ -25,12 +33,7 @@ export const getWhoami = async (): Promise<UserType> => {
   return res.data;
 };
 
-export const getHealthCheck = async () => {
-  const res = await axios.get(`/health-check`);
-  return res;
-};
-
-export interface ProfileType {
+export interface ProfileUserType {
   id: number;
   nickname: string;
   rank: number;
@@ -40,7 +43,7 @@ export interface ProfileType {
   isBlocked: boolean;
 }
 
-export const getProfile = async (userId: string): Promise<ProfileType> => {
+export const getUser = async (userId: string): Promise<ProfileUserType> => {
   const res = await axios.get(`/users/${userId}`);
   if (res.status !== 200) {
     throw new Error('Failed to get profile');
@@ -66,12 +69,28 @@ export const getUsers = async (
   return res.data;
 };
 
+/** Setting */
+
 export const patchMyProfile = async (nickname: string): Promise<UserType> => {
   const res = await axios.patch(`/my/settings`, { nickname });
   if (res.status !== 200) {
     throw new Error('Failed to patch profile');
   }
   return res.data;
+};
+
+export const PostMyProfileImage = async (imageFile: File) => {
+  const formData = new FormData();
+  formData.append('file', imageFile);
+  const res = await axios.post(`/my/profile-image`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  if (res.status !== 204) {
+    throw new Error('Failed to post profile image');
+  }
+  return res;
 };
 
 export const getMy2fa = async () => {
@@ -90,19 +109,7 @@ export const deleteMy2fa = async () => {
   return res;
 };
 
-export const PostMyProfileImage = async (imageFile: File) => {
-  const formData = new FormData();
-  formData.append('file', imageFile);
-  const res = await axios.post(`/my/profile-image`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-  });
-  if (res.status !== 204) {
-    throw new Error('Failed to post profile image');
-  }
-  return res;
-};
+/** Block */
 
 export const getMyBlocks = async () => {
   const res = await axios.get(`/my/blocks`);
@@ -127,6 +134,8 @@ export const putMyBlocks = async (userId: number) => {
   }
   return res;
 };
+
+/** Follow */
 
 export const getMyFollowing = async () => {
   const res = await axios.get(`/my/following`).catch((error) => {

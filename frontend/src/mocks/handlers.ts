@@ -96,19 +96,6 @@ export const handlers = [
     return res(ctx.json(result));
   }),
 
-  rest.patch(`${API_PREFIX}/my/settings`, async (req, res, ctx) => {
-    const { nickname } = await req.json();
-    return res(
-      ctx.json({
-        id: 1,
-        nickname: nickname,
-        rank: 0,
-        achievements: [],
-        games: [],
-      })
-    );
-  }),
-
   rest.get(`${API_PREFIX}/my/2fa`, (_, res, ctx) => {
     return res(
       ctx.json({
@@ -118,10 +105,6 @@ export const handlers = [
   }),
 
   rest.delete(`${API_PREFIX}/my/2fa`, (_, res, ctx) => {
-    return res(ctx.status(204));
-  }),
-
-  rest.post(`${API_PREFIX}/my/profile-image`, async (_, res, ctx) => {
     return res(ctx.status(204));
   }),
 
