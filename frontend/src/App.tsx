@@ -30,10 +30,10 @@ import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
 import { getWhoami, getHealthCheck } from 'api/api.v1';
 
-export const routes = (isLoggedin: boolean, hasNickname: boolean) => [
+export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
   {
     path: '/login',
-    element: !hasNickname ? (
+    element: !isOnboarded ? (
       !isLoggedin ? (
         <LoginPage />
       ) : (
@@ -47,7 +47,7 @@ export const routes = (isLoggedin: boolean, hasNickname: boolean) => [
   {
     path: '/on-boarding',
     element: isLoggedin ? (
-      !hasNickname ? (
+      !isOnboarded ? (
         <OnBoardingPage />
       ) : (
         <Navigate to="/" />
@@ -94,7 +94,7 @@ export const routes = (isLoggedin: boolean, hasNickname: boolean) => [
   {
     path: '/',
     element: isLoggedin ? (
-      hasNickname ? (
+      isOnboarded ? (
         <Root />
       ) : (
         <Navigate to="/on-boarding" />
@@ -141,9 +141,9 @@ const queryClient = new QueryClient();
 
 export function App() {
   const isLoggedIn = useLogin((state) => state.isLogin);
-  const hasNickname = useUser((state) => state.hasNickname);
+  const isOnboarded = useUser((state) => state.isOnboarded);
 
-  const router = createBrowserRouter(routes(isLoggedIn, hasNickname));
+  const router = createBrowserRouter(routes(isLoggedIn, isOnboarded));
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -155,7 +155,7 @@ export function App() {
 
 function Init() {
   const login = useLogin((state) => state.login);
-  const setHasNickname = useUser((state) => state.setHasNickname);
+  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
 
   // TODO: error handling
   const { data, isSuccess } = useQuery({
@@ -173,7 +173,7 @@ function Init() {
 
     login();
     if (data.nickname) {
-      setHasNickname(true);
+      setIsOnboarded(true);
     }
   }, [isSuccess, data]);
 

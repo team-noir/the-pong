@@ -7,8 +7,8 @@ interface LoginState {
 }
 
 interface UserState {
-  hasNickname: boolean;
-  setHasNickname: (hasNickname: boolean) => void;
+  isOnboarded: boolean;
+  setIsOnboarded: (isOnboarded: boolean) => void;
 }
 
 export const useLogin = create<LoginState>((set) => ({
@@ -18,6 +18,6 @@ export const useLogin = create<LoginState>((set) => ({
 }));
 
 export const useUser = create<UserState>((set) => ({
-  hasNickname: false,
-  setHasNickname: (hasNickname: boolean) => set(() => ({ hasNickname })),
+  isOnboarded: false,
+  setIsOnboarded: (isOnboarded: boolean) => set(() => ({ isOnboarded })),
 }));

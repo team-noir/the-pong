@@ -7,7 +7,7 @@ import AppTemplateWithoutHeader from 'components/templates/AppTemplateWithoutHea
 import { useUser } from 'hooks/useStore';
 
 export default function OnBoardingPage() {
-  const setHasNickname = useUser((state) => state.setHasNickname);
+  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [hasImageFile, setHasImageFile] = useState<boolean>(false);
 
@@ -23,7 +23,7 @@ export default function OnBoardingPage() {
       (!hasImageFile || (hasImageFile && postMyProfileImageMutation.isSuccess))
     ) {
       setIsSubmitted(true);
-      setHasNickname(true);
+      setIsOnboarded(true);
     }
   }, [patchMyProfileMutation, postMyProfileImageMutation]);
 
