@@ -9,11 +9,12 @@ import {
   Query,
   DefaultValuePipe,
   ParseIntPipe,
+  StreamableFile,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import { UsersService } from './users.service';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { UserDto } from './dtos/users.dto';
 
 @ApiTags('users')
@@ -48,15 +49,22 @@ export class UsersController {
     const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
     res.status(statusCode).send(user);
   }
-
   @Get(':userId/profile-image')
   @UseGuards(AuthenticatedGuard)
   async downloadProfileImage(
     @Param('userId') userId: number,
     @Res({ passthrough: true }) res: Response
-  ) {
-    const result = await this.usersService.downloadProfileImage(userId, res);
-    const statusCode = result ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-    res.status(statusCode).send(result);
+  ): Promise<StreamableFile> {
+    try {
+      const result = await this.usersService.downloadProfileImage(userId);
+      res.set({
+        'Content-Type': `${result.mimetype}`,
+        'Content-Disposition': `attachment; filename=${result.filename}`,
+        'Cache-Control': 'no-cache, max-age=0',
+      });
+      return new StreamableFile(result.file);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 }
