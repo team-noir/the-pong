@@ -25,12 +25,12 @@ const mockFollowings: UserType[] = [
   {
     id: 1,
     nickname: 'Mock Following Nickname1',
-    status: 'on',
+    status: 'online',
   },
   {
     id: 2,
     nickname: 'Mock Following Nickname2',
-    status: 'off',
+    status: 'offline',
   },
   {
     id: 3,
@@ -40,7 +40,7 @@ const mockFollowings: UserType[] = [
   {
     id: 4,
     nickname: 'Mock Following Nickname4',
-    status: 'off',
+    status: 'offline',
   },
 ];
 
@@ -121,10 +121,6 @@ export const handlers = [
       });
     }
     return res(ctx.status(204));
-  }),
-
-  rest.get(`${API_PREFIX}/my/following`, (_, res, ctx) => {
-    return res(ctx.json(mockFollowings));
   }),
 
   rest.delete(`${API_PREFIX}/my/following/:userId`, (req, res, ctx) => {

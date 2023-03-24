@@ -19,7 +19,7 @@ export default function MessageList({ messages }: Props) {
           <MessageItem
             key={message.id}
             message={message}
-            isShowProfile={!isMyMessage && isContinuousMessage}
+            isShowProfile={!isMyMessage && !isContinuousMessage}
             className={isMyMessage ? styles.my : styles.other}
           />
         );

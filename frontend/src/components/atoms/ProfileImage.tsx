@@ -11,7 +11,7 @@ export default function ProfileImage({ userId, alt, size }: Props) {
   return (
     <img
       src={
-        userId
+        userId !== undefined
           ? `${API_PREFIX}/users/${userId}/profile-image`
           : 'https://placekitten.com/800/800'
       }

@@ -1,3 +1,5 @@
+type UserStatus = 'online' | 'offline' | 'game';
+
 export interface UserType {
   id: number;
   nickname?: string;
@@ -6,5 +8,5 @@ export interface UserType {
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
-  status?: 'on' | 'off' | 'game';
+  status?: UserStatus;
 }
