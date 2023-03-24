@@ -2,7 +2,7 @@ import { Injectable, Req } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { SettingDto } from './dtos/setting.dto';
 import { MyDto } from './dtos/my.dto';
-import { User } from '@prisma';
+import { Prisma, User } from '@prisma';
 
 @Injectable()
 export class MyService {
@@ -108,6 +108,41 @@ export class MyService {
         followeeId: Number(userId),
       },
     });
+    return following;
+  }
+
+  async deleteFollowing(@Req() req) {
+    const myUserId = req.user.id;
+    if (!myUserId) {
+      throw new Error('not logged in');
+    }
+
+    // check if user exists
+    const { userId } = req.params;
+    const user = await this.prismaService.user.findUnique({
+      where: { id: Number(userId) },
+    });
+    if (!user) {
+      throw new Error('user not found');
+    }
+
+    const following = await this.prismaService.followUser
+      .delete({
+        where: {
+          id: {
+            followerId: myUserId,
+            followeeId: Number(userId),
+          },
+        },
+      })
+      .catch((e) => {
+        if (
+          e instanceof Prisma.PrismaClientKnownRequestError &&
+          e.code === 'P2025' // NOTE: Record to delete does not exist
+        ) {
+          throw new Error('not following');
+        }
+      });
     return following;
   }
 }
