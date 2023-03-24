@@ -27,29 +27,26 @@ export default function Profile({
       <h1>Profile</h1>
       <ProfileImage userId={user.id} alt="profile image" size={320} />
       <p data-testid={user.id}>{user.nickname}</p>
+      <Link to="/profile/2">user2</Link>
       {isMyPage && <Link to="/setting">프로필 수정하기</Link>}
       {!isMyPage && (
         <div>
-          {user.isFollowing && (
-            <Button type="button" onClick={() => onClickUnfollow(user.id)}>
-              언팔로우
-            </Button>
-          )}
-          {!user.isFollowing && (
-            <Button type="button" onClick={() => onClickFollow(user.id)}>
-              팔로우하기
-            </Button>
-          )}
-          {user.isBlocked && (
-            <Button type="button" onClick={() => onClickUnblock(user.id)}>
-              차단 해제
-            </Button>
-          )}
-          {!user.isBlocked && (
-            <Button type="button" onClick={() => onClickBlock(user.id)}>
-              차단하기
-            </Button>
-          )}
+          <div>
+            {user.isFollowing && (
+              <Button type="button" onClick={() => onClickUnfollow(user.id)}>
+                언팔로우
+              </Button>
+            )}
+            {!user.isFollowing && (
+              <Button type="button" onClick={() => onClickFollow(user.id)}>
+                팔로우하기
+              </Button>
+            )}
+            <Button type="button">메시지 보내기</Button>
+          </div>
+          <Button type="button" onClick={() => onClickBlock(user.id)}>
+            차단하기
+          </Button>
         </div>
       )}
     </>
