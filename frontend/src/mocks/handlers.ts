@@ -27,7 +27,7 @@ const mockBlocks: UserType[] = [
     nickname: 'Mock Block Nickname1',
   },
   {
-    id: 2,
+    id: 20,
     nickname: 'Mock Block Nickname2',
   },
   {
@@ -105,32 +105,6 @@ export const handlers = [
   }),
 
   rest.delete(`${API_PREFIX}/my/2fa`, (_, res, ctx) => {
-    return res(ctx.status(204));
-  }),
-
-  rest.get(`${API_PREFIX}/my/blocks`, (req, res, ctx) => {
-    return res(ctx.json(mockBlocks));
-  }),
-
-  rest.delete(`${API_PREFIX}/my/blocks/:userId`, (req, res, ctx) => {
-    const userId = Number(req.params.userId);
-    const index = mockBlocks.findIndex((user) => user.id === userId);
-    if (index === -1) {
-      return res(ctx.status(404));
-    }
-    mockBlocks.splice(index, 1);
-    return res(ctx.status(204));
-  }),
-
-  rest.put(`${API_PREFIX}/my/blocks/:userId`, (req, res, ctx) => {
-    const userId = Number(req.params.userId);
-    const index = mockBlocks.findIndex((user) => user.id === userId);
-    if (index == -1) {
-      mockBlocks.push({
-        id: userId,
-        nickname: `Mock Block Nickname${userId}`,
-      });
-    }
     return res(ctx.status(204));
   }),
 
