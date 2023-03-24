@@ -95,7 +95,7 @@ export class MyController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
+  
   @Delete('follwing/:userId')
   @UseGuards(AuthenticatedGuard)
   async deleteFollowing(
@@ -105,6 +105,34 @@ export class MyController {
   ) {
     try {
       await this.myService.deleteFollowing(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get('blocks')
+  @UseGuards(AuthenticatedGuard)
+  async getBlocks(@Req() req) {
+    return this.myService.getBlocks(req);
+  }
+
+  @Put('blocks/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async putBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
+    try {
+      await this.myService.putBlocks(req);
+      return res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Delete('blocks/:userId')
+  @UseGuards(AuthenticatedGuard)
+  async deleteBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
+    try {
+      await this.myService.deleteBlocks(req);
       return res.status(HttpStatus.NO_CONTENT).send();
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
