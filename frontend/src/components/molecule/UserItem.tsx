@@ -3,7 +3,6 @@ import { UserType } from 'types/userType';
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
 import userItemStyles from 'assets/styles/UserItem.module.css';
-import { API_PREFIX } from 'api/api.v1';
 
 interface Props {
   styles: { readonly [key: string]: string };
@@ -31,9 +30,9 @@ export default function UserItem({
             alt={`${user.nickname}'s profile image`}
             size={imageSize}
           />
-          {hasStatus && user.status !== 'off' && (
+          {hasStatus && user.status !== 'offline' && (
             <div className={userItemStyles.status}>
-              {user.status === 'on' ? '🟢' : 'Game'}
+              {user.status === 'online' ? '🟢' : 'Game'}
             </div>
           )}
         </div>

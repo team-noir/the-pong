@@ -18,11 +18,11 @@ model User {
   rank                  Int           @default(0)
   isTwoFactor           Boolean       @default(false)
   ftId                  String        @unique
-  ftUsername            String?        
+  ftUsername            String?
   ftAccessToken         String?       @unique
   ftRefreshToken        String?       @unique
-  ftAccessExpiresAt     DateTime?    
-  ftRefreshExpiresAt    DateTime?    
+  ftAccessExpiresAt     DateTime?
+  ftRefreshExpiresAt    DateTime?
   createdAt             DateTime      @default(now())
   updatedAt             DateTime?
   deletedAt             DateTime?
@@ -42,18 +42,19 @@ model GameResult {
   id              Int       @id @default(autoincrement())
   score           Int
   isLadder        Boolean
-  winnerId        Int    
-  loserId         Int    
+  winnerId        Int
+  loserId         Int
   createdAt       DateTime  @default(now())
 
-  winner          User      @relation("WinLog", fields: [winnerId], references: [id]) 
+  winner          User      @relation("WinLog", fields: [winnerId], references: [id])
   loser           User      @relation("LoseLog", fields: [loserId], references: [id])
 }
 
 model FollowUser {
-  id              Int       @id @default(autoincrement())
-  followerId      Int       
-  followeeId      Int       
+  @@id([followerId, followeeId], name: "id")
+
+  followerId      Int
+  followeeId      Int
   createdAt       DateTime  @default(now())
 
   follewer        User      @relation("Follower", fields: [followerId], references: [id])
@@ -61,9 +62,10 @@ model FollowUser {
 }
 
 model BlockUser {
-  id              Int       @id @default(autoincrement())
-  blockerId       Int       
-  blockedId       Int       
+  @@id([blockerId, blockedId], name: "id")
+
+  blockerId       Int
+  blockedId       Int
   createdAt       DateTime  @default(now())
 
   blocker         User      @relation("Blocker", fields: [blockerId], references: [id])
@@ -87,9 +89,9 @@ model Channel {
 
 model Channel_User {
   id              Int       @id @default(autoincrement())
-  channelId       Int       
-  userId          Int       
-  userType        Int 
+  channelId       Int
+  userId          Int
+  userType        Int
   status          Int
   createdAt       DateTime  @default(now())
 
@@ -99,8 +101,8 @@ model Channel_User {
 
 model Message {
   id              Int       @id @default(autoincrement())
-  senderId        Int       
-  channelId       Int       
+  senderId        Int
+  channelId       Int
   text            String
   createdAt       DateTime  @default(now())
 
@@ -118,8 +120,8 @@ model Achievement {
 
 model Achievement_User {
   id              Int         @id @default(autoincrement())
-  userId          Int       
-  achievementId   Int       
+  userId          Int
+  achievementId   Int
   createdAt       DateTime    @default(now())
 
   achievement     Achievement @relation(fields: [achievementId], references: [id])

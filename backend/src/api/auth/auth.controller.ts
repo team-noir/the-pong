@@ -44,6 +44,6 @@ export class AuthController {
   @UseGuards(AuthenticatedGuard)
   async logout(@Res() res) {
     this.authService.logout(res);
-    res.status(HttpStatus.OK).send();
+    res.status(HttpStatus.NO_CONTENT).send();
   }
 }

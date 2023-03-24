@@ -9,6 +9,7 @@ interface Props {
   onClickFollow: (userId: number) => void;
   onClickUnfollow: (userId: number) => void;
   onClickBlock: (userId: number) => void;
+  onClickUnblock: (userId: number) => void;
 }
 
 export default function Profile({
@@ -17,6 +18,7 @@ export default function Profile({
   onClickFollow,
   onClickUnfollow,
   onClickBlock,
+  onClickUnblock,
 }: Props) {
   const isMyPage = user.id.toString() === myId;
 

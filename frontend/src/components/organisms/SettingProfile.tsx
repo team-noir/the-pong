@@ -5,15 +5,15 @@ import FileInputWithImage from 'components/molecule/FileInputWithImage';
 import { validateNickname } from 'utils/validatorUtils';
 import { API_PREFIX } from 'api/api.v1';
 import { UserType } from 'types/userType';
-import { UserForm } from 'pages/SettingProfilePage';
+import { ProfileFormType } from 'types/profileFormType';
 
 interface Props {
   user: UserType;
-  onSubmit: (userFormData: UserForm) => void;
+  onSubmit: (userFormData: ProfileFormType) => void;
 }
 
 export default function SettingProfile({ user, onSubmit }: Props) {
-  const [userFormData, setUserFormData] = useState<UserForm>({
+  const [userFormData, setUserFormData] = useState<ProfileFormType>({
     nickname: '',
     imageFile: null,
   });
@@ -28,6 +28,10 @@ export default function SettingProfile({ user, onSubmit }: Props) {
     setUserFormData((prevState) => ({
       ...prevState,
       nickname,
+    }));
+    setIsValidated((prevState) => ({
+      ...prevState,
+      nickname: validateNickname(nickname),
     }));
   }, []);
 
