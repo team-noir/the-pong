@@ -3,8 +3,11 @@ import { useMutation } from '@tanstack/react-query';
 import { patchMyProfile, PostMyProfileImage } from 'api/api.v1';
 import { useEffect, useState } from 'react';
 import { ProfileFormType } from 'types/profileFormType';
+import AppTemplateWithoutHeader from 'components/templates/AppTemplateWithoutHeader';
+import { useUser } from 'hooks/useStore';
 
 export default function OnBoardingPage() {
+  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [hasImageFile, setHasImageFile] = useState<boolean>(false);
 
@@ -20,6 +23,7 @@ export default function OnBoardingPage() {
       (!hasImageFile || (hasImageFile && postMyProfileImageMutation.isSuccess))
     ) {
       setIsSubmitted(true);
+      setIsOnboarded(true);
     }
   }, [patchMyProfileMutation, postMyProfileImageMutation]);
 
@@ -32,9 +36,8 @@ export default function OnBoardingPage() {
   };
 
   return (
-    <>
-      <div>OnBoardingPage</div>
+    <AppTemplateWithoutHeader>
       <OnBoarding isSubmitted={isSubmitted} onSubmit={handleSubmit} />
-    </>
+    </AppTemplateWithoutHeader>
   );
 }

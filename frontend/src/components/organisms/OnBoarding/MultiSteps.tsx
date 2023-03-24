@@ -27,6 +27,7 @@ export default function MultiSteps({
 }: Props) {
   const [stepIndex, setStepIndex] = useState<number>(0);
   const [isValid, setIsValid] = useState<boolean>(true);
+  const isFirstStep = stepIndex === 0;
   const isLastStep = stepIndex === stepComponents.length - 1;
 
   const handleClickPrevStep = () => {
@@ -58,9 +59,11 @@ export default function MultiSteps({
 
   return (
     <>
-      <Button type="button" onClick={handleClickPrevStep}>
-        &lt;
-      </Button>
+      {!isFirstStep && (
+        <Button type="button" onClick={handleClickPrevStep}>
+          &lt;
+        </Button>
+      )}
       <form onSubmit={handleClickNextStep}>
         {stepComponents[stepIndex]}
         <Message isShow={!isValid} message={messages[stepIndex]} />

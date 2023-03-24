@@ -73,7 +73,13 @@ export const deleteMy2fa = async () => {
 };
 
 export const PostMyProfileImage = async (imageFile: File) => {
-  const res = await axios.post(`/my/profile-image`, imageFile);
+  const formData = new FormData();
+  formData.append('file', imageFile);
+  const res = await axios.post(`/my/profile-image`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   if (res.status !== 204) {
     throw new Error('Failed to post profile image');
   }
