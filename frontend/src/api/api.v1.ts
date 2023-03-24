@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { UserType } from 'types/userType';
 
 export const API_PREFIX = `/api/v1`;
@@ -8,6 +8,14 @@ axios.defaults.baseURL = API_PREFIX;
 axios.defaults.withCredentials = true;
 
 /** Login **/
+
+export const postLogout = async () => {
+  const res = await axios.post(`/auth/logout`);
+  if (res.status !== 204) {
+    throw new Error('Failed to post logout');
+  }
+  return res;
+};
 
 export const getWhoami = async (): Promise<UserType> => {
   const res = await axios.get(`/my/whoami`);
@@ -48,6 +56,22 @@ export const patchMyProfile = async (nickname: string): Promise<UserType> => {
   return res.data;
 };
 
+export const getMy2fa = async () => {
+  const res = await axios.get(`/my/2fa`);
+  if (res.status !== 200) {
+    throw new Error('Failed to get 2fa');
+  }
+  return res.data;
+};
+
+export const deleteMy2fa = async () => {
+  const res = await axios.delete(`/my/2fa`);
+  if (res.status !== 204) {
+    throw new Error('Failed to delete 2fa');
+  }
+  return res;
+};
+
 export const PostMyProfileImage = async (imageFile: File) => {
   const res = await axios.post(`/my/profile-image`, imageFile);
   if (res.status !== 204) {
@@ -81,10 +105,12 @@ export const putMyBlocks = async (userId: number) => {
 };
 
 export const getMyFollowing = async () => {
-  const res = await axios.get(`/my/following`);
-  if (res.status !== 200) {
-    throw new Error('Failed to get my following');
-  }
+  const res = await axios.get(`/my/following`).catch((error) => {
+    if (error.response.status === 404) {
+      throw new AxiosError('팔로잉한 회원이 없습니다', '404');
+    }
+    throw error;
+  });
   return res.data;
 };
 

@@ -6,17 +6,17 @@ const dummyResultUsers: UserType[] = [
   {
     id: 2,
     nickname: '결과닉네임2',
-    status: 'on',
+    status: 'online',
   },
   {
     id: 3,
     nickname: '결과닉네임3',
-    status: 'on',
+    status: 'online',
   },
   {
     id: 4,
     nickname: '결과닉네임4',
-    status: 'off',
+    status: 'offline',
   },
   {
     id: 5,
