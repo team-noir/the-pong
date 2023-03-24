@@ -32,6 +32,20 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     expose:
       - '5432'
+    ports:
+      - '5432:5432'
+
+  redis:
+    build: ./redis
+    container_name: the-pong_redis_dev
+    restart: unless-stopped
+    networks:
+      - the-pong-dev-net
+    expose:
+      - '6379'
+    ports:
+      - '6379:6379'
+    
 
   backend:
     container_name: the-pong_backend_dev
@@ -43,6 +57,7 @@ services:
       - '8000:8000'
     depends_on:
       - postgres
+      - redis
     environment:
       DATABASE_URL: ${DATABASE_URL}
       FT_UID: ${FT_UID}
@@ -70,3 +85,4 @@ networks:
 
 volumes:
   postgres-dev:
+  redis-dev:

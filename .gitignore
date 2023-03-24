@@ -196,9 +196,10 @@ sketch
 # Ignore redis binary dump (dump.rdb) files
 
 *.rdb
+redis/user.acl
 
 # prisma build files 
 backend/prisma/*
 !backend/prisma/schema.prisma
 
-backend/profile-images
+backend/uploads/profile-images
