@@ -3,8 +3,9 @@ import { REQUEST } from '@nestjs/core';
 
 import { PrismaService } from 'src/prisma/prisma.service';
 import { createReadStream } from 'fs';
+import { readdir } from 'node:fs/promises';
+
 import { join } from 'path';
-import { Response } from 'express';
 import { PROFILE_PATH } from '../../const';
 
 interface RequestWithUser extends Request {
@@ -117,21 +118,24 @@ export class UsersService {
     };
   }
 
-  async downloadProfileImage(userId: number, res: Response) {
-    const user = await this.prismaService.user.findUnique({
-      where: { id: userId },
-    });
-    if (!user || !user.imageUrl) {
-      return;
-    }
-    const file = createReadStream(
-      join(process.cwd(), `${PROFILE_PATH}${user.imageUrl}`)
+  async downloadProfileImage(userId: number) {
+    const files = await readdir(
+      join(process.cwd(), `${PROFILE_PATH}/${userId}/`)
     );
-    const mimetype = user.imageUrl.split('.')[1];
-    res.set({
-      'Content-Type': `image/${mimetype}`,
-      'Content-Disposition': `attachment; filename="${user.imageUrl}"`,
-    });
-    return new StreamableFile(file);
+    if (!files) {
+      throw new Error('No profile image file found');
+    }
+
+    const filename: string = files[0];
+    const file = createReadStream(
+      join(process.cwd(), `${PROFILE_PATH}/${userId}/${filename}`)
+    );
+    const ext = filename.split('.').pop();
+
+    return {
+      file,
+      filename,
+      mimetype: `image/${ext}`,
+    };
   }
 }

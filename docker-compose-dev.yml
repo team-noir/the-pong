@@ -50,6 +50,8 @@ services:
       FT_CB: ${FT_CB}
       JWT_SECRET: ${JWT_SECRET}
       CLIENT_APP_URL: ${CLIENT_APP_URL}
+    volumes:
+      - backend-uploads-dev:/usr/src/app/uploads
 
   frontend:
     container_name: the-pong_frontend_dev
@@ -70,3 +72,4 @@ networks:
 
 volumes:
   postgres-dev:
+  backend-uploads-dev:

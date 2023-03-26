@@ -17,6 +17,8 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiBody } from '@nestjs/swagger';
+import { existsSync, mkdirSync } from 'fs';
+import { readdir, unlink } from 'node:fs/promises';
 import { diskStorage } from 'multer';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { SettingDto } from './dtos/setting.dto';
@@ -65,10 +67,25 @@ export class MyController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: PROFILE_PATH,
-        filename: (req, file, cb) => {
+        destination: async (req, _, cb) => {
+          const dir = `${PROFILE_PATH}/${req.user.id}`;
+          if (!existsSync(dir)) {
+            await mkdirSync(dir);
+          }
+          // remove previous image in dir
+          for (const file of await readdir(dir)) {
+            await unlink(`${dir}/${file}`);
+          }
+          return cb(null, dir);
+        },
+        filename: (_, file, cb) => {
           const ext: string = file.mimetype.split('/')[1];
-          return cb(null, `${req.user.id}.${ext}`);
+          // YYYYMMDDHHMMSS
+          const now = new Date()
+            .toISOString()
+            .replace(/:/g, '')
+            .replace(/\./g, '');
+          return cb(null, `${now}.${ext}`);
         },
       }),
     })
@@ -95,7 +112,7 @@ export class MyController {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-  
+
   @Delete('following/:userId')
   @UseGuards(AuthenticatedGuard)
   async deleteFollowing(
