@@ -55,16 +55,18 @@ export class UsersController {
     @Param('userId') userId: number,
     @Res({ passthrough: true }) res: Response
   ): Promise<StreamableFile> {
-    try {
-      const result = await this.usersService.downloadProfileImage(userId);
-      res.set({
-        'Content-Type': `${result.mimetype}`,
-        'Content-Disposition': `attachment; filename=${result.filename}`,
-        'Cache-Control': 'no-cache, max-age=0',
-      });
-      return new StreamableFile(result.file);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    const result = await this.usersService.downloadProfileImage(userId);
+    if (!result) {
+      throw new HttpException(
+        'No profile image file found',
+        HttpStatus.NOT_FOUND
+      );
     }
+    res.set({
+      'Content-Type': `${result.mimetype}`,
+      'Content-Disposition': `attachment; filename=${result.filename}`,
+      'Cache-Control': 'no-cache, max-age=0',
+    });
+    return new StreamableFile(result.file);
   }
 }
