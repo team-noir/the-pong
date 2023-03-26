@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
 import styles from 'assets/styles/SearchResult.module.css';
 import { UserType } from 'types/userType';
-import { API_PREFIX } from 'api/api.v1';
 
 interface Props {
   user: UserType;

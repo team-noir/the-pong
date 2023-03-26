@@ -1,15 +1,15 @@
 import { render, screen } from '@testing-library/react';
-import { ProfileType } from 'api/api.v1';
+import { ProfileUserType } from 'api/api.v1';
 import Profile from 'components/organisms/Profile';
 
-const profileUser: ProfileType = {
+const profileUser: ProfileUserType = {
   id: 1,
   nickname: `user1's nickname`,
   rank: 0,
   achievements: [],
   games: [],
-  isFollowing: false,
-  isBlocked: false,
+  isFollowedByMyself: false,
+  isBlockedByMyself: false,
 };
 
 const mockHandler = (userId: number, message: string) =>
