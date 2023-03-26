@@ -4,13 +4,14 @@ import SearchBar from 'components/molecule/SearchBar';
 import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types/userType';
-import { useLogin } from 'hooks/useStore';
+import { useLogin, useUser } from 'hooks/useStore';
 import { AxiosError } from 'axios';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getWhoami, postLogout } from 'api/api.v1';
 
 export default function HeaderGnb() {
   const logout = useLogin((state) => state.logout);
+  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
@@ -20,6 +21,7 @@ export default function HeaderGnb() {
 
   useEffect(() => {
     if (postLogoutMutation.isSuccess) {
+      setIsOnboarded(false);
       logout();
     }
   }, [postLogoutMutation.isSuccess]);
