@@ -121,10 +121,12 @@ export class UsersService {
   async downloadProfileImage(userId: number) {
     const files = await readdir(
       join(process.cwd(), `${PROFILE_PATH}/${userId}/`)
-    );
-    if (!files) {
-      throw new Error('No profile image file found');
-    }
+    ).catch((e) => {
+      if (e.code === 'ENOENT') {
+        return null;
+      }
+      throw e;
+    });
 
     const filename: string = files[0];
     const file = createReadStream(

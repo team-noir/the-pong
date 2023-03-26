@@ -70,7 +70,7 @@ export class MyController {
         destination: async (req, _, cb) => {
           const dir = `${PROFILE_PATH}/${req.user.id}`;
           if (!existsSync(dir)) {
-            await mkdirSync(dir);
+            await mkdirSync(dir, { recursive: true });
           }
           // remove previous image in dir
           for (const file of await readdir(dir)) {
