@@ -34,3 +34,27 @@ export class MyDto {
   @IsDateString()
   public deletedAt: Date;
 }
+
+export class FollowDto {
+  @ApiProperty()
+  @IsNumber()
+  public id: number;
+
+  @ApiProperty()
+  @IsString()
+  public nickname: string;
+
+  @ApiProperty()
+  @IsString()
+  public status: 'online' | 'offline' | 'game';
+}
+
+export class BlockDto {
+  @ApiProperty()
+  @IsNumber()
+  public id: number;
+
+  @ApiProperty()
+  @IsString()
+  public nickname: string;
+}

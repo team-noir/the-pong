@@ -16,14 +16,23 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiTags, ApiBody } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiConsumes,
+  ApiBadRequestResponse,
+  ApiNoContentResponse,
+  ApiBody,
+} from '@nestjs/swagger';
 import { existsSync, mkdirSync } from 'fs';
 import { readdir, unlink } from 'node:fs/promises';
 import { diskStorage } from 'multer';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
-import { SettingDto } from './dtos/setting.dto';
+import { SettingDto, FileUploadDto } from './dtos/setting.dto';
 import { MyService } from './my.service';
-import { MyDto } from './dtos/my.dto';
+import { MyDto, FollowDto, BlockDto } from './dtos/my.dto';
 import { PROFILE_PATH } from '../../const';
 
 @ApiTags('my')
@@ -32,23 +41,9 @@ export class MyController {
   constructor(private myService: MyService) {}
 
   @Get('whoami')
-  @ApiBody({
-    description: 'userid',
-    examples: {
-      ftOauth: {
-        value: {
-          id: 1,
-          nickname: null,
-          rank: 0,
-          isTwoFactor: false,
-          ftUsername: 'cpak',
-          createdAt: '2023-03-15T09:21:08.389Z',
-          updatedAt: null,
-          deletedAt: null,
-        },
-      },
-    },
-  })
+  @ApiOperation({ summary: 'Get my profile' })
+  @ApiOkResponse({ description: 'Get my profile', type: MyDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async whoami(@Req() req, @Res() res) {
     const user: MyDto = await this.myService.whoami(req);
@@ -56,6 +51,9 @@ export class MyController {
   }
 
   @Patch('settings')
+  @ApiOperation({ summary: 'Set my profile' })
+  @ApiOkResponse({ description: 'Successfully set my profile', type: MyDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async setMyProfile(@Req() req, @Body() body: SettingDto, @Res() res) {
     const user: MyDto = await this.myService.setMyProfile(req, body);
@@ -63,6 +61,12 @@ export class MyController {
   }
 
   @Post('profile-image')
+  @ApiOperation({ summary: 'Upload profile image' })
+  @ApiConsumes('multipart/form-data')
+  @ApiNoContentResponse({ description: 'Successfully uploaded profile image' })
+  @ApiBadRequestResponse({ description: 'Bad request\n- [TODO]Invalid file' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
+  @ApiBody({ description: 'Profile image binary file', type: FileUploadDto })
   @UseGuards(AuthenticatedGuard)
   @UseInterceptors(
     FileInterceptor('file', {
@@ -91,18 +95,28 @@ export class MyController {
     })
   )
   async uploadProfileImage(@Req() req, @Res() res, @UploadedFile() file) {
+    // TODO: file validation(format, size, etc...)
     const statusCode = file ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST;
     await this.myService.uploadProfileImage(req.user.id, file);
     res.status(statusCode).send();
   }
 
   @Get('following')
+  @ApiOperation({ summary: 'Get following list' })
+  @ApiOkResponse({
+    description: 'Get following list. Empty array if no following.',
+    type: [FollowDto],
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async getFollowing(@Req() req) {
     return this.myService.getFollowing(req);
   }
 
   @Put('following/:userId')
+  @ApiOperation({ summary: 'Follow user' })
+  @ApiNoContentResponse({ description: 'Successfully followed user' })
+  @ApiBadRequestResponse({ description: 'Bad request\n- Invalid user id' })
   @UseGuards(AuthenticatedGuard)
   async putFollowing(@Req() req, @Param('userId') userId: number, @Res() res) {
     try {
@@ -114,6 +128,11 @@ export class MyController {
   }
 
   @Delete('following/:userId')
+  @ApiOperation({ summary: 'Unfollow user' })
+  @ApiNoContentResponse({ description: 'Successfully unfollowed user' })
+  @ApiBadRequestResponse({
+    description: 'Bad request\n- Invalid user id\n- Not following user id',
+  })
   @UseGuards(AuthenticatedGuard)
   async deleteFollowing(
     @Req() req,
@@ -129,12 +148,20 @@ export class MyController {
   }
 
   @Get('blocks')
+  @ApiOperation({ summary: 'Get block list' })
+  @ApiOkResponse({
+    description: 'Get block list. Empty array if no block.',
+    type: [BlockDto],
+  })
   @UseGuards(AuthenticatedGuard)
   async getBlocks(@Req() req) {
     return this.myService.getBlocks(req);
   }
 
   @Put('blocks/:userId')
+  @ApiOperation({ summary: 'Block user' })
+  @ApiNoContentResponse({ description: 'Successfully blocked user' })
+  @ApiBadRequestResponse({ description: 'Bad request\n- Invalid user id' })
   @UseGuards(AuthenticatedGuard)
   async putBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
     try {
@@ -146,6 +173,11 @@ export class MyController {
   }
 
   @Delete('blocks/:userId')
+  @ApiOperation({ summary: 'Unblock user' })
+  @ApiNoContentResponse({ description: 'Successfully unblocked user' })
+  @ApiBadRequestResponse({
+    description: 'Bad request\n- Invalid user id\n- Not blocking user id',
+  })
   @UseGuards(AuthenticatedGuard)
   async deleteBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
     try {

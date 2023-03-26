@@ -12,9 +12,11 @@ import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import {
   ApiOperation,
   ApiTags,
-  ApiResponse,
   ApiHeader,
   ApiBearerAuth,
+  ApiOkResponse,
+  ApiNoContentResponse,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 
@@ -24,6 +26,9 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   @Get('42')
+  @ApiOkResponse({
+    description: 'Redirect to 42 api. Set cookie.',
+  })
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Sign in 42 api' })
   @UseGuards(FtOauthGuard)
@@ -33,7 +38,7 @@ export class AuthController {
 
   @Get('42/return')
   @ApiOperation({ summary: '42 api callback' })
-  @ApiResponse({ status: 200, description: 'Get access token' })
+  @ApiOkResponse({ description: 'Get access token' })
   @ApiHeader({ name: 'Authorization', description: 'jwt' })
   @UseGuards(FtOauthGuard)
   async auth(@Req() req, @Res({ passthrough: true }) res) {
@@ -41,6 +46,9 @@ export class AuthController {
   }
 
   @Post('logout')
+  @ApiOperation({ summary: 'Logout' })
+  @ApiNoContentResponse({ description: 'Logout. Remove cookie.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async logout(@Res() res) {
     this.authService.logout(res);
