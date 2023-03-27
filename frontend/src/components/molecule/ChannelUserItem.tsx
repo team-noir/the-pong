@@ -34,6 +34,12 @@ export default function ChannelUserItem({
       {myUser && user.id !== myUser.id && (
         <div>
           <Button type="button">게임 초대</Button>
+          {myUser.userType === UserTypeType.owner &&
+            (user.userType === UserTypeType.admin ? (
+              <Button type="button">관리자 해제</Button>
+            ) : (
+              <Button type="button">관리자 임명</Button>
+            ))}
           {myUser.userType <= UserTypeType.admin && (
             <>
               <Button type="button">조용히</Button>
@@ -41,12 +47,6 @@ export default function ChannelUserItem({
               <Button type="button">차단하기</Button>
             </>
           )}
-          {myUser.userType === UserTypeType.owner &&
-            (user.userType === UserTypeType.admin ? (
-              <Button type="button">관리자 해제</Button>
-            ) : (
-              <Button type="button">관리자 임명</Button>
-            ))}
         </div>
       )}
     </li>

@@ -18,7 +18,7 @@ const dummyChannelUsers: ChannelUserType[] = [
   {
     id: 1,
     nickname: 'heehkim',
-    userType: UserTypeType.admin,
+    userType: UserTypeType.owner,
   },
   {
     id: 2,
