@@ -46,7 +46,7 @@ const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
   return 0;
 };
 
-export default function ChannelSetting({ channel }: Props) {
+export default function ChannelDetail({ channel }: Props) {
   const [channelUsers, setChannelUsers] = useState<ChannelUserType[] | null>(
     null
   );
@@ -65,7 +65,7 @@ export default function ChannelSetting({ channel }: Props) {
   return (
     <div>
       {myUser?.role === RoleType.owner && (
-        <Button type="button">채팅방 설정</Button>
+        <Button type="button">채널 설정</Button>
       )}
       <h2>참가자</h2>
       <ChannelUserList
