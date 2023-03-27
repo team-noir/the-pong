@@ -1,6 +1,5 @@
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
-import userItemStyles from 'assets/styles/UserItem.module.css';
 import { ChannelUserType, RoleType } from 'types/channelUserType';
 import Button from 'components/atoms/Button';
 
@@ -22,16 +21,18 @@ export default function ChannelUserItem({
   return (
     <li className={styles.li} data-user-id={user.id}>
       <Link to={`/profile/${user.id}`}>
-        <div className={userItemStyles.container}>
-          <ProfileImage
-            userId={user.id}
-            alt={`${user.nickname}'s profile image`}
-            size={imageSize}
-          />
-        </div>
+        <ProfileImage
+          userId={user.id}
+          alt={`${user.nickname}'s profile image`}
+          size={imageSize}
+        />
       </Link>
       <Link to={`/profile/${user.id}`}>
-        <span>{user.nickname}</span>
+        <span>
+          {user.role === RoleType.owner && `🕶`}
+          {user.role === RoleType.admin && `👓`}
+          {user.nickname}
+        </span>
       </Link>
       {!isSelf && (
         <>
