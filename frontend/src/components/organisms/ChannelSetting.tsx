@@ -2,7 +2,7 @@ import Button from 'components/atoms/Button';
 import { useEffect, useState } from 'react';
 import { ChannelType } from 'types/channelType';
 import styles from 'assets/styles/Channel.module.css';
-import { ChannelUserType, UserTypeType } from 'types/channelUserType';
+import { ChannelUserType, RoleType } from 'types/channelUserType';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 
 interface Props {
@@ -13,22 +13,22 @@ const dummyChannelUsers: ChannelUserType[] = [
   {
     id: 0,
     nickname: 'sarchoi',
-    userType: UserTypeType.admin,
+    role: RoleType.admin,
   },
   {
     id: 1,
     nickname: 'heehkim',
-    userType: UserTypeType.owner,
+    role: RoleType.owner,
   },
   {
     id: 2,
     nickname: 'cpak',
-    userType: UserTypeType.normal,
+    role: RoleType.normal,
   },
   {
     id: 3,
     nickname: 'hello',
-    userType: UserTypeType.admin,
+    role: RoleType.admin,
   },
 ];
 
@@ -37,8 +37,8 @@ const myUserId = 1;
 // 내가 가장 위, 다음으로 owner, admin, normal 순, 각 userType끼리는 nickname 순
 const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
   if (user1.id === myUserId) return -1;
-  if (user1.userType !== user2.userType) {
-    return user1.userType - user2.userType;
+  if (user1.role !== user2.role) {
+    return user1.role - user2.role;
   }
   if (user1.nickname && user2.nickname) {
     return user1.nickname.localeCompare(user2.nickname);
@@ -64,7 +64,7 @@ export default function ChannelSetting({ channel }: Props) {
 
   return (
     <div>
-      {myUser?.userType === UserTypeType.owner && (
+      {myUser?.role === RoleType.owner && (
         <Button type="button">채팅방 설정</Button>
       )}
       <h2>참가자</h2>
