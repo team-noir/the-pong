@@ -5,14 +5,20 @@ import { ChannelType } from 'types/channelType';
 
 describe('Component - ChannelDetail 렌더링', () => {
   const channel: ChannelType = {
-    id: 0,
-    title: '게임 할 사람',
+    id: 1,
+    title: 'public test',
+    isProtected: false,
+    isPrivate: false,
+    isDm: false,
   };
 
   test('채널을 보여준다', () => {
     render(
       <BrowserRouter>
-        <ChannelDetail channel={channel} />
+        <ChannelDetail
+          channel={channel}
+          onClickSetting={() => console.log('click setting')}
+        />
       </BrowserRouter>
     );
     screen.getByText('참가자');
