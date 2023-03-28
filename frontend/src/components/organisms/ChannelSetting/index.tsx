@@ -5,7 +5,7 @@ import ChannelSettingPassword from './ChannelSettingPassword';
 import ChannelSettingTitle from './ChannelSettingTitle';
 
 interface Props {
-  channel: ChannelType | null;
+  channel: ChannelType;
   onClickClose: () => void;
 }
 
@@ -40,7 +40,7 @@ export default function ChannelSetting({ channel, onClickClose }: Props) {
             <Button type="button" onClick={handleClickSettingTitle}>
               채널 이름 수정 &gt;
             </Button>
-            {channel && !channel.isPrivate && (
+            {!channel.isPrivate && (
               <Button type="button" onClick={handleClickSettingPassword}>
                 채널 비밀번호 설정 &gt;
               </Button>
@@ -48,13 +48,13 @@ export default function ChannelSetting({ channel, onClickClose }: Props) {
           </div>
         </>
       )}
-      {isSettingTitle && channel && (
+      {isSettingTitle && (
         <ChannelSettingTitle
           channelTitle={channel.title}
           onClickBack={handleClickBack}
         />
       )}
-      {isSettingPassword && channel && (
+      {isSettingPassword && (
         <ChannelSettingPassword
           isProtected={channel.isProtected}
           onClickBack={handleClickBack}

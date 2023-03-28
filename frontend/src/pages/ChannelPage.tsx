@@ -22,31 +22,35 @@ export default function ChannelPage() {
   }, []);
 
   return (
-    <AppTemplate
-      header={
-        <HeaderWithBackButton
-          title={channel?.title}
-          button={
-            <Button type="button" onClick={() => setIsShowDetail(true)}>
-              메뉴
-            </Button>
+    <>
+      {channel && (
+        <AppTemplate
+          header={
+            <HeaderWithBackButton
+              title={channel?.title}
+              button={
+                <Button type="button" onClick={() => setIsShowDetail(true)}>
+                  메뉴
+                </Button>
+              }
+            />
           }
-        />
-      }
-    >
-      <Channel channel={channel} />
-      {isShowDetail && (
-        <ChannelDetail
-          channel={channel}
-          onClickSetting={() => setIsShowSetting(true)}
-        />
+        >
+          <Channel channel={channel} />
+          {isShowDetail && (
+            <ChannelDetail
+              channel={channel}
+              onClickSetting={() => setIsShowSetting(true)}
+            />
+          )}
+          {isShowSetting && (
+            <ChannelSetting
+              channel={channel}
+              onClickClose={() => setIsShowSetting(false)}
+            />
+          )}
+        </AppTemplate>
       )}
-      {isShowSetting && (
-        <ChannelSetting
-          channel={channel}
-          onClickClose={() => setIsShowSetting(false)}
-        />
-      )}
-    </AppTemplate>
+    </>
   );
 }
