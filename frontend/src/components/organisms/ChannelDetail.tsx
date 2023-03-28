@@ -8,6 +8,7 @@ import ChannelUserList from 'components/molecule/ChannelUserList';
 interface Props {
   channel: ChannelType | null;
   onClickSetting: () => void;
+  onClickInvite: () => void;
 }
 
 const myUserId = 1;
@@ -24,7 +25,11 @@ const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
   return 0;
 };
 
-export default function ChannelDetail({ channel, onClickSetting }: Props) {
+export default function ChannelDetail({
+  channel,
+  onClickSetting,
+  onClickInvite,
+}: Props) {
   const [channelUsers, setChannelUsers] = useState<ChannelUserType[] | null>(
     null
   );
@@ -44,21 +49,27 @@ export default function ChannelDetail({ channel, onClickSetting }: Props) {
 
   return (
     <div>
-      {myUser?.role === RoleType.owner && (
-        <Button type="button" onClick={onClickSetting}>
-          채널 설정
-        </Button>
+      {channel && (
+        <>
+          {myUser?.role === RoleType.owner && (
+            <Button type="button" onClick={onClickSetting}>
+              채널 설정
+            </Button>
+          )}
+          <h2>참가자</h2>
+          <ChannelUserList
+            styles={styles}
+            users={channelUsers}
+            imageSize={52}
+            myUser={myUser}
+            isPrivate={channel.isPrivate}
+            onClickInvite={onClickInvite}
+          />
+          <Button type="button">
+            {myUser?.role === RoleType.owner ? '채널 삭제' : '채널 나가기'}
+          </Button>
+        </>
       )}
-      <h2>참가자</h2>
-      <ChannelUserList
-        styles={styles}
-        users={channelUsers}
-        imageSize={52}
-        myUser={myUser}
-      />
-      <Button type="button">
-        {myUser?.role === RoleType.owner ? '채널 삭제' : '채널 나가기'}
-      </Button>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import Button from 'components/atoms/Button';
 import { ChannelUserType } from 'types/channelUserType';
 import ChannelUserItem from './ChannelUserItem';
 
@@ -6,6 +7,8 @@ interface Props {
   users: ChannelUserType[] | null;
   imageSize: number;
   myUser: ChannelUserType | null;
+  isPrivate: boolean;
+  onClickInvite: () => void;
 }
 
 export default function ChannelUserList({
@@ -13,9 +16,16 @@ export default function ChannelUserList({
   users,
   imageSize,
   myUser,
+  isPrivate,
+  onClickInvite,
 }: Props) {
   return (
     <ul className={styles.ul}>
+      {isPrivate && (
+        <Button type="button" onClick={onClickInvite}>
+          초대하기
+        </Button>
+      )}
       {users &&
         users.map((user) => {
           return (
