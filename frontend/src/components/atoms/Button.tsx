@@ -15,11 +15,19 @@ export default function Button({
   onClick,
 }: Props) {
   return (
-    <button type={type} onClick={onClick}>
+    <button
+      className="bg-primary-500 hover:bg-primary-700 text-white font-bold py-2 px-4 rounded inline-flex items-center"
+      type={type}
+      onClick={onClick}
+    >
       {logoImageUrl && (
-        <img src={logoImageUrl} alt="logo" className={styles.logo} />
+        <img
+          src={logoImageUrl}
+          alt="logo"
+          className="fill-current w-4 h-4 mr-2"
+        />
       )}
-      {children}
+      <span>{children}</span>
     </button>
   );
 }

@@ -18,7 +18,7 @@ export default function ProfileImage({ userId, alt, size }: Props) {
       alt={alt}
       width={size}
       height={size}
-      className={styles.img}
+      className="h-8 w-8 rounded-full"
     />
   );
 }
