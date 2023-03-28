@@ -46,8 +46,8 @@ const dummyChannels: ChannelType[] = [
     isDm: false,
     users: [
       {
-        id: 1,
-        nickname: 'heehkim',
+        id: 3,
+        nickname: 'sarchoi',
         role: RoleType.owner,
         isMuted: false,
       },
