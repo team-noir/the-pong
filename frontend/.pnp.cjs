@@ -28,6 +28,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {\
           "packageLocation": "./",\
           "packageDependencies": [\
+            ["@headlessui/react", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:1.7.13"],\
+            ["@heroicons/react", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:2.0.16"],\
             ["@tailwindcss/forms", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:0.5.3"],\
             ["@tailwindcss/typography", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:0.5.9"],\
             ["@tanstack/react-query", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:4.26.1"],\
@@ -3273,6 +3275,55 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@gar-promisify-npm-1.1.3-ac1a325862-4059f790e2.zip/node_modules/@gar/promisify/",\
           "packageDependencies": [\
             ["@gar/promisify", "npm:1.1.3"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@headlessui/react", [\
+        ["npm:1.7.13", {\
+          "packageLocation": "./.yarn/cache/@headlessui-react-npm-1.7.13-538d171a24-132e5fce86.zip/node_modules/@headlessui/react/",\
+          "packageDependencies": [\
+            ["@headlessui/react", "npm:1.7.13"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:1.7.13", {\
+          "packageLocation": "./.yarn/__virtual__/@headlessui-react-virtual-319bdf1632/0/cache/@headlessui-react-npm-1.7.13-538d171a24-132e5fce86.zip/node_modules/@headlessui/react/",\
+          "packageDependencies": [\
+            ["@headlessui/react", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:1.7.13"],\
+            ["@types/react", "npm:18.0.28"],\
+            ["@types/react-dom", "npm:18.0.11"],\
+            ["client-only", "npm:0.0.1"],\
+            ["react", "npm:18.2.0"],\
+            ["react-dom", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:18.2.0"]\
+          ],\
+          "packagePeers": [\
+            "@types/react-dom",\
+            "@types/react",\
+            "react-dom",\
+            "react"\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@heroicons/react", [\
+        ["npm:2.0.16", {\
+          "packageLocation": "./.yarn/cache/@heroicons-react-npm-2.0.16-ce9dfa3c94-1e51bfec72.zip/node_modules/@heroicons/react/",\
+          "packageDependencies": [\
+            ["@heroicons/react", "npm:2.0.16"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:2.0.16", {\
+          "packageLocation": "./.yarn/__virtual__/@heroicons-react-virtual-4879d7429a/0/cache/@heroicons-react-npm-2.0.16-ce9dfa3c94-1e51bfec72.zip/node_modules/@heroicons/react/",\
+          "packageDependencies": [\
+            ["@heroicons/react", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:2.0.16"],\
+            ["@types/react", "npm:18.0.28"],\
+            ["react", "npm:18.2.0"]\
+          ],\
+          "packagePeers": [\
+            "@types/react",\
+            "react"\
           ],\
           "linkType": "HARD"\
         }]\
@@ -7071,6 +7122,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/cli-width-npm-3.0.0-387b3f68f9-4c94af3769.zip/node_modules/cli-width/",\
           "packageDependencies": [\
             ["cli-width", "npm:3.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["client-only", [\
+        ["npm:0.0.1", {\
+          "packageLocation": "./.yarn/cache/client-only-npm-0.0.1-07d3e9505c-0c16bf660d.zip/node_modules/client-only/",\
+          "packageDependencies": [\
+            ["client-only", "npm:0.0.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -17666,6 +17726,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["the-pong", "workspace:."],\
+            ["@headlessui/react", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:1.7.13"],\
+            ["@heroicons/react", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:2.0.16"],\
             ["@tailwindcss/forms", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:0.5.3"],\
             ["@tailwindcss/typography", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:0.5.9"],\
             ["@tanstack/react-query", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:4.26.1"],\
