@@ -1,7 +1,7 @@
 import Button from 'components/atoms/Button';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Channel from 'components/organisms/Channel';
-import ChannelSetting from 'components/organisms/ChannelSetting';
+import ChannelDetail from 'components/organisms/ChannelDetail';
 import AppTemplate from 'components/templates/AppTemplate';
 import { useState } from 'react';
 import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
@@ -51,7 +51,7 @@ export default function ChannelPage() {
       }
     >
       <Channel channel={channel} />
-      {isShowSetting && <ChannelSetting channel={channel} />}
+      {isShowSetting && <ChannelDetail channel={channel} />}
     </AppTemplate>
   );
 }
