@@ -3,6 +3,7 @@ import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Channel from 'components/organisms/Channel';
 import ChannelDetail from 'components/organisms/ChannelDetail';
 import { dummyChannels } from 'components/organisms/ChannelLobby';
+import ChannelSetting from 'components/organisms/ChannelSetting';
 import AppTemplate from 'components/templates/AppTemplate';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -12,6 +13,7 @@ export default function ChannelPage() {
   const { channelId } = useParams() as { channelId: string };
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const [isShowDetail, setIsShowDetail] = useState(false);
+  const [isShowSetting, setIsShowSetting] = useState(false);
 
   useEffect(() => {
     setChannel(
@@ -19,17 +21,13 @@ export default function ChannelPage() {
     );
   }, []);
 
-  const handleClick = () => {
-    setIsShowDetail(!isShowDetail);
-  };
-
   return (
     <AppTemplate
       header={
         <HeaderWithBackButton
           title={channel?.title}
           button={
-            <Button type="button" onClick={handleClick}>
+            <Button type="button" onClick={() => setIsShowDetail(true)}>
               메뉴
             </Button>
           }
@@ -37,7 +35,18 @@ export default function ChannelPage() {
       }
     >
       <Channel channel={channel} />
-      {isShowDetail && <ChannelDetail channel={channel} />}
+      {isShowDetail && (
+        <ChannelDetail
+          channel={channel}
+          onClickSetting={() => setIsShowSetting(true)}
+        />
+      )}
+      {isShowSetting && (
+        <ChannelSetting
+          channel={channel}
+          onClickClose={() => setIsShowSetting(false)}
+        />
+      )}
     </AppTemplate>
   );
 }
