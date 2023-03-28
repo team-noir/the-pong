@@ -6,6 +6,20 @@ export const API_PREFIX = `/api/v1`;
 axios.defaults.baseURL = API_PREFIX;
 axios.defaults.withCredentials = true;
 
+const axiosWithInterceptors = axios.create();
+axiosWithInterceptors.defaults.baseURL = API_PREFIX;
+axiosWithInterceptors.defaults.withCredentials = true;
+
+axiosWithInterceptors.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response.status === 401) {
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const getHealthCheck = async () => {
   const res = await axios.get(`/health-check`);
   return res;
@@ -16,7 +30,7 @@ export const getHealthCheck = async () => {
 export const API_LOGIN_FT = `${API_PREFIX}/auth/42`;
 
 export const postLogout = async () => {
-  const res = await axios.post(`/auth/logout`);
+  const res = await axiosWithInterceptors.post(`/auth/logout`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
@@ -25,8 +39,16 @@ export const postLogout = async () => {
 
 /** User */
 
-export const getWhoami = async (): Promise<UserType> => {
+export const getInitialWhoami = async (): Promise<UserType> => {
   const res = await axios.get(`/my/whoami`);
+  if (res.status !== 200) {
+    throw new Error('Failed to get whoami');
+  }
+  return res.data;
+};
+
+export const getWhoami = async (): Promise<UserType> => {
+  const res = await axiosWithInterceptors.get(`/my/whoami`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
   }
@@ -44,7 +66,7 @@ export interface ProfileUserType {
 }
 
 export const getUser = async (userId: string): Promise<ProfileUserType> => {
-  const res = await axios.get(`/users/${userId}`);
+  const res = await axiosWithInterceptors.get(`/users/${userId}`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
   }
@@ -68,7 +90,7 @@ export const getUsers = async (
 /** Setting */
 
 export const patchMyProfile = async (nickname: string): Promise<UserType> => {
-  const res = await axios.patch(`/my/settings`, { nickname });
+  const res = await axiosWithInterceptors.patch(`/my/settings`, { nickname });
   if (res.status !== 200) {
     throw new Error(res.statusText);
   }
@@ -78,7 +100,7 @@ export const patchMyProfile = async (nickname: string): Promise<UserType> => {
 export const PostMyProfileImage = async (imageFile: File) => {
   const formData = new FormData();
   formData.append('file', imageFile);
-  const res = await axios.post(`/my/profile-image`, formData, {
+  const res = await axiosWithInterceptors.post(`/my/profile-image`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -90,7 +112,7 @@ export const PostMyProfileImage = async (imageFile: File) => {
 };
 
 export const getMy2fa = async () => {
-  const res = await axios.get(`/my/2fa`);
+  const res = await axiosWithInterceptors.get(`/my/2fa`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
   }
@@ -98,7 +120,7 @@ export const getMy2fa = async () => {
 };
 
 export const deleteMy2fa = async () => {
-  const res = await axios.delete(`/my/2fa`);
+  const res = await axiosWithInterceptors.delete(`/my/2fa`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
@@ -108,7 +130,7 @@ export const deleteMy2fa = async () => {
 /** Block */
 
 export const getMyBlocks = async () => {
-  const res = await axios.get(`/my/blocks`);
+  const res = await axiosWithInterceptors.get(`/my/blocks`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
   }
@@ -116,7 +138,7 @@ export const getMyBlocks = async () => {
 };
 
 export const deleteMyBlocks = async (userId: number) => {
-  const res = await axios.delete(`/my/blocks/${userId}`);
+  const res = await axiosWithInterceptors.delete(`/my/blocks/${userId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
@@ -124,7 +146,7 @@ export const deleteMyBlocks = async (userId: number) => {
 };
 
 export const putMyBlocks = async (userId: number) => {
-  const res = await axios.put(`/my/blocks/${userId}`);
+  const res = await axiosWithInterceptors.put(`/my/blocks/${userId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
@@ -134,7 +156,7 @@ export const putMyBlocks = async (userId: number) => {
 /** Follow */
 
 export const getMyFollowing = async () => {
-  const res = await axios.get(`/my/following`);
+  const res = await axiosWithInterceptors.get(`/my/following`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
   }
@@ -142,7 +164,7 @@ export const getMyFollowing = async () => {
 };
 
 export const deleteMyFollowing = async (userId: number) => {
-  const res = await axios.delete(`/my/following/${userId}`);
+  const res = await axiosWithInterceptors.delete(`/my/following/${userId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
@@ -150,7 +172,7 @@ export const deleteMyFollowing = async (userId: number) => {
 };
 
 export const putMyFollowing = async (userId: number) => {
-  const res = await axios.put(`/my/following/${userId}`);
+  const res = await axiosWithInterceptors.put(`/my/following/${userId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
