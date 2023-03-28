@@ -56,6 +56,9 @@ export default function ChannelDetail({ channel, onClickSetting }: Props) {
         imageSize={52}
         myUser={myUser}
       />
+      <Button type="button">
+        {myUser?.role === RoleType.owner ? '채널 삭제' : '채널 나가기'}
+      </Button>
     </div>
   );
 }
