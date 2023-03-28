@@ -8,7 +8,7 @@ interface Props {
 
 export default function Channel({ styles, channel }: Props) {
   return (
-    <Link to={`/channel/${channel.channelCode}`}>
+    <Link to={`/channel/${channel.id}`}>
       <li className={styles.li}>{channel.title}</li>
     </Link>
   );

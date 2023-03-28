@@ -3,10 +3,105 @@ import ChannelList from 'components/molecule/ChannelList';
 import { ChannelType } from 'types/channelType';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { RoleType } from 'types/channelUserType';
 
-const dummyChannels: ChannelType[] = [
-  { id: '0', title: '게임 할 사람', channelCode: '1234' },
-  { id: '1', title: '수다 떨어요', channelCode: '0000' },
+export const dummyChannels: ChannelType[] = [
+  {
+    id: 1,
+    title: 'public test',
+    isProtected: false,
+    isPrivate: false,
+    isDm: false,
+    users: [
+      {
+        id: 1,
+        nickname: 'heehkim',
+        role: RoleType.owner,
+        isMuted: false,
+      },
+      {
+        id: 2,
+        nickname: 'cpak',
+        role: RoleType.normal,
+        isMuted: false,
+      },
+      {
+        id: 3,
+        nickname: 'sarchoi',
+        role: RoleType.admin,
+        isMuted: false,
+      },
+      {
+        id: 4,
+        nickname: 'hello',
+        role: RoleType.admin,
+        isMuted: false,
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: 'protected test',
+    isProtected: true,
+    isPrivate: false,
+    isDm: false,
+    users: [
+      {
+        id: 1,
+        nickname: 'heehkim',
+        role: RoleType.owner,
+        isMuted: false,
+      },
+      {
+        id: 4,
+        nickname: 'hello',
+        role: RoleType.normal,
+        isMuted: false,
+      },
+    ],
+  },
+  {
+    id: 3,
+    title: 'private test',
+    isProtected: false,
+    isPrivate: true,
+    isDm: false,
+    users: [
+      {
+        id: 1,
+        nickname: 'heehkim',
+        role: RoleType.owner,
+        isMuted: false,
+      },
+      {
+        id: 4,
+        nickname: 'hello',
+        role: RoleType.normal,
+        isMuted: false,
+      },
+    ],
+  },
+  {
+    id: 4,
+    title: 'dm test',
+    isProtected: false,
+    isPrivate: false,
+    isDm: true,
+    users: [
+      {
+        id: 1,
+        nickname: 'heehkim',
+        role: RoleType.normal,
+        isMuted: false,
+      },
+      {
+        id: 3,
+        nickname: 'sarchoi',
+        role: RoleType.normal,
+        isMuted: false,
+      },
+    ],
+  },
 ];
 
 export default function ChannelLobby() {

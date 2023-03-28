@@ -6,31 +6,8 @@ import { ChannelUserType, RoleType } from 'types/channelUserType';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 
 interface Props {
-  channel: ChannelType;
+  channel: ChannelType | null;
 }
-
-const dummyChannelUsers: ChannelUserType[] = [
-  {
-    id: 0,
-    nickname: 'sarchoi',
-    role: RoleType.admin,
-  },
-  {
-    id: 1,
-    nickname: 'heehkim',
-    role: RoleType.owner,
-  },
-  {
-    id: 2,
-    nickname: 'cpak',
-    role: RoleType.normal,
-  },
-  {
-    id: 3,
-    nickname: 'hello',
-    role: RoleType.admin,
-  },
-];
 
 const myUserId = 1;
 
@@ -54,7 +31,9 @@ export default function ChannelDetail({ channel }: Props) {
 
   useEffect(() => {
     // TODO: 채널 유저 정보를 가져오는 API 호출
-    setChannelUsers(dummyChannelUsers.sort(compare));
+    if (!channel || !channel.users) return;
+
+    setChannelUsers(channel.users.sort(compare));
   }, []);
 
   useEffect(() => {

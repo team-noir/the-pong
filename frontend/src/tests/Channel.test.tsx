@@ -4,9 +4,8 @@ import { ChannelType } from 'types/channelType';
 
 describe('Component - Channel 렌더링', () => {
   const channel: ChannelType = {
-    id: '0',
+    id: 0,
     title: '게임 할 사람',
-    channelCode: '1234',
   };
 
   test('채널을 보여준다', () => {
