@@ -2,48 +2,32 @@ import Button from 'components/atoms/Button';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Channel from 'components/organisms/Channel';
 import ChannelDetail from 'components/organisms/ChannelDetail';
+import { dummyChannels } from 'components/organisms/ChannelLobby';
+import ChannelSetting from 'components/organisms/ChannelSetting';
 import AppTemplate from 'components/templates/AppTemplate';
-import { useState } from 'react';
-import { LoaderFunctionArgs, useLoaderData } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { ChannelType } from 'types/channelType';
 
-const dummyChannels: ChannelType[] = [
-  { id: '0', title: '게임 할 사람', channelCode: '1234' },
-  { id: '1', title: '수다 떨어요', channelCode: '0000' },
-];
-
-interface LoaderData {
-  channel: ChannelType;
-}
-
-export async function loader({ params }: LoaderFunctionArgs) {
-  if (!params?.channelCode) {
-    throw new Error('channelCode is required');
-  }
-
-  // TODO: 채널 정보를 가져오는 API 호출
-  const channel: ChannelType | undefined = dummyChannels.find(
-    (channel) => channel.channelCode === params.channelCode
-  );
-
-  return { channel };
-}
-
 export default function ChannelPage() {
-  const { channel }: LoaderData = useLoaderData() as LoaderData;
+  const { channelId } = useParams() as { channelId: string };
+  const [channel, setChannel] = useState<ChannelType | null>(null);
+  const [isShowDetail, setIsShowDetail] = useState(false);
   const [isShowSetting, setIsShowSetting] = useState(false);
 
-  const handleClick = () => {
-    setIsShowSetting(!isShowSetting);
-  };
+  useEffect(() => {
+    setChannel(
+      dummyChannels.find((channel) => channel.id === Number(channelId)) || null
+    );
+  }, []);
 
   return (
     <AppTemplate
       header={
         <HeaderWithBackButton
-          title={channel.title}
+          title={channel?.title}
           button={
-            <Button type="button" onClick={handleClick}>
+            <Button type="button" onClick={() => setIsShowDetail(true)}>
               메뉴
             </Button>
           }
@@ -51,7 +35,18 @@ export default function ChannelPage() {
       }
     >
       <Channel channel={channel} />
-      {isShowSetting && <ChannelDetail channel={channel} />}
+      {isShowDetail && (
+        <ChannelDetail
+          channel={channel}
+          onClickSetting={() => setIsShowSetting(true)}
+        />
+      )}
+      {isShowSetting && (
+        <ChannelSetting
+          channel={channel}
+          onClickClose={() => setIsShowSetting(false)}
+        />
+      )}
     </AppTemplate>
   );
 }

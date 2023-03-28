@@ -19,7 +19,6 @@ import FollowingPage from 'pages/FollowingPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
 import SearchResultPage from 'pages/SearchResultPage';
-import { loader as channelLoader } from 'pages/ChannelPage';
 import { useLogin, useUser } from 'hooks/useStore';
 import SettingProfilePage from 'pages/SettingProfilePage';
 import Setting2FAPage from 'pages/Setting2FAPage';
@@ -85,9 +84,8 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
         element: <ChannelNewPage />,
       },
       {
-        path: ':channelCode',
+        path: ':channelId',
         element: <ChannelPage />,
-        loader: channelLoader,
       },
     ],
   },

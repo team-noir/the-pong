@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { ChannelType } from 'types/channelType';
 
 interface Props {
-  channel: ChannelType;
+  channel: ChannelType | null;
 }
 
 interface FormData {
@@ -25,7 +25,7 @@ let dummyId = 0;
 const dummyMessages: DummyMessageType[] = [
   {
     id: dummyId++,
-    userId: 0,
+    userId: 3,
     nickname: 'sarchoi',
     profileImageUrl: 'https://placekitten.com/800/800',
     text: '안녕하세요',
@@ -33,7 +33,7 @@ const dummyMessages: DummyMessageType[] = [
   },
   {
     id: dummyId++,
-    userId: 0,
+    userId: 3,
     nickname: 'sarchoi',
     profileImageUrl: 'https://placekitten.com/800/800',
     text: '반가워요~~~',

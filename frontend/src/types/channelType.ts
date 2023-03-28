@@ -1,11 +1,12 @@
+import { ChannelUserType } from 'types/channelUserType';
 export interface ChannelType {
-  id: string;
+  id: number;
   title: string;
-  channelCode?: string;
-  password?: string;
-  isPublic?: boolean;
-  isDm?: boolean;
+  isProtected: boolean;
+  isPrivate: boolean;
+  isDm: boolean;
+  userCount?: number;
+  users?: ChannelUserType[];
   createdAt?: string;
   updatedAt?: string;
-  deletedAt?: string;
 }

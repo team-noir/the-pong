@@ -2,10 +2,63 @@ import styles from 'assets/styles/Channel.module.css';
 import ChannelList from 'components/molecule/ChannelList';
 import { useEffect, useState } from 'react';
 import { ChannelType } from 'types/channelType';
+import { RoleType } from 'types/channelUserType';
 
 const dummyChannels: ChannelType[] = [
-  { id: '0', title: '게임 할 사람', channelCode: '1234' },
-  { id: '1', title: '수다 떨어요', channelCode: '0000' },
+  {
+    id: 1,
+    title: 'public test',
+    isProtected: false,
+    isPrivate: false,
+    isDm: false,
+    users: [
+      {
+        id: 1,
+        nickname: 'heehkim',
+        role: RoleType.owner,
+        isMuted: false,
+      },
+      {
+        id: 2,
+        nickname: 'cpak',
+        role: RoleType.normal,
+        isMuted: false,
+      },
+      {
+        id: 3,
+        nickname: 'sarchoi',
+        role: RoleType.admin,
+        isMuted: false,
+      },
+      {
+        id: 4,
+        nickname: 'hello',
+        role: RoleType.admin,
+        isMuted: false,
+      },
+    ],
+  },
+  {
+    id: 2,
+    title: 'protected test',
+    isProtected: true,
+    isPrivate: false,
+    isDm: false,
+    users: [
+      {
+        id: 1,
+        nickname: 'heehkim',
+        role: RoleType.owner,
+        isMuted: false,
+      },
+      {
+        id: 4,
+        nickname: 'hello',
+        role: RoleType.normal,
+        isMuted: false,
+      },
+    ],
+  },
 ];
 
 export default function ChannelBrowse() {

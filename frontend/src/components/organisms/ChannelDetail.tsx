@@ -6,31 +6,9 @@ import { ChannelUserType, RoleType } from 'types/channelUserType';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 
 interface Props {
-  channel: ChannelType;
+  channel: ChannelType | null;
+  onClickSetting: () => void;
 }
-
-const dummyChannelUsers: ChannelUserType[] = [
-  {
-    id: 0,
-    nickname: 'sarchoi',
-    role: RoleType.admin,
-  },
-  {
-    id: 1,
-    nickname: 'heehkim',
-    role: RoleType.owner,
-  },
-  {
-    id: 2,
-    nickname: 'cpak',
-    role: RoleType.normal,
-  },
-  {
-    id: 3,
-    nickname: 'hello',
-    role: RoleType.admin,
-  },
-];
 
 const myUserId = 1;
 
@@ -46,7 +24,7 @@ const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
   return 0;
 };
 
-export default function ChannelDetail({ channel }: Props) {
+export default function ChannelDetail({ channel, onClickSetting }: Props) {
   const [channelUsers, setChannelUsers] = useState<ChannelUserType[] | null>(
     null
   );
@@ -54,7 +32,9 @@ export default function ChannelDetail({ channel }: Props) {
 
   useEffect(() => {
     // TODO: 채널 유저 정보를 가져오는 API 호출
-    setChannelUsers(dummyChannelUsers.sort(compare));
+    if (!channel || !channel.users) return;
+
+    setChannelUsers(channel.users.sort(compare));
   }, []);
 
   useEffect(() => {
@@ -65,7 +45,9 @@ export default function ChannelDetail({ channel }: Props) {
   return (
     <div>
       {myUser?.role === RoleType.owner && (
-        <Button type="button">채널 설정</Button>
+        <Button type="button" onClick={onClickSetting}>
+          채널 설정
+        </Button>
       )}
       <h2>참가자</h2>
       <ChannelUserList
@@ -74,6 +56,9 @@ export default function ChannelDetail({ channel }: Props) {
         imageSize={52}
         myUser={myUser}
       />
+      <Button type="button">
+        {myUser?.role === RoleType.owner ? '채널 삭제' : '채널 나가기'}
+      </Button>
     </div>
   );
 }

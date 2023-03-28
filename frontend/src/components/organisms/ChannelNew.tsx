@@ -10,14 +10,14 @@ import {
 
 interface ChannelForm {
   title: string;
-  isPublic: boolean;
+  isPrivate: boolean;
   password: string;
 }
 
 export default function ChannelNew() {
   const [formData, setformData] = useState<ChannelForm>({
     title: '',
-    isPublic: true,
+    isPrivate: false,
     password: '',
   });
   const [isValidated, setIsValidated] = useState({
@@ -27,11 +27,11 @@ export default function ChannelNew() {
   const [hasPassword, setHasPassword] = useState(false);
 
   useEffect(() => {
-    if (!hasPassword || !formData.isPublic) {
+    if (!hasPassword || formData.isPrivate) {
       setformData((prevState) => ({ ...prevState, password: '' }));
       setIsValidated((prevState) => ({ ...prevState, password: true }));
     }
-  }, [hasPassword, formData.isPublic]);
+  }, [hasPassword, formData.isPrivate]);
 
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -64,7 +64,7 @@ export default function ChannelNew() {
           onClick={() =>
             setformData((prevState) => ({
               ...prevState,
-              isPublic: true,
+              isPrivate: false,
             }))
           }
         >
@@ -75,19 +75,19 @@ export default function ChannelNew() {
           onClick={() =>
             setformData((prevState) => ({
               ...prevState,
-              isPublic: false,
+              isPrivate: true,
             }))
           }
         >
           비공개
         </Button>
-        {formData.isPublic ? (
+        {!formData.isPrivate ? (
           <p>공개 채널은 목록에 표시되며, 누구나 입장 가능합니다.</p>
         ) : (
-          <p>비공개 채널은 채널 URL로만 입장할 수 있습니다.</p>
+          <p>비공개 채널은 채널 초대로만 입장할 수 있습니다.</p>
         )}
       </div>
-      {formData.isPublic && (
+      {!formData.isPrivate && (
         <div>
           <CheckboxInputWithLabel
             id="password-check"

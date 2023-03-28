@@ -11,7 +11,7 @@ export function validateNickname(nickname: string) {
 
 export function validateChannelTitle(channelTitle: string) {
   // 2자 이상 25자 이하
-  const channelTitleRegex = /^\w{2,25}$/;
+  const channelTitleRegex = /^.{2,25}$/;
   return channelTitleRegex.test(channelTitle);
 }
 
