@@ -44,7 +44,7 @@ export default function TextInputWithMessage({
   };
 
   return (
-    <>
+    <div className="w-full group mb-6">
       {label && <Label id={id} label={label} />}
       <TextInput
         id={id}
@@ -54,6 +54,6 @@ export default function TextInputWithMessage({
         onBlur={handleBlur}
       />
       <Message isShow={!isValid && isTouched} message={message} />
-    </>
+    </div>
   );
 }

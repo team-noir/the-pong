@@ -9,9 +9,19 @@ module.exports = {
     },
     colors: {
       ...colors,
-      primary: colors.blue,
+      primary: {
+        light: '#F5F0EE',
+        DEFAULT: '#E2D8D5',
+        dark: '#C4B7B4',
+      },
       secondary: colors.yellow,
       neutral: colors.neutral,
+      gray: {
+        light: '#E2D8D5',
+        DEFAULT: '#C3BCBA',
+        dark: '#736C6B',
+        darker: '#1A1C22',
+      },
     },
     extend: {},
   },

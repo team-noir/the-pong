@@ -38,27 +38,27 @@ export default function FileInputWithImage({
   };
 
   return (
-    <>
+    <div className="flex flex-col items-center mb-16">
       <img
         src={imagePreviewUrl || imageUrl}
         alt="profile image"
-        className={styles.img}
+        className="h-32 w-32 rounded-full mb-4"
       />
-      <div>
+      <div className="flex items-center gap-2 mb-4">
         <input
           type="file"
           accept="image/*"
           ref={fileInput}
           onChange={handleFileChange}
-          className={styles.input}
+          className="hidden"
         />
-        <Button type="button" onClick={handleClickFileUpload}>
+        <Button type="button" primary onClick={handleClickFileUpload}>
           이미지 업로드하기
         </Button>
-        <Button type="button" onClick={handleClickFileRemove}>
+        <Button type="button" secondary onClick={handleClickFileRemove}>
           이미지 삭제하기
         </Button>
       </div>
-    </>
+    </div>
   );
 }

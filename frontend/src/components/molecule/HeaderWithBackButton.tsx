@@ -15,8 +15,8 @@ export default function HeaderWithBackButton({ title, button }: Props) {
   };
 
   return (
-    <div className="bg-gray-800">
-      <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 ">
+    <div className="fixed top-0 left-0 right-0">
+      <div className="mx-auto max-w-xl px-2 ">
         <div className="relative flex h-14 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center">
             <div className="inline-flex items-center justify-center rounded-md p-2 text-stone-100 hover:bg-gray-700 hover:text-stone-100 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-white">
