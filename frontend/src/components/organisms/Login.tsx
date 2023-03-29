@@ -14,7 +14,7 @@ export default function Login() {
     <>
       <h1>The Pong</h1>
       <p>isLogin: {isLogin.toString()}</p>
-      <Button type="button" logoImageUrl={logo42} onClick={handleClick}>
+      <Button type="button" logoImageUrl={logo42} onClick={handleClick} primary>
         42로 로그인하기
       </Button>
     </>
