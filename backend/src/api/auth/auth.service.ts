@@ -54,11 +54,7 @@ export class AuthService {
     await res.clearCookie('Authorization', { path: '/' });
   }
 
-  async getJwtPayload(@Req() req: Request): Promise<JwtPayloadDto> {
-    const jwt: string = this.getJwt(req);
-    if (!jwt) {
-      return null;
-    }
+  getJwtPayload(jwt: string) {
     const payload = this.jwtService.decode(jwt);
     if (!payload) {
       return null;
@@ -70,8 +66,16 @@ export class AuthService {
     return result;
   }
 
+  async getJwtPayloadFromReq(@Req() req: Request): Promise<JwtPayloadDto> {
+    const jwt: string = this.getJwt(req);
+    if (!jwt) {
+      return null;
+    }
+    return this.getJwtPayload(jwt);
+  }
+
   async getUserFromJwt(@Req() req: Request): Promise<User> {
-    const payload: JwtPayloadDto = await this.getJwtPayload(req);
+    const payload: JwtPayloadDto = await this.getJwtPayloadFromReq(req);
     if (!payload) {
       return null;
     }

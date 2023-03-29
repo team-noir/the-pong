@@ -11,6 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { ChannelsService, ChannelUser, Channel } from './channels.service';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 @WebSocketGateway({
@@ -22,19 +23,28 @@ import { ChannelsService, ChannelUser, Channel } from './channels.service';
 export class ChannelsGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private channelsService: ChannelsService) {}
+	constructor(
+		private channelsService: ChannelsService,
+		private authService: AuthService
+	) {}
 
-  @WebSocketServer() server: Server;
-  private logger = new Logger('Gateway');
+	@WebSocketServer() server: Server;
+	private logger = new Logger('Gateway');
 
-  afterInit() {
-    this.logger.log('웹소켓 서버 초기화 ✅');
-    this.channelsService.server = this.server;
-  }
+	afterInit() {
+		this.logger.log('웹소켓 서버 초기화 ✅');
+		this.channelsService.server = this.server;
+	}
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-    var userId: number = Number(socket.handshake.query.userId);
-    var username: string = String(socket.handshake.query.username);
+	const token: string = String(socket.handshake.headers.token);
+	if (!token) { return; }
+
+	const payload = this.authService.getJwtPayload(token);
+	if (!payload) { return; }
+
+	const userId: number = Number(payload.id);
+	const username: string = String(payload.nickname);
 
     if (!userId || !username) {
       socket.disconnect(true);
