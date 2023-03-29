@@ -5,5 +5,5 @@ interface Props {
 }
 
 export default function AppTemplateWithoutHeader({ children }: Props) {
-  return <main className="container mx-auto max-w-7xl">{children}</main>;
+  return <main className="container mx-auto max-w-xl">{children}</main>;
 }

@@ -1,3 +1,14 @@
 @tailwind base;
+
+@layer base {
+  html {
+    @apply text-text-light;
+    @apply bg-gradient-to-b;
+    @apply from-gray-darker;
+    @apply to-[#433c3f];
+    @apply min-h-screen;
+  }
+}
+
 @tailwind components;
 @tailwind utilities;

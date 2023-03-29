@@ -9,12 +9,12 @@ interface Props {
 export default function AppTemplate({ header, children }: Props) {
   return (
     <>
-      <header>{header}</header>
-      <main className="container mx-auto max-w-7xl min-h-screen	py-6 px-4 sm:px-6 lg:px-8">
+      <header className="relative">{header}</header>
+      <main className="container mx-auto max-w-xl min-h-screen py-24 px-4">
         {children}
       </main>
-      <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-      <footer className="container mx-auto max-w-7xl p-4 sm:px-6 lg:px-8 bg-green-200 shadow">
+      <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray lg:my-8" />
+      <footer className="container mx-auto max-w-xl p-4 bg-green-200 shadow">
         <p>Footer</p>
         <nav>
           <h5 className="font-mono text-sm font-bold">development nav</h5>

@@ -17,10 +17,15 @@ module.exports = {
       secondary: colors.yellow,
       neutral: colors.neutral,
       gray: {
+        lighter: '#F5F0EE',
         light: '#E2D8D5',
         DEFAULT: '#C3BCBA',
         dark: '#736C6B',
         darker: '#1A1C22',
+      },
+      text: {
+        light: '#FBFBFB',
+        dark: '#1A1C22',
       },
     },
     extend: {},
