@@ -16,9 +16,6 @@ import { AuthService } from '../auth/auth.service';
 @Injectable()
 @WebSocketGateway({
   namespace: 'chat',
-  cors: {
-    origin: ['http://localhost:3000'],
-  },
 })
 export class ChannelsGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect

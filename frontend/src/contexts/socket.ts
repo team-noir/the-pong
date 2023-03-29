@@ -14,6 +14,6 @@ export const socket = io.connect('localhost:8080', {
 });
 
 // TODO: 나중에 지우기~! (연결 상태 확인)
-socket.on('connect', () => console.log('hey'));
+socket.on('connect', () => console.log('socket connected'));
 
 export const SocketContext = React.createContext(socket);
