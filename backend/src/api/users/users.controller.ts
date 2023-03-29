@@ -11,7 +11,15 @@ import {
   ParseIntPipe,
   StreamableFile,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiTags,
+  ApiOkResponse,
+  ApiUnauthorizedResponse,
+  ApiQuery,
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+} from '@nestjs/swagger';
 import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import { UsersService } from './users.service';
 import { Response } from 'express';
@@ -23,6 +31,24 @@ export class UsersController {
   constructor(private usersService: UsersService) {}
 
   @Get()
+  @ApiOperation({ summary: 'Get users' })
+  @ApiQuery({
+    name: 'q',
+    required: false,
+    description: 'Search users by nickname',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Page number\n- Default: `1`',
+  })
+  @ApiQuery({
+    name: 'per_page',
+    required: false,
+    description: 'Number of users per page\n- Default: `30`',
+  })
+  @ApiOkResponse({ description: 'Get users', type: [UserDto] })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async requestUsers(
     @Res() res: Response,
@@ -43,13 +69,29 @@ export class UsersController {
   }
 
   @Get(':userId')
+  @ApiOperation({ summary: 'Get user' })
+  @ApiOkResponse({ description: 'Get user', type: UserDto })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async requestProfile(@Param('userId') userId: number, @Res() res: Response) {
     const user: UserDto = await this.usersService.getUser(Number(userId));
     const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
     res.status(statusCode).send(user);
   }
+
   @Get(':userId/profile-image')
+  @ApiOperation({
+    summary: 'Get profile image',
+    description:
+      '```js\n// prevent caching\nconst random = Math.random();\n<img src=`/api/v1/users/1/profile-image?v=${random}` />\n```',
+  })
+  @ApiOkResponse({ description: 'Get profile image', type: StreamableFile })
+  @ApiBadRequestResponse({
+    description:
+      'Bad request\n- User does not have a profile image\n- User does not exist',
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async downloadProfileImage(
     @Param('userId') userId: number,

@@ -82,8 +82,8 @@ export class UsersService {
             rank: user.rank,
             achievements: [],
             games: [],
-            is_followed_by_myself: await this.checkFollowed(myUserId, user.id),
-            is_blocked_by_myself: await this.checkBlocked(myUserId, user.id),
+            isFollowedByMyself: await this.checkFollowed(myUserId, user.id),
+            isBlockedByMyself: await this.checkBlocked(myUserId, user.id),
           }))
         )
       );
@@ -113,8 +113,8 @@ export class UsersService {
       rank: user.rank,
       achievements: [],
       games: [],
-      is_followed_by_myself: await this.checkFollowed(myUserId, userId),
-      is_blocked_by_myself: await this.checkBlocked(myUserId, userId),
+      isFollowedByMyself: await this.checkFollowed(myUserId, userId),
+      isBlockedByMyself: await this.checkBlocked(myUserId, userId),
     };
   }
 
