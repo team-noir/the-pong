@@ -6,3 +6,8 @@ export class SettingDto {
   @IsString()
   public nickname: string;
 }
+
+export class FileUploadDto {
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
+}

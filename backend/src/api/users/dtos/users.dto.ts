@@ -16,11 +16,11 @@ export class UserDto {
 
   @ApiProperty()
   @IsBoolean()
-  public is_followed_by_myself: boolean;
+  public isFollowedByMyself: boolean;
 
   @ApiProperty()
   @IsBoolean()
-  public is_blocked_by_myself: boolean;
+  public isBlockedByMyself: boolean;
 
   // TODO: Type of achievements and games
   @ApiProperty()

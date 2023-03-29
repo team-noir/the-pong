@@ -6,7 +6,7 @@ export class BaseAPIDocumentation {
   public initializeOptions() {
     return this.builder
       .setTitle('The pong')
-      .setDescription('The cats API description')
+      .setDescription('The pong API')
       .setVersion('1.0')
       .addTag('pong')
       .build();
