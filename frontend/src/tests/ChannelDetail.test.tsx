@@ -18,6 +18,7 @@ describe('Component - ChannelDetail 렌더링', () => {
         <ChannelDetail
           channel={channel}
           onClickSetting={() => console.log('click setting')}
+          onClickInvite={() => console.log('click invite')}
         />
       </BrowserRouter>
     );

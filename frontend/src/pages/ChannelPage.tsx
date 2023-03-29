@@ -4,6 +4,7 @@ import Channel from 'components/organisms/Channel';
 import ChannelDetail from 'components/organisms/ChannelDetail';
 import { dummyChannels } from 'components/organisms/ChannelLobby';
 import ChannelSetting from 'components/organisms/ChannelSetting';
+import ChannelInvite from 'components/organisms/ChannelInvite';
 import AppTemplate from 'components/templates/AppTemplate';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -14,6 +15,7 @@ export default function ChannelPage() {
   const [channel, setChannel] = useState<ChannelType | null>(null);
   const [isShowDetail, setIsShowDetail] = useState(false);
   const [isShowSetting, setIsShowSetting] = useState(false);
+  const [isShowInvite, setIsShowInvite] = useState(false);
 
   useEffect(() => {
     setChannel(
@@ -39,6 +41,7 @@ export default function ChannelPage() {
         <ChannelDetail
           channel={channel}
           onClickSetting={() => setIsShowSetting(true)}
+          onClickInvite={() => setIsShowInvite(true)}
         />
       )}
       {isShowSetting && (
@@ -46,6 +49,9 @@ export default function ChannelPage() {
           channel={channel}
           onClickClose={() => setIsShowSetting(false)}
         />
+      )}
+      {isShowInvite && (
+        <ChannelInvite onClickClose={() => setIsShowInvite(false)} />
       )}
     </AppTemplate>
   );
