@@ -39,16 +39,12 @@ export const postLogout = async () => {
 
 /** User */
 
-export const getInitialWhoami = async (): Promise<UserType> => {
-  const res = await axios.get(`/my/whoami`);
-  if (res.status !== 200) {
-    throw new Error('Failed to get whoami');
-  }
-  return res.data;
-};
-
 export const getWhoami = async (): Promise<UserType> => {
-  const res = await axiosWithInterceptors.get(`/my/whoami`);
+  let whoamiAxios = axiosWithInterceptors;
+  if (window.document.referrer === `${window.location.origin}/login`) {
+    whoamiAxios = axios;
+  }
+  const res = await whoamiAxios.get(`/my/whoami`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
   }
