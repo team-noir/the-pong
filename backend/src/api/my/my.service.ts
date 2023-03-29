@@ -110,7 +110,7 @@ export class MyService {
     });
     return following;
   }
-  
+
   async deleteFollowing(@Req() req) {
     const myUserId = req.user.id;
     if (!myUserId) {
@@ -145,7 +145,7 @@ export class MyService {
       });
     return following;
   }
-  
+
   async getBlocks(@Req() req) {
     const myUserId = req.user.id;
     if (!myUserId) {

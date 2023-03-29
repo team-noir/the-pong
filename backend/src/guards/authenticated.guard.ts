@@ -16,11 +16,11 @@ export class AuthenticatedGuard implements CanActivate {
     const res = context.switchToHttp().getResponse();
     const jwt: string = this.authService.getJwt(req);
 
-    if (!await this.authService.verifyJwt(res, jwt)) {
+    if (!(await this.authService.verifyJwt(res, jwt))) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     }
-  
+
     const user: User = await this.authService.getUserFromJwt(req);
     const now: Date = new Date(Date.now());
 
