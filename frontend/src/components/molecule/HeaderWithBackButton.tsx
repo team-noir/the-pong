@@ -4,7 +4,7 @@ import { ReactElement } from 'react';
 
 interface Props {
   title?: string;
-  button?: ReactElement;
+  button?: ReactElement | boolean;
 }
 
 export default function HeaderWithBackButton({ title, button }: Props) {

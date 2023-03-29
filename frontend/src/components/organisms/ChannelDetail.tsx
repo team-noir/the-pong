@@ -6,7 +6,7 @@ import { ChannelUserType, RoleType } from 'types/channelUserType';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 
 interface Props {
-  channel: ChannelType | null;
+  channel: ChannelType;
   onClickSetting: () => void;
   onClickInvite: () => void;
 }
@@ -37,7 +37,7 @@ export default function ChannelDetail({
 
   useEffect(() => {
     // TODO: 채널 유저 정보를 가져오는 API 호출
-    if (!channel || !channel.users) return;
+    if (!channel.users) return;
 
     setChannelUsers(channel.users.sort(compare));
   }, []);
