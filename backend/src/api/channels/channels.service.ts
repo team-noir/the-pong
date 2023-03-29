@@ -85,7 +85,7 @@ export class ChannelsService {
 
   getChannelUsers(channelId: number) {
     const channel: Channel = this.getChannel(channelId);
-    var data = [];
+    const data = [];
 
     channel.users.forEach((userId) => {
       const user = this.getUser(userId);
@@ -213,7 +213,7 @@ export class ChannelsService {
       };
     }
 
-    var data = [];
+    const data = [];
     [...this.messageMap.values()].forEach((message) => {
       if (message.channelId == channelId) {
         data.push({
@@ -346,7 +346,7 @@ export class ChannelsService {
   }
 
   list(channelId: number) {
-    var data = [];
+    const data = [];
     const channels = this.getChannelValues();
 
     channels.forEach((channel) => {
@@ -371,7 +371,7 @@ export class ChannelsService {
       throw new Error('This channel does not exist.');
     }
 
-    var channelInfo = {
+    const channelInfo = {
       id: channel.id,
       title: channel.title,
       isProtected: !channel.isPrivate && channel.password,
