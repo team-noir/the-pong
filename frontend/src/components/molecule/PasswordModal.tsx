@@ -7,7 +7,7 @@ interface Props {
   onMatchPassword: () => void;
 }
 
-export default function ChannelPassword({ channelId, onMatchPassword }: Props) {
+export default function PasswordModal({ channelId, onMatchPassword }: Props) {
   const [password, setPassword] = useState('');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
