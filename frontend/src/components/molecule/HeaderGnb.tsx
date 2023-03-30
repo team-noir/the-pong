@@ -56,14 +56,17 @@ export default function HeaderGnb() {
   };
 
   return (
-    <Disclosure as="nav" className="fixed top-0 left-0 right-0 bg-gray-darker">
+    <Disclosure
+      as="nav"
+      className="container mx-auto max-w-xl fixed top-0 left-0 right-0 backdrop-blur-md"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-xl px-2">
             <div className="relative flex h-14 items-center justify-between">
               {/* GNB Left */}
               <div className="absolute inset-y-0 left-0 flex items-center">
-                <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2 text-gray hover:bg-gray-lighter hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-white">
+                <Disclosure.Button className="inline-flex items-center justify-center rounded p-2 text-gray hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-white">
                   <span className="sr-only">Open global menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -80,7 +83,7 @@ export default function HeaderGnb() {
               <div className="absolute inset-y-0 right-0 flex items-center pr-2">
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <Menu.Button className="flex rounded-md bg-gray-dark text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray min-w-13 min-h-13">
+                    <Menu.Button className="flex rounded bg-gray-dark text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray min-w-13 min-h-13">
                       <span className="sr-only">Open user menu</span>
                       {whoamiQuery.isSuccess && (
                         <ProfileImage
@@ -100,7 +103,7 @@ export default function HeaderGnb() {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-gray-darker py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-gray-darker py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       <Menu.Item>
                         {({ active }) => (
                           <Link
@@ -160,8 +163,8 @@ export default function HeaderGnb() {
                   className={classNames(
                     item.current
                       ? 'bg-gray-lighter text-white'
-                      : 'text-gray hover:bg-gray-lighter hover:text-white',
-                    'block rounded-md px-3 py-2 text-base font-medium'
+                      : 'text-gray transition hover:scale-101 hover:skew-y-2 hover:translate-y-1 hover:text-white hover:drop-shadow-md',
+                    'block px-3 py-2 text-base font-medium'
                   )}
                   aria-current={item.current ? 'page' : undefined}
                 >

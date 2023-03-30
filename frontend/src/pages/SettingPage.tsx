@@ -12,7 +12,7 @@ export default function SettingPage() {
   return (
     <div className="container max-w-xl">
       <PageTitle>Settings</PageTitle>
-      <nav className="py-4 divide-y -mx-6">
+      <nav className="py-4 divide-y -mx-4">
         {menuItems.map((item) => (
           <Link
             key={item.to}

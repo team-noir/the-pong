@@ -2,11 +2,18 @@
 
 @layer base {
   html {
-    @apply text-text-light;
+    @apply bg-gray-dark;
+  }
+
+  #root {
+    @apply min-h-screen;
+    @apply container;
+    @apply mx-auto;
+    @apply max-w-xl;
     @apply bg-gradient-to-b;
     @apply from-gray-darker;
     @apply to-[#433c3f];
-    @apply min-h-screen;
+    @apply text-text-light;
   }
 }
 
