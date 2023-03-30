@@ -1,9 +1,9 @@
 import ProfileImage from 'components/atoms/ProfileImage';
-import { DummyMessageType } from 'components/organisms/Channel';
+import { MessageType } from 'components/organisms/Channel';
 import styles from 'assets/styles/Message.module.css';
 
 interface Props {
-  message: DummyMessageType;
+  message: MessageType;
   isShowProfile: boolean;
   className: string;
 }
@@ -18,11 +18,11 @@ export default function MessageItem({
       {isShowProfile && (
         <div>
           <ProfileImage
-            userId={message.userId}
-            alt={`${message.nickname}'s profile image`}
+            userId={message.senderId}
+            alt={`${message.senderNickname}'s profile image`}
             size={52}
           />
-          <span>{message.nickname}</span>
+          <span>{message.senderNickname}</span>
         </div>
       )}
       <div>

@@ -1,8 +1,11 @@
+import { useQuery } from '@tanstack/react-query';
 import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
 import MessageList from 'components/molecule/MessageList';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ChannelType } from 'types/channelType';
+import { AxiosError } from 'axios';
+import { getChannelMessages } from '../../api/api.v1';
 
 interface Props {
   channel: ChannelType | null;
@@ -12,67 +15,23 @@ interface FormData {
   message: string;
 }
 
-export interface DummyMessageType {
+export interface MessageType {
   id: number;
-  userId: number;
-  nickname: string;
-  profileImageUrl: string;
+  senderId: number;
+  senderNickname?: string;
+  isLog: boolean;
   text: string;
   createdAt: string;
 }
 
-let dummyId = 0;
-const dummyMessages: DummyMessageType[] = [
-  {
-    id: dummyId++,
-    userId: 3,
-    nickname: 'sarchoi',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '안녕하세요',
-    createdAt: '2023-03-17T00:14:35.000Z',
-  },
-  {
-    id: dummyId++,
-    userId: 3,
-    nickname: 'sarchoi',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '반가워요~~~',
-    createdAt: '2023-03-17T00:14:36.000Z',
-  },
-  {
-    id: dummyId++,
-    userId: 1,
-    nickname: 'heehkim',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '안녕하세요~!',
-    createdAt: '2023-03-17T00:14:37.000Z',
-  },
-  {
-    id: dummyId++,
-    userId: 1,
-    nickname: 'heehkim',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '방가방가',
-    createdAt: '2023-03-17T00:14:38.000Z',
-  },
-  {
-    id: dummyId++,
-    userId: 2,
-    nickname: 'cpak',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '반갑습니다',
-    createdAt: '2023-03-17T00:14:39.000Z',
-  },
-];
-
 export default function Channel({ channel }: Props) {
-  const [messages, setMessages] = useState<DummyMessageType[] | null>(null);
   const [formData, setFormData] = useState<FormData>({ message: '' });
 
-  useEffect(() => {
-    // TODO: 채널 메시지 API에서 가져오기
-    setMessages(dummyMessages);
-  }, []);
+  const getChannelMessagesQuery = useQuery<MessageType[], AxiosError>({
+    queryKey: ['channel', channel?.id, 'messages'],
+    queryFn: () => getChannelMessages(channel?.id ?? 0), // TODO: optional chaining
+    enabled: !!channel?.id,
+  });
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -87,7 +46,13 @@ export default function Channel({ channel }: Props) {
   return (
     <>
       <div>
-        <MessageList messages={messages} />
+        {getChannelMessagesQuery.isLoading && <div>메시지 로딩중...</div>}
+        {getChannelMessagesQuery.isError && (
+          <div>메시지를 불러오는데 실패했습니다.</div>
+        )}
+        {getChannelMessagesQuery.isSuccess && (
+          <MessageList messages={getChannelMessagesQuery.data} />
+        )}
       </div>
       <form onSubmit={handleSubmit}>
         <TextInput
