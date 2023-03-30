@@ -33,22 +33,21 @@ export default function ChannelNew() {
     }
   }, [hasPassword, formData.isPrivate]);
 
-  useEffect(() => {
-    if (postNewChannelMutation.isError) {
-      alert(`다시 시도해 주세요.`);
-    }
-    if (!postNewChannelMutation.isSuccess) return;
-    const { id } = postNewChannelMutation.data;
-    navigate(`/channel/${id}`);
-  }, [postNewChannelMutation]);
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isValidated.title || !isValidated.password) {
       alert('입력값을 확인해주세요.');
       return;
     }
-    postNewChannelMutation.mutate(formData);
+    postNewChannelMutation.mutate(formData, {
+      onError: () => {
+        alert(`다시 시도해 주세요.`);
+      },
+      onSuccess: (data) => {
+        const { id } = data;
+        navigate(`/channel/${id}`);
+      },
+    });
   };
 
   return (
