@@ -15,14 +15,19 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import { ChannelsService } from './channels.service';
+import { ApiOperation } from '@nestjs/swagger';
+import { CreateChannelDto, SettingChannelDto, ChannelPasswordDto, ChannelRoleDto, ChannelMessageDto } from './dtos/channel.dto';
+
+
 
 @Controller('channels')
 export class ChannelsController {
   constructor(private channelsService: ChannelsService) {}
 
   @Post()
+  @ApiOperation({ summary: 'Create channel' })
   @UseGuards(AuthenticatedGuard)
-  create(@Req() req, @Body() body, @Res({ passthrough: true }) res) {
+  create(@Req() req, @Body() body: CreateChannelDto, @Res({ passthrough: true }) res) {
     try {
       const result = this.channelsService.create(req.user.id, body);
       res.status(HttpStatus.OK);
@@ -33,6 +38,7 @@ export class ChannelsController {
   }
 
   @Get()
+  @ApiOperation({ summary: 'Get channel list' })
   @UseGuards(AuthenticatedGuard)
   list(@Res({ passthrough: true }) res) {
     res.status(HttpStatus.OK);
@@ -40,6 +46,7 @@ export class ChannelsController {
   }
 
   @Get(':channelId')
+  @ApiOperation({ summary: 'Get channel info' })
   @UseGuards(AuthenticatedGuard)
   getChannelInfo(
     @Param('channelId') channelId: number,
@@ -55,10 +62,11 @@ export class ChannelsController {
   }
 
   @Patch(':channelId')
+  @ApiOperation({ summary: 'Set channel info' })
   @UseGuards(AuthenticatedGuard)
   setChannelInfo(
     @Req() req,
-    @Body() data,
+    @Body() data: SettingChannelDto,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
   ) {
@@ -72,15 +80,16 @@ export class ChannelsController {
   }
 
   @Post(':channelId')
+  @ApiOperation({ summary: 'Join channel' })
   @UseGuards(AuthenticatedGuard)
   joinChannel(
     @Req() req,
-    @Body('password') password,
+    @Body() body: ChannelPasswordDto,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.join(req.user.id, channelId, password);
+      this.channelsService.join(req.user.id, channelId, body.password);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
@@ -89,6 +98,7 @@ export class ChannelsController {
   }
 
   @Put(':channelId/users/:userId')
+  @ApiOperation({ summary: 'Invite user to channel' })
   @UseGuards(AuthenticatedGuard)
   inviteChannel(
     @Req() req,
@@ -106,6 +116,7 @@ export class ChannelsController {
   }
 
   @Delete(':channelId')
+  @ApiOperation({ summary: 'Leave channel' })
   @UseGuards(AuthenticatedGuard)
   leaveChannel(
     @Req() req,
@@ -122,12 +133,13 @@ export class ChannelsController {
   }
 
   @Patch(':channelId/users/:userId/role')
+  @ApiOperation({ summary: 'Change channel user role' })
   @UseGuards(AuthenticatedGuard)
   changeRoleUser(
     @Req() req,
     @Param('channelId') channelId: number,
     @Param('userId') userId: number,
-    @Body('role') role: string,
+    @Body() body: ChannelRoleDto,
     @Res({ passthrough: true }) res
   ) {
     try {
@@ -135,7 +147,7 @@ export class ChannelsController {
         req.user.id,
         channelId,
         userId,
-        role
+        body.role
       );
       res.status(HttpStatus.NO_CONTENT);
       return;
@@ -145,15 +157,16 @@ export class ChannelsController {
   }
 
   @Post(':channelId/message')
+  @ApiOperation({ summary: 'Send message to channel' })
   @UseGuards(AuthenticatedGuard)
   sendChannelMessage(
     @Req() req,
     @Param('channelId') channelId: number,
-    @Body('message') message: string,
+    @Body() body: ChannelMessageDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.messageToChannel(req.user.id, channelId, message);
+      this.channelsService.messageToChannel(req.user.id, channelId, body.text);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
@@ -162,6 +175,7 @@ export class ChannelsController {
   }
 
   @Get(':channelId/message')
+  @ApiOperation({ summary: 'Get messages in channel' })
   @UseGuards(AuthenticatedGuard)
   getChannelMessages(
     @Req() req,
