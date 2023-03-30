@@ -27,6 +27,7 @@ import ChannelLobbyPage from 'pages/ChannelLobbyPage';
 import ChannelBrowsePage from 'pages/ChannelBrowsePage';
 import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
+import { socket, SocketContext } from 'contexts/socket';
 import { getHealthCheck, getWhoami } from 'api/api.v1';
 
 export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
@@ -144,10 +145,12 @@ export function App() {
   const router = createBrowserRouter(routes(isLoggedIn, isOnboarded));
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Init />
-      <RouterProvider router={router} />
-    </QueryClientProvider>
+    <SocketContext.Provider value={socket}>
+      <QueryClientProvider client={queryClient}>
+        <Init />
+        <RouterProvider router={router} />
+      </QueryClientProvider>
+    </SocketContext.Provider>
   );
 }
 
