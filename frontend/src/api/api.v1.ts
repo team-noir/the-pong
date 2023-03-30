@@ -193,6 +193,14 @@ export const getChannels = async ({ enter, kind }: getChannelsParams) => {
   return res.data;
 };
 
+export const getChannel = async (channelId: string) => {
+  const res = await axiosWithInterceptors.get(`/channels/${channelId}`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 export interface ChannelFormType {
   title: string;
   isPrivate?: boolean;
