@@ -29,7 +29,6 @@ import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
 import { socket, SocketContext } from 'contexts/socket';
 import { getHealthCheck, getWhoami } from 'api/api.v1';
-import 'assets/styles/index.css';
 
 export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
   {
