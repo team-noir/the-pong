@@ -43,11 +43,13 @@ export default function SettingProfilePage() {
 
   return (
     <AppTemplate header={<HeaderWithBackButton title={'프로필 수정'} />}>
-      {whoamiQuery.isLoading && <div>Loading...</div>}
-      {whoamiQuery.isError && <div>{whoamiQuery.error.message}</div>}
-      {whoamiQuery.isSuccess && (
-        <SettingProfile user={whoamiQuery.data} onSubmit={handleSubmit} />
-      )}
+      <div className="container max-w-xl px-0 sm:px-4 lg:px-6">
+        {whoamiQuery.isLoading && <div>Loading...</div>}
+        {whoamiQuery.isError && <div>{whoamiQuery.error.message}</div>}
+        {whoamiQuery.isSuccess && (
+          <SettingProfile user={whoamiQuery.data} onSubmit={handleSubmit} />
+        )}
+      </div>
     </AppTemplate>
   );
 }

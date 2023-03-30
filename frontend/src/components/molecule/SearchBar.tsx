@@ -25,8 +25,7 @@ export default function SearchBar() {
   };
 
   return (
-    <div>
-      <h3>회원 검색</h3>
+    <div className="mb-6">
       <form onSubmit={handleSubmit}>
         <TextInput
           id="search"

@@ -59,7 +59,10 @@ export default function SettingProfile({ user, onSubmit }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form
+      onSubmit={handleSubmit}
+      className="flex flex-col justify-center items-center"
+    >
       <FileInputWithImage
         imageUrl={`${API_PREFIX}/users/${user.id}/profile-image`}
         onChange={handleFileChange}
@@ -83,8 +86,10 @@ export default function SettingProfile({ user, onSubmit }: Props) {
         validate={validateNickname}
         message="유효하지 않은 닉네임입니다."
       />
-      <div>
-        <Button type="submit">저장하기</Button>
+      <div className="w-full">
+        <Button type="submit" primary fullLength>
+          저장하기
+        </Button>
       </div>
     </form>
   );
