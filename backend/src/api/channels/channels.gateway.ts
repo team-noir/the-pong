@@ -12,12 +12,14 @@ import {
 import { Socket, Server } from 'socket.io';
 import { ChannelsService, ChannelUser, Channel } from './channels.service';
 import { AuthService } from '../auth/auth.service';
+import { parse } from "cookie"
 
 @Injectable()
 @WebSocketGateway({
   namespace: 'chat',
   cors: {
-    origin: ['http://localhost:3000'],
+    origin: "http://localhost:8080",
+    credentials: true
   },
 })
 export class ChannelsGatway
@@ -37,18 +39,24 @@ export class ChannelsGatway
 	}
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
-	const token: string = String(socket.handshake.headers.token);
-	if (!token) { return; }
+    const cookie = parse(String(socket.handshake.headers.cookie));
+    if (!cookie.Authorization) { 
+      this.logger.log(`${socket.id} 소켓 연결 실패 : cookie에서 jwt를 찾을 수 없습니다.`);
+      return; 
+    }
 
-	const payload = this.authService.getJwtPayload(token);
-	if (!payload) { return; }
+    const payload = this.authService.getJwtPayload(cookie.Authorization);
+    if (!payload) { 
+      this.logger.log(`${socket.id} 소켓 연결 실패 : payload를 가져을 수 없습니다.`);
+      return; 
+    }
 
-	const userId: number = Number(payload.id);
-	const username: string = String(payload.nickname);
+    const userId: number = Number(payload.id);
+    const username: string = String(payload.nickname);
 
     if (!userId || !username) {
       socket.disconnect(true);
-      this.logger.log(`${socket.id} 소켓 연결 실패`);
+      this.logger.log(`${socket.id} 소켓 연결 실패 : payload에서 userId, username을 가져올 수 없습니다.`);
       return;
     }
     if (this.channelsService.hasUser(userId)) {
@@ -56,6 +64,7 @@ export class ChannelsGatway
       logged.socket.disconnect(true);
       logged.socket = socket;
       socket.data = { user: logged };
+      this.logger.log(`${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`);
       return;
     }
 
@@ -69,7 +78,7 @@ export class ChannelsGatway
     };
     socket.data = { user };
     this.channelsService.setUser(userId, user);
-    this.logger.log(`${socket.id} 소켓 연결 : ${username}`);
+    this.logger.log(`${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`);
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
