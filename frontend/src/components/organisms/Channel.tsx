@@ -1,8 +1,7 @@
-import { useEffect, useState, useContext, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
 import MessageList from 'components/molecule/MessageList';
-
 import { MessageType } from 'types/messageType';
 interface Props {
   messages: MessageType[];
