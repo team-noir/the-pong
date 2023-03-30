@@ -27,8 +27,8 @@ import ChannelLobbyPage from 'pages/ChannelLobbyPage';
 import ChannelBrowsePage from 'pages/ChannelBrowsePage';
 import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
-import { getInitialWhoami, getHealthCheck } from 'api/api.v1';
 import { socket, SocketContext } from 'contexts/socket';
+import { getHealthCheck, getWhoami } from 'api/api.v1';
 
 export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
   {
@@ -160,8 +160,8 @@ function Init() {
 
   // TODO: error handling
   const { data, isSuccess } = useQuery({
-    queryKey: ['initial-whoami'],
-    queryFn: getInitialWhoami,
+    queryKey: ['whoami'],
+    queryFn: getWhoami,
   });
 
   const mockApi = useQuery({

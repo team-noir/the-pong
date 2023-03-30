@@ -1,6 +1,4 @@
 prisma/*
 !prisma/schema.prisma
 
-test
-dist
 upload

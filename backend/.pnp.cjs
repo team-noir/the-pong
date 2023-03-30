@@ -54,6 +54,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["class-transformer", "npm:0.5.1"],\
             ["class-validator", "npm:0.14.0"],\
             ["connect-ensure-login", "npm:0.1.1"],\
+            ["cookie", "npm:0.5.0"],\
             ["cookie-parser", "npm:1.4.6"],\
             ["eslint", "npm:8.36.0"],\
             ["eslint-config-nestjs", "npm:0.3.1"],\
@@ -9478,6 +9479,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["class-transformer", "npm:0.5.1"],\
             ["class-validator", "npm:0.14.0"],\
             ["connect-ensure-login", "npm:0.1.1"],\
+            ["cookie", "npm:0.5.0"],\
             ["cookie-parser", "npm:1.4.6"],\
             ["eslint", "npm:8.36.0"],\
             ["eslint-config-nestjs", "npm:0.3.1"],\
