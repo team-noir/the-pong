@@ -1,12 +1,12 @@
 import { UserType } from './userType';
 
-export const RoleType = {
-  owner: 0,
-  admin: 1,
-  normal: 2,
+export const RoleType: { [key: string]: string } = {
+  owner: 'owner',
+  admin: 'admin',
+  normal: 'normal',
 };
 
 export interface ChannelUserType extends UserType {
-  role: number;
+  role: string;
   isMuted: boolean;
 }
