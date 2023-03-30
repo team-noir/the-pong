@@ -18,7 +18,6 @@ import { parse } from "cookie"
 @WebSocketGateway({
   namespace: 'chat',
   cors: {
-    origin: "http://localhost:8080",
     credentials: true
   },
 })
