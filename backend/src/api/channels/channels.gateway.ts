@@ -16,7 +16,6 @@ import { parse } from "cookie"
 
 @Injectable()
 @WebSocketGateway({
-  namespace: 'chat',
   cors: {
     credentials: true
   },
