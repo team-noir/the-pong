@@ -180,8 +180,6 @@ export interface ChannelFormType {
   title: string;
   isPrivate?: boolean;
   password?: string;
-  isDm?: boolean;
-  userId?: number;
 }
 
 /** Channel */
