@@ -38,12 +38,16 @@ export interface Message {
   createdAt: Date;
 }
 
+type userId = number;
+type channelId = number;
+type messageId = number;
+
 @Injectable()
 export class ChannelsService {
   @WebSocketServer() server: Server;
-  private channelMap = new Map<number, Channel>(); // <channelId, Channel>
-  private channelUserMap = new Map<number, ChannelUser>(); // <userId, ChannelUser>
-  private messageMap = new Map<number, Message>(); // <messageId, Message>
+  private channelMap = new Map<channelId, Channel>();
+  private channelUserMap = new Map<userId, ChannelUser>();
+  private messageMap = new Map<messageId, Message>();
 
   hasUser(userId: number) {
     return this.channelUserMap.has(userId);
