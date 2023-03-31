@@ -361,7 +361,7 @@ export class ChannelsService {
     this.noticeToChannel(channelId, `${user.name} 님이 나가셨습니다.`);
   }
 
-  checkCanListed(channel: Channel, userId: number, isEnter: boolean, isList: boolean): boolean {
+  checkCanListed(channel: Channel, userId: number, isEnter: boolean): boolean {
     const isJoined = channel.users.has(userId);
     const isPrivate = channel.isPrivate;
     const isDm = channel.isDm;
@@ -369,7 +369,7 @@ export class ChannelsService {
 
     if ((isPrivate || isDm) && isJoined) {
       return true;
-    } else if (!isPrivate && isPassword && (isJoined || isList)) {
+    } else if (!isPrivate && isPassword && (isEnter && isJoined)) {
       return true;
     } else if (
       !isPrivate && !isPassword && 
@@ -395,7 +395,7 @@ export class ChannelsService {
     }
 
     channels.forEach((channel) => {
-      if (this.checkCanListed(channel, userId, isEnter, true)) {
+      if (this.checkCanListed(channel, userId, isEnter)) {
         if (
           !(isPublic && !channel.isPrivate && !channel.isDm) &&
           !(isPriv && channel.isPrivate && !channel.isDm) &&
@@ -439,7 +439,7 @@ export class ChannelsService {
         code: HttpStatus.BAD_REQUEST,
         message: 'This channel does not exist.',
       };
-    } else if (!this.checkCanListed(channel, userId, false, false)) {
+    } else if (!this.checkCanListed(channel, userId, false)) {
       throw {
         code: HttpStatus.FORBIDDEN,
         message: 'You are not authorized to this channel.',
