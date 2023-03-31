@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import { ChannelsService } from './channels.service';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import {
   CreateChannelDto,
   SettingChannelDto,
@@ -48,6 +48,14 @@ export class ChannelsController {
 
   @Get()
   @ApiOperation({ summary: 'Get channel list' })
+  @ApiQuery({
+    name: 'enter',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'kind',
+    required: false,
+  })
   @UseGuards(AuthenticatedGuard)
   list(
     @Req() req,
