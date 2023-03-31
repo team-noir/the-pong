@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ChannelType } from 'types/channelType';
 import { UserType } from 'types/userType';
 
 export const API_PREFIX = `/api/v1`;
@@ -173,4 +174,21 @@ export const putMyFollowing = async (userId: number) => {
     throw new Error(res.statusText);
   }
   return res;
+};
+
+export interface ChannelFormType {
+  title: string;
+  isPrivate?: boolean;
+  password?: string;
+}
+
+/** Channel */
+export const postNewChannel = async (
+  channelForm: ChannelFormType
+): Promise<ChannelType> => {
+  const res = await axios.post(`/channels`, channelForm);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
 };

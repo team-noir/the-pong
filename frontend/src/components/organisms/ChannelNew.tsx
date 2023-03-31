@@ -1,21 +1,18 @@
+import { useMutation } from '@tanstack/react-query';
+import { ChannelFormType, postNewChannel } from 'api/api.v1';
 import Button from 'components/atoms/Button';
 import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
 import PasswordInputWithMessage from 'components/molecule/PasswordInputWithMessage';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   validateChannelPassword,
   validateChannelTitle,
 } from 'utils/validatorUtils';
 
-interface ChannelForm {
-  title: string;
-  isPrivate: boolean;
-  password: string;
-}
-
 export default function ChannelNew() {
-  const [formData, setformData] = useState<ChannelForm>({
+  const [formData, setformData] = useState<ChannelFormType>({
     title: '',
     isPrivate: false,
     password: '',
@@ -25,6 +22,9 @@ export default function ChannelNew() {
     password: true,
   });
   const [hasPassword, setHasPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const postNewChannelMutation = useMutation(postNewChannel);
 
   useEffect(() => {
     if (!hasPassword || formData.isPrivate) {
@@ -33,12 +33,21 @@ export default function ChannelNew() {
     }
   }, [hasPassword, formData.isPrivate]);
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isValidated.title || !isValidated.password) return;
-    console.log(formData);
-    // TODO: 서버로 데이터 전송
-    // TODO: 생성된 채널로 리다이렉트
+    if (!isValidated.title || !isValidated.password) {
+      alert('입력값을 확인해주세요.');
+      return;
+    }
+    postNewChannelMutation.mutate(formData, {
+      onError: () => {
+        alert(`다시 시도해 주세요.`);
+      },
+      onSuccess: (data) => {
+        const { id } = data;
+        navigate(`/channel/${id}`);
+      },
+    });
   };
 
   return (
@@ -98,7 +107,7 @@ export default function ChannelNew() {
           {hasPassword && (
             <PasswordInputWithMessage
               id="password"
-              value={formData.password}
+              value={formData.password || ''}
               setValue={(value) =>
                 setformData((prevState) => ({
                   ...prevState,
