@@ -1,14 +1,30 @@
 import Button from 'components/atoms/Button';
 import PasswordInput from 'components/atoms/PasswordInput';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Props {
-  channelId: number;
-  onMatchPassword: () => void;
+  onClose: () => void;
+  onSubmit: () => void;
+  children?: React.ReactNode;
 }
 
-export default function PasswordModal({ channelId, onMatchPassword }: Props) {
+export default function PasswordModal({ onClose, onSubmit, children }: Props) {
   const [password, setPassword] = useState('');
+  const modalRef = useRef<HTMLFormElement>(null);
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleClickOutside = (e: React.BaseSyntheticEvent | MouseEvent) => {
+    if (!modalRef.current?.contains(e.target)) {
+      onClose();
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
@@ -16,13 +32,16 @@ export default function PasswordModal({ channelId, onMatchPassword }: Props) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // TODO: 비밀번호 확인 API 호출
-    onMatchPassword();
+    onSubmit();
+    setPassword('');
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <p>비밀번호 입력이 필요한 채널입니다.</p>
+    <form onSubmit={handleSubmit} ref={modalRef}>
+      <Button type="button" onClick={onClose}>
+        x
+      </Button>
+      <p>{children}</p>
       <PasswordInput id="password" value={password} onChange={handleChange} />
       <div>
         <Button type="submit">확인</Button>
