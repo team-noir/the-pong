@@ -396,16 +396,28 @@ export class ChannelsService {
           (isPriv && channel.isPrivate && !channel.isDm) ||
           (isDm && channel.isDm && !channel.isPrivate)
         ) {
-          data.push({
+          const info = {
             id: channel.id,
             title: channel.title,
             isProtected: !channel.isPrivate && channel.password ? true : false,
             isPrivate: channel.isPrivate,
             isDm: channel.isDm,
+            dmUserId: undefined,
             userCount: channel.users.size,
             isJoined: channel.users.has(userId),
             createdAt: channel.createdAt,
-          });
+          };
+
+          if (info.isDm) {
+            channel.users.forEach((id) => {
+              if (id != userId) {
+                info.dmUserId = id;
+                info.title = this.channelUserMap.get(id).name;
+              }
+            });
+          }
+
+          data.push(info);
         }
       }
     });
@@ -421,7 +433,7 @@ export class ChannelsService {
         code: HttpStatus.BAD_REQUEST,
         message: 'This channel does not exist.',
       };
-    } else if (this.checkCanListed(channel, userId, false)) {
+    } else if (!this.checkCanListed(channel, userId, false)) {
       throw {
         code: HttpStatus.FORBIDDEN,
         message: 'You are not authorized to this channel.',
