@@ -40,7 +40,7 @@ export class AuthService {
     await res.cookie('Authorization', jwt);
   }
 
-  async verifyJwt(@Res() res: Response, jwt: string): Promise<Boolean> {
+  async verifyJwt(@Res() res: Response, jwt: string): Promise<boolean> {
     try {
       await this.jwtService.verify(jwt);
       return true;
@@ -71,7 +71,7 @@ export class AuthService {
     if (!jwt) {
       return null;
     }
-    return this.getJwtPayload(jwt);
+    return await this.getJwtPayload(jwt);
   }
 
   async getUserFromJwt(@Req() req: Request): Promise<User> {

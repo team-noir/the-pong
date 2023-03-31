@@ -6,12 +6,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { AuthModule } from '../auth/auth.module';
 
 @Module({
-	imports: [AuthModule],
-	providers: [
-		ChannelsGatway,
-		ChannelsService,
-		PrismaService,
-	],
-	controllers: [ChannelsController],
+  imports: [AuthModule],
+  providers: [ChannelsGatway, ChannelsService, PrismaService],
+  controllers: [ChannelsController],
 })
 export class ChannelsModule {}

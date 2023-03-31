@@ -14,17 +14,12 @@ export class AuthenticatedGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest();
     const res = context.switchToHttp().getResponse();
-    const jwt: string = this.authService.getJwt(req);
-
-    if (!(await this.authService.verifyJwt(res, jwt))) {
-      res.status(HttpStatus.UNAUTHORIZED).send();
-      return false;
-    }
 
     const user: User = await this.authService.getUserFromJwt(req);
     const now: Date = new Date(Date.now());
 
     if (user == null || now > user.ftRefreshExpiresAt) {
+      res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt) {
       this.authService.refreshToken(user.ftRefreshToken);
