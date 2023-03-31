@@ -361,7 +361,7 @@ export class ChannelsService {
     this.noticeToChannel(channelId, `${user.name} 님이 나가셨습니다.`);
   }
 
-  checkCanListed(channel: Channel, userId: number, isEnter: boolean, hasProtected: boolean): boolean {
+  checkCanListed(channel: Channel, userId: number, isEnter: boolean, isList: boolean): boolean {
     const isJoined = channel.users.has(userId);
     const isPrivate = channel.isPrivate;
     const isDm = channel.isDm;
@@ -369,7 +369,7 @@ export class ChannelsService {
 
     if ((isPrivate || isDm) && isJoined) {
       return true;
-    } else if (!isPrivate && isPassword && (isJoined || hasProtected)) {
+    } else if (!isPrivate && isPassword && (isJoined || isList)) {
       return true;
     } else if (
       !isPrivate && !isPassword && 
