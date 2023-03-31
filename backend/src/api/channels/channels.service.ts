@@ -1,12 +1,12 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
-import { ChannelDmDto } from './dtos/channel.dto';
+import { CreateChannelDto } from './dtos/channel.dto';
 
 // 'public'이면서 비밀번호가 있는 경우 protected
 export interface Channel {
   id: number;
-  title: string;
+  title?: string;
   isDm: boolean;
   isPrivate: boolean;
   createdAt: Date;
@@ -41,9 +41,9 @@ export interface Message {
 @Injectable()
 export class ChannelsService {
   @WebSocketServer() server: Server;
-  private channelMap = new Map<number, Channel>();          // <channelId, Channel>
-  private channelUserMap = new Map<number, ChannelUser>();  // <userId, ChannelUser>
-  private messageMap = new Map<number, Message>();          // <messageId, Message>
+  private channelMap = new Map<number, Channel>(); // <channelId, Channel>
+  private channelUserMap = new Map<number, ChannelUser>(); // <userId, ChannelUser>
+  private messageMap = new Map<number, Message>(); // <messageId, Message>
 
   hasUser(userId: number) {
     return this.channelUserMap.has(userId);
@@ -236,13 +236,13 @@ export class ChannelsService {
     const newChannelId: number = this.channelMap.size;
     const newChannel: Channel = {
       id: newChannelId,
-      title: data.title ? data.title : "untitled",
+      title: data.title ? data.title : undefined,
       isDm: data.isDm ? true : false,
       isPrivate: data.isPrivate ? true : false,
       createdAt: new Date(),
       password: data.password ? data.password : undefined,
 
-      owner: 0,
+      owner: undefined,
       users: new Set<number>(),
       admin: new Set<number>(),
       muted: new Set<number>(),
@@ -259,7 +259,7 @@ export class ChannelsService {
     channel.users.add(user.id);
   }
 
-  create(userId: number, data) {
+  create(userId: number, data: CreateChannelDto) {
     const createdBy: ChannelUser = this.getUser(userId);
     if (!createdBy) {
       throw {
@@ -275,7 +275,7 @@ export class ChannelsService {
 
     const newChannel = this.createChannel(data);
     this.joinChannel(createdBy, newChannel);
-    
+
     createdBy.socket.emit('message', {
       channelId: newChannel.id,
     });
@@ -363,13 +363,17 @@ export class ChannelsService {
     const isJoined = channel.users.has(userId);
     const isPrivate = channel.isPrivate;
     const isDm = channel.isDm;
-    const isPassword = (channel.password) ? true : false;
+    const isPassword = channel.password ? true : false;
 
     if ((isPrivate || isDm) && isJoined) {
       return true;
     } else if (!isPrivate && isPassword && isJoined) {
       return true;
-    } else if (!isPrivate && !isPassword && (!isEnter || (isEnter && isJoined))) {
+    } else if (
+      !isPrivate &&
+      !isPassword &&
+      (!isEnter || (isEnter && isJoined))
+    ) {
       return true;
     }
     return false;
@@ -427,7 +431,7 @@ export class ChannelsService {
     const channelInfo = {
       id: channel.id,
       title: channel.title,
-      isProtected: (!channel.isPrivate && channel.password) ? true : false,
+      isProtected: !channel.isPrivate && channel.password ? true : false,
       isPrivate: channel.isPrivate,
       isDm: channel.isDm,
       isBlocked: channel.banned.has(userId),
@@ -505,7 +509,10 @@ export class ChannelsService {
         message: 'This user is not in the channel.',
       };
     } else if (channel.isDm) {
-      throw { code: HttpStatus.BAD_REQUEST, message: 'This channel is dm' };
+      throw { 
+        code: HttpStatus.BAD_REQUEST, 
+        message: 'This channel is dm' 
+      };
     } else if (channel.owner != settedBy.id) {
       throw {
         code: HttpStatus.FORBIDDEN,
@@ -538,10 +545,10 @@ export class ChannelsService {
     return data;
   }
 
-  initDirectMessage(userId: number, invitedUserId: number, data: ChannelDmDto) {
+  initDirectMessage(userId: number, invitedUserId: number) {
     const invitedUser: ChannelUser = this.channelUserMap.get(invitedUserId);
     const user: ChannelUser = this.channelUserMap.get(userId);
-    
+
     if (!user || !invitedUser) {
       throw {
         code: HttpStatus.BAD_REQUEST,
@@ -550,19 +557,18 @@ export class ChannelsService {
     } else if (invitedUser.blockUser.has(userId)) {
       throw {
         code: HttpStatus.BAD_REQUEST,
-        message: 'You cannot send dm to.'
-      }
+        message: 'You cannot send dm to.',
+      };
     }
-    
+
     const dms: Channel[] = this.getDms(user);
-    const dmTitle: string = data.title;
-    const found = dms.find(channel => channel.title == dmTitle);
+    const found = dms.find(
+      (channel) =>
+        channel.users.has(user.id) && channel.users.has(invitedUserId)
+    );
 
     if (!found) {
-      const newChannel = this.createChannel({
-        title: dmTitle,
-        isDm: true
-      });
+      const newChannel = this.createChannel({ isDm: true });
       this.joinChannel(user, newChannel);
       this.joinChannel(invitedUser, newChannel);
       return { id: newChannel.id };
