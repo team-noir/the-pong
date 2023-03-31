@@ -345,20 +345,48 @@ export class ChannelsService {
     this.noticeToChannel(channelId, `${user.name} 님이 나가셨습니다.`);
   }
 
-  list(channelId: number) {
+  // private, dm : user가 참여 중이어야 한다.
+  // public : enter이라면 참여 중, 아니라면 전부
+  checkCanListed(channel: Channel, userId: number, isEnter: boolean): boolean {
+    if ((channel.isPrivate || channel.isDm) && channel.users.has(userId)) {
+      return true;
+    } else if (
+      !channel.isPrivate &&
+      (!isEnter || (isEnter && channel.users.has(userId)))
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  list(
+    userId: number,
+    isEnter: boolean,
+    isPublic: boolean,
+    isPriv: boolean,
+    isDm: boolean
+  ) {
     const data = [];
     const channels = this.getChannelValues();
 
     channels.forEach((channel) => {
-      if (!channelId || (channelId && channel.id == channelId)) {
-        data.push({
-          id: channel.id,
-          name: channel.title,
-          isProtected: !channel.isPrivate && channel.password,
-          isPrivate: channel.isPrivate,
-          isDm: channel.isDm,
-          createdAt: channel.createdAt,
-        });
+      if (this.checkCanListed(channel, userId, isEnter)) {
+        if (
+          (isPublic && !channel.isPrivate && !channel.isDm) ||
+          (isPriv && channel.isPrivate && !channel.isDm) ||
+          (isDm && channel.isDm && !channel.isPrivate)
+        ) {
+          data.push({
+            id: channel.id,
+            title: channel.title,
+            isProtected: !channel.isPrivate && channel.password ? true : false,
+            isPrivate: channel.isPrivate,
+            isDm: channel.isDm,
+            userCount: channel.users.size,
+            isJoined: channel.users.has(userId),
+            createdAt: channel.createdAt,
+          });
+        }
       }
     });
 

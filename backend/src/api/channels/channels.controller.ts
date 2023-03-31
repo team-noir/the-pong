@@ -3,6 +3,7 @@ import {
   Res,
   Req,
   Body,
+  Query,
   Get,
   Post,
   Patch,
@@ -16,9 +17,13 @@ import {
 import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
 import { ChannelsService } from './channels.service';
 import { ApiOperation } from '@nestjs/swagger';
-import { CreateChannelDto, SettingChannelDto, ChannelPasswordDto, ChannelRoleDto, ChannelMessageDto } from './dtos/channel.dto';
-
-
+import {
+  CreateChannelDto,
+  SettingChannelDto,
+  ChannelPasswordDto,
+  ChannelRoleDto,
+  ChannelMessageDto,
+} from './dtos/channel.dto';
 
 @Controller('channels')
 export class ChannelsController {
@@ -27,7 +32,11 @@ export class ChannelsController {
   @Post()
   @ApiOperation({ summary: 'Create channel' })
   @UseGuards(AuthenticatedGuard)
-  create(@Req() req, @Body() body: CreateChannelDto, @Res({ passthrough: true }) res) {
+  create(
+    @Req() req,
+    @Body() body: CreateChannelDto,
+    @Res({ passthrough: true }) res
+  ) {
     try {
       const result = this.channelsService.create(req.user.id, body);
       res.status(HttpStatus.OK);
@@ -40,9 +49,24 @@ export class ChannelsController {
   @Get()
   @ApiOperation({ summary: 'Get channel list' })
   @UseGuards(AuthenticatedGuard)
-  list(@Res({ passthrough: true }) res) {
+  list(
+    @Req() req,
+    @Query('enter') enter: string,
+    @Query('kind') kind: string[],
+    @Res({ passthrough: true }) res
+  ) {
+    const isEnter: boolean = enter != undefined;
+    const isPublic: boolean = kind && kind.includes('public');
+    const isPriv: boolean = kind && kind.includes('private');
+    const isDm: boolean = kind && kind.includes('dm');
     res.status(HttpStatus.OK);
-    return this.channelsService.list(undefined);
+    return this.channelsService.list(
+      req.user.id,
+      isEnter,
+      isPublic,
+      isPriv,
+      isDm
+    );
   }
 
   @Get(':channelId')
