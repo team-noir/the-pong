@@ -47,24 +47,6 @@ export class ChannelsController {
     }
   }
 
-  @Get('dms/:userId')
-  @ApiOperation({ summary: 'Get dm infomation' })
-  @UseGuards(AuthenticatedGuard)
-  initDirectMessage(
-    @Req() req,
-    @Param('userId') userId: number,
-    @Body() body: ChannelDmDto,
-    @Res({ passthrough: true }) res
-  ) {
-    try {
-      const result = this.channelsService.initDirectMessage(req.user.id, userId, body);
-      res.status(HttpStatus.OK);
-      return result;
-    } catch (error) {
-      throw new HttpException(error.message, error.code);
-    }
-  }
-
   @Get()
   @ApiOperation({ summary: 'Get channel list' })
   @UseGuards(AuthenticatedGuard)
