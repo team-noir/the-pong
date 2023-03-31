@@ -229,6 +229,33 @@ export class ChannelsService {
     return data;
   }
 
+  createChannel(data) {
+    const newChannelId: number = this.channelMap.size;
+    const newChannel: Channel = {
+      id: newChannelId,
+      title: data.title ? data.title : "untitled",
+      isDm: data.isDm ? true : false,
+      isPrivate: data.isPrivate ? true : false,
+      createdAt: new Date(),
+      password: data.password ? data.password : undefined,
+
+      owner: 0,
+      users: new Set<number>(),
+      admin: new Set<number>(),
+      muted: new Set<number>(),
+      banned: new Set<number>(),
+    };
+    this.channelMap.set(newChannel.id, newChannel);
+
+    return newChannel;
+  }
+
+  joinChannel(user: ChannelUser, channel: Channel) {
+    user.socket.join(String(channel.id));
+    user.joined.add(channel.id);
+    channel.users.add(user.id);
+  }
+
   create(userId: number, data) {
     const createdBy: ChannelUser = this.getUser(userId);
     if (!createdBy) {
@@ -243,29 +270,14 @@ export class ChannelsService {
       };
     }
 
-    const newChannelId: number = this.channelMap.size;
-    const newChannel: Channel = {
-      id: newChannelId,
-      title: data.title,
-      isDm: data.isDm ? true : false,
-      isPrivate: data.isPrivate ? true : false,
-      createdAt: new Date(),
-      password: data.password ? data.password : undefined,
-
-      owner: createdBy.id,
-      users: new Set<number>().add(createdBy.id),
-      admin: new Set<number>(),
-      muted: new Set<number>(),
-      banned: new Set<number>(),
-    };
-
-    this.channelMap.set(newChannelId, newChannel);
-    createdBy.socket.join(String(newChannelId));
+    const newChannel = this.createChannel(data);
+    this.joinChannel(createdBy, newChannel);
+    
     createdBy.socket.emit('message', {
-      channelId: newChannelId,
+      channelId: newChannel.id,
     });
 
-    return { id: newChannelId };
+    return { id: newChannel.id };
   }
 
   join(userId: number, channelId: number, password: string) {
@@ -304,11 +316,7 @@ export class ChannelsService {
       };
     }
 
-    user.socket.join(String(channelId));
-    user.joined.add(channel.id);
-    channel.users.add(user.id);
-
-    // socket message
+    this.joinChannel(user, channel);
     this.noticeToChannel(channelId, `${user.name} 님이 채널에 참여하였습니다.`);
   }
 
@@ -498,16 +506,9 @@ export class ChannelsService {
     }
   }
 
-  getDms(userId: number): Channel[] {
-    const user: ChannelUser = this.channelUserMap.get(userId);
-    if (!user) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This user does not exist.',
-      };
-    }
-
+  getDms(user: ChannelUser): Channel[] {
     const data = [];
+
     user.joined.forEach((channelId) => {
       const channel: Channel = this.channelMap.get(channelId);
       if (channel.isDm) {
@@ -518,11 +519,11 @@ export class ChannelsService {
     return data;
   }
 
-  getDmInfo(userId: number, invitedUserId: number, data: ChannelDmDto) {
-    const dms: Channel[] = this.getDms(userId);
+  initDirectMessage(userId: number, invitedUserId: number, data: ChannelDmDto) {
     const invitedUser: ChannelUser = this.channelUserMap.get(invitedUserId);
+    const user: ChannelUser = this.channelUserMap.get(userId);
     
-    if (!invitedUser) {
+    if (!user || !invitedUser) {
       throw {
         code: HttpStatus.BAD_REQUEST,
         message: 'This user does not exist.',
@@ -534,14 +535,18 @@ export class ChannelsService {
       }
     }
     
+    const dms: Channel[] = this.getDms(user);
     const dmTitle: string = data.title;
     const found = dms.find(channel => channel.title == dmTitle);
+
     if (!found) {
-      const created = this.create(userId, {
+      const newChannel = this.createChannel({
         title: dmTitle,
         isDm: true
       });
-      return created;
+      this.joinChannel(user, newChannel);
+      this.joinChannel(invitedUser, newChannel);
+      return { id: newChannel.id };
     }
 
     return { id: found.id };

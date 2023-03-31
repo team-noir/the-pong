@@ -50,14 +50,14 @@ export class ChannelsController {
   @Get('dms/:userId')
   @ApiOperation({ summary: 'Get dm infomation' })
   @UseGuards(AuthenticatedGuard)
-  getDmInfo(
+  initDirectMessage(
     @Req() req,
     @Param('userId') userId: number,
     @Body() body: ChannelDmDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      const result = this.channelsService.getDmInfo(req.user.id, userId, body);
+      const result = this.channelsService.initDirectMessage(req.user.id, userId, body);
       res.status(HttpStatus.OK);
       return result;
     } catch (error) {
