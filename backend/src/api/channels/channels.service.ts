@@ -1,6 +1,7 @@
-import { Injectable, Logger, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
+import { ChannelDmDto } from './dtos/channel.dto';
 
 // 'public'이면서 비밀번호가 있는 경우 protected
 export interface Channel {
@@ -25,6 +26,7 @@ export interface ChannelUser {
 
   joined: Set<number>;
   invited: Set<number>;
+  blockUser: Set<number>;
 }
 
 export interface Message {
@@ -39,10 +41,9 @@ export interface Message {
 @Injectable()
 export class ChannelsService {
   @WebSocketServer() server: Server;
-  private logger = new Logger('Gateway');
-  private channelMap = new Map<number, Channel>(); // <channelId, Channel>
-  private channelUserMap = new Map<number, ChannelUser>(); // <userId, ChannelUser>
-  private messageMap = new Map<number, Message>(); // <messageId, Message>
+  private channelMap = new Map<number, Channel>();          // <channelId, Channel>
+  private channelUserMap = new Map<number, ChannelUser>();  // <userId, ChannelUser>
+  private messageMap = new Map<number, Message>();          // <messageId, Message>
 
   hasUser(userId: number) {
     return this.channelUserMap.has(userId);
@@ -393,7 +394,7 @@ export class ChannelsService {
     return data;
   }
 
-  getChannelInfo(channelId: number) {
+  getChannelInfo(userId: number, channelId: number) {
     const channel: Channel = this.getChannel(channelId);
     if (!channel) {
       throw new Error('This channel does not exist.');
@@ -402,9 +403,10 @@ export class ChannelsService {
     const channelInfo = {
       id: channel.id,
       title: channel.title,
-      isProtected: !channel.isPrivate && channel.password,
+      isProtected: (!channel.isPrivate && channel.password) ? true : false,
       isPrivate: channel.isPrivate,
       isDm: channel.isDm,
+      isBlocked: channel.banned.has(userId),
       users: this.getChannelUsers(channelId),
       createdAt: channel.createdAt,
     };
@@ -494,6 +496,55 @@ export class ChannelsService {
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
     }
+  }
+
+  getDms(userId: number): Channel[] {
+    const user: ChannelUser = this.channelUserMap.get(userId);
+    if (!user) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This user does not exist.',
+      };
+    }
+
+    const data = [];
+    user.joined.forEach((channelId) => {
+      const channel: Channel = this.channelMap.get(channelId);
+      if (channel.isDm) {
+        data.push(channel);
+      }
+    });
+
+    return data;
+  }
+
+  getDmInfo(userId: number, invitedUserId: number, data: ChannelDmDto) {
+    const dms: Channel[] = this.getDms(userId);
+    const invitedUser: ChannelUser = this.channelUserMap.get(invitedUserId);
+    
+    if (!invitedUser) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This user does not exist.',
+      };
+    } else if (invitedUser.blockUser.has(userId)) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'You cannot send dm to.'
+      }
+    }
+    
+    const dmTitle: string = data.title;
+    const found = dms.find(channel => channel.title == dmTitle);
+    if (!found) {
+      const created = this.create(userId, {
+        title: dmTitle,
+        isDm: true
+      });
+      return created;
+    }
+
+    return { id: found.id };
   }
 
   names(socket: Socket, channelId: number) {

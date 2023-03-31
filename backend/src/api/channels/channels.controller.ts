@@ -19,6 +19,7 @@ import { ChannelsService } from './channels.service';
 import { ApiOperation } from '@nestjs/swagger';
 import {
   CreateChannelDto,
+  ChannelDmDto,
   SettingChannelDto,
   ChannelPasswordDto,
   ChannelRoleDto,
@@ -39,6 +40,24 @@ export class ChannelsController {
   ) {
     try {
       const result = this.channelsService.create(req.user.id, body);
+      res.status(HttpStatus.OK);
+      return result;
+    } catch (error) {
+      throw new HttpException(error.message, error.code);
+    }
+  }
+
+  @Get('dms/:userId')
+  @ApiOperation({ summary: 'Get dm infomation' })
+  @UseGuards(AuthenticatedGuard)
+  getDmInfo(
+    @Req() req,
+    @Param('userId') userId: number,
+    @Body() body: ChannelDmDto,
+    @Res({ passthrough: true }) res
+  ) {
+    try {
+      const result = this.channelsService.getDmInfo(req.user.id, userId, body);
       res.status(HttpStatus.OK);
       return result;
     } catch (error) {
@@ -73,11 +92,12 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Get channel info' })
   @UseGuards(AuthenticatedGuard)
   getChannelInfo(
+    @Req() req,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
   ) {
     try {
-      const info = this.channelsService.getChannelInfo(channelId);
+      const info = this.channelsService.getChannelInfo(req.user.id, channelId);
       res.status(HttpStatus.OK);
       return info;
     } catch (error) {

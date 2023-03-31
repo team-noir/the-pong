@@ -81,6 +81,7 @@ export class ChannelsGatway
 
       joined: new Set<number>(),
       invited: new Set<number>(),
+      blockUser: new Set<number>(),
     };
     socket.data = { user };
     this.channelsService.setUser(userId, user);

@@ -15,16 +15,12 @@ export class CreateChannelDto {
   @IsString()
   @IsOptional()
   public password?: string;
+}
 
+export class ChannelDmDto {
   @ApiProperty()
-  @IsBoolean()
-  @IsOptional()
-  public isDm?: boolean;
-
-  @ApiProperty()
-  @IsNumber()
-  @IsOptional()
-  public userId?: number;
+  @IsString()
+  public title: string;
 }
 
 export class SettingChannelDto {
