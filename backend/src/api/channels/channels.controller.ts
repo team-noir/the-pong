@@ -19,7 +19,6 @@ import { ChannelsService } from './channels.service';
 import { ApiOperation } from '@nestjs/swagger';
 import {
   CreateChannelDto,
-  ChannelDmDto,
   SettingChannelDto,
   ChannelPasswordDto,
   ChannelRoleDto,
