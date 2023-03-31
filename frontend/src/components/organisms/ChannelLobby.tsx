@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 
 interface Props {
   channels: ChannelType[] | null;
-  onClick: (channelId: number) => void;
+  onClick: (channel: ChannelType) => void;
 }
 
 export default function ChannelLobby({ channels, onClick }: Props) {

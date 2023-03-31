@@ -176,13 +176,29 @@ export const putMyFollowing = async (userId: number) => {
   return res;
 };
 
+/** Channel */
+
+interface getChannelsParams {
+  enter?: string;
+  kind?: string[];
+}
+
+export const getChannels = async ({ enter, kind }: getChannelsParams) => {
+  const res = await axiosWithInterceptors.get(`/channels/`, {
+    params: { enter, kind },
+  });
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 export interface ChannelFormType {
   title: string;
   isPrivate?: boolean;
   password?: string;
 }
 
-/** Channel */
 export const postNewChannel = async (
   channelForm: ChannelFormType
 ): Promise<ChannelType> => {

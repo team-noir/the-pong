@@ -4,7 +4,7 @@ import ChannelItem from './ChannelItem';
 interface Props {
   styles: { readonly [key: string]: string };
   channels: ChannelType[] | null;
-  onClick?: (channelId: number) => void;
+  onClick?: (channel: ChannelType) => void;
 }
 
 export default function ChannelList({ styles, channels, onClick }: Props) {
