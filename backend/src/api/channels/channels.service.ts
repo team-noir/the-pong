@@ -1,11 +1,12 @@
-import { Injectable, Logger, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
+import { CreateChannelDto } from './dtos/channel.dto';
 
 // 'public'이면서 비밀번호가 있는 경우 protected
 export interface Channel {
   id: number;
-  title: string;
+  title?: string;
   isDm: boolean;
   isPrivate: boolean;
   createdAt: Date;
@@ -25,6 +26,7 @@ export interface ChannelUser {
 
   joined: Set<number>;
   invited: Set<number>;
+  blockUser: Set<number>;
 }
 
 export interface Message {
@@ -36,13 +38,16 @@ export interface Message {
   createdAt: Date;
 }
 
+type userId = number;
+type channelId = number;
+type messageId = number;
+
 @Injectable()
 export class ChannelsService {
   @WebSocketServer() server: Server;
-  private logger = new Logger('Gateway');
-  private channelMap = new Map<number, Channel>(); // <channelId, Channel>
-  private channelUserMap = new Map<number, ChannelUser>(); // <userId, ChannelUser>
-  private messageMap = new Map<number, Message>(); // <messageId, Message>
+  private channelMap = new Map<channelId, Channel>();
+  private channelUserMap = new Map<userId, ChannelUser>();
+  private messageMap = new Map<messageId, Message>();
 
   hasUser(userId: number) {
     return this.channelUserMap.has(userId);
@@ -216,8 +221,11 @@ export class ChannelsService {
     const data = [];
     [...this.messageMap.values()].forEach((message) => {
       if (message.channelId == channelId) {
+        const sender: ChannelUser = this.getUser(message.senderId);
         data.push({
-          senderId: message.senderId,
+          id: message.id,
+          senderId: sender.id,
+          senderNickname: sender.name,
           isLog: message.isLog,
           text: message.text,
           createdAt: message.createdAt,
@@ -228,7 +236,34 @@ export class ChannelsService {
     return data;
   }
 
-  create(userId: number, data) {
+  createChannel(data) {
+    const newChannelId: number = this.channelMap.size;
+    const newChannel: Channel = {
+      id: newChannelId,
+      title: data.title ? data.title : undefined,
+      isDm: data.isDm ? true : false,
+      isPrivate: data.isPrivate ? true : false,
+      createdAt: new Date(),
+      password: data.password ? data.password : undefined,
+
+      owner: undefined,
+      users: new Set<number>(),
+      admin: new Set<number>(),
+      muted: new Set<number>(),
+      banned: new Set<number>(),
+    };
+    this.channelMap.set(newChannel.id, newChannel);
+
+    return newChannel;
+  }
+
+  joinChannel(user: ChannelUser, channel: Channel) {
+    user.socket.join(String(channel.id));
+    user.joined.add(channel.id);
+    channel.users.add(user.id);
+  }
+
+  create(userId: number, data: CreateChannelDto) {
     const createdBy: ChannelUser = this.getUser(userId);
     if (!createdBy) {
       throw {
@@ -242,29 +277,14 @@ export class ChannelsService {
       };
     }
 
-    const newChannelId: number = this.channelMap.size;
-    const newChannel: Channel = {
-      id: newChannelId,
-      title: data.title,
-      isDm: data.isDm ? true : false,
-      isPrivate: data.isPrivate ? true : false,
-      createdAt: new Date(),
-      password: data.password ? data.password : undefined,
+    const newChannel = this.createChannel(data);
+    this.joinChannel(createdBy, newChannel);
 
-      owner: createdBy.id,
-      users: new Set<number>().add(createdBy.id),
-      admin: new Set<number>(),
-      muted: new Set<number>(),
-      banned: new Set<number>(),
-    };
-
-    this.channelMap.set(newChannelId, newChannel);
-    createdBy.socket.join(String(newChannelId));
     createdBy.socket.emit('message', {
-      channelId: newChannelId,
+      channelId: newChannel.id,
     });
 
-    return { id: newChannelId };
+    return { id: newChannel.id };
   }
 
   join(userId: number, channelId: number, password: string) {
@@ -303,11 +323,7 @@ export class ChannelsService {
       };
     }
 
-    user.socket.join(String(channelId));
-    user.joined.add(channel.id);
-    channel.users.add(user.id);
-
-    // socket message
+    this.joinChannel(user, channel);
     this.noticeToChannel(channelId, `${user.name} 님이 채널에 참여하였습니다.`);
   }
 
@@ -345,41 +361,102 @@ export class ChannelsService {
     this.noticeToChannel(channelId, `${user.name} 님이 나가셨습니다.`);
   }
 
-  list(channelId: number) {
+  // private, dm : user가 참여 중이어야 한다.
+  // public : enter이라면 참여 중, 아니라면 전부
+  checkCanListed(channel: Channel, userId: number, isEnter: boolean): boolean {
+    const isJoined = channel.users.has(userId);
+    const isPrivate = channel.isPrivate;
+    const isDm = channel.isDm;
+    const isPassword = channel.password ? true : false;
+
+    if ((isPrivate || isDm) && isJoined) {
+      return true;
+    } else if (!isPrivate && isPassword && isJoined) {
+      return true;
+    } else if (
+      !isPrivate &&
+      !isPassword &&
+      (!isEnter || (isEnter && isJoined))
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  list(
+    userId: number,
+    isEnter: boolean,
+    isPublic: boolean,
+    isPriv: boolean,
+    isDm: boolean
+  ) {
     const data = [];
     const channels = this.getChannelValues();
 
     channels.forEach((channel) => {
-      if (!channelId || (channelId && channel.id == channelId)) {
-        data.push({
-          id: channel.id,
-          name: channel.title,
-          isProtected: !channel.isPrivate && channel.password,
-          isPrivate: channel.isPrivate,
-          isDm: channel.isDm,
-          createdAt: channel.createdAt,
-        });
+      if (this.checkCanListed(channel, userId, isEnter)) {
+        if (
+          (isPublic && !channel.isPrivate && !channel.isDm) ||
+          (isPriv && channel.isPrivate && !channel.isDm) ||
+          (isDm && channel.isDm && !channel.isPrivate)
+        ) {
+          const info = {
+            id: channel.id,
+            title: channel.title,
+            isProtected: !channel.isPrivate && channel.password ? true : false,
+            isPrivate: channel.isPrivate,
+            isDm: channel.isDm,
+            dmUserId: undefined,
+            userCount: channel.users.size,
+            isJoined: channel.users.has(userId),
+            createdAt: channel.createdAt,
+          };
+
+          if (info.isDm) {
+            channel.users.forEach((id) => {
+              if (id != userId) {
+                info.dmUserId = id;
+                info.title = this.channelUserMap.get(id).name;
+              }
+            });
+          }
+
+          data.push(info);
+        }
       }
     });
 
     return data;
   }
 
-  getChannelInfo(channelId: number) {
+  getChannelInfo(userId: number, channelId: number) {
     const channel: Channel = this.getChannel(channelId);
+
     if (!channel) {
-      throw new Error('This channel does not exist.');
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This channel does not exist.',
+      };
+    } else if (!this.checkCanListed(channel, userId, false)) {
+      throw {
+        code: HttpStatus.FORBIDDEN,
+        message: 'You are not authorized to this channel.',
+      };
     }
 
     const channelInfo = {
       id: channel.id,
       title: channel.title,
-      isProtected: !channel.isPrivate && channel.password,
+      isProtected: !channel.isPrivate && channel.password ? true : false,
       isPrivate: channel.isPrivate,
       isDm: channel.isDm,
+      isBlocked: channel.banned.has(userId),
+      isJoined: channel.users.has(userId),
+      userCount: channel.users.size,
       users: this.getChannelUsers(channelId),
       createdAt: channel.createdAt,
     };
+
     return channelInfo;
   }
 
@@ -448,7 +525,10 @@ export class ChannelsService {
         message: 'This user is not in the channel.',
       };
     } else if (channel.isDm) {
-      throw { code: HttpStatus.BAD_REQUEST, message: 'This channel is dm' };
+      throw { 
+        code: HttpStatus.BAD_REQUEST, 
+        message: 'This channel is dm' 
+      };
     } else if (channel.owner != settedBy.id) {
       throw {
         code: HttpStatus.FORBIDDEN,
@@ -466,6 +546,51 @@ export class ChannelsService {
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
     }
+  }
+
+  getDms(user: ChannelUser): Channel[] {
+    const data = [];
+
+    user.joined.forEach((channelId) => {
+      const channel: Channel = this.channelMap.get(channelId);
+      if (channel.isDm) {
+        data.push(channel);
+      }
+    });
+
+    return data;
+  }
+
+  initDirectMessage(userId: number, invitedUserId: number) {
+    const invitedUser: ChannelUser = this.channelUserMap.get(invitedUserId);
+    const user: ChannelUser = this.channelUserMap.get(userId);
+
+    if (!user || !invitedUser) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This user does not exist.',
+      };
+    } else if (invitedUser.blockUser.has(userId)) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'You cannot send dm to.',
+      };
+    }
+
+    const dms: Channel[] = this.getDms(user);
+    const found = dms.find(
+      (channel) =>
+        channel.users.has(user.id) && channel.users.has(invitedUserId)
+    );
+
+    if (!found) {
+      const newChannel = this.createChannel({ isDm: true });
+      this.joinChannel(user, newChannel);
+      this.joinChannel(invitedUser, newChannel);
+      return { id: newChannel.id };
+    }
+
+    return { id: found.id };
   }
 
   names(socket: Socket, channelId: number) {

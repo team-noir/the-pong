@@ -1,4 +1,4 @@
-import { Injectable, StreamableFile, Req, Scope, Inject } from '@nestjs/common';
+import { Injectable, Scope, Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 
 import { PrismaService } from 'src/prisma/prisma.service';
