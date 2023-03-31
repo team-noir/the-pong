@@ -360,12 +360,16 @@ export class ChannelsService {
   // private, dm : user가 참여 중이어야 한다.
   // public : enter이라면 참여 중, 아니라면 전부
   checkCanListed(channel: Channel, userId: number, isEnter: boolean): boolean {
-    if ((channel.isPrivate || channel.isDm) && channel.users.has(userId)) {
+    const isJoined = channel.users.has(userId);
+    const isPrivate = channel.isPrivate;
+    const isDm = channel.isDm;
+    const isPassword = (channel.password) ? true : false;
+
+    if ((isPrivate || isDm) && isJoined) {
       return true;
-    } else if (
-      !channel.isPrivate &&
-      (!isEnter || (isEnter && channel.users.has(userId)))
-    ) {
+    } else if (!isPrivate && isPassword && isJoined) {
+      return true;
+    } else if (!isPrivate && !isPassword && (!isEnter || (isEnter && isJoined))) {
       return true;
     }
     return false;
@@ -407,8 +411,17 @@ export class ChannelsService {
 
   getChannelInfo(userId: number, channelId: number) {
     const channel: Channel = this.getChannel(channelId);
+
     if (!channel) {
-      throw new Error('This channel does not exist.');
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This channel does not exist.',
+      };
+    } else if (this.checkCanListed(channel, userId, false)) {
+      throw {
+        code: HttpStatus.FORBIDDEN,
+        message: 'You are not authorized to this channel.',
+      };
     }
 
     const channelInfo = {
@@ -418,9 +431,12 @@ export class ChannelsService {
       isPrivate: channel.isPrivate,
       isDm: channel.isDm,
       isBlocked: channel.banned.has(userId),
+      isJoined: channel.users.has(userId),
+      userCount: channel.users.size,
       users: this.getChannelUsers(channelId),
       createdAt: channel.createdAt,
     };
+
     return channelInfo;
   }
 
