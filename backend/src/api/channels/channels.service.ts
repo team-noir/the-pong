@@ -374,8 +374,7 @@ export class ChannelsService {
     } else if (!isPrivate && isPassword && isJoined) {
       return true;
     } else if (
-      !isPrivate &&
-      !isPassword &&
+      !isPrivate && !isPassword && 
       (!isEnter || (isEnter && isJoined))
     ) {
       return true;
@@ -396,33 +395,35 @@ export class ChannelsService {
     channels.forEach((channel) => {
       if (this.checkCanListed(channel, userId, isEnter)) {
         if (
-          (isPublic && !channel.isPrivate && !channel.isDm) ||
-          (isPriv && channel.isPrivate && !channel.isDm) ||
-          (isDm && channel.isDm && !channel.isPrivate)
-        ) {
-          const info = {
-            id: channel.id,
-            title: channel.title,
-            isProtected: !channel.isPrivate && channel.password ? true : false,
-            isPrivate: channel.isPrivate,
-            isDm: channel.isDm,
-            dmUserId: undefined,
-            userCount: channel.users.size,
-            isJoined: channel.users.has(userId),
-            createdAt: channel.createdAt,
-          };
+          !(!isPublic && !isPriv && !isDm) &&
+          !(isPublic && !channel.isPrivate && !channel.isDm) &&
+          !(isPriv && channel.isPrivate && !channel.isDm) &&
+          !(isDm && !channel.isPrivate && channel.isDm)
+        ) { return; }
 
-          if (info.isDm) {
-            channel.users.forEach((id) => {
-              if (id != userId) {
-                info.dmUserId = id;
-                info.title = this.channelUserMap.get(id).name;
-              }
-            });
-          }
+        const info = {
+          id: channel.id,
+          title: channel.title,
+          isProtected: !channel.isPrivate && channel.password ? true : false,
+          isPrivate: channel.isPrivate,
+          isDm: channel.isDm,
+          dmUserId: undefined,
+          userCount: channel.users.size,
+          isJoined: channel.users.has(userId),
+          createdAt: channel.createdAt,
+        };
 
-          data.push(info);
+        if (info.isDm) {
+          channel.users.forEach((id) => {
+            if (id != userId) {
+              info.dmUserId = id;
+              info.title = this.channelUserMap.get(id).name;
+            }
+          });
         }
+
+        data.push(info);
+        
       }
     });
 
