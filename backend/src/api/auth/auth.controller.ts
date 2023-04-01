@@ -8,7 +8,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { FtOauthGuard } from '../../guards/ft-oauth.guard';
-import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
+import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import {
   ApiOperation,
   ApiTags,
