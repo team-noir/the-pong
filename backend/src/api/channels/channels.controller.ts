@@ -14,7 +14,7 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { AuthenticatedGuard } from 'src/guards/authenticated.guard';
+import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { ChannelsService } from './channels.service';
 import { ApiOperation, ApiQuery } from '@nestjs/swagger';
 import {
@@ -63,18 +63,14 @@ export class ChannelsController {
     @Query('kind') kind: string[],
     @Res({ passthrough: true }) res
   ) {
-    const isEnter: boolean = enter != undefined;
-    const isPublic: boolean = kind && kind.includes('public');
-    const isPriv: boolean = kind && kind.includes('private');
-    const isDm: boolean = kind && kind.includes('dm');
+    const query = {
+      isEnter: enter != undefined,
+      isPublic: kind && kind.includes('public'),
+      isPriv: kind && kind.includes('private'),
+      isDm: kind && kind.includes('dm'),
+    }
     res.status(HttpStatus.OK);
-    return this.channelsService.list(
-      req.user.id,
-      isEnter,
-      isPublic,
-      isPriv,
-      isDm
-    );
+    return this.channelsService.list(req.user.id, query);
   }
 
   @Get(':channelId')

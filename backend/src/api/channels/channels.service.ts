@@ -22,7 +22,7 @@ export interface Channel {
 export interface ChannelUser {
   id: number;
   name: string;
-  socket: Socket;
+  socket;
 
   joined: Set<number>;
   invited: Set<number>;
@@ -361,71 +361,68 @@ export class ChannelsService {
     this.noticeToChannel(channelId, `${user.name} 님이 나가셨습니다.`);
   }
 
-  checkCanListed(channel: Channel, userId: number, isEnter: boolean): boolean {
+  checkCanListed(channel: Channel, userId: number): boolean {
     const isJoined = channel.users.has(userId);
     const isPrivate = channel.isPrivate;
     const isDm = channel.isDm;
-    const isPassword = channel.password ? true : false;
 
     if ((isPrivate || isDm) && isJoined) {
       return true;
-    } else if (!isPrivate && isPassword && (isEnter && isJoined)) {
-      return true;
-    } else if (
-      !isPrivate && !isPassword && 
-      (!isEnter || (isEnter && isJoined))
-    ) {
+    } else if (!isPrivate) {
       return true;
     }
     return false;
   }
 
-  list(
-    userId: number,
-    isEnter: boolean,
-    isPublic: boolean,
-    isPriv: boolean,
-    isDm: boolean
-  ) {
+  checkIsJoined(channel: Channel, userId: number): boolean {
+    return channel.users.has(userId);
+  }
+
+  checkListedRange(query, channel: Channel) {
+    return (
+      !(query.isPublic && !channel.isPrivate && !channel.isDm) &&
+      !(query.isPriv && channel.isPrivate && !channel.isDm) &&
+      !(query.isDm && !channel.isPrivate && channel.isDm)
+    );
+  }
+
+  list(userId: number, query) {
     const data = [];
     const channels = this.getChannelValues();
 
-    if (!isPublic && !isPriv && !isDm) {
-      isPublic = true;
+    if (!query.isPublic && !query.isPriv && !query.isDm) {
+      query.isPublic = true;
     }
 
     channels.forEach((channel) => {
-      if (this.checkCanListed(channel, userId, isEnter)) {
-        if (
-          !(isPublic && !channel.isPrivate && !channel.isDm) &&
-          !(isPriv && channel.isPrivate && !channel.isDm) &&
-          !(isDm && !channel.isPrivate && channel.isDm)
-        ) { return; }
+      if (
+        !this.checkCanListed(channel, userId) ||
+        (query.isEnter && !this.checkIsJoined(channel, userId)) ||
+        this.checkListedRange(query, channel)
+      ) { return; }
 
-        const info = {
-          id: channel.id,
-          title: channel.title,
-          isProtected: !channel.isPrivate && channel.password ? true : false,
-          isPrivate: channel.isPrivate,
-          isDm: channel.isDm,
-          dmUserId: undefined,
-          userCount: channel.users.size,
-          isJoined: channel.users.has(userId),
-          createdAt: channel.createdAt,
-        };
+      const info = {
+        id: channel.id,
+        title: channel.title,
+        isProtected: !channel.isPrivate && channel.password ? true : false,
+        isPrivate: channel.isPrivate,
+        isDm: channel.isDm,
+        dmUserId: undefined,
+        userCount: channel.users.size,
+        isJoined: channel.users.has(userId),
+        createdAt: channel.createdAt,
+      };
 
-        if (info.isDm) {
-          channel.users.forEach((id) => {
-            if (id != userId) {
-              info.dmUserId = id;
-              info.title = this.channelUserMap.get(id).name;
-            }
-          });
-        }
-
-        data.push(info);
-        
+      if (info.isDm) {
+        channel.users.forEach((id) => {
+          if (id != userId) {
+            info.dmUserId = id;
+            info.title = this.channelUserMap.get(id).name;
+          }
+        });
       }
+
+      data.push(info);
     });
 
     return data;
@@ -439,7 +436,7 @@ export class ChannelsService {
         code: HttpStatus.BAD_REQUEST,
         message: 'This channel does not exist.',
       };
-    } else if (!this.checkCanListed(channel, userId, false)) {
+    } else if (!this.checkCanListed(channel, userId)) {
       throw {
         code: HttpStatus.FORBIDDEN,
         message: 'You are not authorized to this channel.',
@@ -555,7 +552,7 @@ export class ChannelsService {
 
     user.joined.forEach((channelId) => {
       const channel: Channel = this.channelMap.get(channelId);
-      if (channel.isDm) {
+      if (channel && channel.isDm) {
         data.push(channel);
       }
     });
