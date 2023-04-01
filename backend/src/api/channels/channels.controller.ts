@@ -195,7 +195,6 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      console.log(req.user.id);
       this.channelsService.messageToChannel(req.user.id, channelId, body.text);
       res.status(HttpStatus.NO_CONTENT);
       return;

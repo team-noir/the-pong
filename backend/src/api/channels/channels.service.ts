@@ -221,11 +221,18 @@ export class ChannelsService {
     const data = [];
     [...this.messageMap.values()].forEach((message) => {
       if (message.channelId == channelId) {
-        const sender: ChannelUser = this.getUser(message.senderId);
+        
+        let senderNickname;
+        if (message.senderId == 0) {
+          senderNickname = 'notice';
+        } else {
+          senderNickname = this.getUser(message.senderId).name;
+        }
+
         data.push({
           id: message.id,
-          senderId: sender.id,
-          senderNickname: sender.name,
+          senderId: message.senderId,
+          senderNickname: senderNickname,
           isLog: message.isLog,
           text: message.text,
           createdAt: message.createdAt,
