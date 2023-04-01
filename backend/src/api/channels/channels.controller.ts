@@ -68,7 +68,7 @@ export class ChannelsController {
       isPublic: kind && kind.includes('public'),
       isPriv: kind && kind.includes('private'),
       isDm: kind && kind.includes('dm'),
-    }
+    };
     res.status(HttpStatus.OK);
     return this.channelsService.list(req.user.id, query);
   }

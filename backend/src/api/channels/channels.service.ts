@@ -366,12 +366,7 @@ export class ChannelsService {
     const isPrivate = channel.isPrivate;
     const isDm = channel.isDm;
 
-    if ((isPrivate || isDm) && isJoined) {
-      return true;
-    } else if (!isPrivate) {
-      return true;
-    }
-    return false;
+    return ((isPrivate || isDm) && isJoined) || !isPrivate;
   }
 
   checkIsJoined(channel: Channel, userId: number): boolean {
@@ -399,7 +394,9 @@ export class ChannelsService {
         !this.checkCanListed(channel, userId) ||
         (query.isEnter && !this.checkIsJoined(channel, userId)) ||
         this.checkListedRange(query, channel)
-      ) { return; }
+      ) {
+        return;
+      }
 
       const info = {
         id: channel.id,
@@ -421,11 +418,23 @@ export class ChannelsService {
           }
         });
       }
-
       data.push(info);
     });
 
     return data;
+  }
+
+  checkCanGetInfo(channel: Channel, userId: number): boolean {
+    const isJoined = channel.users.has(userId);
+    const isPrivate = channel.isPrivate;
+    const isDm = channel.isDm;
+    const isPassword = channel.password;
+
+    return (
+      ((isPrivate || isDm) && isJoined) ||
+      (!isPrivate && isPassword && !isDm && isJoined) ||
+      (!isPrivate && !isPassword && !isDm)
+    );
   }
 
   getChannelInfo(userId: number, channelId: number) {
@@ -436,7 +445,7 @@ export class ChannelsService {
         code: HttpStatus.BAD_REQUEST,
         message: 'This channel does not exist.',
       };
-    } else if (!this.checkCanListed(channel, userId)) {
+    } else if (!this.checkCanGetInfo(channel, userId)) {
       throw {
         code: HttpStatus.FORBIDDEN,
         message: 'You are not authorized to this channel.',
@@ -524,9 +533,9 @@ export class ChannelsService {
         message: 'This user is not in the channel.',
       };
     } else if (channel.isDm) {
-      throw { 
-        code: HttpStatus.BAD_REQUEST, 
-        message: 'This channel is dm' 
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This channel is dm',
       };
     } else if (channel.owner != settedBy.id) {
       throw {
