@@ -3,6 +3,7 @@ import { ChannelsService, ChannelUser } from './channels.service';
 import { CreateChannelDto } from './dtos/channel.dto';
 import { expect, jest, describe, beforeEach, it } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
+import { ChannelsModule } from './channels.module';
 
 const fakeSocket = {
   emit: jest.fn(),
