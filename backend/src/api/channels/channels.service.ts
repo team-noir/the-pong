@@ -2,8 +2,12 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { Socket, Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
 import { CreateChannelDto } from './dtos/channel.dto';
+import { ONESECOND } from '../../const';
 
-// 'public'이면서 비밀번호가 있는 경우 protected
+type userId = number;
+type channelId = number;
+type messageId = number;
+
 export interface Channel {
   id: number;
   title?: string;
@@ -12,11 +16,11 @@ export interface Channel {
   createdAt: Date;
   password?: string;
 
-  owner?: number;
-  users: Set<number>;
-  admin: Set<number>;
-  muted: Set<number>;
-  banned: Set<number>;
+  owner?: userId;
+  users: Set<userId>;
+  admin: Set<userId>;
+  banned: Set<userId>;
+  muted: Map<userId, Date>;
 }
 
 export interface ChannelUser {
@@ -24,23 +28,19 @@ export interface ChannelUser {
   name: string;
   socket;
 
-  joined: Set<number>;
-  invited: Set<number>;
-  blockUser: Set<number>;
+  joined: Set<channelId>;
+  invited: Set<channelId>;
+  blockUser: Set<channelId>;
 }
 
 export interface Message {
   id: number;
-  senderId: number;
-  channelId: number;
+  senderId: userId;
+  channelId: userId;
   isLog: boolean;
   text: string;
   createdAt: Date;
 }
-
-type userId = number;
-type channelId = number;
-type messageId = number;
 
 @Injectable()
 export class ChannelsService {
@@ -126,7 +126,7 @@ export class ChannelsService {
     }
 
     const newMessage: Message = {
-      id: this.messageMap.size,
+      id: this.messageMap.size + 1,
       senderId: null,
       channelId: channel.id,
       isLog: true,
@@ -169,14 +169,20 @@ export class ChannelsService {
         message: 'You not in the channel.',
       };
     } else if (channel.muted.has(user.id)) {
-      throw {
-        code: HttpStatus.FORBIDDEN,
-        message: 'You are silenced on the channel.',
-      };
+      const expiresAt = channel.muted.get(user.id);
+
+      if (expiresAt.getTime() < new Date().getTime()) {
+        channel.muted.delete(user.id);
+      } else {
+        throw {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You are silenced on the channel.',
+        };
+      }
     }
 
     const newMessage: Message = {
-      id: this.messageMap.size,
+      id: this.messageMap.size + 1,
       senderId: user.id,
       channelId: channel.id,
       isLog: false,
@@ -244,7 +250,7 @@ export class ChannelsService {
   }
 
   createChannel(data) {
-    const newChannelId: number = this.channelMap.size;
+    const newChannelId: number = this.channelMap.size + 1;
     const newChannel: Channel = {
       id: newChannelId,
       title: data.title ? data.title : null,
@@ -256,7 +262,7 @@ export class ChannelsService {
       owner: null,
       users: new Set<number>(),
       admin: new Set<number>(),
-      muted: new Set<number>(),
+      muted: new Map<number, Date>(),
       banned: new Set<number>(),
     };
     this.channelMap.set(newChannel.id, newChannel);
@@ -285,6 +291,7 @@ export class ChannelsService {
     }
 
     const newChannel = this.createChannel(data);
+    newChannel.owner = createdBy.id;
     this.joinChannel(createdBy, newChannel);
 
     createdBy.socket.emit('message', {
@@ -297,7 +304,6 @@ export class ChannelsService {
   join(userId: number, channelId: number, password: string) {
     const channel = this.channelMap.get(channelId);
     const user: ChannelUser = this.getUser(userId);
-
     if (!channel) {
       throw {
         code: HttpStatus.BAD_REQUEST,
@@ -660,30 +666,80 @@ export class ChannelsService {
       .emit('message', `${invitedUser.name} 님을 초대하였습니다.`);
   }
 
-  kick(socket: Socket, channelId: number, userId: number) {
-    const channel = this.channelMap.get(channelId);
-    const tarUser = this.channelUserMap.get(userId);
-    const kickedBy = this.getUserFromSocket(socket);
+  setUserStatus(userId: number, channelId: number, settedUserId: number, status: string) {
+    const channel: Channel = this.channelMap.get(channelId);
+    const user: ChannelUser = this.getUser(userId);
+    const settedUser: ChannelUser = this.getUser(settedUserId);
 
     if (!channel) {
-      socket.emit('error', { code: 4, msg: 'This channel does not exist.' });
-      return;
-    }
-    if (!tarUser) {
-      socket.emit('error', { code: 7, msg: 'This user does not exist.' });
-      return;
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This channel does not exist.',
+      };
+    } else if (!user) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This user does not exist.',
+      };
+    } else if (!settedUser) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This user does not exist.',
+      };
+    } else if (!channel.users.has(user.id)) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This user is not in the channel.',
+      };
+    } else if (!channel.users.has(settedUser.id)) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'This user is not in the channel.',
+      };
+    } else if (channel.owner != user.id && !channel.admin.has(user.id)) {
+      throw {
+        code: HttpStatus.UNAUTHORIZED,
+        message: 'This user does not have permission to do this.',
+      };
     }
 
-    tarUser.socket.emit('kicked', { channelId: channel.id });
+    switch (status) {
+      case "kick":
+        return this.kick(user, channel, settedUser);
+      case "ban":
+        return this.ban(user, channel, settedUser);
+      case "mute":
+        return this.mute(user, channel, settedUser, 3);
+      default:
+        break;
+    }
+  }
+
+  kick(user: ChannelUser, channel: Channel, kickedUser: ChannelUser) {
+    this.setUserLeave(kickedUser, channel);
     this.noticeToChannel(
-      channelId,
-      `${kickedBy.name}님이 ${tarUser.name} 님을 강퇴하였습니다.`
+      channel.id,
+      `${user.name}님이 ${kickedUser.name} 님을 채널에서 강퇴하였습니다.`
     );
-    this.server
-      .to(String(channel.id))
-      .emit(
-        'message',
-        `${kickedBy.name}님이 ${tarUser.name} 님을 강퇴하였습니다.`
-      );
+  }
+
+  ban(user: ChannelUser, channel: Channel, bannedUser: ChannelUser) {
+    this.setUserLeave(bannedUser, channel);
+    channel.banned.add(bannedUser.id);
+    this.noticeToChannel(
+      channel.id,
+      `${user.name}님이 ${bannedUser.name} 님을 채널에서 차단하였습니다.`
+    );
+  }
+
+  mute(user: ChannelUser, channel: Channel, mutedUser: ChannelUser, seconds: number) {
+    const now = new Date();
+    const expiresAt = new Date(now.getTime() + (ONESECOND * seconds));
+
+    channel.muted.set(mutedUser.id, expiresAt);
+    this.noticeToChannel(
+      channel.id,
+      `${user.name}님이 ${mutedUser.name} 님을 채널에서 조용히 시켰습니다.`
+    );
   }
 }

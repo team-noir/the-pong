@@ -47,6 +47,12 @@ export class ChannelRoleDto {
   role: string;
 }
 
+export class ChannelUserStatusDto {
+  @ApiProperty()
+  @IsString()
+  status: string;
+}
+
 export class ChannelMessageDto {
   @ApiProperty()
   @IsString()
