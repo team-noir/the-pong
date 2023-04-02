@@ -264,5 +264,5 @@ export const postChannelMessages = async ({
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
-  return res.data;
+  return res;
 };
