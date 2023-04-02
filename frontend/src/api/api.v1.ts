@@ -208,3 +208,18 @@ export const postNewChannel = async (
   }
   return res.data;
 };
+
+export interface ChannelJoinType {
+  id: number;
+  password?: string;
+}
+
+export const postJoinChannel = async (channelForm: ChannelJoinType) => {
+  const res = await axiosWithInterceptors.post(`/channels/${channelForm.id}`, {
+    password: channelForm.password,
+  });
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
