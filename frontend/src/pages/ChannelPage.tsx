@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { getWhoami, getUser, getChannel } from 'api/api.v1';
+import { getWhoami, getChannel } from 'api/api.v1';
 import Button from 'components/atoms/Button';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Channel from 'components/organisms/Channel';
@@ -29,12 +29,6 @@ export default function ChannelPage() {
     queryFn: () => getChannel(channelId),
   });
 
-  const getUserQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['user', getChannelQuery.data?.dmUserId],
-    queryFn: () => getUser(`${getChannelQuery.data?.dmUserId}`),
-    enabled: getChannelQuery.data?.isDm,
-  });
-
   if (
     whoamiQuery.status === 'loading' ||
     getChannelQuery.status === 'loading'
@@ -50,11 +44,7 @@ export default function ChannelPage() {
     <AppTemplate
       header={
         <HeaderWithBackButton
-          title={
-            getChannelQuery.data.isDm
-              ? getUserQuery.data?.nickname
-              : getChannelQuery.data.title
-          }
+          title={getChannelQuery.data.title}
           button={
             <Button type="button" onClick={() => setIsShowDetail(true)}>
               메뉴

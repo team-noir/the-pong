@@ -16,6 +16,10 @@ module.exports = {
       },
       secondary: colors.yellow,
       neutral: colors.neutral,
+      theme: {
+        green: '4BA19D',
+        red: 'CD392B',
+      },
       gray: {
         lighter: '#F5F0EE',
         light: '#E2D8D5',

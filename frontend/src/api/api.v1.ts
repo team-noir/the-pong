@@ -247,3 +247,22 @@ export const getChannelMessages = async (channelId: number) => {
   }
   return res.data;
 };
+
+export const postChannelMessages = async ({
+  channelId,
+  message,
+}: {
+  channelId: number;
+  message: string;
+}) => {
+  const res = await axiosWithInterceptors.post(
+    `/channels/${channelId}/message`,
+    {
+      text: message,
+    }
+  );
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
