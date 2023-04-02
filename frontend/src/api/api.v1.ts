@@ -202,7 +202,8 @@ export const getChannel = async (channelId: string) => {
 };
 
 export interface ChannelFormType {
-  title: string;
+  id?: number;
+  title?: string;
   isPrivate?: boolean;
   password?: string;
 }
@@ -217,12 +218,7 @@ export const postNewChannel = async (
   return res.data;
 };
 
-export interface ChannelJoinType {
-  id: number;
-  password?: string;
-}
-
-export const postJoinChannel = async (channelForm: ChannelJoinType) => {
+export const postJoinChannel = async (channelForm: ChannelFormType) => {
   const res = await axiosWithInterceptors.post(`/channels/${channelForm.id}`, {
     password: channelForm.password,
   });
