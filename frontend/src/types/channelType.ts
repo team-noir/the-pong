@@ -5,7 +5,9 @@ export interface ChannelType {
   isProtected: boolean;
   isPrivate: boolean;
   isDm: boolean;
+  dmUserId?: number;
   userCount?: number;
+  isJoined?: boolean;
   users?: ChannelUserType[];
   createdAt?: string;
   updatedAt?: string;

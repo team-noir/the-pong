@@ -176,13 +176,29 @@ export const putMyFollowing = async (userId: number) => {
   return res;
 };
 
+/** Channel */
+
+interface getChannelsParams {
+  enter?: string;
+  kind?: string[];
+}
+
+export const getChannels = async ({ enter, kind }: getChannelsParams) => {
+  const res = await axiosWithInterceptors.get(`/channels/`, {
+    params: { enter, kind },
+  });
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 export interface ChannelFormType {
   title: string;
   isPrivate?: boolean;
   password?: string;
 }
 
-/** Channel */
 export const postNewChannel = async (
   channelForm: ChannelFormType
 ): Promise<ChannelType> => {
@@ -191,6 +207,21 @@ export const postNewChannel = async (
     throw new Error(res.statusText);
   }
   return res.data;
+};
+
+export interface ChannelJoinType {
+  id: number;
+  password?: string;
+}
+
+export const postJoinChannel = async (channelForm: ChannelJoinType) => {
+  const res = await axiosWithInterceptors.post(`/channels/${channelForm.id}`, {
+    password: channelForm.password,
+  });
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
 };
 
 export const getDmChannel = async (userId: number) => {

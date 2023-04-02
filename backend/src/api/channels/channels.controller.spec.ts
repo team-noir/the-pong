@@ -24,7 +24,7 @@ const user: ChannelUser = {
 const publicChannelData: CreateChannelDto = {
 	title: 'public',
 	isPrivate: false,
-	password: undefined,
+	password: null,
 };
 
 describe('Chat connection', () => {
@@ -50,7 +50,7 @@ describe('Chat connection', () => {
 
 		socket = io(getSocketDsn(), {
 			extraHeaders: {
-				"cookie": "Authorization=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlja25hbWUiOiJjcGFrIiwiaWF0IjoxNjgwMjQzMTQ0LCJleHAiOjE2ODAyNDY3NDR9.L3liN0o6rRVoVvDVtjX1P8ELCQ3eh5P94FnaoJjVg98"
+				"cookie": `Authorization=${process.env.TEST_JWT}`
 			}
 		});
     });
@@ -80,7 +80,7 @@ describe('Chat connection', () => {
 		socket.off('message', socket.listeners('message')[0]);
         socket.on('message', (data) => {
 			expect(data.channelId).toBe(channel.id);
-			expect(data.sender.id).toBe(user.id);
+			expect(data.senderId).toBe(user.id);
 			expect(data.text).toBe("hello");
             done();
         });

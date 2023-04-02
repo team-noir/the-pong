@@ -13,6 +13,7 @@ export default function PasswordInput({ id, value, onChange, onBlur }: Props) {
       value={value}
       onChange={onChange}
       onBlur={onBlur}
+      className="text-text-dark"
     />
   );
 }
