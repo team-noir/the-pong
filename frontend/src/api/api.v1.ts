@@ -228,6 +228,14 @@ export const postJoinChannel = async (channelForm: ChannelFormType) => {
   return res;
 };
 
+export const getDmChannel = async (userId: number) => {
+  const res = await axiosWithInterceptors.get(`/dms/${userId}`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 export const getChannelMessages = async (channelId: number) => {
   const res = await axiosWithInterceptors.get(`/channels/${channelId}/message`);
   if (res.status !== 200) {
@@ -278,9 +286,47 @@ export const putChannelUsers = async ({
   return res;
 };
 
+export const patchChannelUserRole = async ({
+  channelId,
+  userId,
+  role,
+}: {
+  channelId: number;
+  userId: number;
+  role: 'admin' | 'normal';
+}) => {
+  const res = await axiosWithInterceptors.patch(
+    `/channels/${channelId}/users/${userId}/role`,
+    { role }
+  );
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
 // Leave Channel
 export const deleteChannel = async (channelId: number) => {
   const res = await axiosWithInterceptors.delete(`/channels/${channelId}`);
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const patchChannelUserStatus = async ({
+  channelId,
+  userId,
+  status,
+}: {
+  channelId: number;
+  userId: number;
+  status: 'kick' | 'ban' | 'mute';
+}) => {
+  const res = await axiosWithInterceptors.patch(
+    `/channels/${channelId}/users/${userId}/status`,
+    { status }
+  );
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }

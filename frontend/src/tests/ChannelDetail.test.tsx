@@ -17,6 +17,8 @@ describe('Component - ChannelDetail 렌더링', () => {
       <BrowserRouter>
         <ChannelDetail
           channel={channel}
+          changeRole={() => console.log('change role')}
+          changeStatus={() => console.log('change status')}
           myUserId={1}
           onClickSetting={() => console.log('click setting')}
           onClickInvite={() => console.log('click invite')}

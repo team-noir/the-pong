@@ -3,6 +3,8 @@ import { ChannelUserType } from 'types/channelUserType';
 import ChannelUserItem from './ChannelUserItem';
 
 interface Props {
+  changeRole: (arg: any) => void;
+  changeStatus: (arg: any) => void;
   styles: { readonly [key: string]: string };
   users: ChannelUserType[] | null;
   imageSize: number;
@@ -12,6 +14,8 @@ interface Props {
 }
 
 export default function ChannelUserList({
+  changeRole,
+  changeStatus,
   styles,
   users,
   imageSize,
@@ -28,6 +32,8 @@ export default function ChannelUserList({
       )}
       {myUser && (
         <ChannelUserItem
+          changeRole={changeRole}
+          changeStatus={changeStatus}
           key={myUser?.id}
           styles={styles}
           user={myUser}
@@ -39,6 +45,8 @@ export default function ChannelUserList({
         users.map((user) => {
           return (
             <ChannelUserItem
+              changeRole={changeRole}
+              changeStatus={changeStatus}
               key={user.id}
               styles={styles}
               user={user}
