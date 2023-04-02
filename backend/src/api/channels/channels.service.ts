@@ -136,12 +136,9 @@ export class ChannelsService {
     this.messageMap.set(newMessage.id, newMessage);
 
     // socket message
-    this.server.to(String(channelId)).emit('message', {
+    this.server.to(String(channelId)).emit('notice', {
       id: newMessage.id,
       channelId: newMessage.channelId,
-      senderId: undefined,
-      senderNickname: undefined,
-      isLog: newMessage.isLog,
       text: newMessage.text,
       createdAt: newMessage.createdAt,
     });
