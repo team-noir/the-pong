@@ -25,6 +25,7 @@ describe('Component - Profile 렌더링', () => {
         onClickUnfollow={(userId: number) => mockHandler(userId, 'unfollowed')}
         onClickBlock={(userId: number) => mockHandler(userId, 'blocked')}
         onClickUnblock={(userId: number) => mockHandler(userId, 'unblocked')}
+        onClickDm={(userId: number) => mockHandler(userId, 'dm')}
       />
     );
     screen.findByText(profileUser.nickname);
