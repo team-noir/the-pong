@@ -3,19 +3,18 @@ import React from 'react';
 interface Props {
   children: React.ReactNode;
   type: 'button' | 'submit' | 'reset';
+  value?: string;
   logoImageUrl?: string;
   primary?: boolean;
   secondary?: boolean;
   fullLength?: boolean;
-
-  onClick?: (e: React.MouseEvent<HTMLElement>) => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
-
-const test = `${true && 'tes'} aaa`;
 
 export default function Button({
   children,
   type,
+  value,
   logoImageUrl,
   primary = false,
   secondary = false,
@@ -35,6 +34,7 @@ export default function Button({
       ${fullLength ? 'w-full' : ''}
       font-bold py-2 px-4 rounded inline-flex items-center justify-center`}
       type={type}
+      value={value}
       onClick={onClick}
     >
       {logoImageUrl && (

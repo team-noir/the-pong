@@ -4,6 +4,8 @@ import { ChannelUserType, RoleType } from 'types/channelUserType';
 import Button from 'components/atoms/Button';
 
 interface Props {
+  changeRole: (arg: any) => void;
+  changeStatus: (arg: any) => void;
   styles: { readonly [key: string]: string };
   user: ChannelUserType;
   imageSize: number;
@@ -11,12 +13,30 @@ interface Props {
 }
 
 export default function ChannelUserItem({
+  changeRole,
+  changeStatus,
   styles,
   user,
   imageSize,
   myUser,
 }: Props) {
   const isSelf = myUser?.id === user.id;
+  const amIOwner = myUser?.role === RoleType.owner;
+
+  const handleClickRole = () => {
+    changeRole({
+      userId: user.id,
+      role: user.role === RoleType.admin ? 'normal' : 'admin',
+    });
+  };
+
+  const handleClickStatus = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const status = e.currentTarget.value;
+    changeStatus({
+      userId: user.id,
+      status,
+    });
+  };
 
   return (
     <li className={styles.li} data-user-id={user.id}>
@@ -35,28 +55,44 @@ export default function ChannelUserItem({
         </span>
       </Link>
       {!isSelf && (
-        <>
-          {myUser?.role === RoleType.normal ? (
-            <Button type="button">게임 초대</Button>
-          ) : (
-            <div>
-              <Button type="button">게임 초대</Button>
-              {myUser?.role === RoleType.owner &&
-                (user.role === RoleType.admin ? (
-                  <Button type="button">관리자 해제</Button>
-                ) : (
-                  <Button type="button">관리자 임명</Button>
-                ))}
+        <div>
+          <Button type="button">게임 초대</Button>
+
+          {amIOwner && (
+            <>
+              {user.role === RoleType.admin ? (
+                <Button type="button" onClick={handleClickRole}>
+                  관리자 해제
+                </Button>
+              ) : (
+                <Button type="button" onClick={handleClickRole}>
+                  관리자 임명
+                </Button>
+              )}
               {user.role !== RoleType.owner && (
                 <>
-                  <Button type="button">조용히</Button>
-                  <Button type="button">내보내기</Button>
-                  <Button type="button">차단하기</Button>
+                  <Button
+                    type="button"
+                    value="mute"
+                    onClick={handleClickStatus}
+                  >
+                    조용히
+                  </Button>
+                  <Button
+                    type="button"
+                    value="kick"
+                    onClick={handleClickStatus}
+                  >
+                    내보내기
+                  </Button>
+                  <Button type="button" value="ban" onClick={handleClickStatus}>
+                    차단하기
+                  </Button>
                 </>
               )}
-            </div>
+            </>
           )}
-        </>
+        </div>
       )}
     </li>
   );

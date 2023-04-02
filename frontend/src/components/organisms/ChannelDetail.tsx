@@ -7,6 +7,8 @@ import { ChannelUserType, RoleType } from 'types/channelUserType';
 
 interface Props {
   channel: ChannelType;
+  changeRole: (arg: any) => void;
+  changeStatus: (arg: any) => void;
   myUserId: number;
   onClickSetting: () => void;
   onClickInvite: () => void;
@@ -36,6 +38,8 @@ const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
 
 export default function ChannelDetail({
   channel,
+  changeRole,
+  changeStatus,
   myUserId,
   onClickSetting,
   onClickInvite,
@@ -64,6 +68,8 @@ export default function ChannelDetail({
       <h2>참가자</h2>
       {myUser && channelUsers && (
         <ChannelUserList
+          changeRole={changeRole}
+          changeStatus={changeStatus}
           styles={styles}
           myUser={myUser}
           users={channelUsers}
