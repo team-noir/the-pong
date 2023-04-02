@@ -24,7 +24,7 @@ const user: ChannelUser = {
 const publicChannelData: CreateChannelDto = {
 	title: 'public',
 	isPrivate: false,
-	password: undefined,
+	password: null,
 };
 
 describe('Chat connection', () => {
