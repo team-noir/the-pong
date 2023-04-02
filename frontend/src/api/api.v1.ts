@@ -223,3 +223,11 @@ export const postJoinChannel = async (channelForm: ChannelJoinType) => {
   }
   return res;
 };
+
+export const getDmChannel = async (userId: number) => {
+  const res = await axiosWithInterceptors.get(`/dms/${userId}`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};

@@ -8,14 +8,16 @@ import {
   deleteMyFollowing,
   putMyBlocks,
   deleteMyBlocks,
+  getDmChannel,
 } from 'api/api.v1';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { UserType } from 'types/userType';
 
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };
+  const navigate = useNavigate();
 
   const getUserQuery = useQuery<ProfileUserType, AxiosError>({
     queryKey: ['profile', userId],
@@ -31,6 +33,7 @@ export default function ProfilePage() {
   const deleteMyFollowingMutation = useMutation(deleteMyFollowing);
   const putMyBlocksMutation = useMutation(putMyBlocks);
   const deleteMyBlocksMutation = useMutation(deleteMyBlocks);
+  const getDmChannelMutation = useMutation(getDmChannel);
 
   const handleClickFollow = (userId: number) => {
     const answer = confirm('팔로우하시겠습니까?');
@@ -56,6 +59,13 @@ export default function ProfilePage() {
     deleteMyBlocksMutation.mutate(userId);
   };
 
+  const handleClickDm = (userId: number) => {
+    getDmChannelMutation.mutate(userId, {
+      onError: () => alert('다시 시도해 주세요.'),
+      onSuccess: (data) => navigate(`/channel/${data.id}`),
+    });
+  };
+
   return (
     <>
       {(getUserQuery.isLoading || whoamiQuery.isLoading) && (
@@ -73,6 +83,7 @@ export default function ProfilePage() {
             onClickUnfollow={handleClickUnfollow}
             onClickBlock={handleClickBlock}
             onClickUnblock={handleClickUnblock}
+            onClickDm={handleClickDm}
           />
           {/* <Achievements id={profileQuery.data.id} /> */}
         </>
