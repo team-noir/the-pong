@@ -1,77 +1,20 @@
-import styles from 'assets/styles/Channel.module.css';
+import styles from 'assets/styles/ChannelLobby.module.css';
 import ChannelList from 'components/molecule/ChannelList';
-import { useEffect, useState } from 'react';
 import { ChannelType } from 'types/channelType';
-import { RoleType } from 'types/channelUserType';
 
-const dummyChannels: ChannelType[] = [
-  {
-    id: 1,
-    title: 'public test',
-    isProtected: false,
-    isPrivate: false,
-    isDm: false,
-    users: [
-      {
-        id: 1,
-        nickname: 'heehkim',
-        role: RoleType.owner,
-        isMuted: false,
-      },
-      {
-        id: 2,
-        nickname: 'cpak',
-        role: RoleType.normal,
-        isMuted: false,
-      },
-      {
-        id: 3,
-        nickname: 'sarchoi',
-        role: RoleType.admin,
-        isMuted: false,
-      },
-      {
-        id: 4,
-        nickname: 'hello',
-        role: RoleType.admin,
-        isMuted: false,
-      },
-    ],
-  },
-  {
-    id: 2,
-    title: 'protected test',
-    isProtected: true,
-    isPrivate: false,
-    isDm: false,
-    users: [
-      {
-        id: 3,
-        nickname: 'sarchoi',
-        role: RoleType.owner,
-        isMuted: false,
-      },
-      {
-        id: 4,
-        nickname: 'hello',
-        role: RoleType.normal,
-        isMuted: false,
-      },
-    ],
-  },
-];
+interface Props {
+  channels: ChannelType[] | null;
+  onClick: (channel: ChannelType) => void;
+}
 
-export default function ChannelBrowse() {
-  const [channels, setChannels] = useState<ChannelType[] | null>(null);
-
-  useEffect(() => {
-    // TODO: 전체 채널 목록 API에서 가져오기
-    setChannels(dummyChannels);
-  }, []);
-
+export default function ChannelBrowse({ channels, onClick }: Props) {
   return (
     <>
-      <ChannelList styles={styles} channels={channels} />
+      {channels?.length ? (
+        <ChannelList styles={styles} channels={channels} onClick={onClick} />
+      ) : (
+        <div>생성된 채널이 없습니다.</div>
+      )}
     </>
   );
 }

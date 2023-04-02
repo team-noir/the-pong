@@ -1,10 +1,33 @@
+import { useQuery } from '@tanstack/react-query';
+import { getChannels } from 'api/api.v1';
+import { AxiosError } from 'axios';
 import ChannelLobby from 'components/organisms/ChannelLobby';
+import { useNavigate } from 'react-router-dom';
+import { ChannelType } from 'types/channelType';
 
 export default function ChannelLobbyPage() {
+  const navigate = useNavigate();
+
+  const getChannelsQuery = useQuery<ChannelType[], AxiosError>({
+    queryKey: ['getChannels'],
+    queryFn: () =>
+      getChannels({ enter: '', kind: ['public', 'private', 'dm'] }),
+  });
+
+  const handleClickChannel = (channel: ChannelType) => {
+    navigate(`/channel/${channel.id}`);
+  };
+
   return (
     <>
-      <h1>ChannelLobbyPage</h1>
-      <ChannelLobby />
+      {getChannelsQuery.isLoading && <div>Loading...</div>}
+      {getChannelsQuery.isError && <div>{getChannelsQuery.error.message}</div>}
+      {getChannelsQuery.isSuccess && (
+        <ChannelLobby
+          channels={getChannelsQuery.data}
+          onClick={handleClickChannel}
+        />
+      )}
     </>
   );
 }

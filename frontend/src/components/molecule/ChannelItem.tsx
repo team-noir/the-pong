@@ -1,15 +1,16 @@
-import { Link } from 'react-router-dom';
 import { ChannelType } from 'types/channelType';
 
 interface Props {
   styles: { readonly [key: string]: string };
   channel: ChannelType;
+  onClick?: (channel: ChannelType) => void;
 }
 
-export default function Channel({ styles, channel }: Props) {
+export default function Channel({ styles, channel, onClick }: Props) {
   return (
-    <Link to={`/channel/${channel.id}`}>
-      <li className={styles.li}>{channel.title}</li>
-    </Link>
+    <li className={styles.li} onClick={() => onClick && onClick(channel)}>
+      <span>{channel.title}</span>
+      {!channel.isDm && <span>{channel.userCount}명</span>}
+    </li>
   );
 }
