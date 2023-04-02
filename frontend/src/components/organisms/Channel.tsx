@@ -3,26 +3,17 @@ import { useMutation } from '@tanstack/react-query';
 import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
 import MessageList from 'components/molecule/MessageList';
-import { ChannelType } from 'types/channelType';
 import { AxiosError } from 'axios';
 import { SocketContext } from 'contexts/socket';
 import { getChannelMessages, postChannelMessages } from 'api/api.v1';
-
+import { ChannelType } from 'types/channelType';
+import { MessageType } from 'types/messageType';
 interface Props {
   channel: ChannelType | null;
 }
 
 interface FormData {
   message: string;
-}
-
-export interface MessageType {
-  id: number;
-  senderId?: number;
-  senderNickname?: string;
-  isLog: boolean;
-  text: string;
-  createdAt: string;
 }
 
 export default function Channel({ channel }: Props) {

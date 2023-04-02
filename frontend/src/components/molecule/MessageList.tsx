@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
-import { MessageType } from 'components/organisms/Channel';
 import MessageItem from 'components/molecule/MessageItem';
 import { AxiosError } from 'axios';
 import { getWhoami } from 'api/api.v1';
 import { UserType } from 'types/userType';
+import { MessageType } from 'types/messageType';
 
 interface Props {
   messages: MessageType[] | null;

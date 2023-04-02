@@ -1,5 +1,5 @@
 import ProfileImage from 'components/atoms/ProfileImage';
-import { MessageType } from 'components/organisms/Channel';
+import { MessageType } from 'types/messageType';
 
 interface Props {
   message: MessageType;
