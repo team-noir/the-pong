@@ -1,5 +1,5 @@
 import Button from 'components/atoms/Button';
-import TextInputWithDataList from 'components/molecule/TextInputWithDataList';
+import SearchCombobox from 'components/molecule/SearchCombobox';
 import { useEffect, useState } from 'react';
 import { UserType } from 'types/userType';
 import { useMutation } from '@tanstack/react-query';
@@ -57,11 +57,8 @@ export default function ChannelInvite({ onClickClose }: Props) {
         </Button>
         <h2>채널 초대하기</h2>
       </div>
-      <TextInputWithDataList
-        id="user-search"
-        value={nickname}
+      <SearchCombobox
         placeholder="닉네임을 입력해주세요."
-        listId="user-list"
         dataList={getUsersMutation.isSuccess ? getUsersMutation.data : []}
         setValue={(value) => setNickname(value)}
         onSelect={handleSelect}
