@@ -127,7 +127,7 @@ export class ChannelsService {
 
     const newMessage: Message = {
       id: this.messageMap.size,
-      senderId: 0,
+      senderId: null,
       channelId: channel.id,
       isLog: true,
       text: message,
@@ -136,9 +136,11 @@ export class ChannelsService {
     this.messageMap.set(newMessage.id, newMessage);
 
     // socket message
-    this.server.to(String(channelId)).emit('message', {
-      channelId: channelId,
-      text: message,
+    this.server.to(String(channelId)).emit('notice', {
+      id: newMessage.id,
+      channelId: newMessage.channelId,
+      text: newMessage.text,
+      createdAt: newMessage.createdAt,
     });
     return newMessage;
   }
@@ -185,11 +187,11 @@ export class ChannelsService {
 
     // socket message
     this.server.to(String(channelId)).emit('message', {
-      channelId: channelId,
-      sender: {
-        id: user.id,
-        nickname: user.name,
-      },
+      id: newMessage.id,
+      channelId: newMessage.channelId,
+      senderId: user.id,
+      senderNickname: user.name,
+      isLog: newMessage.isLog,
       text: newMessage.text,
       createdAt: newMessage.createdAt,
     });
@@ -221,22 +223,20 @@ export class ChannelsService {
     const data = [];
     [...this.messageMap.values()].forEach((message) => {
       if (message.channelId == channelId) {
-        
-        let senderNickname;
-        if (message.senderId == 0) {
-          senderNickname = 'notice';
-        } else {
-          senderNickname = this.getUser(message.senderId).name;
-        }
-
-        data.push({
+        const tarMessage = {
           id: message.id,
           senderId: message.senderId,
-          senderNickname: senderNickname,
+          senderNickname: null,
           isLog: message.isLog,
           text: message.text,
           createdAt: message.createdAt,
-        });
+        }
+        
+        if (message.senderId) {
+          tarMessage.senderNickname = this.getUser(message.senderId).name;
+        }
+
+        data.push(tarMessage);
       }
     });
 
@@ -247,13 +247,13 @@ export class ChannelsService {
     const newChannelId: number = this.channelMap.size;
     const newChannel: Channel = {
       id: newChannelId,
-      title: data.title ? data.title : undefined,
+      title: data.title ? data.title : null,
       isDm: data.isDm ? true : false,
       isPrivate: data.isPrivate ? true : false,
       createdAt: new Date(),
-      password: data.password ? data.password : undefined,
+      password: data.password ? data.password : null,
 
-      owner: undefined,
+      owner: null,
       users: new Set<number>(),
       admin: new Set<number>(),
       muted: new Set<number>(),
@@ -411,7 +411,7 @@ export class ChannelsService {
         isProtected: !channel.isPrivate && channel.password ? true : false,
         isPrivate: channel.isPrivate,
         isDm: channel.isDm,
-        dmUserId: undefined,
+        dmUserId: null,
         userCount: channel.users.size,
         isJoined: channel.users.has(userId),
         createdAt: channel.createdAt,
@@ -505,7 +505,7 @@ export class ChannelsService {
     }
 
     channel.title = data.title;
-    channel.password = data.password ? data.password : undefined;
+    channel.password = data.password ? data.password : null;
     return;
   }
 
