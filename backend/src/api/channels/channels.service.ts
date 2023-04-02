@@ -127,7 +127,7 @@ export class ChannelsService {
 
     const newMessage: Message = {
       id: this.messageMap.size,
-      senderId: 0,
+      senderId: undefined,
       channelId: channel.id,
       isLog: true,
       text: message,
@@ -137,8 +137,13 @@ export class ChannelsService {
 
     // socket message
     this.server.to(String(channelId)).emit('message', {
-      channelId: channelId,
-      text: message,
+      id: newMessage.id,
+      channelId: newMessage.channelId,
+      senderId: undefined,
+      senderNickname: undefined,
+      isLog: newMessage.isLog,
+      text: newMessage.text,
+      createdAt: newMessage.createdAt,
     });
     return newMessage;
   }
@@ -185,11 +190,11 @@ export class ChannelsService {
 
     // socket message
     this.server.to(String(channelId)).emit('message', {
-      channelId: channelId,
-      sender: {
-        id: user.id,
-        nickname: user.name,
-      },
+      id: newMessage.id,
+      channelId: newMessage.channelId,
+      senderId: user.id,
+      senderNickname: user.name,
+      isLog: newMessage.isLog,
       text: newMessage.text,
       createdAt: newMessage.createdAt,
     });
@@ -221,22 +226,20 @@ export class ChannelsService {
     const data = [];
     [...this.messageMap.values()].forEach((message) => {
       if (message.channelId == channelId) {
-        
-        let senderNickname;
-        if (message.senderId == 0) {
-          senderNickname = 'notice';
-        } else {
-          senderNickname = this.getUser(message.senderId).name;
-        }
-
-        data.push({
+        const tarMessage = {
           id: message.id,
           senderId: message.senderId,
-          senderNickname: senderNickname,
+          senderNickname: undefined,
           isLog: message.isLog,
           text: message.text,
           createdAt: message.createdAt,
-        });
+        }
+        
+        if (message.senderId) {
+          tarMessage.senderNickname = this.getUser(message.senderId).name;
+        }
+
+        data.push(tarMessage);
       }
     });
 
