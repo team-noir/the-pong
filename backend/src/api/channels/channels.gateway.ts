@@ -150,12 +150,4 @@ export class ChannelsGatway
     this.channelsService.invite(socket.data.user.id, channelId, userId);
   }
 
-  @SubscribeMessage('kick')
-  kick(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody('channelId') channelId: number,
-    @MessageBody('userId') userId: number
-  ) {
-    this.channelsService.kick(socket, channelId, userId);
-  }
 }

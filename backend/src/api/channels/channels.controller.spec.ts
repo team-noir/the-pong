@@ -4,7 +4,7 @@ import { Test } from '@nestjs/testing';
 import { ChannelsModule } from './channels.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { expect, jest, describe, beforeEach, it, afterAll } from '@jest/globals';
-import { ChannelsService, ChannelUser } from './channels.service';
+import { ChannelsService, Channel, ChannelUser } from './channels.service';
 import { CreateChannelDto } from './dtos/channel.dto';
 
 const fakeSocket = {
@@ -30,7 +30,9 @@ const publicChannelData: CreateChannelDto = {
 describe('Chat connection', () => {
     let app: INestApplication;
 	let service: ChannelsService;
-	let socket, channel;
+	let socketUser: ChannelUser;
+	let channel: Channel;
+	let socket;
 
     const getSocketDsn = () => {
        const { port } = app.getHttpServer().listen().address();
@@ -53,31 +55,47 @@ describe('Chat connection', () => {
 				"cookie": `Authorization=${process.env.TEST_JWT}`
 			}
 		});
+
+		service.setUser(user.id, user);
+		const result = service.create(user.id, publicChannelData);
+		channel = service.getChannel(result.id);
     });
+
+	beforeEach(() => {
+		const noticeListeners = socket.listeners('notice');
+		noticeListeners.forEach((listener) => socket.off('notice', listener));
+		
+		const messageListeners = socket.listeners('message');
+		messageListeners.forEach((listener) => socket.off('message', listener));
+	})
 
 	afterAll(async () => {
 		app.getHttpServer().close();
 		socket.disconnect();
 	})
 
-    it('I can connect to the socket server', (done) => {
+    it('소켓 서버에 연결합니다.', (done) => {
         socket.on('connect', () => {
             done();
         });
     });
 
-	it('I can connect to the socket server', (done) => {
-        socket.on('message', (data) => {
+	it('public 채널에 유저가 참가합니다.', (done) => {
+		socketUser = service.getUser(1);
+        socket.on('notice', (data) => {
+			expect(data.channelId).toBe(channel.id);
+			expect(data.senderId).toBe(undefined);
             done();
         });
 
-		service.setUser(user.id, user);
-		channel = service.create(user.id, publicChannelData);
-		service.join(1, channel.id, undefined);
+		try {
+			service.join(socketUser.id, channel.id, undefined);
+		} catch (error) {
+			console.log(error);
+		}
     });
 	
-	it('I can connect to the socket server', (done) => {
-		socket.off('message', socket.listeners('message')[0]);
+	it('참여 중인 채널에서 메세지를 받습니다.', (done) => {
         socket.on('message', (data) => {
 			expect(data.channelId).toBe(channel.id);
 			expect(data.senderId).toBe(user.id);
@@ -88,9 +106,48 @@ describe('Chat connection', () => {
 		service.messageToChannel(user.id, channel.id, "hello");
     });
 
-	it('get message', () => {
-		const messages = service.getChannelMessages(1, 0);
+	it('참여 중인 채널에서 메세지를 가져옵니다.', () => {
+		const messages = service.getChannelMessages(socketUser.id, channel.id);
 		expect(messages.length).toBe(2);
+	})
+
+	it('참여 중인 채널의 owner가 유저를 mute 시킵니다.', (done) => {
+		const time = new Date(new Date().getTime() + 1000);
+
+		// socket.on('notice', (data) => {
+		// 	console.log('notice', data);
+		// });
+
+		socket.on('message', (data) => {
+			const msgCreatedAt = new Date(data.createdAt);
+
+			expect(msgCreatedAt.getTime()).toBeGreaterThan(time.getTime());
+			done();
+        });
+
+		service.mute(user, channel, socketUser, 1);
+		try {
+			service.messageToChannel(socketUser.id, channel.id, "hello");
+		} catch (error) {
+			expect(error.code).toBe(403);
+		}
+
+		setTimeout(() => {
+			try {
+				service.messageToChannel(socketUser.id, channel.id, "hello");
+			} catch (error) {
+				expect(error.code).toBe(403);
+			}
+		}, 500)
+		
+		setTimeout(() => {
+			try {
+				service.messageToChannel(socketUser.id, channel.id, "hello");
+				expect(true).toBe(true);
+			} catch (error) {
+				console.log(error);
+			}
+		}, 1500)
 	})
 
 

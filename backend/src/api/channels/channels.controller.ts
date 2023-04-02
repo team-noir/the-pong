@@ -23,6 +23,7 @@ import {
   ChannelPasswordDto,
   ChannelRoleDto,
   ChannelMessageDto,
+  ChannelUserStatusDto,
 } from './dtos/channel.dto';
 
 @Controller('channels')
@@ -218,6 +219,25 @@ export class ChannelsController {
       );
       res.status(HttpStatus.OK);
       return messages;
+    } catch (error) {
+      throw new HttpException(error.message, error.code);
+    }
+  }
+
+  @Patch(':channelId/users/:userId/status')
+  @ApiOperation({ summary: 'Set user status in channel' })
+  @UseGuards(AuthenticatedGuard)
+  setUserStatus(
+    @Req() req,
+    @Param('channelId') channelId: number,
+    @Param('userId') userId: number,
+    @Body() body: ChannelUserStatusDto,
+    @Res({ passthrough: true }) res
+  ) {
+    try {
+      this.channelsService.setUserStatus(req.user.id, channelId, userId, body.status);
+      res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, error.code);
     }
