@@ -127,7 +127,7 @@ export class ChannelsService {
 
     const newMessage: Message = {
       id: this.messageMap.size,
-      senderId: undefined,
+      senderId: null,
       channelId: channel.id,
       isLog: true,
       text: message,
@@ -226,7 +226,7 @@ export class ChannelsService {
         const tarMessage = {
           id: message.id,
           senderId: message.senderId,
-          senderNickname: undefined,
+          senderNickname: null,
           isLog: message.isLog,
           text: message.text,
           createdAt: message.createdAt,
@@ -247,13 +247,13 @@ export class ChannelsService {
     const newChannelId: number = this.channelMap.size;
     const newChannel: Channel = {
       id: newChannelId,
-      title: data.title ? data.title : undefined,
+      title: data.title ? data.title : null,
       isDm: data.isDm ? true : false,
       isPrivate: data.isPrivate ? true : false,
       createdAt: new Date(),
-      password: data.password ? data.password : undefined,
+      password: data.password ? data.password : null,
 
-      owner: undefined,
+      owner: null,
       users: new Set<number>(),
       admin: new Set<number>(),
       muted: new Set<number>(),
@@ -411,7 +411,7 @@ export class ChannelsService {
         isProtected: !channel.isPrivate && channel.password ? true : false,
         isPrivate: channel.isPrivate,
         isDm: channel.isDm,
-        dmUserId: undefined,
+        dmUserId: null,
         userCount: channel.users.size,
         isJoined: channel.users.has(userId),
         createdAt: channel.createdAt,
@@ -505,7 +505,7 @@ export class ChannelsService {
     }
 
     channel.title = data.title;
-    channel.password = data.password ? data.password : undefined;
+    channel.password = data.password ? data.password : null;
     return;
   }
 

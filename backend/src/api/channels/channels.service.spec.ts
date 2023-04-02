@@ -40,7 +40,7 @@ const user3: ChannelUser = {
 const publicChannelData: CreateChannelDto = {
   title: 'public',
   isPrivate: false,
-  password: undefined,
+  password: null,
 };
 
 const protectedChannelData: CreateChannelDto = {
@@ -52,7 +52,7 @@ const protectedChannelData: CreateChannelDto = {
 const privateChannelData: CreateChannelDto = {
   title: 'private',
   isPrivate: true,
-  password: undefined,
+  password: null,
 };
 
 describe('Channel list', () => {
