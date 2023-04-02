@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   onClose: () => void;
-  onSubmit: () => void;
+  onSubmit: (password: string) => void;
   children?: React.ReactNode;
 }
 
@@ -32,7 +32,7 @@ export default function PasswordModal({ onClose, onSubmit, children }: Props) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit();
+    onSubmit(password);
     setPassword('');
   };
 

@@ -9,7 +9,8 @@ interface Props {
 export default function Channel({ styles, channel, onClick }: Props) {
   return (
     <li className={styles.li} onClick={() => onClick && onClick(channel)}>
-      {channel.title}aa
+      <span>{channel.title}</span>
+      {!channel.isDm && <span>{channel.userCount}명</span>}
     </li>
   );
 }

@@ -17,7 +17,11 @@ export default function ChannelLobby({ channels, onClick }: Props) {
         <Link to="/channel/new">새 채널 만들기</Link>
       </div>
       <h1>입장 중인 채널 목록</h1>
-      <ChannelList styles={styles} channels={channels} onClick={onClick} />
+      {channels?.length ? (
+        <ChannelList styles={styles} channels={channels} onClick={onClick} />
+      ) : (
+        <div>입장 중인 채널이 없습니다.</div>
+      )}
     </>
   );
 }
