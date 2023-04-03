@@ -511,8 +511,10 @@ export class ChannelsService {
 
     if (role == 'admin') {
       channel.admin.add(settedUser.id);
+      this.noticeToChannel(channel.id, `${settedUser.name} 님이 관리자 권한을 얻었습니다.`);
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
+      this.noticeToChannel(channel.id, `${settedUser.name} 님의 관리자 권한이 해제되었습니다.`);
     }
   }
 

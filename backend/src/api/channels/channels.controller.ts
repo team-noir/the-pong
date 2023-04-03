@@ -28,6 +28,7 @@ import {
   ChannelIdDto,
   ChannelInfoDto,
   ChannelDetailDto,
+  ChannelMessageTextDto,
 } from './dtos/channel.dto';
 
 @ApiTags('channels')
@@ -90,10 +91,6 @@ export class ChannelsController {
   @ApiOkResponse({
     type: [ChannelDetailDto],
   })
-  @ApiParam({
-    name: 'channelId',
-    required: true,
-  })
   @UseGuards(AuthenticatedGuard)
   getChannelInfo(
     @Req() req,
@@ -111,10 +108,6 @@ export class ChannelsController {
 
   @Patch(':channelId')
   @ApiOperation({ summary: 'Set channel info' })
-  @ApiParam({
-    name: 'channelId',
-    required: true,
-  })
   @UseGuards(AuthenticatedGuard)
   setChannelInfo(
     @Req() req,
@@ -214,7 +207,7 @@ export class ChannelsController {
   sendChannelMessage(
     @Req() req,
     @Param('channelId') channelId: number,
-    @Body() body: ChannelMessageDto,
+    @Body() body: ChannelMessageTextDto,
     @Res({ passthrough: true }) res
   ) {
     try {
@@ -228,6 +221,9 @@ export class ChannelsController {
 
   @Get(':channelId/message')
   @ApiOperation({ summary: 'Get messages in channel' })
+  @ApiOkResponse({
+    type: [ChannelMessageDto],
+  })
   @UseGuards(AuthenticatedGuard)
   getChannelMessages(
     @Req() req,
