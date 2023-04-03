@@ -6,12 +6,19 @@ import { useMutation } from '@tanstack/react-query';
 import { getUsers } from 'api/api.v1';
 import UserList from 'components/molecule/UserList';
 import styles from 'assets/styles/ChannelInvite.module.css';
+import { ChannelUserType } from 'types/channelUserType';
 
 interface Props {
+  channelUsers: ChannelUserType[];
   onClickClose: () => void;
+  inviteUsers: (userIds: number[]) => void;
 }
 
-export default function ChannelInvite({ onClickClose }: Props) {
+export default function ChannelInvite({
+  channelUsers,
+  onClickClose,
+  inviteUsers,
+}: Props) {
   const [nickname, setNickname] = useState('');
   const [users, setUsers] = useState<UserType[]>([]);
 
@@ -45,10 +52,6 @@ export default function ChannelInvite({ onClickClose }: Props) {
     setUsers((prevState) => prevState.filter((user) => user.id !== userId));
   };
 
-  const handleClickInvite = () => {
-    // TODO: 채널 초대하기 API 호출
-  };
-
   return (
     <div>
       <div>
@@ -60,6 +63,7 @@ export default function ChannelInvite({ onClickClose }: Props) {
       <SearchCombobox
         placeholder="닉네임을 입력해주세요."
         dataList={getUsersMutation.isSuccess ? getUsersMutation.data : []}
+        channelUsers={channelUsers}
         setValue={(value) => setNickname(value)}
         onSelect={handleSelect}
       />
@@ -73,7 +77,10 @@ export default function ChannelInvite({ onClickClose }: Props) {
           </Button>,
         ]}
       />
-      <Button type="button" onClick={handleClickInvite}>
+      <Button
+        type="button"
+        onClick={() => inviteUsers(users.map((user) => user.id))}
+      >
         초대하기
       </Button>
     </div>
