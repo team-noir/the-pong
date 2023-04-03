@@ -1,78 +1,22 @@
 import { useEffect, useState, useContext, useRef } from 'react';
-import { useMutation } from '@tanstack/react-query';
 import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
 import MessageList from 'components/molecule/MessageList';
-import { AxiosError } from 'axios';
-import { SocketContext } from 'contexts/socket';
-import { getChannelMessages, postChannelMessages } from 'api/api.v1';
-import { ChannelType } from 'types/channelType';
+
 import { MessageType } from 'types/messageType';
 interface Props {
-  channel: ChannelType | null;
+  messages: MessageType[];
+  postMessage: (message: string) => void;
+  myUserId: number;
 }
 
 interface FormData {
   message: string;
 }
 
-export default function Channel({ channel }: Props) {
-  const socket = useContext(SocketContext);
-  const [messages, setMessages] = useState<MessageType[]>([]);
+export default function Channel({ messages, postMessage, myUserId }: Props) {
   const [formData, setFormData] = useState<FormData>({ message: '' });
   const scrollRef = useRef<HTMLDivElement>(null);
-
-  const getChannelMessagesMutation = useMutation<
-    MessageType[],
-    AxiosError,
-    number
-  >(getChannelMessages);
-
-  const postChannelMessagesMutation = useMutation<
-    any,
-    AxiosError,
-    { channelId: number; message: string }
-  >(postChannelMessages);
-
-  const channelId = channel?.id;
-  useEffect(() => {
-    if (channelId) {
-      getChannelMessagesMutation.mutate(channelId);
-    }
-  }, [channelId]);
-
-  useEffect(() => {
-    if (getChannelMessagesMutation.data) {
-      setMessages(getChannelMessagesMutation.data);
-    }
-  }, [getChannelMessagesMutation.data]);
-
-  useEffect(() => {
-    socket.on('message', (data: any) => {
-      const newMessage: MessageType = {
-        id: data.id,
-        senderId: data.senderId,
-        senderNickname: data.senderNickname,
-        isLog: false,
-        text: data.text,
-        createdAt: data.createdAt,
-      };
-      setMessages((prev) => [...prev, newMessage]);
-    });
-    socket.on('notice', (data: any) => {
-      const newNotice: MessageType = {
-        id: data.id,
-        isLog: true,
-        text: data.text,
-        createdAt: data.createdAt,
-      };
-      setMessages((prev) => [...prev, newNotice]);
-    });
-    return () => {
-      socket.off('message');
-      socket.off('notice');
-    };
-  }, [socket]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -87,12 +31,8 @@ export default function Channel({ channel }: Props) {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (channelId === undefined) return;
-
-    postChannelMessagesMutation.mutate({
-      channelId,
-      message: formData.message,
-    });
+    if (!formData.message) return;
+    postMessage(formData.message);
     setFormData({ message: '' });
   };
 
@@ -103,13 +43,7 @@ export default function Channel({ channel }: Props) {
         className="h-[80vh] overflow-y-auto"
         ref={scrollRef}
       >
-        {getChannelMessagesMutation.isLoading && <div>메시지 로딩중...</div>}
-        {getChannelMessagesMutation.isError && (
-          <div>메시지를 불러오는데 실패했습니다.</div>
-        )}
-        {getChannelMessagesMutation.isSuccess && (
-          <MessageList messages={messages} />
-        )}
+        <MessageList messages={messages} myUserId={myUserId} />
       </div>
       <form onSubmit={handleSubmit}>
         <TextInput

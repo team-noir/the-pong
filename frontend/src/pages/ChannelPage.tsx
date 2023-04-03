@@ -1,8 +1,14 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect, useContext } from 'react';
+import { redirect, useParams } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { getWhoami, getChannel } from 'api/api.v1';
+import {
+  getWhoami,
+  getChannel,
+  getChannelMessages,
+  postChannelMessages,
+} from 'api/api.v1';
+import { SocketContext } from 'contexts/socket';
 import Button from 'components/atoms/Button';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Channel from 'components/organisms/Channel';
@@ -12,9 +18,12 @@ import ChannelInvite from 'components/organisms/ChannelInvite';
 import AppTemplate from 'components/templates/AppTemplate';
 import { UserType } from 'types/userType';
 import { ChannelType } from 'types/channelType';
+import { MessageType } from 'types/messageType';
 
 export default function ChannelPage() {
   const { channelId } = useParams() as { channelId: string };
+  const socket = useContext(SocketContext);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [isShowDetail, setIsShowDetail] = useState(false);
   const [isShowSetting, setIsShowSetting] = useState(false);
   const [isShowInvite, setIsShowInvite] = useState(false);
@@ -25,9 +34,71 @@ export default function ChannelPage() {
   });
 
   const getChannelQuery = useQuery<ChannelType, AxiosError>({
-    queryKey: ['channel', channelId],
+    queryKey: ['getChannel', channelId],
     queryFn: () => getChannel(channelId),
   });
+
+  const getChannelMessagesMutation = useMutation<
+    MessageType[],
+    AxiosError,
+    number
+  >(getChannelMessages);
+
+  const postChannelMessagesMutation = useMutation<
+    any,
+    AxiosError,
+    { channelId: number; message: string }
+  >(postChannelMessages);
+
+  useEffect(() => {
+    if (getChannelQuery.data) {
+      getChannelMessagesMutation.mutate(getChannelQuery.data.id);
+    }
+  }, [getChannelQuery.data]);
+
+  useEffect(() => {
+    if (getChannelMessagesMutation.data) {
+      setMessages([...getChannelMessagesMutation.data]);
+    }
+  }, [getChannelMessagesMutation.data]);
+
+  useEffect(() => {
+    socket.on('message', (data: MessageType) => {
+      console.log('socket message data', data);
+      const newMessage: MessageType = {
+        id: data.id,
+        senderId: data.senderId,
+        senderNickname: data.senderNickname,
+        isLog: false,
+        text: data.text,
+        createdAt: data.createdAt,
+      };
+      setMessages((prev) => [...prev, newMessage]);
+    });
+    socket.on('notice', (data: MessageType) => {
+      console.log('socket notice data', data);
+      const newNotice: MessageType = {
+        id: data.id,
+        isLog: true,
+        text: data.text,
+        createdAt: data.createdAt,
+      };
+      setMessages((prev) => [...prev, newNotice]);
+    });
+    return () => {
+      socket.off('message');
+      socket.off('notice');
+    };
+  }, [socket]);
+
+  const postMessage = (message: string) => {
+    if (channelId === undefined) return;
+
+    postChannelMessagesMutation.mutate({
+      channelId: Number(channelId),
+      message,
+    });
+  };
 
   if (
     whoamiQuery.status === 'loading' ||
@@ -37,14 +108,15 @@ export default function ChannelPage() {
   }
 
   if (whoamiQuery.status === 'error' || getChannelQuery.status === 'error') {
-    return <div>Error</div>;
+    alert('에러가 발생했습니다.');
+    redirect('/channel');
   }
 
   return (
     <AppTemplate
       header={
         <HeaderWithBackButton
-          title={getChannelQuery.data.title}
+          title={getChannelQuery.data?.title || ''}
           button={
             <Button type="button" onClick={() => setIsShowDetail(true)}>
               메뉴
@@ -53,23 +125,34 @@ export default function ChannelPage() {
         />
       }
     >
-      <Channel channel={getChannelQuery.data} />
-      {isShowDetail && (
-        <ChannelDetail
-          channel={getChannelQuery.data}
-          onClickSetting={() => setIsShowSetting(true)}
-          onClickInvite={() => setIsShowInvite(true)}
-        />
-      )}
-      {isShowSetting && (
-        <ChannelSetting
-          channel={getChannelQuery.data}
-          onClickClose={() => setIsShowSetting(false)}
-        />
-      )}
-      {isShowInvite && (
-        <ChannelInvite onClickClose={() => setIsShowInvite(false)} />
-      )}
+      <>
+        {whoamiQuery.data && getChannelQuery.data && (
+          <>
+            <Channel
+              messages={messages}
+              postMessage={postMessage}
+              myUserId={whoamiQuery.data.id}
+            />
+            {isShowDetail && (
+              <ChannelDetail
+                channel={getChannelQuery.data}
+                myUserId={whoamiQuery.data.id}
+                onClickSetting={() => setIsShowSetting(true)}
+                onClickInvite={() => setIsShowInvite(true)}
+              />
+            )}
+            {isShowSetting && (
+              <ChannelSetting
+                channel={getChannelQuery.data}
+                onClickClose={() => setIsShowSetting(false)}
+              />
+            )}
+            {isShowInvite && (
+              <ChannelInvite onClickClose={() => setIsShowInvite(false)} />
+            )}
+          </>
+        )}
+      </>
     </AppTemplate>
   );
 }
