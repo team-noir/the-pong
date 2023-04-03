@@ -8,6 +8,7 @@ import {
   getChannelMessages,
   postChannelMessages,
   putChannelUsers,
+  deleteChannel,
 } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 import Button from 'components/atoms/Button';
@@ -57,6 +58,8 @@ export default function ChannelPage() {
   const patchChannelSettingMutation = useMutation(patchChannelSetting);
 
   const putChannelUsersMutation = useMutation(putChannelUsers);
+
+  const deleteChannelMutation = useMutation(deleteChannel);
 
   useEffect(() => {
     if (getChannelQuery.data) {
@@ -123,6 +126,16 @@ export default function ChannelPage() {
     );
   };
 
+  const leaveChannel = () => {
+    deleteChannelMutation.mutate(Number(channelId), {
+      onError: () => alert('다시 시도해 주세요.'),
+      onSuccess: () => {
+        queryClient.invalidateQueries(['getChannel', channelId]);
+        navigate('/channel');
+      },
+    });
+  };
+
   const changeChannelSetting = (channelForm: ChannelFormType) => {
     patchChannelSettingMutation.mutate(channelForm, {
       onError: () => alert('다시 시도해 주세요.'),
@@ -172,6 +185,7 @@ export default function ChannelPage() {
                 myUserId={whoamiQuery.data.id}
                 onClickSetting={() => setIsShowSetting(true)}
                 onClickInvite={() => setIsShowInvite(true)}
+                onClickLeave={leaveChannel}
               />
             )}
             {isShowSetting && (
