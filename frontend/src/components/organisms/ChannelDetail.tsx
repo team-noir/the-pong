@@ -26,7 +26,7 @@ const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
   if (user1.role !== user2.role) {
     return priority.indexOf(user1.role) - priority.indexOf(user2.role);
   }
-  // 같은 userType이면 nickname 순
+  // 같은 role이면 nickname 순
   if (user1.nickname && user2.nickname) {
     return user1.nickname.localeCompare(user2.nickname);
   }
@@ -43,13 +43,11 @@ export default function ChannelDetail({
   const [channelUsers, setChannelUsers] = useState<ChannelUserType[]>([]);
 
   useEffect(() => {
-    if (channel.users) {
-      setMyUser(findMyUser(myUserId, channel.users));
-
-      setChannelUsers(
-        channel.users.filter((user) => user.id !== myUserId).sort(compare)
-      );
-    }
+    if (!channel.users) return;
+    setMyUser(findMyUser(myUserId, channel.users));
+    setChannelUsers(
+      channel.users.filter((user) => user.id !== myUserId).sort(compare)
+    );
   }, [channel.users, myUserId]);
 
   const isMyUserRoleOwner = myUser?.role === RoleType.owner;
