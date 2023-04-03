@@ -26,7 +26,8 @@ export class ChannelDmDto {
 export class SettingChannelDto {
   @ApiProperty()
   @IsString()
-  public title: string;
+  @IsOptional()
+  public title?: string;
 
   @ApiProperty()
   @IsString()
