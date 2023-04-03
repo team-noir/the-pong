@@ -434,7 +434,7 @@ export class ChannelsService {
       isBlocked: channel.banned.has(userId),
       isJoined: channel.users.has(userId),
       userCount: channel.users.size,
-      users: channel.users,
+      users: [ ...channel.users ],
       createdAt: channel.createdAt,
     };
 
