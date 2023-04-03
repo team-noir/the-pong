@@ -425,6 +425,18 @@ export class ChannelsService {
       };
     }
 
+    const users = [];
+    channel.users.forEach((id) => {
+      const user = this.channelUserMap.get(id);
+      const role = this.getChannelUserRole(channelId, id);
+      users.push({
+        id: user.id,
+        nickname: user.name,
+        role: role,
+        isMuted: channel.muted.has(id),
+      })
+    })
+
     const channelInfo = {
       id: channel.id,
       title: channel.title,
@@ -434,7 +446,7 @@ export class ChannelsService {
       isBlocked: channel.banned.has(userId),
       isJoined: channel.users.has(userId),
       userCount: channel.users.size,
-      users: [ ...channel.users ],
+      users: users,
       createdAt: channel.createdAt,
     };
 

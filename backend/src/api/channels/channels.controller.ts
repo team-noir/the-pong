@@ -92,7 +92,7 @@ export class ChannelsController {
   })
   @ApiParam({
     name: 'channelId',
-    required: false,
+    required: true,
   })
   @UseGuards(AuthenticatedGuard)
   getChannelInfo(
@@ -113,7 +113,7 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Set channel info' })
   @ApiParam({
     name: 'channelId',
-    required: false,
+    required: true,
   })
   @UseGuards(AuthenticatedGuard)
   setChannelInfo(
