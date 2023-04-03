@@ -20,6 +20,7 @@ import AppTemplate from 'components/templates/AppTemplate';
 import { UserType } from 'types/userType';
 import { ChannelType } from 'types/channelType';
 import { MessageType } from 'types/messageType';
+import { ChannelFormType, patchChannelSetting } from 'api/api.v1';
 
 export default function ChannelPage() {
   const navigate = useNavigate();
@@ -53,6 +54,7 @@ export default function ChannelPage() {
     AxiosError,
     { channelId: number; message: string }
   >(postChannelMessages);
+  const patchChannelSettingMutation = useMutation(patchChannelSetting);
 
   const putChannelUsersMutation = useMutation(putChannelUsers);
 
@@ -121,6 +123,16 @@ export default function ChannelPage() {
     );
   };
 
+  const changeChannelSetting = (channelForm: ChannelFormType) => {
+    patchChannelSettingMutation.mutate(channelForm, {
+      onError: () => alert('다시 시도해 주세요.'),
+      onSuccess: () => {
+        setIsShowSetting(false);
+        queryClient.invalidateQueries(['getChannel', channelId]);
+      },
+    });
+  };
+
   if (
     whoamiQuery.status === 'loading' ||
     getChannelQuery.status === 'loading'
@@ -166,6 +178,7 @@ export default function ChannelPage() {
               <ChannelSetting
                 channel={getChannelQuery.data}
                 onClickClose={() => setIsShowSetting(false)}
+                changeChannelSetting={changeChannelSetting}
               />
             )}
             {isShowInvite && getChannelQuery.data.users && (

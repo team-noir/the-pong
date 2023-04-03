@@ -257,6 +257,13 @@ export const postChannelMessages = async ({
       text: message,
     }
   );
+};
+
+export const patchChannelSetting = async (channelForm: ChannelFormType) => {
+  const res = await axiosWithInterceptors.patch(`/channels/${channelForm.id}`, {
+    title: channelForm.title,
+    password: channelForm.password,
+  });
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
