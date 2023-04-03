@@ -104,6 +104,8 @@ export class ChannelsController {
     type: [ChannelDetailDto],
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
+  @ApiBadRequestResponse({ description: 'This channel does not exist.' })
+  @ApiForbiddenResponse({ description: 'You are not authorized to this channel.' })
   @UseGuards(AuthenticatedGuard)
   getChannelInfo(
     @Req() req,
@@ -122,6 +124,11 @@ export class ChannelsController {
   @Patch(':channelId')
   @ApiOperation({ summary: 'Set channel info' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
+  @ApiBadRequestResponse({ description: 'This channel does not exist.' })
+  @ApiBadRequestResponse({ description: 'This user does not exist.' })
+  @ApiBadRequestResponse({ description: 'DM channel cannot change settings.' })
+  @ApiBadRequestResponse({ description: 'Private channel cannot set a password.' })
+  @ApiForbiddenResponse({ description: 'You do not have permission to change settings.' })
   @UseGuards(AuthenticatedGuard)
   setChannelInfo(
     @Req() req,

@@ -427,7 +427,7 @@ export class ChannelsService {
 
     const users = [];
     channel.users.forEach((id) => {
-      const user = this.channelUserMap.get(id);
+      const user = this.getUser(id);
       const role = this.getChannelUserRole(channelId, id);
       users.push({
         id: user.id,
