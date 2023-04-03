@@ -450,6 +450,11 @@ export class ChannelsService {
         code: HttpStatus.BAD_REQUEST,
         message: 'DM channel cannot change settings.',
       };
+    } else if (channel.isPrivate && data.password) {
+      throw {
+        code: HttpStatus.BAD_REQUEST,
+        message: 'Private channel cannot set a password.',
+      };
     } else if (
       !settedBy ||
       this.getChannelUserRole(channel.id, settedBy.id) == 'normal'
@@ -461,7 +466,7 @@ export class ChannelsService {
     }
 
     channel.title = data.title ? data.title : channel.title;
-    channel.password = data.password ? data.password : channel.password;
+    channel.password = data.password ? data.password : null;
     return;
   }
 
