@@ -458,11 +458,6 @@ export class ChannelsService {
         code: HttpStatus.FORBIDDEN,
         message: 'You do not have permission to change settings.',
       };
-    } else if (!data.title) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'The title value is invalid.',
-      };
     }
 
     channel.title = data.title;
