@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { redirect, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import {
@@ -21,6 +21,7 @@ import { ChannelType } from 'types/channelType';
 import { MessageType } from 'types/messageType';
 
 export default function ChannelPage() {
+  const navigate = useNavigate();
   const { channelId } = useParams() as { channelId: string };
   const socket = useContext(SocketContext);
   const [messages, setMessages] = useState<MessageType[]>([]);
@@ -109,7 +110,7 @@ export default function ChannelPage() {
 
   if (whoamiQuery.status === 'error' || getChannelQuery.status === 'error') {
     alert('에러가 발생했습니다.');
-    redirect('/channel');
+    navigate('/channel');
   }
 
   return (
