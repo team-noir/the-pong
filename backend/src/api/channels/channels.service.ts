@@ -602,7 +602,8 @@ export class ChannelsService {
       }
   
       invitedUser.invited.add(channel.id);
-  
+      this.joinChannel(invitedUser, channel);
+      
       // socket massage
       invitedUser.socket.emit('invited', { channelId: channel.id });
       this.noticeToChannel(channel.id, `${invitedUser.name} 님을 초대하였습니다.`);
