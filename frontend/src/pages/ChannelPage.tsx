@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import {
   getWhoami,
@@ -19,6 +19,7 @@ import AppTemplate from 'components/templates/AppTemplate';
 import { UserType } from 'types/userType';
 import { ChannelType } from 'types/channelType';
 import { MessageType } from 'types/messageType';
+import { ChannelFormType, patchChannelSetting } from 'api/api.v1';
 
 export default function ChannelPage() {
   const navigate = useNavigate();
@@ -28,6 +29,8 @@ export default function ChannelPage() {
   const [isShowDetail, setIsShowDetail] = useState(false);
   const [isShowSetting, setIsShowSetting] = useState(false);
   const [isShowInvite, setIsShowInvite] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
@@ -50,6 +53,7 @@ export default function ChannelPage() {
     AxiosError,
     { channelId: number; message: string }
   >(postChannelMessages);
+  const patchChannelSettingMutation = useMutation(patchChannelSetting);
 
   useEffect(() => {
     if (getChannelQuery.data) {
@@ -101,6 +105,16 @@ export default function ChannelPage() {
     });
   };
 
+  const changeChannelSetting = (channelForm: ChannelFormType) => {
+    patchChannelSettingMutation.mutate(channelForm, {
+      onError: () => alert('다시 시도해 주세요.'),
+      onSuccess: () => {
+        setIsShowSetting(false);
+        queryClient.invalidateQueries(['getChannel', channelId]);
+      },
+    });
+  };
+
   if (
     whoamiQuery.status === 'loading' ||
     getChannelQuery.status === 'loading'
@@ -146,6 +160,7 @@ export default function ChannelPage() {
               <ChannelSetting
                 channel={getChannelQuery.data}
                 onClickClose={() => setIsShowSetting(false)}
+                changeChannelSetting={changeChannelSetting}
               />
             )}
             {isShowInvite && (
