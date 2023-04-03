@@ -460,8 +460,8 @@ export class ChannelsService {
       };
     }
 
-    channel.title = data.title;
-    channel.password = data.password ? data.password : null;
+    channel.title = data.title ? data.title : channel.title;
+    channel.password = data.password ? data.password : channel.password;
     return;
   }
 
