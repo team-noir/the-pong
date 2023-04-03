@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsOptional } from 'class-validator';
+import { IsString, IsBoolean, IsOptional, IsNumber, IsArray } from 'class-validator';
 
 export class CreateChannelDto {
   @ApiProperty()
@@ -57,4 +57,11 @@ export class ChannelMessageDto {
   @ApiProperty()
   @IsString()
   text: string;
+}
+
+export class ChannelInviteDto {
+  @ApiProperty()
+  @IsNumber()
+  @IsArray()
+  userIds: number[];
 }
