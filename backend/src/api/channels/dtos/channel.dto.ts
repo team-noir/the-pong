@@ -60,12 +60,6 @@ export class ChannelUserStatusDto {
   public status: 'kick' | 'ban' | 'mute';
 }
 
-export class ChannelMessageDto {
-  @ApiProperty()
-  @IsString()
-  public text: string;
-}
-
 export class ChannelInviteDto {
   @ApiProperty({
     type: [Number],
@@ -164,5 +158,31 @@ export class ChannelDetailDto {
   public createdAt: Date;
 }
 
+export class ChannelMessageDto {
+  @ApiProperty()
+  public id: number;
 
+  @ApiProperty()
+  @IsOptional()
+  public senderId?: number;
+
+  @ApiProperty()
+  @IsOptional()
+  public senderNickname?: string;
+
+  @ApiProperty()
+  public isLog: boolean;
+
+  @ApiProperty()
+  public text: string;
+
+  @ApiProperty()
+  public createdAt: Date;
+}
+
+export class ChannelMessageTextDto {
+  @ApiProperty()
+  @IsString()
+  public text: string;
+}
 
