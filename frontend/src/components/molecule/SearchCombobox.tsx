@@ -2,10 +2,12 @@ import { UserType } from 'types/userType';
 import { Combobox } from '@headlessui/react';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { Fragment, useEffect, useState } from 'react';
+import { ChannelUserType } from 'types/channelUserType';
 
 interface Props {
   placeholder?: string;
   dataList?: UserType[];
+  channelUsers?: ChannelUserType[];
   setValue: (value: string) => void;
   onSelect?: (value: string) => void;
 }
@@ -13,6 +15,7 @@ interface Props {
 export default function SearchCombobox({
   placeholder,
   dataList,
+  channelUsers,
   setValue,
   onSelect,
 }: Props) {
@@ -29,27 +32,48 @@ export default function SearchCombobox({
         <Combobox.Input
           placeholder={placeholder}
           onChange={(e) => setValue(e.target.value)}
-          className="text-text-dark"
         />
         <Combobox.Options className="absolute w-1/2">
-          {dataList?.map((user) => (
-            <Combobox.Option key={user.id} value={user.nickname} as={Fragment}>
-              {({ active }) => (
-                <li
-                  className={`${
-                    active ? 'bg-gray-dark' : 'bg-white text-text-dark'
-                  }`}
-                >
-                  <ProfileImage
-                    userId={user.id}
-                    alt={`${user.nickname}'s profile image`}
-                    size={40}
-                  />
-                  {user.nickname}
-                </li>
-              )}
-            </Combobox.Option>
-          ))}
+          {dataList?.map((user) => {
+            const isJoined = channelUsers?.some(
+              (channelUser) => channelUser.id === user.id
+            );
+
+            return (
+              <Combobox.Option
+                key={user.id}
+                value={user.nickname}
+                as={Fragment}
+                disabled={isJoined}
+              >
+                {({ active }) => (
+                  <li
+                    className={`flex ${isJoined ? '' : 'cursor-pointer'} ${
+                      active
+                        ? 'bg-gray-dark text-text-light'
+                        : 'bg-white text-text-dark'
+                    }`}
+                  >
+                    <ProfileImage
+                      userId={user.id}
+                      alt={`${user.nickname}'s profile image`}
+                      size={40}
+                    />
+                    <div
+                      className={`flex-1 flex justify-between items-center ${
+                        isJoined ? 'text-slate-400' : ''
+                      }`}
+                    >
+                      <span>{user.nickname}</span>
+                      <span className="text-xs">
+                        {isJoined && '이미 참여중'}
+                      </span>
+                    </div>
+                  </li>
+                )}
+              </Combobox.Option>
+            );
+          })}
         </Combobox.Options>
       </Combobox>
     </>

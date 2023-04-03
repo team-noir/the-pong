@@ -1,12 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import {
   getWhoami,
   getChannel,
   getChannelMessages,
   postChannelMessages,
+  putChannelUsers,
 } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 import Button from 'components/atoms/Button';
@@ -29,6 +30,8 @@ export default function ChannelPage() {
   const [isShowSetting, setIsShowSetting] = useState(false);
   const [isShowInvite, setIsShowInvite] = useState(false);
 
+  const queryClient = useQueryClient();
+
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
     queryFn: getWhoami,
@@ -50,6 +53,8 @@ export default function ChannelPage() {
     AxiosError,
     { channelId: number; message: string }
   >(postChannelMessages);
+
+  const putChannelUsersMutation = useMutation(putChannelUsers);
 
   useEffect(() => {
     if (getChannelQuery.data) {
@@ -101,6 +106,21 @@ export default function ChannelPage() {
     });
   };
 
+  const inviteUsers = (userIds: number[]) => {
+    if (!channelId) return;
+
+    putChannelUsersMutation.mutate(
+      { channelId: Number(channelId), userIds },
+      {
+        onError: () => alert('다시 시도해 주세요.'),
+        onSuccess: () => {
+          setIsShowInvite(false);
+          queryClient.invalidateQueries(['getChannel', channelId]);
+        },
+      }
+    );
+  };
+
   if (
     whoamiQuery.status === 'loading' ||
     getChannelQuery.status === 'loading'
@@ -148,8 +168,12 @@ export default function ChannelPage() {
                 onClickClose={() => setIsShowSetting(false)}
               />
             )}
-            {isShowInvite && (
-              <ChannelInvite onClickClose={() => setIsShowInvite(false)} />
+            {isShowInvite && getChannelQuery.data.users && (
+              <ChannelInvite
+                channelUsers={getChannelQuery.data.users}
+                onClickClose={() => setIsShowInvite(false)}
+                inviteUsers={inviteUsers}
+              />
             )}
           </>
         )}
