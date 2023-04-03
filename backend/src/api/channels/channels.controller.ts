@@ -16,7 +16,18 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { ChannelsService } from './channels.service';
-import { ApiTags, ApiOperation, ApiQuery, ApiOkResponse, ApiParam } from '@nestjs/swagger';
+import { 
+  ApiTags, 
+  ApiOperation, 
+  ApiQuery, 
+  ApiParam,
+  ApiOkResponse, 
+  ApiNoContentResponse, 
+  ApiNotFoundResponse,
+  ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
+  ApiForbiddenResponse
+} from '@nestjs/swagger';
 import {
   CreateChannelDto,
   SettingChannelDto,
@@ -41,6 +52,8 @@ export class ChannelsController {
   @ApiOkResponse({
     type: ChannelIdDto,
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
+  @ApiBadRequestResponse({ description: 'This user does not exist.' })
   @UseGuards(AuthenticatedGuard)
   create(
     @Req() req,
@@ -66,9 +79,8 @@ export class ChannelsController {
     name: 'kind',
     required: false,
   })
-  @ApiOkResponse({
-    type: [ChannelInfoDto],
-  })
+  @ApiOkResponse({ type: [ChannelInfoDto] })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   list(
     @Req() req,
@@ -91,6 +103,7 @@ export class ChannelsController {
   @ApiOkResponse({
     type: [ChannelDetailDto],
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   getChannelInfo(
     @Req() req,
@@ -108,6 +121,7 @@ export class ChannelsController {
 
   @Patch(':channelId')
   @ApiOperation({ summary: 'Set channel info' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   setChannelInfo(
     @Req() req,
@@ -126,6 +140,7 @@ export class ChannelsController {
 
   @Post(':channelId')
   @ApiOperation({ summary: 'Join channel' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   joinChannel(
     @Req() req,
@@ -144,6 +159,7 @@ export class ChannelsController {
 
   @Put(':channelId/users')
   @ApiOperation({ summary: 'Invite user to channel' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   inviteChannel(
     @Req() req,
@@ -162,6 +178,7 @@ export class ChannelsController {
 
   @Delete(':channelId')
   @ApiOperation({ summary: 'Leave channel' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   leaveChannel(
     @Req() req,
@@ -179,6 +196,7 @@ export class ChannelsController {
 
   @Patch(':channelId/users/:userId/role')
   @ApiOperation({ summary: 'Change channel user role' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   changeRoleUser(
     @Req() req,
@@ -203,6 +221,7 @@ export class ChannelsController {
 
   @Post(':channelId/message')
   @ApiOperation({ summary: 'Send message to channel' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   sendChannelMessage(
     @Req() req,
@@ -224,6 +243,7 @@ export class ChannelsController {
   @ApiOkResponse({
     type: [ChannelMessageDto],
   })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   getChannelMessages(
     @Req() req,
@@ -244,6 +264,7 @@ export class ChannelsController {
 
   @Patch(':channelId/users/:userId/status')
   @ApiOperation({ summary: 'Set user status in channel' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   setUserStatus(
     @Req() req,
