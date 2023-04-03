@@ -145,7 +145,7 @@ export class ChannelsGatway
   invite(
     @ConnectedSocket() socket: Socket,
     @MessageBody('channelId') channelId: number,
-    @MessageBody('userId') userId: number
+    @MessageBody('userId') userId: number[]
   ) {
     this.channelsService.invite(socket.data.user.id, channelId, userId);
   }

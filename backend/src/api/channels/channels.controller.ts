@@ -24,6 +24,7 @@ import {
   ChannelRoleDto,
   ChannelMessageDto,
   ChannelUserStatusDto,
+  ChannelInviteDto,
 } from './dtos/channel.dto';
 
 @Controller('channels')
@@ -133,11 +134,11 @@ export class ChannelsController {
   inviteChannel(
     @Req() req,
     @Param('channelId') channelId: number,
-    @Param('userId') userId: number,
+    @Body() body: ChannelInviteDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.invite(req.user.id, channelId, userId);
+      this.channelsService.invite(req.user.id, channelId, body.userIds);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {

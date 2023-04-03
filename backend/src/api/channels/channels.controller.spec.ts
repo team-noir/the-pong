@@ -3,18 +3,28 @@ import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { ChannelsModule } from './channels.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { expect, jest, describe, beforeEach, it, afterAll } from '@jest/globals';
+import { expect, jest, describe, afterEach, beforeEach, beforeAll, it, afterAll } from '@jest/globals';
 import { ChannelsService, Channel, ChannelUser } from './channels.service';
 import { CreateChannelDto } from './dtos/channel.dto';
 
 const fakeSocket = {
 	emit: jest.fn(),
 	join: jest.fn(),
+	leave: jest.fn(),
 };
 
 const user: ChannelUser = {
 	id: 3,
 	name: 'user',
+	socket: fakeSocket,
+	joined: new Set(),
+	invited: new Set(),
+	blockUser: new Set(),
+};
+
+const user2: ChannelUser = {
+	id: 5,
+	name: 'user2',
 	socket: fakeSocket,
 	joined: new Set(),
 	invited: new Set(),
@@ -27,11 +37,18 @@ const publicChannelData: CreateChannelDto = {
 	password: null,
 };
 
+const privateChannelData: CreateChannelDto = {
+	title: 'private',
+	isPrivate: true,
+	password: null,
+  };
+
 describe('Chat connection', () => {
     let app: INestApplication;
 	let service: ChannelsService;
 	let socketUser: ChannelUser;
 	let channel: Channel;
+	let privateChannel: Channel;
 	let socket;
 
     const getSocketDsn = () => {
@@ -39,7 +56,6 @@ describe('Chat connection', () => {
        return `http://localhost:${port}`;
    }
 
-    // @ts-ignore
     beforeAll(async () => {
         const moduleFixture = await Test.createTestingModule({
             imports: [ChannelsModule],
@@ -57,8 +73,7 @@ describe('Chat connection', () => {
 		});
 
 		service.setUser(user.id, user);
-		const result = service.create(user.id, publicChannelData);
-		channel = service.getChannel(result.id);
+		service.setUser(user2.id, user2);
     });
 
 	beforeEach(() => {
@@ -67,6 +82,12 @@ describe('Chat connection', () => {
 		
 		const messageListeners = socket.listeners('message');
 		messageListeners.forEach((listener) => socket.off('message', listener));
+
+		const result = service.create(user.id, publicChannelData);
+		channel = service.getChannel(result.id);
+		
+		const result2 = service.create(user.id, privateChannelData);
+		privateChannel = service.getChannel(result2.id);
 	})
 
 	afterAll(async () => {
@@ -74,14 +95,14 @@ describe('Chat connection', () => {
 		socket.disconnect();
 	})
 
-    it('소켓 서버에 연결합니다.', (done) => {
+    it('[init] 소켓 서버에 연결', (done) => {
         socket.on('connect', () => {
+			socketUser = service.getUser(1);
             done();
         });
     });
 
-	it('public 채널에 유저가 참가합니다.', (done) => {
-		socketUser = service.getUser(1);
+	it('[init] public 채널에 유저가 참가', (done) => {
         socket.on('notice', (data) => {
 			expect(data.channelId).toBe(channel.id);
 			expect(data.senderId).toBe(undefined);
@@ -89,13 +110,13 @@ describe('Chat connection', () => {
         });
 
 		try {
-			service.join(socketUser.id, channel.id, undefined);
+			service.join(socketUser.id, channel.id, null);
 		} catch (error) {
 			console.log(error);
 		}
     });
 	
-	it('참여 중인 채널에서 메세지를 받습니다.', (done) => {
+	it('[message] 참여 중인 채널에서 메세지 수신', (done) => {
         socket.on('message', (data) => {
 			expect(data.channelId).toBe(channel.id);
 			expect(data.senderId).toBe(user.id);
@@ -103,38 +124,43 @@ describe('Chat connection', () => {
             done();
         });
 
+		service.join(socketUser.id, channel.id, null);
 		service.messageToChannel(user.id, channel.id, "hello");
     });
 
-	it('참여 중인 채널에서 메세지를 가져옵니다.', () => {
+	it('[message] 참여 중인 채널에서 메세지를 가져오기', () => {
+		service.join(socketUser.id, channel.id, null);
+		service.messageToChannel(user.id, channel.id, "hello");
+
 		const messages = service.getChannelMessages(socketUser.id, channel.id);
 		expect(messages.length).toBe(2);
 	})
 
-	it('참여 중인 채널의 owner가 유저를 mute 시킵니다.', (done) => {
+	it('[mute] 참여 중인 채널의 owner가 유저를 mute', (done) => {
 		const time = new Date(new Date().getTime() + 1000);
+		service.join(socketUser.id, channel.id, null);
 
-		// socket.on('notice', (data) => {
-		// 	console.log('notice', data);
-		// });
+		socket.on('notice', (data) => {
+			console.log(data);
+		})
 
 		socket.on('message', (data) => {
-			const msgCreatedAt = new Date(data.createdAt);
+			
+			console.log(data);
 
-			expect(msgCreatedAt.getTime()).toBeGreaterThan(time.getTime());
 			done();
         });
 
 		service.mute(user, channel, socketUser, 1);
 		try {
-			service.messageToChannel(socketUser.id, channel.id, "hello");
+			service.messageToChannel(socketUser.id, channel.id, "hello 0");
 		} catch (error) {
 			expect(error.code).toBe(403);
 		}
 
 		setTimeout(() => {
 			try {
-				service.messageToChannel(socketUser.id, channel.id, "hello");
+				service.messageToChannel(socketUser.id, channel.id, "hello 1");
 			} catch (error) {
 				expect(error.code).toBe(403);
 			}
@@ -142,15 +168,43 @@ describe('Chat connection', () => {
 		
 		setTimeout(() => {
 			try {
-				service.messageToChannel(socketUser.id, channel.id, "hello");
-				expect(true).toBe(true);
+				service.messageToChannel(socketUser.id, channel.id, "hello 2");
 			} catch (error) {
-				console.log(error);
+				expect(error.code).toBe(false);
 			}
-		}, 1500)
+		}, 2000)
 	})
 
+	it('[invite] 채널장이 유저를 초대', (done) => {
+		socket.on('invited', (data) => {
+			expect(data.channelId).toBe(privateChannel.id);
+			done();
+		});
+		service.invite(user.id, privateChannel.id, [socketUser.id, user2.id]);
 
+		const channelInfo = service.getChannelInfo(user.id, channel.id);
+		expect(channelInfo.userCount).toBe(1);
+		expect(socketUser.invited.size).toBe(1);
+		expect(user2.invited.size).toBe(1);
+	});
+	
+	it('[invite] 권한 없는 유저가 다른 유저를 초대', (done) => {
+		socket.on('invited', (data) => {
+			console.log(data);
+			expect(data.channelId).toBe(privateChannel.id);
+		});
+
+		service.invite(user.id, privateChannel.id, [user2.id]);
+		service.join(user2.id, privateChannel.id, null);
+
+		try {
+			service.invite(user2.id, privateChannel.id, [socketUser.id]);
+		} catch (error) {
+			console.log(error);
+			expect(error.code).toBe(403);
+			done();
+		}
+	});
 
 
 

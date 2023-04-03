@@ -49,15 +49,22 @@ export class ChannelsService {
   private channelUserMap = new Map<userId, ChannelUser>();
   private messageMap = new Map<messageId, Message>();
 
-  hasUser(userId: number) {
+  hasUser(userId: number): boolean {
     return this.channelUserMap.has(userId);
   }
 
-  getUser(userId: number) {
-    return this.channelUserMap.get(userId);
+  getUser(userId: number): ChannelUser {
+    const user = this.channelUserMap.get(userId);
+
+    if (!user) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'This user does not exist.';
+      throw { code, message };
+    } 
+    return user;
   }
 
-  setUser(userId: number, user: ChannelUser) {
+  setUser(userId: number, user: ChannelUser): void {
     this.channelUserMap.set(userId, user);
   }
 
@@ -81,14 +88,33 @@ export class ChannelsService {
   }
 
   getChannel(channelId: number) {
-    return this.channelMap.get(channelId);
+    const channel = this.channelMap.get(channelId);
+
+    if (!channel) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'This channel does not exist.';
+      throw { code, message };
+    } 
+    return channel;
   }
 
   getChannelValues() {
     return [...this.channelMap.values()];
   }
 
-  getChannelUsers(channelId: number) {
+  getUserJoinedChannel(userId: number, channelId: number): ChannelUser {
+    const channel: Channel = this.getChannel(channelId);
+    const user: ChannelUser = this.getUser(userId);
+
+    if (!channel.users.has(user.id)) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'This user is not in the channel';
+      throw { code, message };
+    }
+    return user;
+  }
+
+  getUserArrayJoinedChannel(channelId: number) {
     const channel: Channel = this.getChannel(channelId);
     const data = [];
 
@@ -107,23 +133,18 @@ export class ChannelsService {
 
   getChannelUserRole(channelId: number, userId: number): string {
     const channel: Channel = this.getChannel(channelId);
-    if (channel.owner == userId) {
+    const user = this.getUserJoinedChannel(userId, channelId);
+
+    if (channel.owner == user.id) {
       return 'owner';
-    } else if (channel.admin.has(userId)) {
+    } else if (channel.admin.has(user.id)) {
       return 'admin';
     }
     return 'normal';
   }
 
   noticeToChannel(channelId: number, message: string): Message {
-    const channel: Channel = this.channelMap.get(channelId);
-
-    if (!channel) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
-      };
-    }
+    const channel: Channel = this.getChannel(channelId);
 
     const newMessage: Message = {
       id: this.messageMap.size + 1,
@@ -150,34 +171,23 @@ export class ChannelsService {
     channelId: number,
     message: string
   ): Message {
-    const channel: Channel = this.channelMap.get(channelId);
-    const user: ChannelUser = this.getUser(userId);
+    const channel: Channel = this.getChannel(channelId);
+    const user: ChannelUser = this.getUserJoinedChannel(userId, channelId);
 
-    if (!channel) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
-      };
-    } else if (!user) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This user does not exist.',
-      };
-    } else if (!channel.users.has(user.id)) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'You not in the channel.',
-      };
-    } else if (channel.muted.has(user.id)) {
-      const expiresAt = channel.muted.get(user.id);
+    if (channel.muted.has(user.id)) {
+      const expiresAt = new Date(channel.muted.get(user.id));
 
-      if (expiresAt.getTime() < new Date().getTime()) {
+      console.log('muted', expiresAt <= new Date());
+      if (expiresAt.getTime() <= new Date().getTime()) {
+        
+        console.log('expired', expiresAt.getTime());
+        console.log('now', new Date().getTime());
+
         channel.muted.delete(user.id);
       } else {
-        throw {
-          code: HttpStatus.FORBIDDEN,
-          message: 'You are silenced on the channel.',
-        };
+        const code = HttpStatus.FORBIDDEN;
+        const message = 'You are silenced on the channel.';
+        throw { code, message };
       }
     }
 
@@ -206,25 +216,8 @@ export class ChannelsService {
   }
 
   getChannelMessages(userId: number, channelId: number) {
-    const channel: Channel = this.channelMap.get(channelId);
-    const user: ChannelUser = this.getUser(userId);
-
-    if (!channel) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
-      };
-    } else if (!user) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This user does not exist.',
-      };
-    } else if (!channel.users.has(user.id)) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'You not in the channel.',
-      };
-    }
+    this.channelMap.get(channelId);
+    this.getUserJoinedChannel(userId, channelId);
 
     const data = [];
     [...this.messageMap.values()].forEach((message) => {
@@ -278,22 +271,12 @@ export class ChannelsService {
 
   create(userId: number, data: CreateChannelDto) {
     const createdBy: ChannelUser = this.getUser(userId);
-    if (!createdBy) {
-      throw {
-        code: HttpStatus.UNAUTHORIZED,
-        message: "This is a user ID that doesn't exist.",
-      };
-    } else if (!data.title) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'You did not enter a channel name.',
-      };
-    }
+    const newChannel: Channel = this.createChannel(data);
 
-    const newChannel = this.createChannel(data);
     newChannel.owner = createdBy.id;
     this.joinChannel(createdBy, newChannel);
 
+    // socket message
     createdBy.socket.emit('message', {
       channelId: newChannel.id,
     });
@@ -302,14 +285,10 @@ export class ChannelsService {
   }
 
   join(userId: number, channelId: number, password: string) {
-    const channel = this.channelMap.get(channelId);
+    const channel: Channel = this.getChannel(channelId);
     const user: ChannelUser = this.getUser(userId);
-    if (!channel) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
-      };
-    } else if (channel.password && password != channel.password) {
+
+    if (channel.password && password != channel.password) {
       throw {
         code: HttpStatus.FORBIDDEN,
         message: 'You entered an incorrect password.',
@@ -319,21 +298,23 @@ export class ChannelsService {
         code: HttpStatus.FORBIDDEN,
         message: 'You are blocked from the channel.',
       };
-    } else if (channel.isPrivate && !user.invited.has(channel.id)) {
-      throw {
-        code: HttpStatus.FORBIDDEN,
-        message: 'You are connot join the channel.',
-      };
     } else if (channel.isDm && channel.users.size > 1) {
       throw {
         code: HttpStatus.FORBIDDEN,
         message: 'You are connot join the channel.',
       };
-    } else if (channel.users.has(user.id)) {
+    } else if (this.checkIsJoined(channel, user.id)) {
       throw {
         code: HttpStatus.CONFLICT,
         message: 'This channel is already participating.',
       };
+    } else if (channel.isPrivate && !user.invited.has(channel.id)) {
+      throw {
+        code: HttpStatus.FORBIDDEN,
+        message: 'You are connot join the channel.',
+      };
+    } else if (user.invited.has(channel.id)) {
+      user.invited.delete(channel.id);
     }
 
     this.joinChannel(user, channel);
@@ -342,24 +323,7 @@ export class ChannelsService {
 
   leave(userId: number, channelId: number) {
     const channel: Channel = this.getChannel(channelId);
-    const user: ChannelUser = this.getUser(userId);
-
-    if (!channel) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
-      };
-    } else if (!user) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This user does not exist.',
-      };
-    } else if (!channel.users.has(user.id)) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'You are not participating in the channel.',
-      };
-    }
+    const user: ChannelUser = this.getUserJoinedChannel(userId, channelId);
 
     if (channel.owner == user.id) {
       channel.users.forEach((joinedUserId) => {
@@ -370,7 +334,6 @@ export class ChannelsService {
       this.setUserLeave(user, channel);
     }
 
-    // socket message
     this.noticeToChannel(channelId, `${user.name} 님이 나가셨습니다.`);
   }
 
@@ -385,6 +348,8 @@ export class ChannelsService {
   checkIsJoined(channel: Channel, userId: number): boolean {
     return channel.users.has(userId);
   }
+
+  checkChannelAthor
 
   checkListedRange(query, channel: Channel) {
     return (
@@ -453,12 +418,7 @@ export class ChannelsService {
   getChannelInfo(userId: number, channelId: number) {
     const channel: Channel = this.getChannel(channelId);
 
-    if (!channel) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
-      };
-    } else if (!this.checkCanGetInfo(channel, userId)) {
+    if (!this.checkCanGetInfo(channel, userId)) {
       throw {
         code: HttpStatus.FORBIDDEN,
         message: 'You are not authorized to this channel.',
@@ -474,7 +434,7 @@ export class ChannelsService {
       isBlocked: channel.banned.has(userId),
       isJoined: channel.users.has(userId),
       userCount: channel.users.size,
-      users: this.getChannelUsers(channelId),
+      users: channel.users,
       createdAt: channel.createdAt,
     };
 
@@ -485,12 +445,7 @@ export class ChannelsService {
     const channel: Channel = this.getChannel(channelId);
     const settedBy: ChannelUser = this.getUser(userId);
 
-    if (!channel) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
-      };
-    } else if (channel.isDm) {
+    if (channel.isDm) {
       throw {
         code: HttpStatus.BAD_REQUEST,
         message: 'DM channel cannot change settings.',
@@ -522,30 +477,10 @@ export class ChannelsService {
     role: string
   ) {
     const channel: Channel = this.getChannel(channelId);
-    const settedBy: ChannelUser = this.getUser(userId);
-    const settedUser: ChannelUser = this.getUser(settedUserId);
+    const settedBy: ChannelUser = this.getUserJoinedChannel(userId, channelId);
+    const settedUser: ChannelUser = this.getUserJoinedChannel(settedUserId, channelId);
 
-    if (!channel) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
-      };
-    } else if (!settedBy || !settedUser) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This user does not exist.',
-      };
-    } else if (!channel.users.has(settedBy.id)) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'You not in the channel.',
-      };
-    } else if (!channel.users.has(settedUser.id)) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This user is not in the channel.',
-      };
-    } else if (channel.isDm) {
+    if (channel.isDm) {
       throw {
         code: HttpStatus.BAD_REQUEST,
         message: 'This channel is dm',
@@ -625,45 +560,41 @@ export class ChannelsService {
     socket.emit('names', data);
   }
 
-  invite(userId: number, channelId: number, invitedUserId: number) {
-    const channel = this.channelMap.get(channelId);
-    const invitedBy = this.channelUserMap.get(userId);
-    const invitedUser = this.channelUserMap.get(invitedUserId);
-
-    if (!channel) {
+  invite(userId: number, channelId: number, invitedUserId: number[]) {
+    const channel = this.getChannel(channelId);
+    const invitedBy = this.getUserJoinedChannel(userId, channelId);
+    const role = this.getChannelUserRole(channel.id, invitedBy.id);
+    
+    if (channel.isDm || !channel.isPrivate) {
       throw {
         code: HttpStatus.BAD_REQUEST,
-        message: 'This channel does not exist.',
+        message: 'You invited the user to the wrong channel.',
       };
-    } else if (!invitedUser || !invitedBy) {
+    } else if (role == 'normal') {
       throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'This user does not exist.',
-      };
-    } else if (channel.isDm || !channel.isPrivate) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'You have been invited to the wrong channel.',
-      };
-    } else if (!channel.users.has(invitedBy.id)) {
-      throw {
-        code: HttpStatus.BAD_REQUEST,
-        message: 'The user is not in the channel.',
-      };
-    } else if (channel.users.has(invitedUser.id)) {
-      throw {
-        code: HttpStatus.CONFLICT,
-        message: 'The user is already joining the channel.',
+        code: HttpStatus.FORBIDDEN,
+        message: 'You do not have permission in this channel.',
       };
     }
 
-    invitedUser.invited.add(channel.id);
+    invitedUserId.forEach((id) => {
+      const invitedUser = this.getUser(id);
 
-    // socket massage
-    invitedUser.socket.emit('invited', { channelId: channel.id });
-    this.server
-      .to(String(channel.id))
-      .emit('message', `${invitedUser.name} 님을 초대하였습니다.`);
+      if (this.checkIsJoined(channel, invitedUser.id)) {
+        throw {
+          code: HttpStatus.CONFLICT,
+          message: 'The user is already joining the channel.',
+        };
+      }
+  
+      invitedUser.invited.add(channel.id);
+  
+      // socket massage
+      invitedUser.socket.emit('invited', { channelId: channel.id });
+      this.server
+        .to(String(channel.id))
+        .emit('message', `${invitedUser.name} 님을 초대하였습니다.`);
+    });
   }
 
   setUserStatus(userId: number, channelId: number, settedUserId: number, status: string) {
