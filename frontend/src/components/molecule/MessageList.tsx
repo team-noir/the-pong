@@ -1,26 +1,24 @@
-import { DummyMessageType } from 'components/organisms/Channel';
 import MessageItem from 'components/molecule/MessageItem';
-import styles from 'assets/styles/Message.module.css';
+import { MessageType } from 'types/messageType';
 
 interface Props {
-  messages: DummyMessageType[] | null;
+  messages: MessageType[] | null;
+  myUserId: number;
 }
 
-const myUsrId = 1;
-
-export default function MessageList({ messages }: Props) {
+export default function MessageList({ messages, myUserId }: Props) {
   return (
-    <ul className={styles.ul}>
+    <ul className="flex flex-col">
       {messages?.map((message, index) => {
-        const isMyMessage = message.userId === myUsrId;
+        const isMyMessage = message.senderId === myUserId;
         const isContinuousMessage =
-          messages[index - 1]?.userId === message.userId;
+          messages[index - 1]?.senderId === message.senderId;
         return (
           <MessageItem
             key={message.id}
             message={message}
             isShowProfile={!isMyMessage && !isContinuousMessage}
-            className={isMyMessage ? styles.my : styles.other}
+            isMyMessage={isMyMessage}
           />
         );
       })}

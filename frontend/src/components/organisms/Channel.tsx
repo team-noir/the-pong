@@ -1,78 +1,28 @@
+import { useEffect, useState, useContext, useRef } from 'react';
 import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
 import MessageList from 'components/molecule/MessageList';
-import { useEffect, useState } from 'react';
-import { ChannelType } from 'types/channelType';
 
+import { MessageType } from 'types/messageType';
 interface Props {
-  channel: ChannelType | null;
+  messages: MessageType[];
+  postMessage: (message: string) => void;
+  myUserId: number;
 }
 
 interface FormData {
   message: string;
 }
 
-export interface DummyMessageType {
-  id: number;
-  userId: number;
-  nickname: string;
-  profileImageUrl: string;
-  text: string;
-  createdAt: string;
-}
-
-let dummyId = 0;
-const dummyMessages: DummyMessageType[] = [
-  {
-    id: dummyId++,
-    userId: 3,
-    nickname: 'sarchoi',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '안녕하세요',
-    createdAt: '2023-03-17T00:14:35.000Z',
-  },
-  {
-    id: dummyId++,
-    userId: 3,
-    nickname: 'sarchoi',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '반가워요~~~',
-    createdAt: '2023-03-17T00:14:36.000Z',
-  },
-  {
-    id: dummyId++,
-    userId: 1,
-    nickname: 'heehkim',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '안녕하세요~!',
-    createdAt: '2023-03-17T00:14:37.000Z',
-  },
-  {
-    id: dummyId++,
-    userId: 1,
-    nickname: 'heehkim',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '방가방가',
-    createdAt: '2023-03-17T00:14:38.000Z',
-  },
-  {
-    id: dummyId++,
-    userId: 2,
-    nickname: 'cpak',
-    profileImageUrl: 'https://placekitten.com/800/800',
-    text: '반갑습니다',
-    createdAt: '2023-03-17T00:14:39.000Z',
-  },
-];
-
-export default function Channel({ channel }: Props) {
-  const [messages, setMessages] = useState<DummyMessageType[] | null>(null);
+export default function Channel({ messages, postMessage, myUserId }: Props) {
   const [formData, setFormData] = useState<FormData>({ message: '' });
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // TODO: 채널 메시지 API에서 가져오기
-    setMessages(dummyMessages);
-  }, []);
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -81,13 +31,19 @@ export default function Channel({ channel }: Props) {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // TODO: 메시지를 보내는 API 호출
+    if (!formData.message) return;
+    postMessage(formData.message);
+    setFormData({ message: '' });
   };
 
   return (
     <>
-      <div>
-        <MessageList messages={messages} />
+      <div
+        id="message-list-wrapper"
+        className="h-[80vh] overflow-y-auto"
+        ref={scrollRef}
+      >
+        <MessageList messages={messages} myUserId={myUserId} />
       </div>
       <form onSubmit={handleSubmit}>
         <TextInput

@@ -12,7 +12,13 @@ describe('Component - Channel 렌더링', () => {
   };
 
   test('채널을 보여준다', () => {
-    render(<Channel channel={channel} />);
+    render(
+      <Channel
+        messages={[]}
+        postMessage={(message: string) => {}}
+        myUserId={1}
+      />
+    );
     screen.getByPlaceholderText('메시지를 입력해 주세요');
   });
 });

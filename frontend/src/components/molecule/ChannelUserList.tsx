@@ -26,6 +26,15 @@ export default function ChannelUserList({
           초대하기
         </Button>
       )}
+      {myUser && (
+        <ChannelUserItem
+          key={myUser?.id}
+          styles={styles}
+          user={myUser}
+          imageSize={imageSize}
+          myUser={myUser}
+        />
+      )}
       {users &&
         users.map((user) => {
           return (

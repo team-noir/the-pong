@@ -193,6 +193,14 @@ export const getChannels = async ({ enter, kind }: getChannelsParams) => {
   return res.data;
 };
 
+export const getChannel = async (channelId: string) => {
+  const res = await axiosWithInterceptors.get(`/channels/${channelId}`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 export interface ChannelFormType {
   title: string;
   isPrivate?: boolean;
@@ -230,4 +238,31 @@ export const getDmChannel = async (userId: number) => {
     throw new Error(res.statusText);
   }
   return res.data;
+};
+
+export const getChannelMessages = async (channelId: number) => {
+  const res = await axiosWithInterceptors.get(`/channels/${channelId}/message`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
+export const postChannelMessages = async ({
+  channelId,
+  message,
+}: {
+  channelId: number;
+  message: string;
+}) => {
+  const res = await axiosWithInterceptors.post(
+    `/channels/${channelId}/message`,
+    {
+      text: message,
+    }
+  );
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
 };

@@ -1,24 +1,32 @@
-import Button from 'components/atoms/Button';
 import { useEffect, useState } from 'react';
+import Button from 'components/atoms/Button';
 import { ChannelType } from 'types/channelType';
 import styles from 'assets/styles/Channel.module.css';
-import { ChannelUserType, RoleType } from 'types/channelUserType';
 import ChannelUserList from 'components/molecule/ChannelUserList';
+import { ChannelUserType, RoleType } from 'types/channelUserType';
 
 interface Props {
   channel: ChannelType;
+  myUserId: number;
   onClickSetting: () => void;
   onClickInvite: () => void;
 }
 
-const myUserId = 1;
+const findMyUser = (
+  myUserId: number,
+  users: ChannelUserType[] | null
+): ChannelUserType | null => {
+  if (!users) return null;
+  const myUser = users.find((user) => user.id === myUserId);
+  return myUser ? myUser : null;
+};
 
-// 내가 가장 위, 다음으로 owner, admin, normal 순, 각 userType끼리는 nickname 순
 const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
-  if (user1.id === myUserId) return -1;
+  const priority = [RoleType.owner, RoleType.admin, RoleType.normal];
   if (user1.role !== user2.role) {
-    return user1.role - user2.role;
+    return priority.indexOf(user1.role) - priority.indexOf(user2.role);
   }
+  // 같은 role이면 nickname 순
   if (user1.nickname && user2.nickname) {
     return user1.nickname.localeCompare(user2.nickname);
   }
@@ -27,49 +35,44 @@ const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
 
 export default function ChannelDetail({
   channel,
+  myUserId,
   onClickSetting,
   onClickInvite,
 }: Props) {
-  const [channelUsers, setChannelUsers] = useState<ChannelUserType[] | null>(
-    null
-  );
   const [myUser, setMyUser] = useState<ChannelUserType | null>(null);
+  const [channelUsers, setChannelUsers] = useState<ChannelUserType[]>([]);
 
   useEffect(() => {
-    // TODO: 채널 유저 정보를 가져오는 API 호출
     if (!channel.users) return;
+    setMyUser(findMyUser(myUserId, channel.users));
+    setChannelUsers(
+      channel.users.filter((user) => user.id !== myUserId).sort(compare)
+    );
+  }, [channel.users, myUserId]);
 
-    setChannelUsers(channel.users.sort(compare));
-  }, []);
-
-  useEffect(() => {
-    const user = channelUsers?.find((user) => user.id === myUserId);
-    user && setMyUser(user);
-  }, [channelUsers]);
+  const isMyUserRoleOwner = myUser?.role === RoleType.owner;
 
   return (
     <div>
-      {channel && (
-        <>
-          {myUser?.role === RoleType.owner && (
-            <Button type="button" onClick={onClickSetting}>
-              채널 설정
-            </Button>
-          )}
-          <h2>참가자</h2>
-          <ChannelUserList
-            styles={styles}
-            users={channelUsers}
-            imageSize={52}
-            myUser={myUser}
-            isPrivate={channel.isPrivate}
-            onClickInvite={onClickInvite}
-          />
-          <Button type="button">
-            {myUser?.role === RoleType.owner ? '채널 삭제' : '채널 나가기'}
-          </Button>
-        </>
+      {isMyUserRoleOwner && (
+        <Button type="button" onClick={onClickSetting}>
+          채널 설정
+        </Button>
       )}
+      <h2>참가자</h2>
+      {myUser && channelUsers && (
+        <ChannelUserList
+          styles={styles}
+          myUser={myUser}
+          users={channelUsers}
+          imageSize={52}
+          isPrivate={channel.isPrivate}
+          onClickInvite={onClickInvite}
+        />
+      )}
+      <Button type="button">
+        {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
+      </Button>
     </div>
   );
 }
