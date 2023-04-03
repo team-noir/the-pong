@@ -111,6 +111,20 @@ export class ChannelInfoDto {
   public createdAt: Date;
 }
 
+export class ChannelDetailUserDto {
+  @ApiProperty()
+  public id: Number;
+
+  @ApiProperty()
+  public nickname: String;
+
+  @ApiProperty()
+  public role: String
+
+  @ApiProperty()
+  public isMuted: boolean;
+}
+
 export class ChannelDetailDto {
   @ApiProperty()
   public id: number;
@@ -137,11 +151,18 @@ export class ChannelDetailDto {
   public userCount: number;
   
   @ApiProperty({
-    type: [Number],
-    example: [1, 2, 3],
+    type: [ChannelDetailUserDto],
+    example: [
+      {id: 1, nickname: 'nickname1', role: 'owner', isMuted: false},
+      {id: 2, nickname: 'nickname2', role: 'admin', isMuted: false},
+      {id: 3, nickname: 'nickname3', role: 'normal', isMuted: true}
+    ],
   })
-  public users: number[];
+  public users: ChannelDetailUserDto[];
 
   @ApiProperty()
   public createdAt: Date;
 }
+
+
+
