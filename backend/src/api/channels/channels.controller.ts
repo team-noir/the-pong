@@ -16,7 +16,7 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { ChannelsService } from './channels.service';
-import { ApiTags, ApiOperation, ApiQuery, ApiOkResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiQuery, ApiOkResponse, ApiParam } from '@nestjs/swagger';
 import {
   CreateChannelDto,
   SettingChannelDto,
@@ -87,12 +87,12 @@ export class ChannelsController {
 
   @Get(':channelId')
   @ApiOperation({ summary: 'Get channel info' })
-  @ApiQuery({
-    name: 'channelId',
-    required: true,
-  })
   @ApiOkResponse({
     type: [ChannelDetailDto],
+  })
+  @ApiParam({
+    name: 'channelId',
+    required: false,
   })
   @UseGuards(AuthenticatedGuard)
   getChannelInfo(
@@ -111,6 +111,10 @@ export class ChannelsController {
 
   @Patch(':channelId')
   @ApiOperation({ summary: 'Set channel info' })
+  @ApiParam({
+    name: 'channelId',
+    required: false,
+  })
   @UseGuards(AuthenticatedGuard)
   setChannelInfo(
     @Req() req,
