@@ -1,24 +1,16 @@
-import { useQuery } from '@tanstack/react-query';
 import MessageItem from 'components/molecule/MessageItem';
-import { AxiosError } from 'axios';
-import { getWhoami } from 'api/api.v1';
-import { UserType } from 'types/userType';
 import { MessageType } from 'types/messageType';
 
 interface Props {
   messages: MessageType[] | null;
+  myUserId: number;
 }
 
-export default function MessageList({ messages }: Props) {
-  const whoamiQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['whoami'],
-    queryFn: getWhoami,
-  });
-
+export default function MessageList({ messages, myUserId }: Props) {
   return (
     <ul className="flex flex-col">
       {messages?.map((message, index) => {
-        const isMyMessage = message.senderId === whoamiQuery.data?.id;
+        const isMyMessage = message.senderId === myUserId;
         const isContinuousMessage =
           messages[index - 1]?.senderId === message.senderId;
         return (
