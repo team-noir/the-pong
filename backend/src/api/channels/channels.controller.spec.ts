@@ -118,6 +118,79 @@ describe('Chat connection', () => {
 		});
 	});
 
+	describe('channel setting', () => {
+		it('채널장이 public 채널을 protected로 수정', () => {
+			const newTitle = "protected";
+			service.setChannelInfo(user.id, channel.id, {
+				title: newTitle,
+				password: "",
+			});
+			expect(channel.title).toBe(newTitle);
+			
+			service.setChannelInfo(user.id, channel.id, {
+				password: "1234",
+			});
+			const channelInfo = service.getChannelInfo(user.id, channel.id);
+			expect(channelInfo.isProtected).toBe(true);
+		});
+		
+		it('채널장이 protected 채널을 public으로 수정', () => {
+			service.setChannelInfo(user.id, channel.id, {
+				password: "1234",
+			});
+			const channelInfo1 = service.getChannelInfo(user.id, channel.id);
+			expect(channelInfo1.isProtected).toBe(true);
+
+			const newTitle = "public";
+			service.setChannelInfo(user.id, channel.id, {
+				title: newTitle,
+				password: "",
+			});
+			expect(channel.title).toBe(newTitle);
+			const channelInfo2 = service.getChannelInfo(user.id, channel.id);
+			expect(channelInfo2.isProtected).toBe(false);
+		});
+		
+		it('채널장이 private 채널의 title 수정', () => {
+			const newTitle = "public";
+			service.setChannelInfo(user.id, privateChannel.id, {
+				title: newTitle,
+			});
+			expect(privateChannel.title).toBe(newTitle);
+			const channelInfo = service.getChannelInfo(user.id, privateChannel.id);
+			expect(channelInfo.isPrivate).toBe(true);
+		});
+		
+		it('[error] 채널장이 private 채널의 password 수정하는 경우', () => {
+			try {
+				service.setChannelInfo(user.id, privateChannel.id, {
+					title: "public",
+					password: "1234",
+				});
+				expect(true).toBe(false);
+			} catch (error) {
+				expect(error.code).toBe(400);
+			}
+			expect(privateChannel.title).toBe("private");
+			const channelInfo = service.getChannelInfo(user.id, privateChannel.id);
+			expect(channelInfo.isPrivate).toBe(true);
+		});
+		it('[error] 채널장이 private 채널의 password 수정하는 경우', () => {
+			try {
+				service.setChannelInfo(user.id, privateChannel.id, {
+					title: "public",
+					password: "1234",
+				});
+				expect(true).toBe(false);
+			} catch (error) {
+				expect(error.code).toBe(400);
+			}
+			expect(privateChannel.title).toBe("private");
+			const channelInfo = service.getChannelInfo(user.id, privateChannel.id);
+			expect(channelInfo.isPrivate).toBe(true);
+		});
+	})
+
 	describe('Message', () => {
 		it('참여 중인 채널에서 메세지 수신', (done) => {
 			socket.on('message', (data) => {

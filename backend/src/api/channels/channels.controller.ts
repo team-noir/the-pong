@@ -128,7 +128,7 @@ export class ChannelsController {
     }
   }
 
-  @Put(':channelId/users/:userId')
+  @Put(':channelId/users')
   @ApiOperation({ summary: 'Invite user to channel' })
   @UseGuards(AuthenticatedGuard)
   inviteChannel(
