@@ -2,7 +2,6 @@ import { render, screen } from '@testing-library/react';
 import ChannelBrowse from 'components/organisms/ChannelBrowse';
 import { BrowserRouter } from 'react-router-dom';
 import { ChannelType } from 'types/channelType';
-import { RoleType } from 'types/channelUserType';
 
 const dummyChannels: ChannelType[] = [
   {

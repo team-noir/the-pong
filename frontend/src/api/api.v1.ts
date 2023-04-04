@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { ChannelType } from 'types/channelType';
 import { UserType } from 'types/userType';
+import { ChannelUserRoleType, ChannelUserStatusType } from 'types/channelUserType';
 
 export const API_PREFIX = `/api/v1`;
 
@@ -293,7 +294,7 @@ export const patchChannelUserRole = async ({
 }: {
   channelId: number;
   userId: number;
-  role: 'admin' | 'normal';
+  role: ChannelUserRoleType;
 }) => {
   const res = await axiosWithInterceptors.patch(
     `/channels/${channelId}/users/${userId}/role`,
@@ -321,7 +322,7 @@ export const patchChannelUserStatus = async ({
 }: {
   channelId: number;
   userId: number;
-  status: 'kick' | 'ban' | 'mute';
+  status: ChannelUserStatusType;
 }) => {
   const res = await axiosWithInterceptors.patch(
     `/channels/${channelId}/users/${userId}/status`,
