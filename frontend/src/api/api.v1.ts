@@ -285,3 +285,12 @@ export const putChannelUsers = async ({
   }
   return res;
 };
+
+// Leave Channel
+export const deleteChannel = async (channelId: number) => {
+  const res = await axiosWithInterceptors.delete(`/channels/${channelId}`);
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};

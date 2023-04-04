@@ -10,6 +10,7 @@ interface Props {
   myUserId: number;
   onClickSetting: () => void;
   onClickInvite: () => void;
+  onClickLeave: () => void;
 }
 
 const findMyUser = (
@@ -38,6 +39,7 @@ export default function ChannelDetail({
   myUserId,
   onClickSetting,
   onClickInvite,
+  onClickLeave,
 }: Props) {
   const [myUser, setMyUser] = useState<ChannelUserType | null>(null);
   const [channelUsers, setChannelUsers] = useState<ChannelUserType[]>([]);
@@ -70,7 +72,7 @@ export default function ChannelDetail({
           onClickInvite={onClickInvite}
         />
       )}
-      <Button type="button">
+      <Button type="button" onClick={onClickLeave}>
         {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
       </Button>
     </div>

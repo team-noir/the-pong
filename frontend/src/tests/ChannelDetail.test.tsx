@@ -20,6 +20,7 @@ describe('Component - ChannelDetail 렌더링', () => {
           myUserId={1}
           onClickSetting={() => console.log('click setting')}
           onClickInvite={() => console.log('click invite')}
+          onClickLeave={() => console.log('click leave')}
         />
       </BrowserRouter>
     );
