@@ -269,3 +269,19 @@ export const patchChannelSetting = async (channelForm: ChannelFormType) => {
   }
   return res;
 };
+
+export const putChannelUsers = async ({
+  channelId,
+  userIds,
+}: {
+  channelId: number;
+  userIds: number[];
+}) => {
+  const res = await axiosWithInterceptors.put(`/channels/${channelId}/users`, {
+    userIds,
+  });
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
