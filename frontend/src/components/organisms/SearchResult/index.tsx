@@ -1,5 +1,5 @@
+import SearchResultList from 'components/organisms/SearchResult/SearchResultList';
 import { UserType } from 'types/userType';
-import SearchResultList from './SearchResultList';
 
 interface Props {
   users: UserType[];

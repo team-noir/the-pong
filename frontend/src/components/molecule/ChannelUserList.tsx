@@ -1,6 +1,6 @@
+import ChannelUserItem from 'components/molecule/ChannelUserItem';
 import Button from 'components/atoms/Button';
 import { ChannelUserType } from 'types/channelUserType';
-import ChannelUserItem from './ChannelUserItem';
 
 interface Props {
   changeRole: (arg: any) => void;

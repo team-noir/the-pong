@@ -1,10 +1,10 @@
-import AppTemplate from 'components/templates/AppTemplate';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { UserType } from 'types/userType';
 import { AxiosError } from 'axios';
 import { deleteMy2fa, getMy2fa, getWhoami } from 'api/api.v1';
+import AppTemplate from 'components/templates/AppTemplate';
 import Setting2FA from 'components/organisms/Setting2FA';
+import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import { UserType } from 'types/userType';
 
 export default function Setting2FAPage() {
   const whoamiQuery = useQuery<UserType, AxiosError>({

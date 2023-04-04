@@ -1,14 +1,14 @@
 import { useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { getWhoami, postLogout } from 'api/api.v1';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useLogin, useUser } from 'hooks/useStore';
 import SearchBar from 'components/molecule/SearchBar';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types/userType';
-import { useLogin, useUser } from 'hooks/useStore';
-import { AxiosError } from 'axios';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { getWhoami, postLogout } from 'api/api.v1';
 
 const navigation = [
   { name: 'Game', href: '/game', current: false },

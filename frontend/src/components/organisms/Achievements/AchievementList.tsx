@@ -1,6 +1,6 @@
-import AchievementItem from './AchievementItem';
-import styles from 'assets/styles/Achievement.module.css';
+import AchievementItem from 'components/organisms/Achievements/AchievementItem';
 import { AchievementType } from 'types/achievementType';
+import styles from 'assets/styles/Achievement.module.css';
 
 interface Props {
   achievements: AchievementType[] | null;

@@ -1,12 +1,12 @@
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { getChannels, postJoinChannel } from 'api/api.v1';
-import { AxiosError } from 'axios';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
-import PasswordModal from 'components/molecule/PasswordModal';
-import ChannelBrowse from 'components/organisms/ChannelBrowse';
-import AppTemplate from 'components/templates/AppTemplate';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { getChannels, postJoinChannel } from 'api/api.v1';
+import AppTemplate from 'components/templates/AppTemplate';
+import ChannelBrowse from 'components/organisms/ChannelBrowse';
+import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import PasswordModal from 'components/molecule/PasswordModal';
 import { ChannelType } from 'types/channelType';
 
 export default function ChannelBrowsePage() {

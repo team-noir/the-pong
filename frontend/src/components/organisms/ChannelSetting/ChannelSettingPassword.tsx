@@ -1,7 +1,7 @@
-import Button from 'components/atoms/Button';
+import { useEffect, useState } from 'react';
 import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
 import PasswordInputWithMessage from 'components/molecule/PasswordInputWithMessage';
-import { useEffect, useState } from 'react';
+import Button from 'components/atoms/Button';
 import { validateChannelPassword } from 'utils/validatorUtils';
 
 interface Props {

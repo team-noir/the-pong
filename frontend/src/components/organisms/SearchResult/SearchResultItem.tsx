@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
-import styles from 'assets/styles/SearchResult.module.css';
 import { UserType } from 'types/userType';
+import styles from 'assets/styles/SearchResult.module.css';
 
 interface Props {
   user: UserType;

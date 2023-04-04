@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
-import { ChannelUserType, UserRole } from 'types/channelUserType';
 import Button from 'components/atoms/Button';
+import { ChannelUserType, UserRole } from 'types/channelUserType';
 
 interface Props {
   changeRole: (arg: any) => void;

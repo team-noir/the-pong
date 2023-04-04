@@ -1,8 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
-import { getChannels } from 'api/api.v1';
-import { AxiosError } from 'axios';
-import ChannelLobby from 'components/organisms/ChannelLobby';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { getChannels } from 'api/api.v1';
+import ChannelLobby from 'components/organisms/ChannelLobby';
 import { ChannelType } from 'types/channelType';
 
 export default function ChannelLobbyPage() {

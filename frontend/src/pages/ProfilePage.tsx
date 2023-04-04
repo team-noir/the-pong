@@ -1,5 +1,6 @@
-import Profile from 'components/organisms/Profile';
-import Achievements from 'components/organisms/Achievements';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { useNavigate, useParams } from 'react-router-dom';
+import { AxiosError } from 'axios';
 import {
   getUser,
   getWhoami,
@@ -10,9 +11,8 @@ import {
   deleteMyBlocks,
   getDmChannel,
 } from 'api/api.v1';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
-import { AxiosError } from 'axios';
+import Profile from 'components/organisms/Profile';
+import Achievements from 'components/organisms/Achievements';
 import { UserType } from 'types/userType';
 
 export default function ProfilePage() {

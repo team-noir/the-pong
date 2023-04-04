@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import AchievementList from './AchievementList';
+import AchievementList from 'components/organisms/Achievements/AchievementList';
 import { UserType } from 'types/userType';
 import { AchievementType } from 'types/achievementType';
 

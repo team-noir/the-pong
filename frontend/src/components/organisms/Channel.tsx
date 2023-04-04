@@ -3,6 +3,7 @@ import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
 import MessageList from 'components/molecule/MessageList';
 import { MessageType } from 'types/messageType';
+
 interface Props {
   messages: MessageType[];
   postMessage: (message: string) => void;

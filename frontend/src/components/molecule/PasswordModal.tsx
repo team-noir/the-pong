@@ -1,6 +1,6 @@
+import { useEffect, useRef, useState } from 'react';
 import Button from 'components/atoms/Button';
 import PasswordInput from 'components/atoms/PasswordInput';
-import { useEffect, useRef, useState } from 'react';
 
 interface Props {
   onClose: () => void;

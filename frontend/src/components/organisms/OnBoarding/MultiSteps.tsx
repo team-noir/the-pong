@@ -1,7 +1,7 @@
-import Button from 'components/atoms/Button';
 import { useState } from 'react';
-import Message from 'components/atoms/Message';
 import { FormData } from 'components/organisms/OnBoarding';
+import Button from 'components/atoms/Button';
+import Message from 'components/atoms/Message';
 import { ProfileFormType } from 'types/profileFormType';
 
 type FunctionORNull = (() => any) | null;
