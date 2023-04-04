@@ -7,7 +7,7 @@ import {
 } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { healthCheck, whoami } from 'api/api.v1';
-import { useLogin, useUser } from 'hooks/useStore';
+import { useUser } from 'hooks/useStore';
 import { socket, SocketContext } from 'contexts/socket';
 import { routes } from 'routes';
 
@@ -26,7 +26,7 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
-  const isLoggedIn = useLogin((state) => state.isLogin);
+  const isLoggedIn = useUser((state) => state.isLogin);
   const isOnboarded = useUser((state) => state.isOnboarded);
 
   const router = createBrowserRouter(routes(isLoggedIn, isOnboarded));
@@ -43,7 +43,7 @@ export function App() {
 }
 
 function Init() {
-  const login = useLogin((state) => state.login);
+  const login = useUser((state) => state.login);
   const setIsOnboarded = useUser((state) => state.setIsOnboarded);
 
   const healthCheckQuery = useQuery({
@@ -59,11 +59,12 @@ function Init() {
   useEffect(() => {
     if (!whoamiQuery.isSuccess) return;
 
-    login();
+    login(whoamiQuery.data);
+
     if (whoamiQuery.data.nickname) {
       setIsOnboarded(true);
     }
-  }, [whoamiQuery]);
+  }, [whoamiQuery.isSuccess, whoamiQuery.data]);
 
   return <></>;
 }
