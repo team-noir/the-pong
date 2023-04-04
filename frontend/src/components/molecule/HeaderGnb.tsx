@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
 import { whoami, logout as logoutApi } from 'api/api.v1';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import { useLogin, useUser } from 'hooks/useStore';
+import { useUser } from 'hooks/useStore';
 import SearchBar from 'components/molecule/SearchBar';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types';
@@ -35,7 +35,7 @@ function Logo() {
 }
 
 export default function HeaderGnb() {
-  const logout = useLogin((state) => state.logout);
+  const logout = useUser((state) => state.logout);
   const setIsOnboarded = useUser((state) => state.setIsOnboarded);
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
