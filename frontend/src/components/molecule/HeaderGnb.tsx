@@ -2,7 +2,7 @@ import { useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { getWhoami, postLogout } from 'api/api.v1';
+import { whoami, logout as logoutApi } from 'api/api.v1';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useLogin, useUser } from 'hooks/useStore';
@@ -40,9 +40,9 @@ export default function HeaderGnb() {
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
-    queryFn: getWhoami,
+    queryFn: whoami,
   });
-  const postLogoutMutation = useMutation(postLogout);
+  const postLogoutMutation = useMutation(logoutApi);
 
   useEffect(() => {
     if (postLogoutMutation.isSuccess) {

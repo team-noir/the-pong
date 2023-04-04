@@ -4,6 +4,7 @@ import {
   ChannelType,
   ChannelUserRoleType,
   ChannelUserStatusType,
+  ChannelFormType,
 } from 'types';
 
 export const API_PREFIX = `/api/v1`;
@@ -25,7 +26,7 @@ axiosWithInterceptors.interceptors.response.use(
   }
 );
 
-export const getHealthCheck = async () => {
+export const healthCheck = async () => {
   const res = await axios.get(`/health-check`);
   return res;
 };
@@ -34,7 +35,7 @@ export const getHealthCheck = async () => {
 
 export const API_LOGIN_FT = `${API_PREFIX}/auth/42`;
 
-export const postLogout = async () => {
+export const logout = async () => {
   const res = await axiosWithInterceptors.post(`/auth/logout`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
@@ -44,7 +45,7 @@ export const postLogout = async () => {
 
 /** User */
 
-export const getWhoami = async (): Promise<UserType> => {
+export const whoami = async (): Promise<UserType> => {
   let whoamiAxios = axiosWithInterceptors;
   if (window.document.referrer === `${window.location.origin}/login`) {
     whoamiAxios = axios;
@@ -56,17 +57,7 @@ export const getWhoami = async (): Promise<UserType> => {
   return res.data;
 };
 
-export interface ProfileUserType {
-  id: number;
-  nickname: string;
-  rank: number;
-  achievements: [];
-  games: [];
-  isFollowedByMyself: boolean;
-  isBlockedByMyself: boolean;
-}
-
-export const getUser = async (userId: string): Promise<ProfileUserType> => {
+export const getUser = async (userId: string): Promise<UserType> => {
   const res = await axiosWithInterceptors.get(`/users/${userId}`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -90,7 +81,7 @@ export const getUsers = async (
 
 /** Setting */
 
-export const patchMyProfile = async (nickname: string): Promise<UserType> => {
+export const updateMyProfile = async (nickname: string): Promise<UserType> => {
   const res = await axiosWithInterceptors.patch(`/my/settings`, { nickname });
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -98,7 +89,7 @@ export const patchMyProfile = async (nickname: string): Promise<UserType> => {
   return res.data;
 };
 
-export const PostMyProfileImage = async (imageFile: File) => {
+export const updateMyProfileImage = async (imageFile: File) => {
   const formData = new FormData();
   formData.append('file', imageFile);
   const res = await axiosWithInterceptors.post(`/my/profile-image`, formData, {
@@ -138,7 +129,7 @@ export const getMyBlocks = async () => {
   return res.data;
 };
 
-export const deleteMyBlocks = async (userId: number) => {
+export const unblockUser = async (userId: number) => {
   const res = await axiosWithInterceptors.delete(`/my/blocks/${userId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
@@ -146,7 +137,7 @@ export const deleteMyBlocks = async (userId: number) => {
   return res;
 };
 
-export const putMyBlocks = async (userId: number) => {
+export const blockUser = async (userId: number) => {
   const res = await axiosWithInterceptors.put(`/my/blocks/${userId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
@@ -156,7 +147,7 @@ export const putMyBlocks = async (userId: number) => {
 
 /** Follow */
 
-export const getMyFollowing = async () => {
+export const getMyFollowings = async () => {
   const res = await axiosWithInterceptors.get(`/my/following`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -164,7 +155,7 @@ export const getMyFollowing = async () => {
   return res.data;
 };
 
-export const deleteMyFollowing = async (userId: number) => {
+export const unfollowUser = async (userId: number) => {
   const res = await axiosWithInterceptors.delete(`/my/following/${userId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
@@ -172,7 +163,7 @@ export const deleteMyFollowing = async (userId: number) => {
   return res;
 };
 
-export const putMyFollowing = async (userId: number) => {
+export const followUser = async (userId: number) => {
   const res = await axiosWithInterceptors.put(`/my/following/${userId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
@@ -182,12 +173,13 @@ export const putMyFollowing = async (userId: number) => {
 
 /** Channel */
 
-interface getChannelsParams {
+export const getChannels = async ({
+  enter,
+  kind,
+}: {
   enter?: string;
   kind?: string[];
-}
-
-export const getChannels = async ({ enter, kind }: getChannelsParams) => {
+}) => {
   const res = await axiosWithInterceptors.get(`/channels/`, {
     params: { enter, kind },
   });
@@ -205,14 +197,7 @@ export const getChannel = async (channelId: string) => {
   return res.data;
 };
 
-export interface ChannelFormType {
-  id?: number;
-  title?: string;
-  isPrivate?: boolean;
-  password?: string;
-}
-
-export const postNewChannel = async (
+export const createChannel = async (
   channelForm: ChannelFormType
 ): Promise<ChannelType> => {
   const res = await axios.post(`/channels`, channelForm);
@@ -222,7 +207,7 @@ export const postNewChannel = async (
   return res.data;
 };
 
-export const postJoinChannel = async (channelForm: ChannelFormType) => {
+export const joinChannel = async (channelForm: ChannelFormType) => {
   const res = await axiosWithInterceptors.post(`/channels/${channelForm.id}`, {
     password: channelForm.password,
   });
@@ -240,7 +225,7 @@ export const getDmChannel = async (userId: number) => {
   return res.data;
 };
 
-export const getChannelMessages = async (channelId: number) => {
+export const getMessages = async (channelId: number) => {
   const res = await axiosWithInterceptors.get(`/channels/${channelId}/message`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -248,7 +233,7 @@ export const getChannelMessages = async (channelId: number) => {
   return res.data;
 };
 
-export const postChannelMessages = async ({
+export const sendMessage = async ({
   channelId,
   message,
 }: {
@@ -263,7 +248,7 @@ export const postChannelMessages = async ({
   );
 };
 
-export const patchChannelSetting = async (channelForm: ChannelFormType) => {
+export const updateChannelSetting = async (channelForm: ChannelFormType) => {
   const res = await axiosWithInterceptors.patch(`/channels/${channelForm.id}`, {
     title: channelForm.title,
     password: channelForm.password,
@@ -274,7 +259,7 @@ export const patchChannelSetting = async (channelForm: ChannelFormType) => {
   return res;
 };
 
-export const putChannelUsers = async ({
+export const inviteUserToChannel = async ({
   channelId,
   userIds,
 }: {
@@ -290,7 +275,7 @@ export const putChannelUsers = async ({
   return res;
 };
 
-export const patchChannelUserRole = async ({
+export const updateChannelUserRole = async ({
   channelId,
   userId,
   role,
@@ -309,16 +294,7 @@ export const patchChannelUserRole = async ({
   return res;
 };
 
-// Leave Channel
-export const deleteChannel = async (channelId: number) => {
-  const res = await axiosWithInterceptors.delete(`/channels/${channelId}`);
-  if (res.status !== 204) {
-    throw new Error(res.statusText);
-  }
-  return res;
-};
-
-export const patchChannelUserStatus = async ({
+export const updateChannelUserStatus = async ({
   channelId,
   userId,
   status,
@@ -331,6 +307,14 @@ export const patchChannelUserStatus = async ({
     `/channels/${channelId}/users/${userId}/status`,
     { status }
   );
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const leaveChannel = async (channelId: number) => {
+  const res = await axiosWithInterceptors.delete(`/channels/${channelId}`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }

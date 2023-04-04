@@ -1,10 +1,10 @@
 import { Link } from 'react-router-dom';
 import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
-import { ProfileUserType } from 'api/api.v1';
+import { UserType } from 'types';
 
 interface Props {
-  user: ProfileUserType;
+  user: UserType;
   myId: string;
   onClickFollow: (userId: number) => void;
   onClickUnfollow: (userId: number) => void;

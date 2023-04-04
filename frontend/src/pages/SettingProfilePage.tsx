@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { getWhoami, patchMyProfile, PostMyProfileImage } from 'api/api.v1';
+import { whoami, updateMyProfile, updateMyProfileImage } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import SettingProfile from 'components/organisms/SettingProfile';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
@@ -14,28 +14,32 @@ export default function SettingProfilePage() {
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
-    queryFn: getWhoami,
+    queryFn: whoami,
   });
-  const patchMyProfileMutation = useMutation(patchMyProfile);
-  const postMyProfileImageMutation = useMutation(PostMyProfileImage);
+  const updateMyProfileMutation = useMutation(updateMyProfile);
+  const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
 
   useEffect(() => {
-    if (patchMyProfileMutation.isError || postMyProfileImageMutation.isError) {
+    if (
+      updateMyProfileMutation.isError ||
+      updateMyProfileImageMutation.isError
+    ) {
       alert('다시 시도해주세요.');
     }
     if (
       whoamiQuery.isSuccess &&
-      patchMyProfileMutation.isSuccess &&
-      (!hasImageFile || (hasImageFile && postMyProfileImageMutation.isSuccess))
+      updateMyProfileMutation.isSuccess &&
+      (!hasImageFile ||
+        (hasImageFile && updateMyProfileImageMutation.isSuccess))
     ) {
       navigate(`/profile/${whoamiQuery.data.id}`);
     }
-  }, [patchMyProfileMutation, whoamiQuery]);
+  }, [updateMyProfileMutation, whoamiQuery]);
 
   const handleSubmit = (formData: ProfileFormType) => {
-    patchMyProfileMutation.mutate(formData.nickname);
+    updateMyProfileMutation.mutate(formData.nickname);
     if (formData.imageFile) {
-      postMyProfileImageMutation.mutate(formData.imageFile);
+      updateMyProfileImageMutation.mutate(formData.imageFile);
       setHasImageFile(true);
     }
   };

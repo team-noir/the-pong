@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { getMyBlocks, deleteMyBlocks } from 'api/api.v1';
+import { getMyBlocks, unblockUser } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import UserList from 'components/molecule/UserList';
@@ -14,7 +14,7 @@ export default function SettingBlocksPage() {
     queryFn: getMyBlocks,
   });
 
-  const deleteMyBlocksMutation = useMutation(deleteMyBlocks);
+  const unblockUserMutation = useMutation(unblockUser);
 
   const handleClickUnblock = (e: React.MouseEvent<HTMLElement>) => {
     const ancestorElement = e.currentTarget.closest('[data-user-id]');
@@ -23,7 +23,7 @@ export default function SettingBlocksPage() {
 
     const answer = confirm('차단을 해제하시겠습니까?');
     if (!answer) return;
-    deleteMyBlocksMutation.mutate(Number(userId));
+    unblockUserMutation.mutate(Number(userId));
   };
 
   return (
