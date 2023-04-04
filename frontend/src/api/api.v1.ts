@@ -1,10 +1,10 @@
 import axios from 'axios';
-import { ChannelType } from 'types/channelType';
-import { UserType } from 'types/userType';
 import {
+  UserType,
+  ChannelType,
   ChannelUserRoleType,
   ChannelUserStatusType,
-} from 'types/channelUserType';
+} from 'types';
 
 export const API_PREFIX = `/api/v1`;
 

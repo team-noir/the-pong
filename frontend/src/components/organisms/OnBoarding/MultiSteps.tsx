@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { FormData } from 'components/organisms/OnBoarding';
 import Button from 'components/atoms/Button';
 import Message from 'components/atoms/Message';
-import { ProfileFormType } from 'types/profileFormType';
+import { ProfileFormType } from 'types';
 
 type FunctionORNull = (() => any) | null;
 

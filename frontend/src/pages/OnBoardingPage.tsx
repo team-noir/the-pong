@@ -4,7 +4,7 @@ import { patchMyProfile, PostMyProfileImage } from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
 import AppTemplateWithoutHeader from 'components/templates/AppTemplateWithoutHeader';
 import OnBoarding from 'components/organisms/OnBoarding';
-import { ProfileFormType } from 'types/profileFormType';
+import { ProfileFormType } from 'types';
 
 export default function OnBoardingPage() {
   const setIsOnboarded = useUser((state) => state.setIsOnboarded);

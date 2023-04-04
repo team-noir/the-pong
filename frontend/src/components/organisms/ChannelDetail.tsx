@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 import Button from 'components/atoms/Button';
-import { ChannelType } from 'types/channelType';
-import { ChannelUserType, UserRole } from 'types/channelUserType';
+import { ChannelType, USER_ROLES, ChannelUserType } from 'types';
 import styles from 'assets/styles/Channel.module.css';
 
 interface Props {
@@ -25,11 +24,10 @@ const findMyUser = (
 };
 
 const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
-  const priority = [UserRole.owner, UserRole.admin, UserRole.normal];
+  const priority = [USER_ROLES.OWNER, USER_ROLES.ADMIN, USER_ROLES.NORMAL];
   if (user1.role !== user2.role) {
     return priority.indexOf(user1.role) - priority.indexOf(user2.role);
   }
-  // 같은 role이면 nickname 순
   if (user1.nickname && user2.nickname) {
     return user1.nickname.localeCompare(user2.nickname);
   }
@@ -56,7 +54,7 @@ export default function ChannelDetail({
     );
   }, [channel.users, myUserId]);
 
-  const isMyUserRoleOwner = myUser?.role === UserRole.owner;
+  const isMyUserRoleOwner = myUser?.role === USER_ROLES.OWNER;
 
   return (
     <div>

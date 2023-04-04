@@ -1,5 +1,5 @@
 import MessageItem from 'components/molecule/MessageItem';
-import { MessageType } from 'types/messageType';
+import { MessageType } from 'types';
 
 interface Props {
   messages: MessageType[] | null;

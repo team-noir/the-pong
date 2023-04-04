@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { getChannels } from 'api/api.v1';
 import ChannelLobby from 'components/organisms/ChannelLobby';
-import { ChannelType } from 'types/channelType';
+import { ChannelType } from 'types';
 
 export default function ChannelLobbyPage() {
   const navigate = useNavigate();

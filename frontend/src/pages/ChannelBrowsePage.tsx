@@ -7,7 +7,7 @@ import AppTemplate from 'components/templates/AppTemplate';
 import ChannelBrowse from 'components/organisms/ChannelBrowse';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import PasswordModal from 'components/molecule/PasswordModal';
-import { ChannelType } from 'types/channelType';
+import { ChannelType } from 'types';
 
 export default function ChannelBrowsePage() {
   const [isShowPasswordInput, setIsShowPasswordInput] = useState(false);

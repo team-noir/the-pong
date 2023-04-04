@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import AchievementList from 'components/organisms/Achievements/AchievementList';
-import { UserType } from 'types/userType';
-import { AchievementType } from 'types/achievementType';
+import { UserType, AchievementType } from 'types';
 
 const dummyAchievementData: AchievementType[] = [
   {

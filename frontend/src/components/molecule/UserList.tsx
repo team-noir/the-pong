@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 import UserItem from 'components/molecule/UserItem';
-import { UserType } from 'types/userType';
+import { UserType } from 'types';
 
 interface Props {
   styles: { readonly [key: string]: string };

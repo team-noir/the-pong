@@ -1,6 +1,6 @@
 import SearchResultItem from 'components/organisms/SearchResult/SearchResultItem';
 import styles from 'assets/styles/SearchResult.module.css';
-import { UserType } from 'types/userType';
+import { UserType } from 'types';
 
 interface Props {
   users: UserType[] | null;

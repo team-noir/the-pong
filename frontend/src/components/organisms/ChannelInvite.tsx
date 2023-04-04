@@ -4,8 +4,7 @@ import { getUsers } from 'api/api.v1';
 import UserList from 'components/molecule/UserList';
 import SearchCombobox from 'components/molecule/SearchCombobox';
 import Button from 'components/atoms/Button';
-import { UserType } from 'types/userType';
-import { ChannelUserType } from 'types/channelUserType';
+import { UserType, ChannelUserType } from 'types';
 import styles from 'assets/styles/ChannelInvite.module.css';
 
 interface Props {

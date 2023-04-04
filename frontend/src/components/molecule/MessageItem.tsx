@@ -1,5 +1,5 @@
 import ProfileImage from 'components/atoms/ProfileImage';
-import { MessageType } from 'types/messageType';
+import { MessageType } from 'types';
 
 interface Props {
   message: MessageType;

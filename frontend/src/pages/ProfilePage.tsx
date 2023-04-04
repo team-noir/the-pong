@@ -13,7 +13,7 @@ import {
 } from 'api/api.v1';
 import Profile from 'components/organisms/Profile';
 import Achievements from 'components/organisms/Achievements';
-import { UserType } from 'types/userType';
+import { UserType } from 'types';
 
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };

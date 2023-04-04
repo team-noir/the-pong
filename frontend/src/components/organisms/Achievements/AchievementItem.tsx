@@ -1,4 +1,4 @@
-import { AchievementType } from 'types/achievementType';
+import { AchievementType } from 'types';
 import styles from 'assets/styles/Achievement.module.css';
 
 interface Props {

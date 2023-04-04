@@ -2,7 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { deleteMyFollowing, getMyFollowing } from 'api/api.v1';
 import Following from 'components/organisms/Following';
-import { UserType } from 'types/userType';
+import { UserType } from 'types';
 
 export default function FollowingPage() {
   const getMyFollowingQuery = useQuery<UserType[], AxiosError>({

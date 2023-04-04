@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import ChannelDetail from 'components/organisms/ChannelDetail';
 import { BrowserRouter } from 'react-router-dom';
-import { ChannelType } from 'types/channelType';
+import { ChannelType } from 'types';
 
 describe('Component - ChannelDetail 렌더링', () => {
   const channel: ChannelType = {

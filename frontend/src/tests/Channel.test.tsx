@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import Channel from 'components/organisms/Channel';
-import { ChannelType } from 'types/channelType';
+import { ChannelType } from 'types';
 
 describe('Component - Channel 렌더링', () => {
   const channel: ChannelType = {
