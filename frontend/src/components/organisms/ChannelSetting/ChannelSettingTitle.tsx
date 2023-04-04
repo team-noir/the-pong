@@ -6,11 +6,13 @@ import { validateChannelTitle } from 'utils/validatorUtils';
 interface Props {
   channelTitle: string;
   onClickBack: () => void;
+  onSubmit: (title: string) => void;
 }
 
 export default function ChannelSettingTitle({
   channelTitle,
   onClickBack,
+  onSubmit,
 }: Props) {
   const [title, setTitle] = useState<string>(channelTitle);
   const [isValid, setIsValid] = useState(false);
@@ -18,8 +20,7 @@ export default function ChannelSettingTitle({
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!isValid) return;
-    onClickBack();
-    // TODO: 서버로 데이터 전송
+    onSubmit(title);
   };
 
   return (

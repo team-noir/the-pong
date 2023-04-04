@@ -7,11 +7,13 @@ import { validateChannelPassword } from 'utils/validatorUtils';
 interface Props {
   isProtected: boolean;
   onClickBack: () => void;
+  onSubmit: (password: string) => void;
 }
 
 export default function ChannelSettingPassword({
   isProtected,
   onClickBack,
+  onSubmit,
 }: Props) {
   const [password, setPassword] = useState<string>('');
   const [hasPassword, setHasPassword] = useState(isProtected);
@@ -28,8 +30,7 @@ export default function ChannelSettingPassword({
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!isValid) return;
-    onClickBack();
-    // TODO: 서버로 데이터 전송
+    onSubmit(password);
   };
 
   return (

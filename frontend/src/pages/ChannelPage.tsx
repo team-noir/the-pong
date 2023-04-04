@@ -20,6 +20,7 @@ import AppTemplate from 'components/templates/AppTemplate';
 import { UserType } from 'types/userType';
 import { ChannelType } from 'types/channelType';
 import { MessageType } from 'types/messageType';
+import { ChannelFormType, patchChannelSetting } from 'api/api.v1';
 
 export default function ChannelPage() {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ export default function ChannelPage() {
     { channelId: number; message: string }
   >(postChannelMessages);
 
+  const patchChannelSettingMutation = useMutation(patchChannelSetting);
   const putChannelUsersMutation = useMutation(putChannelUsers);
 
   useEffect(() => {
@@ -119,65 +121,76 @@ export default function ChannelPage() {
         },
       }
     );
-  };
 
-  if (
-    whoamiQuery.status === 'loading' ||
-    getChannelQuery.status === 'loading'
-  ) {
-    return <div>Loading...</div>;
-  }
+    const changeChannelSetting = (channelForm: ChannelFormType) => {
+      patchChannelSettingMutation.mutate(channelForm, {
+        onError: () => alert('다시 시도해 주세요.'),
+        onSuccess: () => {
+          setIsShowSetting(false);
+          queryClient.invalidateQueries(['getChannel', channelId]);
+        },
+      });
+    };
 
-  if (whoamiQuery.status === 'error' || getChannelQuery.status === 'error') {
-    alert('에러가 발생했습니다.');
-    navigate('/channel');
-  }
+    if (
+      whoamiQuery.status === 'loading' ||
+      getChannelQuery.status === 'loading'
+    ) {
+      return <div>Loading...</div>;
+    }
 
-  return (
-    <AppTemplate
-      header={
-        <HeaderWithBackButton
-          title={getChannelQuery.data?.title || ''}
-          button={
-            <Button type="button" onClick={() => setIsShowDetail(true)}>
-              메뉴
-            </Button>
-          }
-        />
-      }
-    >
-      <>
-        {whoamiQuery.data && getChannelQuery.data && (
-          <>
-            <Channel
-              messages={messages}
-              postMessage={postMessage}
-              myUserId={whoamiQuery.data.id}
-            />
-            {isShowDetail && (
-              <ChannelDetail
-                channel={getChannelQuery.data}
+    if (whoamiQuery.status === 'error' || getChannelQuery.status === 'error') {
+      alert('에러가 발생했습니다.');
+      navigate('/channel');
+    }
+
+    return (
+      <AppTemplate
+        header={
+          <HeaderWithBackButton
+            title={getChannelQuery.data?.title || ''}
+            button={
+              <Button type="button" onClick={() => setIsShowDetail(true)}>
+                메뉴
+              </Button>
+            }
+          />
+        }
+      >
+        <>
+          {whoamiQuery.data && getChannelQuery.data && (
+            <>
+              <Channel
+                messages={messages}
+                postMessage={postMessage}
                 myUserId={whoamiQuery.data.id}
-                onClickSetting={() => setIsShowSetting(true)}
-                onClickInvite={() => setIsShowInvite(true)}
               />
-            )}
-            {isShowSetting && (
-              <ChannelSetting
-                channel={getChannelQuery.data}
-                onClickClose={() => setIsShowSetting(false)}
-              />
-            )}
-            {isShowInvite && getChannelQuery.data.users && (
-              <ChannelInvite
-                channelUsers={getChannelQuery.data.users}
-                onClickClose={() => setIsShowInvite(false)}
-                inviteUsers={inviteUsers}
-              />
-            )}
-          </>
-        )}
-      </>
-    </AppTemplate>
-  );
+              {isShowDetail && (
+                <ChannelDetail
+                  channel={getChannelQuery.data}
+                  myUserId={whoamiQuery.data.id}
+                  onClickSetting={() => setIsShowSetting(true)}
+                  onClickInvite={() => setIsShowInvite(true)}
+                />
+              )}
+              {isShowSetting && (
+                <ChannelSetting
+                  channel={getChannelQuery.data}
+                  onClickClose={() => setIsShowSetting(false)}
+                  changeChannelSetting={changeChannelSetting}
+                />
+              )}
+              {isShowInvite && getChannelQuery.data.users && (
+                <ChannelInvite
+                  channelUsers={getChannelQuery.data.users}
+                  onClickClose={() => setIsShowInvite(false)}
+                  inviteUsers={inviteUsers}
+                />
+              )}
+            </>
+          )}
+        </>
+      </AppTemplate>
+    );
+  };
 }

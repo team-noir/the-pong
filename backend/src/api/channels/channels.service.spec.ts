@@ -431,30 +431,18 @@ describe('Channel info', () => {
     service.setUser(user2.id, user2);
     service.setUser(user3.id, user3);
 
-    service.create(1, publicChannelData);
-    service.create(1, protectedChannelData);
-    service.create(1, privateChannelData);
+    service.create(user1.id, publicChannelData);
+    service.create(user1.id, protectedChannelData);
+    service.create(user1.id, privateChannelData);
 
-    service.create(2, publicChannelData);
-    service.create(2, protectedChannelData);
-    service.create(2, privateChannelData);
+    service.create(user2.id, publicChannelData);
+    service.create(user2.id, protectedChannelData);
+    service.create(user2.id, privateChannelData);
 
-    service.initDirectMessage(1, 2);
+    service.initDirectMessage(user1.id, user2.id);
   });
 
   it('유저 참여 중, public 채널 정보를 확인하는 경우', () => {
-    const channelId = 0;
-    const userId = 1;
-
-    try {
-      const channelInfo = service.getChannelInfo(userId, channelId);
-      expect(channelInfo.id).toBe(channelId);
-    } catch (error) {
-      expect(error).toBe(false);
-    }
-  });
-
-  it('유저 참여 중, protected 채널 정보를 확인하는 경우', () => {
     const channelId = 1;
     const userId = 1;
 
@@ -466,7 +454,7 @@ describe('Channel info', () => {
     }
   });
 
-  it('유저 참여 중, private 채널 정보를 확인하는 경우', () => {
+  it('유저 참여 중, protected 채널 정보를 확인하는 경우', () => {
     const channelId = 2;
     const userId = 1;
 
@@ -478,7 +466,7 @@ describe('Channel info', () => {
     }
   });
 
-  it('유저 미참여, public 채널 정보를 확인하는 경우', () => {
+  it('유저 참여 중, private 채널 정보를 확인하는 경우', () => {
     const channelId = 3;
     const userId = 1;
 
@@ -490,19 +478,19 @@ describe('Channel info', () => {
     }
   });
 
-  it('유저 미참여, protected 채널 정보를 확인하는 경우', () => {
+  it('유저 미참여, public 채널 정보를 확인하는 경우', () => {
     const channelId = 4;
     const userId = 1;
 
     try {
       const channelInfo = service.getChannelInfo(userId, channelId);
-      expect(channelInfo.id).toBe(false);
+      expect(channelInfo.id).toBe(channelId);
     } catch (error) {
-      expect(error.code).toBe(HttpStatus.FORBIDDEN);
+      expect(error).toBe(false);
     }
   });
 
-  it('유저 미참여, private 채널 정보를 확인하는 경우', () => {
+  it('유저 미참여, protected 채널 정보를 확인하는 경우', () => {
     const channelId = 5;
     const userId = 1;
 
@@ -514,8 +502,20 @@ describe('Channel info', () => {
     }
   });
 
-  it('유저 참여 중, dm 채널 정보를 확인하는 경우', () => {
+  it('유저 미참여, private 채널 정보를 확인하는 경우', () => {
     const channelId = 6;
+    const userId = 1;
+
+    try {
+      const channelInfo = service.getChannelInfo(userId, channelId);
+      expect(channelInfo.id).toBe(false);
+    } catch (error) {
+      expect(error.code).toBe(HttpStatus.FORBIDDEN);
+    }
+  });
+
+  it('유저 참여 중, dm 채널 정보를 확인하는 경우', () => {
+    const channelId = 7;
     const userId = 1;
 
     try {
@@ -527,7 +527,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, dm 채널 정보를 확인하는 경우', () => {
-    const channelId = 6;
+    const channelId = 7;
     const userId = 3;
 
     try {

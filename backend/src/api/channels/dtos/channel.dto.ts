@@ -1,17 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsOptional } from 'class-validator';
+import { IsString, IsBoolean, IsOptional, IsNumber, IsArray } from 'class-validator';
 
 export class CreateChannelDto {
-  @ApiProperty()
+  @ApiProperty({
+    example: "title"
+  })
   @IsString()
   public title: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: true
+  })
   @IsBoolean()
   @IsOptional()
   public isPrivate?: boolean;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: "title"
+  })
   @IsString()
   @IsOptional()
   public password?: string;
@@ -26,7 +32,8 @@ export class ChannelDmDto {
 export class SettingChannelDto {
   @ApiProperty()
   @IsString()
-  public title: string;
+  @IsOptional()
+  public title?: string;
 
   @ApiProperty()
   @IsString()
@@ -44,11 +51,138 @@ export class ChannelPasswordDto {
 export class ChannelRoleDto {
   @ApiProperty()
   @IsString()
-  role: string;
+  public role: string;
+}
+
+export class ChannelUserStatusDto {
+  @ApiProperty()
+  @IsString()
+  public status: 'kick' | 'ban' | 'mute';
+}
+
+export class ChannelInviteDto {
+  @ApiProperty({
+    type: [Number],
+    example: [1, 2, 3],
+  })
+  @IsArray()
+  @IsNumber({}, { each: true })
+  public userIds: number[];
+}
+
+export class ChannelIdDto {
+  @ApiProperty()
+  @IsNumber()
+  public id: number;
+}
+
+export class ChannelInfoDto {
+  @ApiProperty()
+  public id: number;
+
+  @ApiProperty()
+  public title: string;
+
+  @ApiProperty()
+  public isProtected: boolean;
+
+  @ApiProperty()
+  public isPrivate: boolean;
+
+  @ApiProperty()
+  public isDm: boolean;
+
+  @ApiProperty()
+  public dmUserId: number;
+
+  @ApiProperty()
+  public userCount: number;
+
+  @ApiProperty()
+  public isJoined: boolean;
+
+  @ApiProperty()
+  public createdAt: Date;
+}
+
+export class ChannelDetailUserDto {
+  @ApiProperty()
+  public id: Number;
+
+  @ApiProperty()
+  public nickname: String;
+
+  @ApiProperty()
+  public role: String
+
+  @ApiProperty()
+  public isMuted: boolean;
+}
+
+export class ChannelDetailDto {
+  @ApiProperty()
+  public id: number;
+
+  @ApiProperty()
+  public title: string;
+
+  @ApiProperty()
+  public isProtected: boolean;
+
+  @ApiProperty()
+  public isPrivate: boolean;
+
+  @ApiProperty()
+  public isDm: boolean;
+  
+  @ApiProperty()
+  public isBlocked: boolean;
+  
+  @ApiProperty()
+  public isJoined: boolean;
+  
+  @ApiProperty()
+  public userCount: number;
+  
+  @ApiProperty({
+    type: [ChannelDetailUserDto],
+    example: [
+      {id: 1, nickname: 'nickname1', role: 'owner', isMuted: false},
+      {id: 2, nickname: 'nickname2', role: 'admin', isMuted: false},
+      {id: 3, nickname: 'nickname3', role: 'normal', isMuted: true}
+    ],
+  })
+  public users: ChannelDetailUserDto[];
+
+  @ApiProperty()
+  public createdAt: Date;
 }
 
 export class ChannelMessageDto {
   @ApiProperty()
-  @IsString()
-  text: string;
+  public id: number;
+
+  @ApiProperty()
+  @IsOptional()
+  public senderId?: number;
+
+  @ApiProperty()
+  @IsOptional()
+  public senderNickname?: string;
+
+  @ApiProperty()
+  public isLog: boolean;
+
+  @ApiProperty()
+  public text: string;
+
+  @ApiProperty()
+  public createdAt: Date;
 }
+
+export class ChannelMessageTextDto {
+  @ApiProperty()
+  @IsString()
+  public text: string;
+}
+
