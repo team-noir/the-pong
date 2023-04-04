@@ -25,7 +25,13 @@ export default function ChannelNew() {
   const [hasPassword, setHasPassword] = useState(false);
   const navigate = useNavigate();
 
-  const createChannelMutation = useMutation(createChannel);
+  const createChannelMutation = useMutation({
+    mutationFn: createChannel,
+    onSuccess: (data) => {
+      const { id } = data;
+      navigate(`/channel/${id}`);
+    },
+  });
 
   useEffect(() => {
     if (!hasPassword || formData.isPrivate) {
@@ -40,15 +46,7 @@ export default function ChannelNew() {
       alert('입력값을 확인해주세요.');
       return;
     }
-    createChannelMutation.mutate(formData, {
-      onError: () => {
-        alert(`다시 시도해 주세요.`);
-      },
-      onSuccess: (data) => {
-        const { id } = data;
-        navigate(`/channel/${id}`);
-      },
-    });
+    createChannelMutation.mutate(formData);
   };
 
   return (

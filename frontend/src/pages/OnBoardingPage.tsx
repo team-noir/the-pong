@@ -16,12 +16,6 @@ export default function OnBoardingPage() {
 
   useEffect(() => {
     if (
-      updateMyProfileMutation.isError ||
-      updateMyProfileImageMutation.isError
-    ) {
-      alert('다시 시도해주세요.');
-    }
-    if (
       updateMyProfileMutation.isSuccess &&
       (!hasImageFile ||
         (hasImageFile && updateMyProfileImageMutation.isSuccess))
@@ -35,7 +29,6 @@ export default function OnBoardingPage() {
     updateMyProfileMutation.mutate(formData.nickname);
     if (formData.imageFile) {
       updateMyProfileImageMutation.mutate(formData.imageFile, {
-        onError: () => alert('다시 시도해주세요.'),
         onSuccess: () => setNickname(formData.nickname),
       });
       setHasImageFile(true);

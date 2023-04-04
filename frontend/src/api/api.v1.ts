@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import {
   UserType,
   ChannelType,
@@ -50,11 +50,20 @@ export const whoami = async (): Promise<UserType> => {
   if (window.document.referrer === `${window.location.origin}/login`) {
     whoamiAxios = axios;
   }
-  const res = await whoamiAxios.get(`/my/whoami`);
-  if (res.status !== 200) {
-    throw new Error(res.statusText);
+
+  try {
+    const res = await whoamiAxios.get(`/my/whoami`);
+
+    if (res.status !== 200) {
+      throw new Error(res.statusText);
+    }
+    return res.data;
+  } catch (e) {
+    if (e instanceof AxiosError) {
+      throw new Error(e.response?.data.message || e.message);
+    }
+    throw e;
   }
-  return res.data;
 };
 
 export const getUser = async (userId: number): Promise<UserType> => {
@@ -183,10 +192,12 @@ export const getChannels = async ({
   const res = await axiosWithInterceptors.get(`/channels/`, {
     params: { enter, kind },
   });
-  if (res.status !== 200) {
-    throw new Error(res.statusText);
-  }
-  return res.data;
+  throw new Error(res.statusText);
+
+  // if (res.status !== 200) {
+  //   throw new Error(res.statusText);
+  // }
+  // return res.data;
 };
 
 export const getChannel = async (channelId: number) => {

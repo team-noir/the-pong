@@ -1,16 +1,17 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { getMyFollowings, unfollowUser } from 'api/api.v1';
 import Following from 'components/organisms/Following';
-import { UserType } from 'types';
 
 export default function FollowingPage() {
-  const getMyFollowingQuery = useQuery<UserType[], AxiosError>({
+  const getMyFollowingQuery = useQuery({
     queryKey: ['getMyFollowing'],
     queryFn: getMyFollowings,
   });
 
-  const unfollowUserMutation = useMutation(unfollowUser);
+  const unfollowUserMutation = useMutation({
+    mutationFn: unfollowUser,
+    onSuccess: () => getMyFollowingQuery.refetch(),
+  });
 
   const handleClickUnfollow = (e: React.MouseEvent<HTMLElement>) => {
     const ancestorElement = e.currentTarget.closest('[data-user-id]');
@@ -25,17 +26,11 @@ export default function FollowingPage() {
   return (
     <>
       <h1>FollowingPage</h1>
-      {getMyFollowingQuery.isLoading && <div>Loading...</div>}
-      {getMyFollowingQuery.isError && (
-        <div>{getMyFollowingQuery.error.message}</div>
-      )}
       {getMyFollowingQuery.isSuccess && (
-        <>
-          <Following
-            users={getMyFollowingQuery.data}
-            onClickUnfollow={handleClickUnfollow}
-          />
-        </>
+        <Following
+          users={getMyFollowingQuery.data}
+          onClickUnfollow={handleClickUnfollow}
+        />
       )}
     </>
   );

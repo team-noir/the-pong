@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import * as api from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
 import { SocketContext } from 'contexts/socket';
@@ -13,7 +12,6 @@ import ChannelInvite from 'components/organisms/ChannelInvite';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Button from 'components/atoms/Button';
 import {
-  ChannelType,
   ChannelUserRoleType,
   ChannelUserStatusType,
   MessageType,
@@ -32,32 +30,49 @@ export default function ChannelPage() {
 
   const queryClient = useQueryClient();
 
-  const getChannelQuery = useQuery<ChannelType, AxiosError>({
+  const getChannelQuery = useQuery({
     queryKey: ['getChannel', channelId],
     queryFn: () => api.getChannel(Number(channelId)),
   });
 
-  const getMessagesMutation = useMutation<MessageType[], AxiosError, number>(
-    api.getMessages
-  );
+  const getMessagesQuery = useQuery({
+    queryKey: ['getMessages'],
+    queryFn: () => api.getMessages(Number(channelId)),
+    staleTime: Infinity,
+  });
 
-  const sendMessageMutation = useMutation<
-    any,
-    AxiosError,
-    { channelId: number; message: string }
-  >(api.sendMessage);
+  const sendMessageMutation = useMutation(api.sendMessage);
 
-  const updateChannelSettingMutation = useMutation(api.updateChannelSetting);
-  const inviteUserToChannelMutation = useMutation(api.inviteUserToChannel);
+  const updateChannelSettingMutation = useMutation({
+    mutationFn: api.updateChannelSetting,
+    onSuccess: () => {
+      setIsShowSetting(false);
+      queryClient.invalidateQueries(['getChannel', channelId]);
+    },
+  });
 
-  const leaveChannelMutation = useMutation(api.leaveChannel);
+  const inviteUserToChannelMutation = useMutation({
+    mutationFn: api.inviteUserToChannel,
+    onSuccess: () => {
+      setIsShowInvite(false);
+      queryClient.invalidateQueries(['getChannel', channelId]);
+    },
+  });
 
-  const updateChannelUserRoleMutation = useMutation<any, AxiosError, any>({
+  const leaveChannelMutation = useMutation({
+    mutationFn: api.leaveChannel,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['getChannel', channelId]);
+      navigate('/channel');
+    },
+  });
+
+  const updateChannelUserRoleMutation = useMutation({
     mutationFn: api.updateChannelUserRole,
     onSuccess: () => getChannelQuery.refetch(),
   });
 
-  const updateChannelUserStatusMutation = useMutation<any, AxiosError, any>({
+  const updateChannelUserStatusMutation = useMutation({
     mutationFn: api.updateChannelUserStatus,
     onSuccess: () => getChannelQuery.refetch(),
   });
@@ -91,16 +106,10 @@ export default function ChannelPage() {
   };
 
   useEffect(() => {
-    if (getChannelQuery.data) {
-      getMessagesMutation.mutate(getChannelQuery.data.id);
+    if (getMessagesQuery.data) {
+      setMessages([...getMessagesQuery.data]);
     }
-  }, [getChannelQuery.data]);
-
-  useEffect(() => {
-    if (getMessagesMutation.data) {
-      setMessages([...getMessagesMutation.data]);
-    }
-  }, [getMessagesMutation.data]);
+  }, [getMessagesQuery.data]);
 
   useEffect(() => {
     socket.on('message', (data: MessageType) => {
@@ -141,52 +150,25 @@ export default function ChannelPage() {
   const inviteUsers = (userIds: number[]) => {
     if (!channelId) return;
 
-    inviteUserToChannelMutation.mutate(
-      { channelId: Number(channelId), userIds },
-      {
-        onError: () => alert('다시 시도해 주세요.'),
-        onSuccess: () => {
-          setIsShowInvite(false);
-          queryClient.invalidateQueries(['getChannel', channelId]);
-        },
-      }
-    );
+    inviteUserToChannelMutation.mutate({
+      channelId: Number(channelId),
+      userIds,
+    });
   };
 
   const leaveChannel = () => {
-    leaveChannelMutation.mutate(Number(channelId), {
-      onError: () => alert('다시 시도해 주세요.'),
-      onSuccess: () => {
-        queryClient.invalidateQueries(['getChannel', channelId]);
-        navigate('/channel');
-      },
-    });
+    leaveChannelMutation.mutate(Number(channelId));
   };
 
   const changeChannelSetting = (channelForm: ChannelFormType) => {
-    updateChannelSettingMutation.mutate(channelForm, {
-      onError: () => alert('다시 시도해 주세요.'),
-      onSuccess: () => {
-        setIsShowSetting(false);
-        queryClient.invalidateQueries(['getChannel', channelId]);
-      },
-    });
+    updateChannelSettingMutation.mutate(channelForm);
   };
-
-  if (getChannelQuery.status === 'loading') {
-    return <div>Loading...</div>;
-  }
-
-  if (getChannelQuery.status === 'error') {
-    alert('에러가 발생했습니다.');
-    navigate('/channel');
-  }
 
   return (
     <AppTemplate
       header={
         <HeaderWithBackButton
-          title={getChannelQuery.data?.title || ''}
+          title={getChannelQuery.data.title || ''}
           button={
             <Button type="button" onClick={() => setIsShowDetail(true)}>
               메뉴
@@ -195,44 +177,38 @@ export default function ChannelPage() {
         />
       }
     >
-      <>
-        {getChannelQuery.data && (
-          <>
-            {myUserId && (
-              <Channel
-                messages={messages}
-                postMessage={postMessage}
-                myUserId={myUserId}
-              />
-            )}
-            {isShowDetail && myUserId && (
-              <ChannelDetail
-                channel={getChannelQuery.data}
-                changeRole={changeRole}
-                changeStatus={changeStatus}
-                myUserId={myUserId}
-                onClickSetting={() => setIsShowSetting(true)}
-                onClickInvite={() => setIsShowInvite(true)}
-                onClickLeave={leaveChannel}
-              />
-            )}
-            {isShowSetting && (
-              <ChannelSetting
-                channel={getChannelQuery.data}
-                onClickClose={() => setIsShowSetting(false)}
-                changeChannelSetting={changeChannelSetting}
-              />
-            )}
-            {isShowInvite && getChannelQuery.data.users && (
-              <ChannelInvite
-                channelUsers={getChannelQuery.data.users}
-                onClickClose={() => setIsShowInvite(false)}
-                inviteUsers={inviteUsers}
-              />
-            )}
-          </>
-        )}
-      </>
+      {myUserId && (
+        <Channel
+          messages={messages}
+          postMessage={postMessage}
+          myUserId={myUserId}
+        />
+      )}
+      {isShowDetail && myUserId && (
+        <ChannelDetail
+          channel={getChannelQuery.data}
+          changeRole={changeRole}
+          changeStatus={changeStatus}
+          myUserId={myUserId}
+          onClickSetting={() => setIsShowSetting(true)}
+          onClickInvite={() => setIsShowInvite(true)}
+          onClickLeave={leaveChannel}
+        />
+      )}
+      {isShowSetting && (
+        <ChannelSetting
+          channel={getChannelQuery.data}
+          onClickClose={() => setIsShowSetting(false)}
+          changeChannelSetting={changeChannelSetting}
+        />
+      )}
+      {isShowInvite && getChannelQuery.data.users && (
+        <ChannelInvite
+          channelUsers={getChannelQuery.data.users}
+          onClickClose={() => setIsShowInvite(false)}
+          inviteUsers={inviteUsers}
+        />
+      )}
     </AppTemplate>
   );
 }

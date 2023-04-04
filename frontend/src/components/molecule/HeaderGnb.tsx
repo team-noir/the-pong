@@ -35,18 +35,13 @@ function Logo() {
 export default function HeaderGnb() {
   const { logout, setIsOnboarded, id: myUserId } = useUser((state) => state);
 
-  const postLogoutMutation = useMutation(logoutApi);
-
-  useEffect(() => {
-    if (postLogoutMutation.isSuccess) {
+  const postLogoutMutation = useMutation({
+    mutationFn: logoutApi,
+    onSuccess: () => {
       setIsOnboarded(false);
       logout();
-    }
-  }, [postLogoutMutation.isSuccess]);
-
-  const handleLogout = () => {
-    postLogoutMutation.mutate();
-  };
+    },
+  });
 
   return (
     <Disclosure
@@ -127,7 +122,7 @@ export default function HeaderGnb() {
                         {({ active }) => (
                           <span
                             role="button"
-                            onClick={handleLogout}
+                            onClick={() => postLogoutMutation.mutate()}
                             className={classNames(
                               active ? 'bg-gray-dark' : '',
                               'block px-4 py-2 text-sm text-text-light cursor-pointer'

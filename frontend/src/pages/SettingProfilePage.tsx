@@ -14,15 +14,10 @@ export default function SettingProfilePage() {
   const navigate = useNavigate();
 
   const updateMyProfileMutation = useMutation(updateMyProfile);
+
   const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
 
   useEffect(() => {
-    if (
-      updateMyProfileMutation.isError ||
-      updateMyProfileImageMutation.isError
-    ) {
-      alert('다시 시도해주세요.');
-    }
     if (
       updateMyProfileMutation.isSuccess &&
       (!hasImageFile ||
@@ -34,7 +29,6 @@ export default function SettingProfilePage() {
 
   const handleSubmit = (formData: ProfileFormType) => {
     updateMyProfileMutation.mutate(formData.nickname, {
-      onError: () => alert('다시 시도해주세요.'),
       onSuccess: () => setNickname(formData.nickname),
     });
     if (formData.imageFile) {
