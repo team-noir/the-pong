@@ -6,8 +6,7 @@ import { getWhoami, patchMyProfile, PostMyProfileImage } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import SettingProfile from 'components/organisms/SettingProfile';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
-import { UserType } from 'types/userType';
-import { ProfileFormType } from 'types/profileFormType';
+import { UserType, ProfileFormType } from 'types';
 
 export default function SettingProfilePage() {
   const navigate = useNavigate();

@@ -8,7 +8,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useLogin, useUser } from 'hooks/useStore';
 import SearchBar from 'components/molecule/SearchBar';
 import ProfileImage from 'components/atoms/ProfileImage';
-import { UserType } from 'types/userType';
+import { UserType } from 'types';
 
 const navigation = [
   { name: 'Game', href: '/game', current: false },

@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import Following from 'components/organisms/Following';
 import { BrowserRouter } from 'react-router-dom';
-import { UserType } from 'types/userType';
+import { UserType } from 'types';
 
 const mockFollowings: UserType[] = [
   {

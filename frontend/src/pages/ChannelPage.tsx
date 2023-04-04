@@ -22,13 +22,13 @@ import ChannelSetting from 'components/organisms/ChannelSetting';
 import ChannelInvite from 'components/organisms/ChannelInvite';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Button from 'components/atoms/Button';
-import { ChannelType } from 'types/channelType';
 import {
+  UserType,
+  ChannelType,
   ChannelUserRoleType,
   ChannelUserStatusType,
-} from 'types/channelUserType';
-import { MessageType } from 'types/messageType';
-import { UserType } from 'types/userType';
+  MessageType,
+} from 'types';
 
 export default function ChannelPage() {
   const navigate = useNavigate();

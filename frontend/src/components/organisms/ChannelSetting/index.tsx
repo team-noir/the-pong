@@ -3,7 +3,7 @@ import { ChannelFormType } from 'api/api.v1';
 import ChannelSettingPassword from 'components/organisms/ChannelSetting/ChannelSettingPassword';
 import ChannelSettingTitle from 'components/organisms/ChannelSetting/ChannelSettingTitle';
 import Button from 'components/atoms/Button';
-import { ChannelType } from 'types/channelType';
+import { ChannelType } from 'types';
 
 interface Props {
   channel: ChannelType;

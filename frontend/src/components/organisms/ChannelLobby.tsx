@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import ChannelList from 'components/molecule/ChannelList';
-import { ChannelType } from 'types/channelType';
+import { ChannelType } from 'types';
 import styles from 'assets/styles/ChannelLobby.module.css';
 
 interface Props {

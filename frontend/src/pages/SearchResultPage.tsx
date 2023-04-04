@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { getUsers } from 'api/api.v1';
 import SearchResult from 'components/organisms/SearchResult';
-import { UserType } from 'types/userType';
+import { UserType } from 'types';
 
 export default function SearchResultPage() {
   const [searchParams] = useSearchParams();

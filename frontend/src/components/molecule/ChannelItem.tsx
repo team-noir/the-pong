@@ -1,4 +1,4 @@
-import { ChannelType } from 'types/channelType';
+import { ChannelType } from 'types';
 
 interface Props {
   styles: { readonly [key: string]: string };
