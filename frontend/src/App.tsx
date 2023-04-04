@@ -5,12 +5,25 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { healthCheck, whoami } from 'api/api.v1';
 import { useLogin, useUser } from 'hooks/useStore';
 import { socket, SocketContext } from 'contexts/socket';
 import { routes } from 'routes';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: false,
+      refetchOnMount: 'always',
+      refetchInterval: 1000 * 60, // 1분
+      staleTime: 1000 * 60, // 1분
+    },
+    mutations: {
+      retry: false,
+    },
+  },
+});
 
 export function App() {
   const isLoggedIn = useLogin((state) => state.isLogin);
@@ -23,6 +36,7 @@ export function App() {
       <QueryClientProvider client={queryClient}>
         <Init />
         <RouterProvider router={router} />
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </SocketContext.Provider>
   );
