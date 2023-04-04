@@ -23,6 +23,7 @@ import AppTemplate from 'components/templates/AppTemplate';
 import { UserType } from 'types/userType';
 import { ChannelType } from 'types/channelType';
 import { MessageType } from 'types/messageType';
+import { ChannelUserRoleType, ChannelUserStatusType } from 'types/channelUserType';
 import { ChannelFormType, patchChannelSetting } from 'api/api.v1';
 
 export default function ChannelPage() {
@@ -78,7 +79,7 @@ export default function ChannelPage() {
     role,
   }: {
     userId: number;
-    role: 'admin' | 'normal';
+    role: ChannelUserRoleType;
   }) => {
     patchChannelUserRoleMutation.mutate({
       channelId: getChannelQuery.data?.id,
@@ -92,7 +93,7 @@ export default function ChannelPage() {
     status,
   }: {
     userId: number;
-    status: 'kick' | 'ban' | 'mute';
+    status: ChannelUserStatusType;
   }) => {
     patchChannelUserStatusMutation.mutate({
       channelId: getChannelQuery.data?.id,

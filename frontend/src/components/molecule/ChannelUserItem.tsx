@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
-import { ChannelUserType, RoleType } from 'types/channelUserType';
+import { ChannelUserType, UserRole } from 'types/channelUserType';
 import Button from 'components/atoms/Button';
 
 interface Props {
@@ -21,12 +21,12 @@ export default function ChannelUserItem({
   myUser,
 }: Props) {
   const isSelf = myUser?.id === user.id;
-  const amIOwner = myUser?.role === RoleType.owner;
+  const amIOwner = myUser?.role === UserRole.owner;
 
   const handleClickRole = () => {
     changeRole({
       userId: user.id,
-      role: user.role === RoleType.admin ? 'normal' : 'admin',
+      role: user.role === UserRole.admin ? 'normal' : 'admin',
     });
   };
 
@@ -49,8 +49,8 @@ export default function ChannelUserItem({
       </Link>
       <Link to={`/profile/${user.id}`}>
         <span>
-          {user.role === RoleType.owner && `🕶`}
-          {user.role === RoleType.admin && `👓`}
+          {user.role === UserRole.owner && `🕶`}
+          {user.role === UserRole.admin && `👓`}
           {user.nickname}
         </span>
       </Link>
@@ -60,7 +60,7 @@ export default function ChannelUserItem({
 
           {amIOwner && (
             <>
-              {user.role === RoleType.admin ? (
+              {user.role === UserRole.admin ? (
                 <Button type="button" onClick={handleClickRole}>
                   관리자 해제
                 </Button>
@@ -69,7 +69,7 @@ export default function ChannelUserItem({
                   관리자 임명
                 </Button>
               )}
-              {user.role !== RoleType.owner && (
+              {user.role !== UserRole.owner && (
                 <>
                   <Button
                     type="button"
