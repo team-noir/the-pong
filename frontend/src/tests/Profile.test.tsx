@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
-import { ProfileUserType } from 'api/api.v1';
 import Profile from 'components/organisms/Profile';
+import { UserType } from 'types';
 
-const profileUser: ProfileUserType = {
+const profileUser: UserType = {
   id: 1,
   nickname: `user1's nickname`,
   rank: 0,
@@ -28,7 +28,7 @@ describe('Component - Profile 렌더링', () => {
         onClickDm={(userId: number) => mockHandler(userId, 'dm')}
       />
     );
-    screen.findByText(profileUser.nickname);
+    screen.findByText(`user1's nickname`);
     screen.findByAltText('profile image');
     screen.findByText('팔로우하기');
   });

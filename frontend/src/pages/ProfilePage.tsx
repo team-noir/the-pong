@@ -3,12 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import {
   getUser,
-  getWhoami,
-  ProfileUserType,
-  putMyFollowing,
-  deleteMyFollowing,
-  putMyBlocks,
-  deleteMyBlocks,
+  whoami,
+  followUser,
+  unfollowUser,
+  blockUser,
+  unblockUser,
   getDmChannel,
 } from 'api/api.v1';
 import Profile from 'components/organisms/Profile';
@@ -19,44 +18,44 @@ export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };
   const navigate = useNavigate();
 
-  const getUserQuery = useQuery<ProfileUserType, AxiosError>({
+  const getUserQuery = useQuery<UserType, AxiosError>({
     queryKey: ['profile', userId],
     queryFn: () => getUser(userId),
   });
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
-    queryFn: getWhoami,
+    queryFn: whoami,
   });
 
-  const putMyFollowingMutation = useMutation(putMyFollowing);
-  const deleteMyFollowingMutation = useMutation(deleteMyFollowing);
-  const putMyBlocksMutation = useMutation(putMyBlocks);
-  const deleteMyBlocksMutation = useMutation(deleteMyBlocks);
+  const followUserMutation = useMutation(followUser);
+  const unfollowUserMutation = useMutation(unfollowUser);
+  const blockUserMutation = useMutation(blockUser);
+  const unblockUserMutation = useMutation(unblockUser);
   const getDmChannelMutation = useMutation(getDmChannel);
 
   const handleClickFollow = (userId: number) => {
     const answer = confirm('팔로우하시겠습니까?');
     if (!answer) return;
-    putMyFollowingMutation.mutate(userId);
+    followUserMutation.mutate(userId);
   };
 
   const handleClickUnfollow = (userId: number) => {
     const answer = confirm('언팔로우하시겠습니까?');
     if (!answer) return;
-    deleteMyFollowingMutation.mutate(Number(userId));
+    unfollowUserMutation.mutate(Number(userId));
   };
 
   const handleClickBlock = (userId: number) => {
     const answer = confirm('정말 차단하시겠습니까?');
     if (!answer) return;
-    putMyBlocksMutation.mutate(userId);
+    blockUserMutation.mutate(userId);
   };
 
   const handleClickUnblock = (userId: number) => {
     const answer = confirm('차단을 해제하시겠습니까?');
     if (!answer) return;
-    deleteMyBlocksMutation.mutate(userId);
+    unblockUserMutation.mutate(userId);
   };
 
   const handleClickDm = (userId: number) => {

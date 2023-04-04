@@ -2,18 +2,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import {
-  getWhoami,
-  getChannel,
-  getChannelMessages,
-  postChannelMessages,
-  putChannelUsers,
-  deleteChannel,
-  patchChannelUserRole,
-  patchChannelUserStatus,
-  patchChannelSetting,
-  ChannelFormType,
-} from 'api/api.v1';
+import * as api from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 import AppTemplate from 'components/templates/AppTemplate';
 import Channel from 'components/organisms/Channel';
@@ -28,6 +17,7 @@ import {
   ChannelUserRoleType,
   ChannelUserStatusType,
   MessageType,
+  ChannelFormType,
 } from 'types';
 
 export default function ChannelPage() {
@@ -43,38 +33,36 @@ export default function ChannelPage() {
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
     queryKey: ['whoami'],
-    queryFn: getWhoami,
+    queryFn: api.whoami,
   });
 
   const getChannelQuery = useQuery<ChannelType, AxiosError>({
     queryKey: ['getChannel', channelId],
-    queryFn: () => getChannel(channelId),
+    queryFn: () => api.getChannel(channelId),
   });
 
-  const getChannelMessagesMutation = useMutation<
-    MessageType[],
-    AxiosError,
-    number
-  >(getChannelMessages);
+  const getMessagesMutation = useMutation<MessageType[], AxiosError, number>(
+    api.getMessages
+  );
 
-  const postChannelMessagesMutation = useMutation<
+  const sendMessageMutation = useMutation<
     any,
     AxiosError,
     { channelId: number; message: string }
-  >(postChannelMessages);
+  >(api.sendMessage);
 
-  const patchChannelSettingMutation = useMutation(patchChannelSetting);
-  const putChannelUsersMutation = useMutation(putChannelUsers);
+  const updateChannelSettingMutation = useMutation(api.updateChannelSetting);
+  const inviteUserToChannelMutation = useMutation(api.inviteUserToChannel);
 
-  const deleteChannelMutation = useMutation(deleteChannel);
+  const leaveChannelMutation = useMutation(api.leaveChannel);
 
-  const patchChannelUserRoleMutation = useMutation<any, AxiosError, any>({
-    mutationFn: patchChannelUserRole,
+  const updateChannelUserRoleMutation = useMutation<any, AxiosError, any>({
+    mutationFn: api.updateChannelUserRole,
     onSuccess: () => getChannelQuery.refetch(),
   });
 
-  const patchChannelUserStatusMutation = useMutation<any, AxiosError, any>({
-    mutationFn: patchChannelUserStatus,
+  const updateChannelUserStatusMutation = useMutation<any, AxiosError, any>({
+    mutationFn: api.updateChannelUserStatus,
     onSuccess: () => getChannelQuery.refetch(),
   });
 
@@ -85,7 +73,7 @@ export default function ChannelPage() {
     userId: number;
     role: ChannelUserRoleType;
   }) => {
-    patchChannelUserRoleMutation.mutate({
+    updateChannelUserRoleMutation.mutate({
       channelId: getChannelQuery.data?.id,
       userId,
       role,
@@ -99,7 +87,7 @@ export default function ChannelPage() {
     userId: number;
     status: ChannelUserStatusType;
   }) => {
-    patchChannelUserStatusMutation.mutate({
+    updateChannelUserStatusMutation.mutate({
       channelId: getChannelQuery.data?.id,
       userId,
       status,
@@ -108,15 +96,15 @@ export default function ChannelPage() {
 
   useEffect(() => {
     if (getChannelQuery.data) {
-      getChannelMessagesMutation.mutate(getChannelQuery.data.id);
+      getMessagesMutation.mutate(getChannelQuery.data.id);
     }
   }, [getChannelQuery.data]);
 
   useEffect(() => {
-    if (getChannelMessagesMutation.data) {
-      setMessages([...getChannelMessagesMutation.data]);
+    if (getMessagesMutation.data) {
+      setMessages([...getMessagesMutation.data]);
     }
-  }, [getChannelMessagesMutation.data]);
+  }, [getMessagesMutation.data]);
 
   useEffect(() => {
     socket.on('message', (data: MessageType) => {
@@ -150,7 +138,7 @@ export default function ChannelPage() {
   const postMessage = (message: string) => {
     if (channelId === undefined) return;
 
-    postChannelMessagesMutation.mutate({
+    sendMessageMutation.mutate({
       channelId: Number(channelId),
       message,
     });
@@ -159,7 +147,7 @@ export default function ChannelPage() {
   const inviteUsers = (userIds: number[]) => {
     if (!channelId) return;
 
-    putChannelUsersMutation.mutate(
+    inviteUserToChannelMutation.mutate(
       { channelId: Number(channelId), userIds },
       {
         onError: () => alert('다시 시도해 주세요.'),
@@ -172,7 +160,7 @@ export default function ChannelPage() {
   };
 
   const leaveChannel = () => {
-    deleteChannelMutation.mutate(Number(channelId), {
+    leaveChannelMutation.mutate(Number(channelId), {
       onError: () => alert('다시 시도해 주세요.'),
       onSuccess: () => {
         queryClient.invalidateQueries(['getChannel', channelId]);
@@ -182,7 +170,7 @@ export default function ChannelPage() {
   };
 
   const changeChannelSetting = (channelForm: ChannelFormType) => {
-    patchChannelSettingMutation.mutate(channelForm, {
+    updateChannelSettingMutation.mutate(channelForm, {
       onError: () => alert('다시 시도해 주세요.'),
       onSuccess: () => {
         setIsShowSetting(false);

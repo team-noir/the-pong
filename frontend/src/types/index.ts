@@ -7,10 +7,14 @@ export interface UserType {
   nickname?: string;
   rank?: number;
   isTwoFactor?: boolean;
+  status?: UserStatus;
+  achievements?: [];
+  games?: [];
+  isFollowedByMyself?: boolean;
+  isBlockedByMyself?: boolean;
   createdAt?: string;
   updatedAt?: string;
   deletedAt?: string;
-  status?: UserStatus;
 }
 
 export const USER_ROLES = {
@@ -66,6 +70,13 @@ export interface ChannelType {
   users?: ChannelUserType[];
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface ChannelFormType {
+  id?: number;
+  title?: string;
+  isPrivate?: boolean;
+  password?: string;
 }
 
 export interface MessageType {

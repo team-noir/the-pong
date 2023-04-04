@@ -5,7 +5,7 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
-import { getHealthCheck, getWhoami } from 'api/api.v1';
+import { healthCheck, whoami } from 'api/api.v1';
 import { useLogin, useUser } from 'hooks/useStore';
 import { socket, SocketContext } from 'contexts/socket';
 import { routes } from 'routes';
@@ -35,12 +35,12 @@ function Init() {
   // TODO: error handling
   const { data, isSuccess } = useQuery({
     queryKey: ['whoami'],
-    queryFn: getWhoami,
+    queryFn: whoami,
   });
 
   const mockApi = useQuery({
     queryKey: ['mock-health-check'],
-    queryFn: getHealthCheck,
+    queryFn: healthCheck,
   });
 
   useEffect(() => {

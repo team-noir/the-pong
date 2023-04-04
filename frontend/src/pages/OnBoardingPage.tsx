@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { patchMyProfile, PostMyProfileImage } from 'api/api.v1';
+import { updateMyProfile, updateMyProfileImage } from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
 import AppTemplateWithoutHeader from 'components/templates/AppTemplateWithoutHeader';
 import OnBoarding from 'components/organisms/OnBoarding';
@@ -11,26 +11,30 @@ export default function OnBoardingPage() {
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [hasImageFile, setHasImageFile] = useState<boolean>(false);
 
-  const patchMyProfileMutation = useMutation(patchMyProfile);
-  const postMyProfileImageMutation = useMutation(PostMyProfileImage);
+  const updateMyProfileMutation = useMutation(updateMyProfile);
+  const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
 
   useEffect(() => {
-    if (patchMyProfileMutation.isError || postMyProfileImageMutation.isError) {
+    if (
+      updateMyProfileMutation.isError ||
+      updateMyProfileImageMutation.isError
+    ) {
       alert('다시 시도해주세요.');
     }
     if (
-      patchMyProfileMutation.isSuccess &&
-      (!hasImageFile || (hasImageFile && postMyProfileImageMutation.isSuccess))
+      updateMyProfileMutation.isSuccess &&
+      (!hasImageFile ||
+        (hasImageFile && updateMyProfileImageMutation.isSuccess))
     ) {
       setIsSubmitted(true);
       setIsOnboarded(true);
     }
-  }, [patchMyProfileMutation, postMyProfileImageMutation]);
+  }, [updateMyProfileMutation, updateMyProfileImageMutation]);
 
   const handleSubmit = (formData: ProfileFormType) => {
-    patchMyProfileMutation.mutate(formData.nickname);
+    updateMyProfileMutation.mutate(formData.nickname);
     if (formData.imageFile) {
-      postMyProfileImageMutation.mutate(formData.imageFile);
+      updateMyProfileImageMutation.mutate(formData.imageFile);
       setHasImageFile(true);
     }
   };

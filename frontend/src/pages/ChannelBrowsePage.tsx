@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { getChannels, postJoinChannel } from 'api/api.v1';
+import { getChannels, joinChannel } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import ChannelBrowse from 'components/organisms/ChannelBrowse';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
@@ -18,7 +18,7 @@ export default function ChannelBrowsePage() {
     queryKey: ['getChannels', 'browse'],
     queryFn: () => getChannels({}),
   });
-  const postJoinChannelMutation = useMutation(postJoinChannel);
+  const joinChannelMutation = useMutation(joinChannel);
 
   const handleClickChannel = (channel: ChannelType) => {
     if (channel.isJoined) {
@@ -27,7 +27,7 @@ export default function ChannelBrowsePage() {
     }
 
     if (!channel.isProtected) {
-      postJoinChannelMutation.mutate(
+      joinChannelMutation.mutate(
         { id: channel.id },
         {
           onError: () => alert('다시 시도해 주세요.'),
@@ -41,7 +41,7 @@ export default function ChannelBrowsePage() {
   };
 
   const handlePasswordSubmit = (password: string) => {
-    postJoinChannelMutation.mutate(
+    joinChannelMutation.mutate(
       { id: protectedChannelId, password },
       {
         onError: () => alert('다시 시도해 주세요.'),
