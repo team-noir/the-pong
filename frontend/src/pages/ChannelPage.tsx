@@ -23,7 +23,10 @@ import AppTemplate from 'components/templates/AppTemplate';
 import { UserType } from 'types/userType';
 import { ChannelType } from 'types/channelType';
 import { MessageType } from 'types/messageType';
-import { ChannelUserRoleType, ChannelUserStatusType } from 'types/channelUserType';
+import {
+  ChannelUserRoleType,
+  ChannelUserStatusType,
+} from 'types/channelUserType';
 import { ChannelFormType, patchChannelSetting } from 'api/api.v1';
 
 export default function ChannelPage() {
