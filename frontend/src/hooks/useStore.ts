@@ -11,6 +11,7 @@ interface UserState {
   isTwoFactor: boolean;
   login: (user: UserType) => void;
   logout: () => void;
+  setNickname: (nickname: string) => void;
   setIsOnboarded: (isOnboarded: boolean) => void;
 }
 
@@ -35,6 +36,10 @@ export const useUser = create<UserState>()(
         isTwoFactor,
       })),
     logout: () => set(() => initialState),
+    setNickname: (nickname: string) =>
+      set(() => ({
+        nickname,
+      })),
     setIsOnboarded: (isOnboarded: boolean) => set(() => ({ isOnboarded })),
   }))
 );

@@ -20,7 +20,6 @@ describe('Component - Profile 렌더링', () => {
     render(
       <Profile
         user={profileUser}
-        myId={'2'}
         onClickFollow={(userId: number) => mockHandler(userId, 'followed')}
         onClickUnfollow={(userId: number) => mockHandler(userId, 'unfollowed')}
         onClickBlock={(userId: number) => mockHandler(userId, 'blocked')}

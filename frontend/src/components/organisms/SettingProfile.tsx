@@ -3,15 +3,15 @@ import { API_PREFIX } from 'api/api.v1';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import FileInputWithImage from 'components/molecule/FileInputWithImage';
 import Button from 'components/atoms/Button';
-import { UserType, ProfileFormType } from 'types';
+import { ProfileFormType } from 'types';
 import { validateNickname } from 'utils/validatorUtils';
+import { useUser } from 'hooks/useStore';
 
 interface Props {
-  user: UserType;
   onSubmit: (userFormData: ProfileFormType) => void;
 }
 
-export default function SettingProfile({ user, onSubmit }: Props) {
+export default function SettingProfile({ onSubmit }: Props) {
   const [userFormData, setUserFormData] = useState<ProfileFormType>({
     nickname: '',
     imageFile: null,
@@ -19,11 +19,12 @@ export default function SettingProfile({ user, onSubmit }: Props) {
   const [isValidated, setIsValidated] = useState({
     nickname: false,
   });
+  const { id: myUserId, nickname: myUserNickname } = useUser((state) => state);
 
   useEffect(() => {
-    if (!user.nickname) return;
+    if (!myUserNickname) return;
 
-    const nickname = user.nickname;
+    const nickname = myUserNickname;
     setUserFormData((prevState) => ({
       ...prevState,
       nickname,
@@ -63,7 +64,7 @@ export default function SettingProfile({ user, onSubmit }: Props) {
       className="flex flex-col justify-center items-center"
     >
       <FileInputWithImage
-        imageUrl={`${API_PREFIX}/users/${user.id}/profile-image`}
+        imageUrl={`${API_PREFIX}/users/${myUserId}/profile-image`}
         onChange={handleFileChange}
         onClickRemove={handleClickFileRemove}
       />

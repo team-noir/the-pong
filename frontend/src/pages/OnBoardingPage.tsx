@@ -7,7 +7,7 @@ import OnBoarding from 'components/organisms/OnBoarding';
 import { ProfileFormType } from 'types';
 
 export default function OnBoardingPage() {
-  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
+  const { setNickname, setIsOnboarded } = useUser((state) => state);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [hasImageFile, setHasImageFile] = useState<boolean>(false);
 
@@ -34,7 +34,10 @@ export default function OnBoardingPage() {
   const handleSubmit = (formData: ProfileFormType) => {
     updateMyProfileMutation.mutate(formData.nickname);
     if (formData.imageFile) {
-      updateMyProfileImageMutation.mutate(formData.imageFile);
+      updateMyProfileImageMutation.mutate(formData.imageFile, {
+        onError: () => alert('다시 시도해주세요.'),
+        onSuccess: () => setNickname(formData.nickname),
+      });
       setHasImageFile(true);
     }
   };

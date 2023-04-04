@@ -1,14 +1,12 @@
 import { useEffect, Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { whoami, logout as logoutApi } from 'api/api.v1';
+import { useMutation } from '@tanstack/react-query';
+import { logout as logoutApi } from 'api/api.v1';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useUser } from 'hooks/useStore';
 import SearchBar from 'components/molecule/SearchBar';
 import ProfileImage from 'components/atoms/ProfileImage';
-import { UserType } from 'types';
 
 const navigation = [
   { name: 'Game', href: '/game', current: false },
@@ -35,13 +33,8 @@ function Logo() {
 }
 
 export default function HeaderGnb() {
-  const logout = useUser((state) => state.logout);
-  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
+  const { logout, setIsOnboarded, id: myUserId } = useUser((state) => state);
 
-  const whoamiQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['whoami'],
-    queryFn: whoami,
-  });
   const postLogoutMutation = useMutation(logoutApi);
 
   useEffect(() => {
@@ -85,9 +78,9 @@ export default function HeaderGnb() {
                   <div>
                     <Menu.Button className="flex rounded bg-gray-dark text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray min-w-13 min-h-13">
                       <span className="sr-only">Open user menu</span>
-                      {whoamiQuery.isSuccess && (
+                      {myUserId && (
                         <ProfileImage
-                          userId={whoamiQuery.data.id}
+                          userId={myUserId}
                           alt="My profile image"
                           size={52}
                         />
@@ -107,7 +100,7 @@ export default function HeaderGnb() {
                       <Menu.Item>
                         {({ active }) => (
                           <Link
-                            to={`/profile/${whoamiQuery.data?.id}`}
+                            to={`/profile/${myUserId}`}
                             className={classNames(
                               active ? 'bg-gray-dark' : '',
                               'block px-4 py-2 text-sm text-text-light'
