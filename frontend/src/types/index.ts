@@ -51,7 +51,7 @@ export interface ProfileFormType {
 /** Achievement */
 
 export interface AchievementType {
-  id: string;
+  id: number;
   title: string;
   description: string;
 }

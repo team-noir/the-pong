@@ -4,17 +4,17 @@ import { UserType, AchievementType } from 'types';
 
 const dummyAchievementData: AchievementType[] = [
   {
-    id: '0',
+    id: 0,
     title: '업적 제목0',
     description: '업적 달성 조건에 대한 설명입니다.',
   },
   {
-    id: '1',
+    id: 1,
     title: '업적 제목1',
     description: '업적 달성 조건에 대한 설명입니다.',
   },
   {
-    id: '2',
+    id: 2,
     title: '업적 제목2',
     description: '업적 달성 조건에 대한 설명입니다.',
   },

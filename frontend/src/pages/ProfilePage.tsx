@@ -20,7 +20,7 @@ export default function ProfilePage() {
 
   const getUserQuery = useQuery<UserType, AxiosError>({
     queryKey: ['profile', userId],
-    queryFn: () => getUser(userId),
+    queryFn: () => getUser(Number(userId)),
   });
 
   const whoamiQuery = useQuery<UserType, AxiosError>({
