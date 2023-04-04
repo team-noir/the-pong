@@ -32,29 +32,24 @@ function Init() {
   const login = useLogin((state) => state.login);
   const setIsOnboarded = useUser((state) => state.setIsOnboarded);
 
-  // TODO: error handling
-  const { data, isSuccess } = useQuery({
+  const healthCheckQuery = useQuery({
+    queryKey: ['health-check'],
+    queryFn: healthCheck,
+  });
+
+  const whoamiQuery = useQuery({
     queryKey: ['whoami'],
     queryFn: whoami,
   });
 
-  const mockApi = useQuery({
-    queryKey: ['mock-health-check'],
-    queryFn: healthCheck,
-  });
-
   useEffect(() => {
-    if (!isSuccess) return;
+    if (!whoamiQuery.isSuccess) return;
 
     login();
-    if (data.nickname) {
+    if (whoamiQuery.data.nickname) {
       setIsOnboarded(true);
     }
-  }, [isSuccess, data]);
-
-  useEffect(() => {
-    console.log('mock: ', mockApi.data);
-  }, [mockApi.isSuccess]);
+  }, [whoamiQuery]);
 
   return <></>;
 }

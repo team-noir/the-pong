@@ -108,7 +108,6 @@ export default function ChannelPage() {
 
   useEffect(() => {
     socket.on('message', (data: MessageType) => {
-      console.log('socket message data', data);
       const newMessage: MessageType = {
         id: data.id,
         senderId: data.senderId,
@@ -120,7 +119,6 @@ export default function ChannelPage() {
       setMessages((prev) => [...prev, newMessage]);
     });
     socket.on('notice', (data: MessageType) => {
-      console.log('socket notice data', data);
       const newNotice: MessageType = {
         id: data.id,
         isLog: true,
