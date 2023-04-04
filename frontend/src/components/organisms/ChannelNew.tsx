@@ -1,11 +1,11 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { ChannelFormType, postNewChannel } from 'api/api.v1';
-import Button from 'components/atoms/Button';
 import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
 import PasswordInputWithMessage from 'components/molecule/PasswordInputWithMessage';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import Button from 'components/atoms/Button';
 import {
   validateChannelPassword,
   validateChannelTitle,

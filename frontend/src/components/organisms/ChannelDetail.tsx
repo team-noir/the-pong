@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
+import ChannelUserList from 'components/molecule/ChannelUserList';
 import Button from 'components/atoms/Button';
 import { ChannelType } from 'types/channelType';
-import styles from 'assets/styles/Channel.module.css';
-import ChannelUserList from 'components/molecule/ChannelUserList';
 import { ChannelUserType, UserRole } from 'types/channelUserType';
+import styles from 'assets/styles/Channel.module.css';
 
 interface Props {
   channel: ChannelType;

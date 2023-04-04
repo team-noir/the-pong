@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { FormData } from 'components/organisms/OnBoarding';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import { validateNickname } from 'utils/validatorUtils';
-import { FormData } from 'components/organisms/OnBoarding';
 
 interface Props {
   formData: FormData;

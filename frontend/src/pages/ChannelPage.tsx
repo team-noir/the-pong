@@ -11,23 +11,24 @@ import {
   deleteChannel,
   patchChannelUserRole,
   patchChannelUserStatus,
+  patchChannelSetting,
+  ChannelFormType,
 } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
-import Button from 'components/atoms/Button';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import AppTemplate from 'components/templates/AppTemplate';
 import Channel from 'components/organisms/Channel';
 import ChannelDetail from 'components/organisms/ChannelDetail';
 import ChannelSetting from 'components/organisms/ChannelSetting';
 import ChannelInvite from 'components/organisms/ChannelInvite';
-import AppTemplate from 'components/templates/AppTemplate';
-import { UserType } from 'types/userType';
+import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Button from 'components/atoms/Button';
 import { ChannelType } from 'types/channelType';
-import { MessageType } from 'types/messageType';
 import {
   ChannelUserRoleType,
   ChannelUserStatusType,
 } from 'types/channelUserType';
-import { ChannelFormType, patchChannelSetting } from 'api/api.v1';
+import { MessageType } from 'types/messageType';
+import { UserType } from 'types/userType';
 
 export default function ChannelPage() {
   const navigate = useNavigate();

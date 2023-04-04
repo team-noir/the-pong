@@ -1,9 +1,9 @@
 import { useSearchParams } from 'react-router-dom';
-import SearchResult from 'components/organisms/SearchResult';
 import { useQuery } from '@tanstack/react-query';
-import { getUsers } from 'api/api.v1';
-import { UserType } from 'types/userType';
 import { AxiosError } from 'axios';
+import { getUsers } from 'api/api.v1';
+import SearchResult from 'components/organisms/SearchResult';
+import { UserType } from 'types/userType';
 
 export default function SearchResultPage() {
   const [searchParams] = useSearchParams();

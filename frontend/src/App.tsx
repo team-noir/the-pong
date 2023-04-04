@@ -5,9 +5,9 @@ import {
   QueryClientProvider,
   useQuery,
 } from '@tanstack/react-query';
+import { getHealthCheck, getWhoami } from 'api/api.v1';
 import { useLogin, useUser } from 'hooks/useStore';
 import { socket, SocketContext } from 'contexts/socket';
-import { getHealthCheck, getWhoami } from 'api/api.v1';
 import { routes } from 'routes';
 
 const queryClient = new QueryClient();

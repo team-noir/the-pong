@@ -5,8 +5,8 @@ import AppTemplate from 'components/templates/AppTemplate';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
-import styles from 'assets/styles/Blocks.module.css';
 import { UserType } from 'types/userType';
+import styles from 'assets/styles/Blocks.module.css';
 
 export default function SettingBlocksPage() {
   const getMyBlocksQuery = useQuery<UserType[], AxiosError>({

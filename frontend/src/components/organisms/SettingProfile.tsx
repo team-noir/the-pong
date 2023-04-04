@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
-import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
-import Button from 'components/atoms/Button';
-import FileInputWithImage from 'components/molecule/FileInputWithImage';
-import { validateNickname } from 'utils/validatorUtils';
 import { API_PREFIX } from 'api/api.v1';
+import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
+import FileInputWithImage from 'components/molecule/FileInputWithImage';
+import Button from 'components/atoms/Button';
 import { UserType } from 'types/userType';
 import { ProfileFormType } from 'types/profileFormType';
+import { validateNickname } from 'utils/validatorUtils';
 
 interface Props {
   user: UserType;

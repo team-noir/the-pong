@@ -1,6 +1,6 @@
-import Button from 'components/atoms/Button';
-import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import { useState } from 'react';
+import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
+import Button from 'components/atoms/Button';
 import { validateChannelTitle } from 'utils/validatorUtils';
 
 interface Props {

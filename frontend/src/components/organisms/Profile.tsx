@@ -1,5 +1,5 @@
-import Button from 'components/atoms/Button';
 import { Link } from 'react-router-dom';
+import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { ProfileUserType } from 'api/api.v1';
 

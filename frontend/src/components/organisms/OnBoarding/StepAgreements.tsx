@@ -1,5 +1,5 @@
-import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
 import { FormData } from 'components/organisms/OnBoarding';
+import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
 
 interface Props {
   formData: FormData;

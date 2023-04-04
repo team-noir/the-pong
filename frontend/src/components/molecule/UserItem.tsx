@@ -1,7 +1,7 @@
 import { ReactElement } from 'react';
-import { UserType } from 'types/userType';
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
+import { UserType } from 'types/userType';
 import userItemStyles from 'assets/styles/UserItem.module.css';
 
 interface Props {
