@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import {
   getUser,
-  whoami,
   followUser,
   unfollowUser,
   blockUser,
@@ -21,11 +20,6 @@ export default function ProfilePage() {
   const getUserQuery = useQuery<UserType, AxiosError>({
     queryKey: ['profile', userId],
     queryFn: () => getUser(Number(userId)),
-  });
-
-  const whoamiQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['whoami'],
-    queryFn: whoami,
   });
 
   const followUserMutation = useMutation(followUser);
@@ -67,17 +61,13 @@ export default function ProfilePage() {
 
   return (
     <>
-      {(getUserQuery.isLoading || whoamiQuery.isLoading) && (
-        <div>Loading...</div>
-      )}
+      {getUserQuery.isLoading && <div>Loading...</div>}
       {getUserQuery.isError && <div>{getUserQuery.error.message}</div>}
-      {whoamiQuery.isError && <div>{whoamiQuery.error.message}</div>}
-      {getUserQuery.isSuccess && whoamiQuery.isSuccess && (
+      {getUserQuery.isSuccess && (
         <>
           <div>ProfilePage</div>
           <Profile
             user={getUserQuery.data}
-            myId={`${whoamiQuery.data.id}`}
             onClickFollow={handleClickFollow}
             onClickUnfollow={handleClickUnfollow}
             onClickBlock={handleClickBlock}

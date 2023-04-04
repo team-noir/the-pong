@@ -1,21 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import { whoami, updateMyProfile, updateMyProfileImage } from 'api/api.v1';
+import { useMutation } from '@tanstack/react-query';
+import { updateMyProfile, updateMyProfileImage } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import SettingProfile from 'components/organisms/SettingProfile';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
-import { UserType, ProfileFormType } from 'types';
+import { ProfileFormType } from 'types';
+import { useUser } from 'hooks/useStore';
 
 export default function SettingProfilePage() {
-  const navigate = useNavigate();
   const [hasImageFile, setHasImageFile] = useState<boolean>(false);
+  const { id: myUserId, setNickname } = useUser((state) => state);
+  const navigate = useNavigate();
 
-  const whoamiQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['whoami'],
-    queryFn: whoami,
-  });
   const updateMyProfileMutation = useMutation(updateMyProfile);
   const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
 
@@ -27,17 +24,19 @@ export default function SettingProfilePage() {
       alert('다시 시도해주세요.');
     }
     if (
-      whoamiQuery.isSuccess &&
       updateMyProfileMutation.isSuccess &&
       (!hasImageFile ||
         (hasImageFile && updateMyProfileImageMutation.isSuccess))
     ) {
-      navigate(`/profile/${whoamiQuery.data.id}`);
+      navigate(`/profile/${myUserId}`);
     }
-  }, [updateMyProfileMutation, whoamiQuery]);
+  }, [updateMyProfileMutation]);
 
   const handleSubmit = (formData: ProfileFormType) => {
-    updateMyProfileMutation.mutate(formData.nickname);
+    updateMyProfileMutation.mutate(formData.nickname, {
+      onError: () => alert('다시 시도해주세요.'),
+      onSuccess: () => setNickname(formData.nickname),
+    });
     if (formData.imageFile) {
       updateMyProfileImageMutation.mutate(formData.imageFile);
       setHasImageFile(true);
@@ -47,11 +46,7 @@ export default function SettingProfilePage() {
   return (
     <AppTemplate header={<HeaderWithBackButton title={'프로필 수정'} />}>
       <div className="container max-w-xl px-0 sm:px-4 lg:px-6">
-        {whoamiQuery.isLoading && <div>Loading...</div>}
-        {whoamiQuery.isError && <div>{whoamiQuery.error.message}</div>}
-        {whoamiQuery.isSuccess && (
-          <SettingProfile user={whoamiQuery.data} onSubmit={handleSubmit} />
-        )}
+        <SettingProfile onSubmit={handleSubmit} />
       </div>
     </AppTemplate>
   );

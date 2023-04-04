@@ -2,10 +2,10 @@ import { Link } from 'react-router-dom';
 import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types';
+import { useUser } from 'hooks/useStore';
 
 interface Props {
   user: UserType;
-  myId: string;
   onClickFollow: (userId: number) => void;
   onClickUnfollow: (userId: number) => void;
   onClickBlock: (userId: number) => void;
@@ -15,14 +15,14 @@ interface Props {
 
 export default function Profile({
   user,
-  myId,
   onClickFollow,
   onClickUnfollow,
   onClickBlock,
   onClickUnblock,
   onClickDm,
 }: Props) {
-  const isMyPage = user.id.toString() === myId;
+  const myUserId = useUser((state) => state.id);
+  const isMyPage = user.id === myUserId;
 
   return (
     <>

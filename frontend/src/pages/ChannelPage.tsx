@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import * as api from 'api/api.v1';
+import { useUser } from 'hooks/useStore';
 import { SocketContext } from 'contexts/socket';
 import AppTemplate from 'components/templates/AppTemplate';
 import Channel from 'components/organisms/Channel';
@@ -12,7 +13,6 @@ import ChannelInvite from 'components/organisms/ChannelInvite';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Button from 'components/atoms/Button';
 import {
-  UserType,
   ChannelType,
   ChannelUserRoleType,
   ChannelUserStatusType,
@@ -21,6 +21,7 @@ import {
 } from 'types';
 
 export default function ChannelPage() {
+  const myUserId = useUser((state) => state.id);
   const navigate = useNavigate();
   const { channelId } = useParams() as { channelId: string };
   const socket = useContext(SocketContext);
@@ -30,11 +31,6 @@ export default function ChannelPage() {
   const [isShowInvite, setIsShowInvite] = useState(false);
 
   const queryClient = useQueryClient();
-
-  const whoamiQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['whoami'],
-    queryFn: api.whoami,
-  });
 
   const getChannelQuery = useQuery<ChannelType, AxiosError>({
     queryKey: ['getChannel', channelId],
@@ -177,14 +173,11 @@ export default function ChannelPage() {
     });
   };
 
-  if (
-    whoamiQuery.status === 'loading' ||
-    getChannelQuery.status === 'loading'
-  ) {
+  if (getChannelQuery.status === 'loading') {
     return <div>Loading...</div>;
   }
 
-  if (whoamiQuery.status === 'error' || getChannelQuery.status === 'error') {
+  if (getChannelQuery.status === 'error') {
     alert('에러가 발생했습니다.');
     navigate('/channel');
   }
@@ -203,19 +196,21 @@ export default function ChannelPage() {
       }
     >
       <>
-        {whoamiQuery.data && getChannelQuery.data && (
+        {getChannelQuery.data && (
           <>
-            <Channel
-              messages={messages}
-              postMessage={postMessage}
-              myUserId={whoamiQuery.data.id}
-            />
-            {isShowDetail && (
+            {myUserId && (
+              <Channel
+                messages={messages}
+                postMessage={postMessage}
+                myUserId={myUserId}
+              />
+            )}
+            {isShowDetail && myUserId && (
               <ChannelDetail
                 channel={getChannelQuery.data}
                 changeRole={changeRole}
                 changeStatus={changeStatus}
-                myUserId={whoamiQuery.data.id}
+                myUserId={myUserId}
                 onClickSetting={() => setIsShowSetting(true)}
                 onClickInvite={() => setIsShowInvite(true)}
                 onClickLeave={leaveChannel}
