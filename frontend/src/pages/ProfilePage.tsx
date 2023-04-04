@@ -1,32 +1,43 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AxiosError } from 'axios';
-import {
-  getUser,
-  followUser,
-  unfollowUser,
-  blockUser,
-  unblockUser,
-  getDmChannel,
-} from 'api/api.v1';
+import * as api from 'api/api.v1';
 import Profile from 'components/organisms/Profile';
 import Achievements from 'components/organisms/Achievements';
-import { UserType } from 'types';
 
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };
   const navigate = useNavigate();
 
-  const getUserQuery = useQuery<UserType, AxiosError>({
+  const getUserQuery = useQuery({
     queryKey: ['profile', userId],
-    queryFn: () => getUser(Number(userId)),
+    queryFn: () => api.getUser(Number(userId)),
   });
 
-  const followUserMutation = useMutation(followUser);
-  const unfollowUserMutation = useMutation(unfollowUser);
-  const blockUserMutation = useMutation(blockUser);
-  const unblockUserMutation = useMutation(unblockUser);
-  const getDmChannelMutation = useMutation(getDmChannel);
+  const followUserMutation = useMutation({
+    mutationFn: api.followUser,
+    onSuccess: () => getUserQuery.refetch(),
+  });
+
+  const unfollowUserMutation = useMutation({
+    mutationFn: api.unfollowUser,
+    onSuccess: () => getUserQuery.refetch(),
+  });
+
+  const blockUserMutation = useMutation({
+    mutationFn: api.blockUser,
+    onSuccess: () => getUserQuery.refetch(),
+  });
+
+  const unblockUserMutation = useMutation({
+    mutationFn: api.unblockUser,
+    onSuccess: () => getUserQuery.refetch(),
+  });
+
+  const getDmChannelMutation = useMutation({
+    mutationFn: api.getDmChannel,
+    onSuccess: (data) => navigate(`/channel/${data.id}`),
+    useErrorBoundary: true,
+  });
 
   const handleClickFollow = (userId: number) => {
     const answer = confirm('팔로우하시겠습니까?');
@@ -53,16 +64,11 @@ export default function ProfilePage() {
   };
 
   const handleClickDm = (userId: number) => {
-    getDmChannelMutation.mutate(userId, {
-      onError: () => alert('다시 시도해 주세요.'),
-      onSuccess: (data) => navigate(`/channel/${data.id}`),
-    });
+    getDmChannelMutation.mutate(userId);
   };
 
   return (
     <>
-      {getUserQuery.isLoading && <div>Loading...</div>}
-      {getUserQuery.isError && <div>{getUserQuery.error.message}</div>}
       {getUserQuery.isSuccess && (
         <>
           <div>ProfilePage</div>

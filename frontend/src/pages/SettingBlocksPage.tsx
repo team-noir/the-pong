@@ -1,20 +1,21 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { getMyBlocks, unblockUser } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
-import { UserType } from 'types';
 import styles from 'assets/styles/Blocks.module.css';
 
 export default function SettingBlocksPage() {
-  const getMyBlocksQuery = useQuery<UserType[], AxiosError>({
+  const getMyBlocksQuery = useQuery({
     queryKey: ['getMyBlocks'],
     queryFn: getMyBlocks,
   });
 
-  const unblockUserMutation = useMutation(unblockUser);
+  const unblockUserMutation = useMutation({
+    mutationFn: unblockUser,
+    onSuccess: () => getMyBlocksQuery.refetch(),
+  });
 
   const handleClickUnblock = (e: React.MouseEvent<HTMLElement>) => {
     const ancestorElement = e.currentTarget.closest('[data-user-id]');
@@ -28,10 +29,6 @@ export default function SettingBlocksPage() {
 
   return (
     <AppTemplate header={<HeaderWithBackButton title={'차단 관리'} />}>
-      {getMyBlocksQuery.isLoading && <div>loading...</div>}
-      {getMyBlocksQuery.isError && (
-        <div>error: {getMyBlocksQuery.error.message}</div>
-      )}
       {getMyBlocksQuery.isSuccess && (
         <UserList
           styles={styles}

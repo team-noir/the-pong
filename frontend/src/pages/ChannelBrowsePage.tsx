@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
 import { getChannels, joinChannel } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import ChannelBrowse from 'components/organisms/ChannelBrowse';
@@ -14,10 +13,11 @@ export default function ChannelBrowsePage() {
   const [protectedChannelId, setProtectedChannelId] = useState<number>(-1);
   const navigate = useNavigate();
 
-  const getChannelsQuery = useQuery<ChannelType[], AxiosError>({
+  const getChannelsQuery = useQuery({
     queryKey: ['getChannels', 'browse'],
     queryFn: () => getChannels({}),
   });
+
   const joinChannelMutation = useMutation(joinChannel);
 
   const handleClickChannel = (channel: ChannelType) => {
@@ -30,7 +30,6 @@ export default function ChannelBrowsePage() {
       joinChannelMutation.mutate(
         { id: channel.id },
         {
-          onError: () => alert('다시 시도해 주세요.'),
           onSuccess: () => navigate(`/channel/${channel.id}`),
         }
       );
@@ -44,7 +43,6 @@ export default function ChannelBrowsePage() {
     joinChannelMutation.mutate(
       { id: protectedChannelId, password },
       {
-        onError: () => alert('다시 시도해 주세요.'),
         onSuccess: () => navigate(`/channel/${protectedChannelId}`),
       }
     );
@@ -52,23 +50,19 @@ export default function ChannelBrowsePage() {
 
   return (
     <AppTemplate header={<HeaderWithBackButton title={'채널 둘러보기'} />}>
-      {getChannelsQuery.isLoading && <div>Loading...</div>}
-      {getChannelsQuery.isError && <div>{getChannelsQuery.error.message}</div>}
       {getChannelsQuery.isSuccess && (
-        <>
-          <ChannelBrowse
-            channels={getChannelsQuery.data}
-            onClick={handleClickChannel}
-          />
-          {isShowPasswordInput && (
-            <PasswordModal
-              onClose={() => setIsShowPasswordInput(false)}
-              onSubmit={handlePasswordSubmit}
-            >
-              비밀번호 입력이 필요한 채널입니다.
-            </PasswordModal>
-          )}
-        </>
+        <ChannelBrowse
+          channels={getChannelsQuery.data}
+          onClick={handleClickChannel}
+        />
+      )}
+      {isShowPasswordInput && (
+        <PasswordModal
+          onClose={() => setIsShowPasswordInput(false)}
+          onSubmit={handlePasswordSubmit}
+        >
+          비밀번호 입력이 필요한 채널입니다.
+        </PasswordModal>
       )}
     </AppTemplate>
   );
