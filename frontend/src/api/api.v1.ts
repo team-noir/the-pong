@@ -57,7 +57,7 @@ export const whoami = async (): Promise<UserType> => {
   return res.data;
 };
 
-export const getUser = async (userId: string): Promise<UserType> => {
+export const getUser = async (userId: number): Promise<UserType> => {
   const res = await axiosWithInterceptors.get(`/users/${userId}`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -189,7 +189,7 @@ export const getChannels = async ({
   return res.data;
 };
 
-export const getChannel = async (channelId: string) => {
+export const getChannel = async (channelId: number) => {
   const res = await axiosWithInterceptors.get(`/channels/${channelId}`);
   if (res.status !== 200) {
     throw new Error(res.statusText);

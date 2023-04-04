@@ -38,7 +38,7 @@ export default function ChannelPage() {
 
   const getChannelQuery = useQuery<ChannelType, AxiosError>({
     queryKey: ['getChannel', channelId],
-    queryFn: () => api.getChannel(channelId),
+    queryFn: () => api.getChannel(Number(channelId)),
   });
 
   const getMessagesMutation = useMutation<MessageType[], AxiosError, number>(
