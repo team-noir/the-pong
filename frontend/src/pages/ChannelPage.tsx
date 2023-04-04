@@ -9,6 +9,8 @@ import {
   postChannelMessages,
   putChannelUsers,
   deleteChannel,
+  patchChannelUserRole,
+  patchChannelUserStatus,
 } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 import Button from 'components/atoms/Button';
@@ -21,6 +23,7 @@ import AppTemplate from 'components/templates/AppTemplate';
 import { UserType } from 'types/userType';
 import { ChannelType } from 'types/channelType';
 import { MessageType } from 'types/messageType';
+import { ChannelUserRoleType, ChannelUserStatusType } from 'types/channelUserType';
 import { ChannelFormType, patchChannelSetting } from 'api/api.v1';
 
 export default function ChannelPage() {
@@ -60,6 +63,44 @@ export default function ChannelPage() {
   const putChannelUsersMutation = useMutation(putChannelUsers);
 
   const deleteChannelMutation = useMutation(deleteChannel);
+
+  const patchChannelUserRoleMutation = useMutation<any, AxiosError, any>({
+    mutationFn: patchChannelUserRole,
+    onSuccess: () => getChannelQuery.refetch(),
+  });
+
+  const patchChannelUserStatusMutation = useMutation<any, AxiosError, any>({
+    mutationFn: patchChannelUserStatus,
+    onSuccess: () => getChannelQuery.refetch(),
+  });
+
+  const changeRole = ({
+    userId,
+    role,
+  }: {
+    userId: number;
+    role: ChannelUserRoleType;
+  }) => {
+    patchChannelUserRoleMutation.mutate({
+      channelId: getChannelQuery.data?.id,
+      userId,
+      role,
+    });
+  };
+
+  const changeStatus = ({
+    userId,
+    status,
+  }: {
+    userId: number;
+    status: ChannelUserStatusType;
+  }) => {
+    patchChannelUserStatusMutation.mutate({
+      channelId: getChannelQuery.data?.id,
+      userId,
+      status,
+    });
+  };
 
   useEffect(() => {
     if (getChannelQuery.data) {
@@ -178,16 +219,16 @@ export default function ChannelPage() {
               messages={messages}
               postMessage={postMessage}
               myUserId={whoamiQuery.data.id}
-              onClickSetting={() => setIsShowSetting(true)}
-              onClickInvite={() => setIsShowInvite(true)}
-              onClickLeave={leaveChannel}
             />
             {isShowDetail && (
               <ChannelDetail
                 channel={getChannelQuery.data}
+                changeRole={changeRole}
+                changeStatus={changeStatus}
                 myUserId={whoamiQuery.data.id}
                 onClickSetting={() => setIsShowSetting(true)}
                 onClickInvite={() => setIsShowInvite(true)}
+                onClickLeave={leaveChannel}
               />
             )}
             {isShowSetting && (

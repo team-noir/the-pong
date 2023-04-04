@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { ChannelType } from 'types/channelType';
 import { UserType } from 'types/userType';
+import { ChannelUserRoleType, ChannelUserStatusType } from 'types/channelUserType';
 
 export const API_PREFIX = `/api/v1`;
 
@@ -286,9 +287,47 @@ export const putChannelUsers = async ({
   return res;
 };
 
+export const patchChannelUserRole = async ({
+  channelId,
+  userId,
+  role,
+}: {
+  channelId: number;
+  userId: number;
+  role: ChannelUserRoleType;
+}) => {
+  const res = await axiosWithInterceptors.patch(
+    `/channels/${channelId}/users/${userId}/role`,
+    { role }
+  );
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
 // Leave Channel
 export const deleteChannel = async (channelId: number) => {
   const res = await axiosWithInterceptors.delete(`/channels/${channelId}`);
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const patchChannelUserStatus = async ({
+  channelId,
+  userId,
+  status,
+}: {
+  channelId: number;
+  userId: number;
+  status: ChannelUserStatusType;
+}) => {
+  const res = await axiosWithInterceptors.patch(
+    `/channels/${channelId}/users/${userId}/status`,
+    { status }
+  );
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }

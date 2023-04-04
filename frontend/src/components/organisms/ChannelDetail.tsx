@@ -3,10 +3,12 @@ import Button from 'components/atoms/Button';
 import { ChannelType } from 'types/channelType';
 import styles from 'assets/styles/Channel.module.css';
 import ChannelUserList from 'components/molecule/ChannelUserList';
-import { ChannelUserType, RoleType } from 'types/channelUserType';
+import { ChannelUserType, UserRole } from 'types/channelUserType';
 
 interface Props {
   channel: ChannelType;
+  changeRole: (arg: any) => void;
+  changeStatus: (arg: any) => void;
   myUserId: number;
   onClickSetting: () => void;
   onClickInvite: () => void;
@@ -23,7 +25,7 @@ const findMyUser = (
 };
 
 const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
-  const priority = [RoleType.owner, RoleType.admin, RoleType.normal];
+  const priority = [UserRole.owner, UserRole.admin, UserRole.normal];
   if (user1.role !== user2.role) {
     return priority.indexOf(user1.role) - priority.indexOf(user2.role);
   }
@@ -36,6 +38,8 @@ const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
 
 export default function ChannelDetail({
   channel,
+  changeRole,
+  changeStatus,
   myUserId,
   onClickSetting,
   onClickInvite,
@@ -52,7 +56,7 @@ export default function ChannelDetail({
     );
   }, [channel.users, myUserId]);
 
-  const isMyUserRoleOwner = myUser?.role === RoleType.owner;
+  const isMyUserRoleOwner = myUser?.role === UserRole.owner;
 
   return (
     <div>
@@ -64,6 +68,8 @@ export default function ChannelDetail({
       <h2>참가자</h2>
       {myUser && channelUsers && (
         <ChannelUserList
+          changeRole={changeRole}
+          changeStatus={changeStatus}
           styles={styles}
           myUser={myUser}
           users={channelUsers}
