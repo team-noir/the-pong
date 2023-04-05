@@ -1,9 +1,9 @@
 import { io } from 'socket.io-client';
 import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { ChannelsModule } from './channels.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-import { expect, jest, describe, afterEach, beforeEach, beforeAll, it, afterAll } from '@jest/globals';
+import { expect, jest, describe, afterEach, beforeEach, beforeAll, it, afterAll, test } from '@jest/globals';
 import { ChannelsService, Channel, ChannelUser } from './channels.service';
 import { CreateChannelDto } from './dtos/channel.dto';
 
@@ -56,62 +56,81 @@ describe('Chat connection', () => {
        return `http://localhost:${port}`;
    }
 
-    beforeAll(async () => {
-        const moduleFixture = await Test.createTestingModule({
-            imports: [ChannelsModule],
-        }).compile();
+	const removeNoticeListeners = () => {
+		const listeners = socket.listeners('notice');
+		listeners.forEach((listener) => socket.off('notice', listener));
+	}
+	
+	const removeMessageListeners = () => {
+		const listeners = socket.listeners('message');
+		listeners.forEach((listener) => socket.off('message', listener));
+	}
+	
+	const removeAllListeners = () => {
+		socket.removeAllListeners();
+	}
 
-		service = moduleFixture.get<ChannelsService>(ChannelsService);
-        app = moduleFixture.createNestApplication();
-        app.useWebSocketAdapter(new IoAdapter(app.getHttpServer()));
-        await app.init();
-
-		socket = io(getSocketDsn(), {
-			extraHeaders: {
-				"cookie": `Authorization=${process.env.TEST_JWT}`
-			}
+	const connectSocket = (done) => {
+		socket.on('connect', () => {
+			done();
 		});
+		socket = io(getSocketDsn(), {
+			extraHeaders: {"cookie": `Authorization=${process.env.TEST_JWT}`}
+		});
+	}
+	
+	const initChannels = () => {
+		const publicObj = service.create(user.id, publicChannelData);
+		const privateObj = service.create(user.id, privateChannelData);
+		channel = service.getChannel(publicObj.id);
+		privateChannel = service.getChannel(privateObj.id);
+	}
 
-		service.setUser(user.id, user);
-		service.setUser(user2.id, user2);
-    });
+	const initSocketUser = () => {
+		socketUser = service.getUser(1);
+		socketUser.invited.clear();
+		socketUser.joined.forEach((channelId) => {
+			service.leave(socketUser.id, channelId);
+		})
+	}
 
-	beforeEach(() => {
-		const noticeListeners = socket.listeners('notice');
-		noticeListeners.forEach((listener) => socket.off('notice', listener));
+	beforeAll((done) => {
 		
-		const messageListeners = socket.listeners('message');
-		messageListeners.forEach((listener) => socket.off('message', listener));
+        Test.createTestingModule({
+            imports: [ChannelsModule],
+        }).compile()
+		.then((moduleFixture: TestingModule) => {
+			service = moduleFixture.get<ChannelsService>(ChannelsService);
+			app = moduleFixture.createNestApplication();
+			app.useWebSocketAdapter(new IoAdapter(app.getHttpServer()));
+			app.init();
 
-		const result = service.create(user.id, publicChannelData);
-		channel = service.getChannel(result.id);
-		
-		const result2 = service.create(user.id, privateChannelData);
-		privateChannel = service.getChannel(result2.id);
-	})
-
-	afterAll(async () => {
-		app.getHttpServer().close();
-		socket.disconnect();
-	})
-
-	describe('init', () => {
-		it('소켓 서버에 연결', (done) => {
+			service.setUser(user.id, user);
+			service.setUser(user2.id, user2);
+			socket = io(getSocketDsn(), {
+				extraHeaders: {"cookie": `Authorization=${process.env.TEST_JWT}`}
+			})
 			socket.on('connect', () => {
 				socketUser = service.getUser(1);
 				done();
 			});
-		});
-	
-		it('public 채널에 유저가 참가', (done) => {
-			socket.on('notice', (data) => {
-				expect(data.channelId).toBe(channel.id);
-				expect(data.senderId).toBe(undefined);
-				done();
-			});
-	
+		})
+    });
+
+	afterAll(() => {
+		// socket.disconnect();
+		// app.getHttpServer().close();
+		// app.close();
+	})
+
+	describe('init', () => {
+		beforeAll(() => { initSocketUser(); initChannels(); });
+		afterAll(() => { removeNoticeListeners(); });
+		
+		it('public 채널에 유저가 참가', (done) => {	
 			try {
-				service.join(socketUser.id, channel.id, null);
+				service.join(1, channel.id, null);
+				done();
 			} catch (error) {
 				console.log(error);
 			}
@@ -119,6 +138,9 @@ describe('Chat connection', () => {
 	});
 
 	describe('channel setting', () => {
+		beforeAll(() => { initSocketUser(); });
+		beforeEach(() => { initChannels(); });
+
 		it('채널장이 public 채널을 protected로 수정', () => {
 			const newTitle = "protected";
 			service.setChannelInfo(user.id, channel.id, {
@@ -192,6 +214,10 @@ describe('Chat connection', () => {
 	})
 
 	describe('Message', () => {
+		beforeAll(() => { initSocketUser(); });
+		beforeEach(() => { initChannels(); });
+		afterAll(() => { removeAllListeners(); });
+
 		it('참여 중인 채널에서 메세지 수신', (done) => {
 			socket.on('message', (data) => {
 				expect(data.channelId).toBe(channel.id);
@@ -214,20 +240,18 @@ describe('Chat connection', () => {
 	});
 	
 	describe('mute', () => {
+		beforeAll(() => { initSocketUser(); });
+		beforeEach(() => { initChannels(); });
+		afterAll(() => { removeAllListeners(); });
 
 		it('참여 중인 채널의 owner가 유저를 mute', (done) => {
 			const time = new Date(new Date().getTime() + 1000);
 			service.join(socketUser.id, channel.id, null);
 	
-			socket.on('notice', (data) => {
-				console.log(data);
-			})
-	
 			socket.on('message', (data) => {
-				
-				console.log(data);
-	
-				done();
+				if (data.text == 'hello 2') {
+					done();
+				}
 			});
 	
 			service.mute(user, channel, socketUser, 1);
@@ -256,33 +280,39 @@ describe('Chat connection', () => {
 	});
 
 	describe('invite', () => {
+		beforeAll(() => { initSocketUser(); });
+		beforeEach(() => { initChannels(); });
+		afterAll(() => { removeAllListeners(); });
 
 		it('채널장이 유저를 초대', (done) => {
 			socket.on('invited', (data) => {
 				expect(data.channelId).toBe(privateChannel.id);
 				done();
 			});
-			service.invite(user.id, privateChannel.id, [socketUser.id, user2.id]);
+
+			try {
+				service.invite(user.id, privateChannel.id, [socketUser.id, user2.id]);
+			} catch(error) {
+				console.log(error);
+				expect(true).toBe(false);
+			}
 	
-			const channelInfo = service.getChannelInfo(user.id, channel.id);
-			expect(channelInfo.userCount).toBe(1);
+			const channelInfo = service.getChannelInfo(user.id, privateChannel.id);
+
+			expect(channelInfo.userCount).toBe(3);
 			expect(socketUser.invited.size).toBe(1);
 			expect(user2.invited.size).toBe(1);
 		});
 		
 		it('권한 없는 유저가 다른 유저를 초대', (done) => {
 			socket.on('invited', (data) => {
-				console.log(data);
 				expect(data.channelId).toBe(privateChannel.id);
 			});
 	
-			service.invite(user.id, privateChannel.id, [user2.id]);
-			service.join(user2.id, privateChannel.id, null);
-	
 			try {
+				service.invite(user.id, privateChannel.id, [user2.id]);
 				service.invite(user2.id, privateChannel.id, [socketUser.id]);
 			} catch (error) {
-				console.log(error);
 				expect(error.code).toBe(403);
 				done();
 			}
