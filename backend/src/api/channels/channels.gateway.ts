@@ -80,7 +80,6 @@ export class ChannelsGatway
       socket: socket,
 
       joined: new Set<number>(),
-      invited: new Set<number>(),
       blockUser: new Set<number>(),
     };
     socket.data = { user };
@@ -131,14 +130,6 @@ export class ChannelsGatway
     @MessageBody('channelId') channelId: number
   ) {
     this.channelsService.leave(socket.data.user.id, channelId);
-  }
-
-  @SubscribeMessage('names')
-  names(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody('channelId') channelId: number
-  ) {
-    this.channelsService.names(socket, channelId);
   }
 
   @SubscribeMessage('invite')
