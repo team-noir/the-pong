@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChannelsService, ChannelUser } from './channels.service';
 import { CreateChannelDto } from './dtos/channel.dto';
-import { expect, jest, describe, beforeEach, it } from '@jest/globals';
+import { expect, jest, describe, beforeEach, beforeAll, it } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import { ChannelsModule } from './channels.module';
 
@@ -58,7 +58,7 @@ const privateChannelData: CreateChannelDto = {
 describe('Channel list', () => {
   let service: ChannelsService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [ChannelsService],
     }).compile();
@@ -420,7 +420,7 @@ describe('Channel list', () => {
 describe('Channel info', () => {
   let service: ChannelsService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [ChannelsService],
     }).compile();
