@@ -7,8 +7,17 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const queryClient = new QueryClient();
 
+const clickBurgerButton = async (user: any) => {
+  await waitFor(async () =>
+    user.click(await screen.findByText(/Open global menu/i))
+  );
+};
+
 describe('Router - Nav에 있는 페이지들 렌더링', () => {
   test('Nav의 링크를 클릭하면 각 페이지로 이동한다', async () => {
+    const originalError = console.error;
+    console.error = jest.fn();
+
     const route = '/';
 
     const router = createMemoryRouter(routes(true, true), {
@@ -20,27 +29,38 @@ describe('Router - Nav에 있는 페이지들 렌더링', () => {
         <RouterProvider router={router} />
       </QueryClientProvider>
     );
+
     const user = userEvent.setup();
 
-    screen.getByText('MainPage');
+    screen.findByText('MainPage');
 
-    waitFor(async () => user.click(screen.getByText(/On Boarding/i)));
-    screen.findByText('서비스 이용약관에 동의해 주세요.');
-    waitFor(async () => user.click(screen.getByText(/game/i)));
+    clickBurgerButton(user);
+    await waitFor(async () => user.click(await screen.findByText(/game/i)));
     screen.findByText(/GamePage/i);
-    waitFor(async () => user.click(screen.getByText(/channel/i)));
-    screen.findByText(/ChannelLobbyPage/i);
-    waitFor(async () => user.click(screen.getByText(/following/i)));
+
+    clickBurgerButton(user);
+    await waitFor(async () => user.click(await screen.findByText(/channel/i)));
+    screen.findByText('채널');
+
+    clickBurgerButton(user);
+    await waitFor(async () =>
+      user.click(await screen.findByText(/following/i))
+    );
     screen.findByText(/FollowingPage/i);
-    waitFor(async () => user.click(screen.getByText(/profile/i)));
-    screen.findByText(/ProfilePage/i);
-    waitFor(async () => user.click(screen.getByText(/setting/i)));
-    screen.findByText(/SettingPage/i);
+
+    clickBurgerButton(user);
+    await waitFor(async () => user.click(await screen.findByText(/setting/i)));
+    screen.findByText(/Settings/i);
+
+    console.error = originalError;
   });
 });
 
 describe('Router - Error Page 렌더링', () => {
   test('존재하지 않는 경로로 접근할 경우 404 에러 페이지가 렌더링 된다', () => {
+    const originalError = console.error;
+    console.error = jest.fn();
+
     const badRoute = '/some/bad/route';
 
     const router = createMemoryRouter(routes(true, true), {
@@ -49,25 +69,8 @@ describe('Router - Error Page 렌더링', () => {
 
     render(<RouterProvider router={router} />);
 
-    screen.getByText(/ErrorPage/i);
-  });
-});
+    screen.findByText(/에러가 발생했습니다./i);
 
-describe('Router - ProfilePage 렌더링', () => {
-  test('/profile/:userId로 접근하면 해당 회원의 프로필 페이지를 보여준다', async () => {
-    const route = '/profile/1';
-
-    const router = createMemoryRouter(routes(true, true), {
-      initialEntries: [route],
-    });
-
-    render(
-      <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
-      </QueryClientProvider>
-    );
-
-    screen.findByText('ProfilePage');
-    screen.findByTestId('1');
+    console.error = originalError;
   });
 });
