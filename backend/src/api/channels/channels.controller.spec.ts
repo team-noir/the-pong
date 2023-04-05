@@ -4,7 +4,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChannelsModule } from './channels.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { expect, jest, describe, afterEach, beforeEach, beforeAll, it, afterAll, test } from '@jest/globals';
-import { ChannelsService, Channel, ChannelUser } from './channels.service';
+import { ChannelsService, ChannelUser } from './channels.service';
+import { ChannelClass, Channel } from './ChannelClass';
 import { CreateChannelDto } from './dtos/channel.dto';
 
 const fakeSocket = {
@@ -18,7 +19,6 @@ const user: ChannelUser = {
 	name: 'user',
 	socket: fakeSocket,
 	joined: new Set(),
-	invited: new Set(),
 	blockUser: new Set(),
 };
 
@@ -27,7 +27,6 @@ const user2: ChannelUser = {
 	name: 'user2',
 	socket: fakeSocket,
 	joined: new Set(),
-	invited: new Set(),
 	blockUser: new Set(),
 };
 
@@ -82,13 +81,12 @@ describe('Chat connection', () => {
 	const initChannels = () => {
 		const publicObj = service.create(user.id, publicChannelData);
 		const privateObj = service.create(user.id, privateChannelData);
-		channel = service.getChannel(publicObj.id);
-		privateChannel = service.getChannel(privateObj.id);
+		channel = service.channelClass.get(publicObj.id);
+		privateChannel = service.channelClass.get(privateObj.id);
 	}
 
 	const initSocketUser = () => {
 		socketUser = service.getUser(1);
-		socketUser.invited.clear();
 		socketUser.joined.forEach((channelId) => {
 			service.leave(socketUser.id, channelId);
 		})
@@ -300,8 +298,6 @@ describe('Chat connection', () => {
 			const channelInfo = service.getChannelInfo(user.id, privateChannel.id);
 
 			expect(channelInfo.userCount).toBe(3);
-			expect(socketUser.invited.size).toBe(1);
-			expect(user2.invited.size).toBe(1);
 		});
 		
 		it('권한 없는 유저가 다른 유저를 초대', (done) => {

@@ -15,7 +15,6 @@ const user1: ChannelUser = {
   name: 'user1',
   socket: fakeSocket,
   joined: new Set(),
-  invited: new Set(),
   blockUser: new Set(),
 };
 
@@ -24,7 +23,6 @@ const user2: ChannelUser = {
   name: 'user2',
   socket: fakeSocket,
   joined: new Set(),
-  invited: new Set(),
   blockUser: new Set(),
 };
 
@@ -33,7 +31,6 @@ const user3: ChannelUser = {
   name: 'user3',
   socket: fakeSocket,
   joined: new Set(),
-  invited: new Set(),
   blockUser: new Set(),
 };
 
