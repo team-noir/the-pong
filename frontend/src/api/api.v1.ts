@@ -256,6 +256,10 @@ export const sendMessage = async ({
       text: message,
     }
   );
+  if (res.status != 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
 };
 
 export const updateChannelSetting = async (channelForm: ChannelFormType) => {

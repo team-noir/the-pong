@@ -1,5 +1,4 @@
 import { API_PREFIX } from 'api/api.v1';
-import styles from 'assets/styles/ProfileImage.module.css';
 
 interface Props {
   userId: number | undefined;

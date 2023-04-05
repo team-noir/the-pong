@@ -2,7 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as api from 'api/api.v1';
 import Profile from 'components/organisms/Profile';
-import Achievements from 'components/organisms/Achievements';
+// import Achievements from 'components/organisms/Achievements';
 
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };

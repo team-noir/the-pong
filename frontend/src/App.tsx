@@ -72,12 +72,12 @@ function Init() {
   const login = useUser((state) => state.login);
   const setIsOnboarded = useUser((state) => state.setIsOnboarded);
 
-  const healthCheckQuery = useQuery({
+  useQuery({
     queryKey: ['health-check'],
     queryFn: healthCheck,
   });
 
-  const whoamiQuery = useQuery({
+  useQuery({
     queryKey: ['whoami'],
     queryFn: whoami,
     onSuccess: (data) => {

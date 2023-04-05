@@ -1,4 +1,4 @@
-import { useEffect, Fragment } from 'react';
+import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { logout as logoutApi } from 'api/api.v1';
