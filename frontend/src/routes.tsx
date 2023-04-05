@@ -42,9 +42,11 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
     ) : (
       <Navigate to="/login" />
     ),
+    errorElement: <ErrorPage />,
   },
   {
     path: '/setting/*',
+    errorElement: <ErrorPage />,
     children: [
       {
         path: 'profile',
@@ -62,6 +64,7 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
   },
   {
     path: '/channel/*',
+    errorElement: <ErrorPage />,
     children: [
       {
         path: 'browse',
