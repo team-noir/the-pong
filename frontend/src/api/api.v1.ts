@@ -192,12 +192,11 @@ export const getChannels = async ({
   const res = await axiosWithInterceptors.get(`/channels/`, {
     params: { enter, kind },
   });
-  throw new Error(res.statusText);
 
-  // if (res.status !== 200) {
-  //   throw new Error(res.statusText);
-  // }
-  // return res.data;
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
 };
 
 export const getChannel = async (channelId: number) => {

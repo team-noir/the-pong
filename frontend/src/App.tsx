@@ -12,7 +12,7 @@ import { healthCheck, whoami } from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
 import { socket, SocketContext } from 'contexts/socket';
 import LoadingFallback from 'components/organisms/LoadingFalback';
-import ErrorFallback from 'components/organisms/ErrorFallback';
+import ErrorFallbackWithHeader from 'components/organisms/ErrorFallbackWithHeader';
 import { routes } from 'routes';
 
 const queryClient = new QueryClient({
@@ -49,7 +49,7 @@ export function App() {
                 error,
                 resetErrorBoundary,
               }: FallbackProps) => (
-                <ErrorFallback
+                <ErrorFallbackWithHeader
                   error={error}
                   resetErrorBoundary={resetErrorBoundary}
                 />
