@@ -6,38 +6,14 @@ import styles from 'assets/styles/Channel.module.css';
 
 interface Props {
   channel: ChannelType;
-  changeRole: (arg: any) => void;
-  changeStatus: (arg: any) => void;
   myUserId: number;
   onClickSetting: () => void;
   onClickInvite: () => void;
   onClickLeave: () => void;
 }
 
-const findMyUser = (
-  myUserId: number,
-  users: ChannelUserType[] | null
-): ChannelUserType | null => {
-  if (!users) return null;
-  const myUser = users.find((user) => user.id === myUserId);
-  return myUser ? myUser : null;
-};
-
-const compare = (user1: ChannelUserType, user2: ChannelUserType) => {
-  const priority = [USER_ROLES.OWNER, USER_ROLES.ADMIN, USER_ROLES.NORMAL];
-  if (user1.role !== user2.role) {
-    return priority.indexOf(user1.role) - priority.indexOf(user2.role);
-  }
-  if (user1.nickname && user2.nickname) {
-    return user1.nickname.localeCompare(user2.nickname);
-  }
-  return 0;
-};
-
 export default function ChannelDetail({
   channel,
-  changeRole,
-  changeStatus,
   myUserId,
   onClickSetting,
   onClickInvite,
@@ -66,8 +42,7 @@ export default function ChannelDetail({
       <h2>참가자</h2>
       {myUser && channelUsers && (
         <ChannelUserList
-          changeRole={changeRole}
-          changeStatus={changeStatus}
+          channelId={channel.id}
           styles={styles}
           myUser={myUser}
           users={channelUsers}
@@ -81,4 +56,26 @@ export default function ChannelDetail({
       </Button>
     </div>
   );
+}
+
+// Utils
+
+function findMyUser(
+  myUserId: number,
+  users: ChannelUserType[] | null
+): ChannelUserType | null {
+  if (!users) return null;
+  const myUser = users.find((user) => user.id === myUserId);
+  return myUser ? myUser : null;
+}
+
+function compare(user1: ChannelUserType, user2: ChannelUserType) {
+  const priority = [USER_ROLES.OWNER, USER_ROLES.ADMIN, USER_ROLES.NORMAL];
+  if (user1.role !== user2.role) {
+    return priority.indexOf(user1.role) - priority.indexOf(user2.role);
+  }
+  if (user1.nickname && user2.nickname) {
+    return user1.nickname.localeCompare(user2.nickname);
+  }
+  return 0;
 }
