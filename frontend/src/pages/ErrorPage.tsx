@@ -6,7 +6,7 @@ interface RouteError {
   message: string;
   internal: boolean;
   data: string;
-  error: any;
+  error: Error;
 }
 
 export default function ErrorPage() {

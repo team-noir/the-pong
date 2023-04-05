@@ -1,11 +1,17 @@
 import { Link } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { updateChannelUserRole, updateChannelUserStatus } from 'api/api.v1';
 import ProfileImage from 'components/atoms/ProfileImage';
 import Button from 'components/atoms/Button';
-import { ChannelUserType, CHANNEL_USER_STATUS, USER_ROLES } from 'types';
+import {
+  ChannelUserStatusType,
+  ChannelUserType,
+  CHANNEL_USER_STATUS,
+  USER_ROLES,
+} from 'types';
 
 interface Props {
-  changeRole: (arg: any) => void;
-  changeStatus: (arg: any) => void;
+  channelId: number;
   styles: { readonly [key: string]: string };
   user: ChannelUserType;
   imageSize: number;
@@ -13,18 +19,29 @@ interface Props {
 }
 
 export default function ChannelUserItem({
-  changeRole,
-  changeStatus,
+  channelId,
   styles,
   user,
   imageSize,
   myUser,
 }: Props) {
+  const queryClient = useQueryClient();
   const isSelf = myUser?.id === user.id;
   const amIOwner = myUser?.role === USER_ROLES.OWNER;
 
+  const updateChannelUserRoleMutation = useMutation({
+    mutationFn: updateChannelUserRole,
+    onSuccess: () => queryClient.invalidateQueries(['getChannel', channelId]),
+  });
+
+  const updateChannelUserStatusMutation = useMutation({
+    mutationFn: updateChannelUserStatus,
+    onSuccess: () => queryClient.invalidateQueries(['getChannel', channelId]),
+  });
+
   const handleClickRole = () => {
-    changeRole({
+    updateChannelUserRoleMutation.mutate({
+      channelId,
       userId: user.id,
       role:
         user.role === USER_ROLES.ADMIN ? USER_ROLES.NORMAL : USER_ROLES.ADMIN,
@@ -33,9 +50,10 @@ export default function ChannelUserItem({
 
   const handleClickStatus = (e: React.MouseEvent<HTMLButtonElement>) => {
     const status = e.currentTarget.value;
-    changeStatus({
+    updateChannelUserStatusMutation.mutate({
+      channelId,
       userId: user.id,
-      status,
+      status: status as ChannelUserStatusType,
     });
   };
 

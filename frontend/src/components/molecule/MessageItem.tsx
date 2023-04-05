@@ -39,7 +39,7 @@ export default function MessageItem({
       <li
         className={`p-2 rounded ${
           isMyMessage
-            ? 'text-right bg-theme-green text-text-light'
+            ? 'text-right bg-green text-text-light'
             : 'bg-gray text-text-dark'
         }`}
       >

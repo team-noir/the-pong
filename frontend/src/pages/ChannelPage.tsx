@@ -11,12 +11,7 @@ import ChannelSetting from 'components/organisms/ChannelSetting';
 import ChannelInvite from 'components/organisms/ChannelInvite';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Button from 'components/atoms/Button';
-import {
-  ChannelUserRoleType,
-  ChannelUserStatusType,
-  MessageType,
-  ChannelFormType,
-} from 'types';
+import { MessageType, ChannelFormType } from 'types';
 
 export default function ChannelPage() {
   const myUserId = useUser((state) => state.id);
@@ -66,44 +61,6 @@ export default function ChannelPage() {
       navigate('/channel');
     },
   });
-
-  const updateChannelUserRoleMutation = useMutation({
-    mutationFn: api.updateChannelUserRole,
-    onSuccess: () => getChannelQuery.refetch(),
-  });
-
-  const updateChannelUserStatusMutation = useMutation({
-    mutationFn: api.updateChannelUserStatus,
-    onSuccess: () => getChannelQuery.refetch(),
-  });
-
-  const changeRole = ({
-    userId,
-    role,
-  }: {
-    userId: number;
-    role: ChannelUserRoleType;
-  }) => {
-    updateChannelUserRoleMutation.mutate({
-      channelId: getChannelQuery.data?.id,
-      userId,
-      role,
-    });
-  };
-
-  const changeStatus = ({
-    userId,
-    status,
-  }: {
-    userId: number;
-    status: ChannelUserStatusType;
-  }) => {
-    updateChannelUserStatusMutation.mutate({
-      channelId: getChannelQuery.data?.id,
-      userId,
-      status,
-    });
-  };
 
   useEffect(() => {
     if (getMessagesQuery.data) {
@@ -187,8 +144,6 @@ export default function ChannelPage() {
       {isShowDetail && myUserId && (
         <ChannelDetail
           channel={getChannelQuery.data}
-          changeRole={changeRole}
-          changeStatus={changeStatus}
           myUserId={myUserId}
           onClickSetting={() => setIsShowSetting(true)}
           onClickInvite={() => setIsShowInvite(true)}
