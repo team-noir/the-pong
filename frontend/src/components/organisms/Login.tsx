@@ -1,10 +1,10 @@
-import { useLogin } from 'hooks/useStore';
+import { API_LOGIN_FT } from 'api/api.v1';
+import { useUser } from 'hooks/useStore';
 import Button from 'components/atoms/Button';
 import logo42 from 'assets/images/logo_42.svg';
-import { API_LOGIN_FT } from 'api/api.v1';
 
 export default function Login() {
-  const isLogin = useLogin((state) => state.isLogin);
+  const isLogin = useUser((state) => state.isLogin);
 
   const handleClick = () => {
     window.location.href = API_LOGIN_FT;

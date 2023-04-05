@@ -1,15 +1,16 @@
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { ChannelFormType, postNewChannel } from 'api/api.v1';
-import Button from 'components/atoms/Button';
+import { createChannel } from 'api/api.v1';
 import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
 import PasswordInputWithMessage from 'components/molecule/PasswordInputWithMessage';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
-import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import Button from 'components/atoms/Button';
 import {
   validateChannelPassword,
   validateChannelTitle,
 } from 'utils/validatorUtils';
+import { ChannelFormType } from 'types';
 
 export default function ChannelNew() {
   const [formData, setformData] = useState<ChannelFormType>({
@@ -24,7 +25,13 @@ export default function ChannelNew() {
   const [hasPassword, setHasPassword] = useState(false);
   const navigate = useNavigate();
 
-  const postNewChannelMutation = useMutation(postNewChannel);
+  const createChannelMutation = useMutation({
+    mutationFn: createChannel,
+    onSuccess: (data) => {
+      const { id } = data;
+      navigate(`/channel/${id}`);
+    },
+  });
 
   useEffect(() => {
     if (!hasPassword || formData.isPrivate) {
@@ -39,15 +46,7 @@ export default function ChannelNew() {
       alert('입력값을 확인해주세요.');
       return;
     }
-    postNewChannelMutation.mutate(formData, {
-      onError: () => {
-        alert(`다시 시도해 주세요.`);
-      },
-      onSuccess: (data) => {
-        const { id } = data;
-        navigate(`/channel/${id}`);
-      },
-    });
+    createChannelMutation.mutate(formData);
   };
 
   return (

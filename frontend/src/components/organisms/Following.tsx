@@ -1,7 +1,7 @@
-import { UserType } from 'types/userType';
-import UserList from '../molecule/UserList';
-import styles from 'assets/styles/Following.module.css';
+import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
+import { UserType } from 'types';
+import styles from 'assets/styles/Following.module.css';
 
 interface Props {
   users: UserType[];

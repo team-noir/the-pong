@@ -1,16 +1,14 @@
 import Button from 'components/atoms/Button';
+import { useUser } from 'hooks/useStore';
 
 interface Props {
-  isTwoFactor: boolean | undefined;
   onClickSet: () => void;
   onClickUnset: () => void;
 }
 
-export default function Setting2FA({
-  isTwoFactor,
-  onClickSet,
-  onClickUnset,
-}: Props) {
+export default function Setting2FA({ onClickSet, onClickUnset }: Props) {
+  const isTwoFactor = useUser((state) => state.isTwoFactor);
+
   return (
     <>
       <h2>Two-Factor Authentication (2FA)</h2>

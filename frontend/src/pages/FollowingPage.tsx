@@ -1,16 +1,17 @@
-import Following from 'components/organisms/Following';
 import { useQuery, useMutation } from '@tanstack/react-query';
-import { UserType } from 'types/userType';
-import { AxiosError } from 'axios';
-import { deleteMyFollowing, getMyFollowing } from 'api/api.v1';
+import { getMyFollowings, unfollowUser } from 'api/api.v1';
+import Following from 'components/organisms/Following';
 
 export default function FollowingPage() {
-  const getMyFollowingQuery = useQuery<UserType[], AxiosError>({
+  const getMyFollowingQuery = useQuery({
     queryKey: ['getMyFollowing'],
-    queryFn: getMyFollowing,
+    queryFn: getMyFollowings,
   });
 
-  const deleteMyFollowingMutation = useMutation(deleteMyFollowing);
+  const unfollowUserMutation = useMutation({
+    mutationFn: unfollowUser,
+    onSuccess: () => getMyFollowingQuery.refetch(),
+  });
 
   const handleClickUnfollow = (e: React.MouseEvent<HTMLElement>) => {
     const ancestorElement = e.currentTarget.closest('[data-user-id]');
@@ -19,23 +20,17 @@ export default function FollowingPage() {
 
     const answer = confirm('언팔로우하시겠습니까?');
     if (!answer) return;
-    deleteMyFollowingMutation.mutate(Number(userId));
+    unfollowUserMutation.mutate(Number(userId));
   };
 
   return (
     <>
       <h1>FollowingPage</h1>
-      {getMyFollowingQuery.isLoading && <div>Loading...</div>}
-      {getMyFollowingQuery.isError && (
-        <div>{getMyFollowingQuery.error.message}</div>
-      )}
       {getMyFollowingQuery.isSuccess && (
-        <>
-          <Following
-            users={getMyFollowingQuery.data}
-            onClickUnfollow={handleClickUnfollow}
-          />
-        </>
+        <Following
+          users={getMyFollowingQuery.data}
+          onClickUnfollow={handleClickUnfollow}
+        />
       )}
     </>
   );

@@ -1,12 +1,11 @@
-import Button from 'components/atoms/Button';
-import SearchCombobox from 'components/molecule/SearchCombobox';
 import { useEffect, useState } from 'react';
-import { UserType } from 'types/userType';
 import { useMutation } from '@tanstack/react-query';
 import { getUsers } from 'api/api.v1';
 import UserList from 'components/molecule/UserList';
+import SearchCombobox from 'components/molecule/SearchCombobox';
+import Button from 'components/atoms/Button';
+import { UserType, ChannelUserType } from 'types';
 import styles from 'assets/styles/ChannelInvite.module.css';
-import { ChannelUserType } from 'types/channelUserType';
 
 interface Props {
   channelUsers: ChannelUserType[];

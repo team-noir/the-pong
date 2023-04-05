@@ -1,6 +1,6 @@
 import { Link, Outlet } from 'react-router-dom';
-import PageTitle from 'components/atoms/PageTitle';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import PageTitle from 'components/atoms/PageTitle';
 
 const menuItems = [
   { to: '/setting/profile', text: '프로필 수정' },

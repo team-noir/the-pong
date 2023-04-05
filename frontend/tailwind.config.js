@@ -1,5 +1,12 @@
 const colors = require('tailwindcss/colors');
 
+// TODO: remove
+delete colors['lightBlue'];
+delete colors['warmGray'];
+delete colors['trueGray'];
+delete colors['coolGray'];
+delete colors['blueGray'];
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
@@ -8,7 +15,7 @@ module.exports = {
       center: true,
     },
     colors: {
-      ...colors,
+      ...colors, // TODO: remove
       primary: {
         light: '#F5F0EE',
         DEFAULT: '#E2D8D5',
@@ -16,9 +23,13 @@ module.exports = {
       },
       secondary: colors.yellow,
       neutral: colors.neutral,
-      theme: {
-        green: '4BA19D',
-        red: 'CD392B',
+      green: {
+        ...colors.green,
+        DEFAULT: '4BA19D',
+      },
+      red: {
+        ...colors.red,
+        DEFAULT: 'CD392B',
       },
       gray: {
         lighter: '#F5F0EE',

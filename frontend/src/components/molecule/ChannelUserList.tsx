@@ -1,10 +1,9 @@
+import ChannelUserItem from 'components/molecule/ChannelUserItem';
 import Button from 'components/atoms/Button';
-import { ChannelUserType } from 'types/channelUserType';
-import ChannelUserItem from './ChannelUserItem';
+import { ChannelUserType } from 'types';
 
 interface Props {
-  changeRole: (arg: any) => void;
-  changeStatus: (arg: any) => void;
+  channelId: number;
   styles: { readonly [key: string]: string };
   users: ChannelUserType[] | null;
   imageSize: number;
@@ -14,8 +13,7 @@ interface Props {
 }
 
 export default function ChannelUserList({
-  changeRole,
-  changeStatus,
+  channelId,
   styles,
   users,
   imageSize,
@@ -32,8 +30,7 @@ export default function ChannelUserList({
       )}
       {myUser && (
         <ChannelUserItem
-          changeRole={changeRole}
-          changeStatus={changeStatus}
+          channelId={channelId}
           key={myUser?.id}
           styles={styles}
           user={myUser}
@@ -45,8 +42,7 @@ export default function ChannelUserList({
         users.map((user) => {
           return (
             <ChannelUserItem
-              changeRole={changeRole}
-              changeStatus={changeStatus}
+              channelId={channelId}
               key={user.id}
               styles={styles}
               user={user}

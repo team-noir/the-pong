@@ -1,32 +1,20 @@
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { AxiosError } from 'axios';
-import {
-  getWhoami,
-  getChannel,
-  getChannelMessages,
-  postChannelMessages,
-  putChannelUsers,
-  deleteChannel,
-  patchChannelUserRole,
-  patchChannelUserStatus,
-} from 'api/api.v1';
+import * as api from 'api/api.v1';
+import { useUser } from 'hooks/useStore';
 import { SocketContext } from 'contexts/socket';
-import Button from 'components/atoms/Button';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import AppTemplate from 'components/templates/AppTemplate';
 import Channel from 'components/organisms/Channel';
 import ChannelDetail from 'components/organisms/ChannelDetail';
 import ChannelSetting from 'components/organisms/ChannelSetting';
 import ChannelInvite from 'components/organisms/ChannelInvite';
-import AppTemplate from 'components/templates/AppTemplate';
-import { UserType } from 'types/userType';
-import { ChannelType } from 'types/channelType';
-import { MessageType } from 'types/messageType';
-import { ChannelUserRoleType, ChannelUserStatusType } from 'types/channelUserType';
-import { ChannelFormType, patchChannelSetting } from 'api/api.v1';
+import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Button from 'components/atoms/Button';
+import { MessageType, ChannelFormType } from 'types';
 
 export default function ChannelPage() {
+  const myUserId = useUser((state) => state.id);
   const navigate = useNavigate();
   const { channelId } = useParams() as { channelId: string };
   const socket = useContext(SocketContext);
@@ -37,86 +25,51 @@ export default function ChannelPage() {
 
   const queryClient = useQueryClient();
 
-  const whoamiQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['whoami'],
-    queryFn: getWhoami,
-  });
-
-  const getChannelQuery = useQuery<ChannelType, AxiosError>({
+  const getChannelQuery = useQuery({
     queryKey: ['getChannel', channelId],
-    queryFn: () => getChannel(channelId),
+    queryFn: () => api.getChannel(Number(channelId)),
   });
 
-  const getChannelMessagesMutation = useMutation<
-    MessageType[],
-    AxiosError,
-    number
-  >(getChannelMessages);
-
-  const postChannelMessagesMutation = useMutation<
-    any,
-    AxiosError,
-    { channelId: number; message: string }
-  >(postChannelMessages);
-
-  const patchChannelSettingMutation = useMutation(patchChannelSetting);
-  const putChannelUsersMutation = useMutation(putChannelUsers);
-
-  const deleteChannelMutation = useMutation(deleteChannel);
-
-  const patchChannelUserRoleMutation = useMutation<any, AxiosError, any>({
-    mutationFn: patchChannelUserRole,
-    onSuccess: () => getChannelQuery.refetch(),
+  const getMessagesQuery = useQuery({
+    queryKey: ['getMessages'],
+    queryFn: () => api.getMessages(Number(channelId)),
+    staleTime: Infinity,
   });
 
-  const patchChannelUserStatusMutation = useMutation<any, AxiosError, any>({
-    mutationFn: patchChannelUserStatus,
-    onSuccess: () => getChannelQuery.refetch(),
+  const sendMessageMutation = useMutation(api.sendMessage);
+
+  const updateChannelSettingMutation = useMutation({
+    mutationFn: api.updateChannelSetting,
+    onSuccess: () => {
+      setIsShowSetting(false);
+      queryClient.invalidateQueries(['getChannel', channelId]);
+    },
   });
 
-  const changeRole = ({
-    userId,
-    role,
-  }: {
-    userId: number;
-    role: ChannelUserRoleType;
-  }) => {
-    patchChannelUserRoleMutation.mutate({
-      channelId: getChannelQuery.data?.id,
-      userId,
-      role,
-    });
-  };
+  const inviteUserToChannelMutation = useMutation({
+    mutationFn: api.inviteUserToChannel,
+    onSuccess: () => {
+      setIsShowInvite(false);
+      queryClient.invalidateQueries(['getChannel', channelId]);
+    },
+  });
 
-  const changeStatus = ({
-    userId,
-    status,
-  }: {
-    userId: number;
-    status: ChannelUserStatusType;
-  }) => {
-    patchChannelUserStatusMutation.mutate({
-      channelId: getChannelQuery.data?.id,
-      userId,
-      status,
-    });
-  };
+  const leaveChannelMutation = useMutation({
+    mutationFn: api.leaveChannel,
+    onSuccess: () => {
+      queryClient.invalidateQueries(['getChannel', channelId]);
+      navigate('/channel');
+    },
+  });
 
   useEffect(() => {
-    if (getChannelQuery.data) {
-      getChannelMessagesMutation.mutate(getChannelQuery.data.id);
+    if (getMessagesQuery.data) {
+      setMessages([...getMessagesQuery.data]);
     }
-  }, [getChannelQuery.data]);
-
-  useEffect(() => {
-    if (getChannelMessagesMutation.data) {
-      setMessages([...getChannelMessagesMutation.data]);
-    }
-  }, [getChannelMessagesMutation.data]);
+  }, [getMessagesQuery.data]);
 
   useEffect(() => {
     socket.on('message', (data: MessageType) => {
-      console.log('socket message data', data);
       const newMessage: MessageType = {
         id: data.id,
         senderId: data.senderId,
@@ -128,7 +81,6 @@ export default function ChannelPage() {
       setMessages((prev) => [...prev, newMessage]);
     });
     socket.on('notice', (data: MessageType) => {
-      console.log('socket notice data', data);
       const newNotice: MessageType = {
         id: data.id,
         isLog: true,
@@ -146,7 +98,7 @@ export default function ChannelPage() {
   const postMessage = (message: string) => {
     if (channelId === undefined) return;
 
-    postChannelMessagesMutation.mutate({
+    sendMessageMutation.mutate({
       channelId: Number(channelId),
       message,
     });
@@ -155,55 +107,25 @@ export default function ChannelPage() {
   const inviteUsers = (userIds: number[]) => {
     if (!channelId) return;
 
-    putChannelUsersMutation.mutate(
-      { channelId: Number(channelId), userIds },
-      {
-        onError: () => alert('다시 시도해 주세요.'),
-        onSuccess: () => {
-          setIsShowInvite(false);
-          queryClient.invalidateQueries(['getChannel', channelId]);
-        },
-      }
-    );
+    inviteUserToChannelMutation.mutate({
+      channelId: Number(channelId),
+      userIds,
+    });
   };
 
   const leaveChannel = () => {
-    deleteChannelMutation.mutate(Number(channelId), {
-      onError: () => alert('다시 시도해 주세요.'),
-      onSuccess: () => {
-        queryClient.invalidateQueries(['getChannel', channelId]);
-        navigate('/channel');
-      },
-    });
+    leaveChannelMutation.mutate(Number(channelId));
   };
 
   const changeChannelSetting = (channelForm: ChannelFormType) => {
-    patchChannelSettingMutation.mutate(channelForm, {
-      onError: () => alert('다시 시도해 주세요.'),
-      onSuccess: () => {
-        setIsShowSetting(false);
-        queryClient.invalidateQueries(['getChannel', channelId]);
-      },
-    });
+    updateChannelSettingMutation.mutate(channelForm);
   };
-
-  if (
-    whoamiQuery.status === 'loading' ||
-    getChannelQuery.status === 'loading'
-  ) {
-    return <div>Loading...</div>;
-  }
-
-  if (whoamiQuery.status === 'error' || getChannelQuery.status === 'error') {
-    alert('에러가 발생했습니다.');
-    navigate('/channel');
-  }
 
   return (
     <AppTemplate
       header={
         <HeaderWithBackButton
-          title={getChannelQuery.data?.title || ''}
+          title={getChannelQuery.data.title || ''}
           button={
             <Button type="button" onClick={() => setIsShowDetail(true)}>
               메뉴
@@ -212,42 +134,36 @@ export default function ChannelPage() {
         />
       }
     >
-      <>
-        {whoamiQuery.data && getChannelQuery.data && (
-          <>
-            <Channel
-              messages={messages}
-              postMessage={postMessage}
-              myUserId={whoamiQuery.data.id}
-            />
-            {isShowDetail && (
-              <ChannelDetail
-                channel={getChannelQuery.data}
-                changeRole={changeRole}
-                changeStatus={changeStatus}
-                myUserId={whoamiQuery.data.id}
-                onClickSetting={() => setIsShowSetting(true)}
-                onClickInvite={() => setIsShowInvite(true)}
-                onClickLeave={leaveChannel}
-              />
-            )}
-            {isShowSetting && (
-              <ChannelSetting
-                channel={getChannelQuery.data}
-                onClickClose={() => setIsShowSetting(false)}
-                changeChannelSetting={changeChannelSetting}
-              />
-            )}
-            {isShowInvite && getChannelQuery.data.users && (
-              <ChannelInvite
-                channelUsers={getChannelQuery.data.users}
-                onClickClose={() => setIsShowInvite(false)}
-                inviteUsers={inviteUsers}
-              />
-            )}
-          </>
-        )}
-      </>
+      {myUserId && (
+        <Channel
+          messages={messages}
+          postMessage={postMessage}
+          myUserId={myUserId}
+        />
+      )}
+      {isShowDetail && myUserId && (
+        <ChannelDetail
+          channel={getChannelQuery.data}
+          myUserId={myUserId}
+          onClickSetting={() => setIsShowSetting(true)}
+          onClickInvite={() => setIsShowInvite(true)}
+          onClickLeave={leaveChannel}
+        />
+      )}
+      {isShowSetting && (
+        <ChannelSetting
+          channel={getChannelQuery.data}
+          onClickClose={() => setIsShowSetting(false)}
+          changeChannelSetting={changeChannelSetting}
+        />
+      )}
+      {isShowInvite && getChannelQuery.data.users && (
+        <ChannelInvite
+          channelUsers={getChannelQuery.data.users}
+          onClickClose={() => setIsShowInvite(false)}
+          inviteUsers={inviteUsers}
+        />
+      )}
     </AppTemplate>
   );
 }

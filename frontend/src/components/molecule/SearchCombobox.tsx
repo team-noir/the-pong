@@ -1,9 +1,7 @@
-import { UserType } from 'types/userType';
+import { Fragment, useEffect, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import ProfileImage from 'components/atoms/ProfileImage';
-import { Fragment, useEffect, useState } from 'react';
-import { ChannelUserType } from 'types/channelUserType';
-
+import { UserType, ChannelUserType } from 'types';
 interface Props {
   placeholder?: string;
   dataList?: UserType[];

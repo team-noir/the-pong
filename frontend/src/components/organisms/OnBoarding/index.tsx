@@ -5,7 +5,7 @@ import StepNickname from 'components/organisms/OnBoarding/StepNickname';
 import StepProfileImage from 'components/organisms/OnBoarding/StepProfileImage';
 import StepWelcome from 'components/organisms/OnBoarding/StepWelcome';
 import { validateAgreements, validateNickname } from 'utils/validatorUtils';
-import { ProfileFormType } from 'types/profileFormType';
+import { ProfileFormType } from 'types';
 
 interface Props {
   isSubmitted: boolean;

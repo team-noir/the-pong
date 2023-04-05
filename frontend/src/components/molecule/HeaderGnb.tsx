@@ -1,14 +1,12 @@
-import { useEffect, Fragment } from 'react';
+import { Fragment } from 'react';
 import { Link } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { logout as logoutApi } from 'api/api.v1';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { useUser } from 'hooks/useStore';
 import SearchBar from 'components/molecule/SearchBar';
 import ProfileImage from 'components/atoms/ProfileImage';
-import { UserType } from 'types/userType';
-import { useLogin, useUser } from 'hooks/useStore';
-import { AxiosError } from 'axios';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { getWhoami, postLogout } from 'api/api.v1';
 
 const navigation = [
   { name: 'Game', href: '/game', current: false },
@@ -35,25 +33,15 @@ function Logo() {
 }
 
 export default function HeaderGnb() {
-  const logout = useLogin((state) => state.logout);
-  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
+  const { logout, setIsOnboarded, id: myUserId } = useUser((state) => state);
 
-  const whoamiQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['whoami'],
-    queryFn: getWhoami,
-  });
-  const postLogoutMutation = useMutation(postLogout);
-
-  useEffect(() => {
-    if (postLogoutMutation.isSuccess) {
+  const postLogoutMutation = useMutation({
+    mutationFn: logoutApi,
+    onSuccess: () => {
       setIsOnboarded(false);
       logout();
-    }
-  }, [postLogoutMutation.isSuccess]);
-
-  const handleLogout = () => {
-    postLogoutMutation.mutate();
-  };
+    },
+  });
 
   return (
     <Disclosure
@@ -85,9 +73,9 @@ export default function HeaderGnb() {
                   <div>
                     <Menu.Button className="flex rounded bg-gray-dark text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray min-w-13 min-h-13">
                       <span className="sr-only">Open user menu</span>
-                      {whoamiQuery.isSuccess && (
+                      {myUserId && (
                         <ProfileImage
-                          userId={whoamiQuery.data.id}
+                          userId={myUserId}
                           alt="My profile image"
                           size={52}
                         />
@@ -107,7 +95,7 @@ export default function HeaderGnb() {
                       <Menu.Item>
                         {({ active }) => (
                           <Link
-                            to={`/profile/${whoamiQuery.data?.id}`}
+                            to={`/profile/${myUserId}`}
                             className={classNames(
                               active ? 'bg-gray-dark' : '',
                               'block px-4 py-2 text-sm text-text-light'
@@ -134,7 +122,7 @@ export default function HeaderGnb() {
                         {({ active }) => (
                           <span
                             role="button"
-                            onClick={handleLogout}
+                            onClick={() => postLogoutMutation.mutate()}
                             className={classNames(
                               active ? 'bg-gray-dark' : '',
                               'block px-4 py-2 text-sm text-text-light cursor-pointer'

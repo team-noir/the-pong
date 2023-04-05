@@ -1,5 +1,5 @@
-import FileInputWithImage from 'components/molecule/FileInputWithImage';
 import { FormData } from 'components/organisms/OnBoarding';
+import FileInputWithImage from 'components/molecule/FileInputWithImage';
 
 interface Props {
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;

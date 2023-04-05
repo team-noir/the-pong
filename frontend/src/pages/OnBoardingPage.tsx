@@ -1,36 +1,36 @@
-import OnBoarding from 'components/organisms/OnBoarding';
-import { useMutation } from '@tanstack/react-query';
-import { patchMyProfile, PostMyProfileImage } from 'api/api.v1';
 import { useEffect, useState } from 'react';
-import { ProfileFormType } from 'types/profileFormType';
-import AppTemplateWithoutHeader from 'components/templates/AppTemplateWithoutHeader';
+import { useMutation } from '@tanstack/react-query';
+import { updateMyProfile, updateMyProfileImage } from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
+import AppTemplateWithoutHeader from 'components/templates/AppTemplateWithoutHeader';
+import OnBoarding from 'components/organisms/OnBoarding';
+import { ProfileFormType } from 'types';
 
 export default function OnBoardingPage() {
-  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
+  const { setNickname, setIsOnboarded } = useUser((state) => state);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [hasImageFile, setHasImageFile] = useState<boolean>(false);
 
-  const patchMyProfileMutation = useMutation(patchMyProfile);
-  const postMyProfileImageMutation = useMutation(PostMyProfileImage);
+  const updateMyProfileMutation = useMutation(updateMyProfile);
+  const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
 
   useEffect(() => {
-    if (patchMyProfileMutation.isError || postMyProfileImageMutation.isError) {
-      alert('다시 시도해주세요.');
-    }
     if (
-      patchMyProfileMutation.isSuccess &&
-      (!hasImageFile || (hasImageFile && postMyProfileImageMutation.isSuccess))
+      updateMyProfileMutation.isSuccess &&
+      (!hasImageFile ||
+        (hasImageFile && updateMyProfileImageMutation.isSuccess))
     ) {
       setIsSubmitted(true);
       setIsOnboarded(true);
     }
-  }, [patchMyProfileMutation, postMyProfileImageMutation]);
+  }, [updateMyProfileMutation, updateMyProfileImageMutation]);
 
   const handleSubmit = (formData: ProfileFormType) => {
-    patchMyProfileMutation.mutate(formData.nickname);
+    updateMyProfileMutation.mutate(formData.nickname);
     if (formData.imageFile) {
-      postMyProfileImageMutation.mutate(formData.imageFile);
+      updateMyProfileImageMutation.mutate(formData.imageFile, {
+        onSuccess: () => setNickname(formData.nickname),
+      });
       setHasImageFile(true);
     }
   };

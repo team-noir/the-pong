@@ -1,6 +1,5 @@
 import { useState, useRef } from 'react';
 import Button from 'components/atoms/Button';
-import styles from 'assets/styles/FileInputWithImage.module.css';
 
 interface Props {
   imageUrl: string;

@@ -1,5 +1,5 @@
-import { ChannelType } from 'types/channelType';
-import ChannelItem from './ChannelItem';
+import ChannelItem from 'components/molecule/ChannelItem';
+import { ChannelType } from 'types';
 
 interface Props {
   styles: { readonly [key: string]: string };

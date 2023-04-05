@@ -1,6 +1,6 @@
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
-import ChannelNew from 'components/organisms/ChannelNew';
 import AppTemplate from 'components/templates/AppTemplate';
+import ChannelNew from 'components/organisms/ChannelNew';
+import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 
 export default function ChannelNewPage() {
   return (

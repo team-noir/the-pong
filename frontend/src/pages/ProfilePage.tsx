@@ -1,84 +1,79 @@
-import Profile from 'components/organisms/Profile';
-import Achievements from 'components/organisms/Achievements';
-import {
-  getUser,
-  getWhoami,
-  ProfileUserType,
-  putMyFollowing,
-  deleteMyFollowing,
-  putMyBlocks,
-  deleteMyBlocks,
-  getDmChannel,
-} from 'api/api.v1';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { AxiosError } from 'axios';
-import { UserType } from 'types/userType';
+import * as api from 'api/api.v1';
+import Profile from 'components/organisms/Profile';
+// import Achievements from 'components/organisms/Achievements';
 
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };
   const navigate = useNavigate();
 
-  const getUserQuery = useQuery<ProfileUserType, AxiosError>({
+  const getUserQuery = useQuery({
     queryKey: ['profile', userId],
-    queryFn: () => getUser(userId),
+    queryFn: () => api.getUser(Number(userId)),
   });
 
-  const whoamiQuery = useQuery<UserType, AxiosError>({
-    queryKey: ['whoami'],
-    queryFn: getWhoami,
+  const followUserMutation = useMutation({
+    mutationFn: api.followUser,
+    onSuccess: () => getUserQuery.refetch(),
   });
 
-  const putMyFollowingMutation = useMutation(putMyFollowing);
-  const deleteMyFollowingMutation = useMutation(deleteMyFollowing);
-  const putMyBlocksMutation = useMutation(putMyBlocks);
-  const deleteMyBlocksMutation = useMutation(deleteMyBlocks);
-  const getDmChannelMutation = useMutation(getDmChannel);
+  const unfollowUserMutation = useMutation({
+    mutationFn: api.unfollowUser,
+    onSuccess: () => getUserQuery.refetch(),
+  });
+
+  const blockUserMutation = useMutation({
+    mutationFn: api.blockUser,
+    onSuccess: () => getUserQuery.refetch(),
+  });
+
+  const unblockUserMutation = useMutation({
+    mutationFn: api.unblockUser,
+    onSuccess: () => getUserQuery.refetch(),
+  });
+
+  const getDmChannelMutation = useMutation({
+    mutationFn: api.getDmChannel,
+    onSuccess: (data) => navigate(`/channel/${data.id}`),
+    useErrorBoundary: true,
+  });
 
   const handleClickFollow = (userId: number) => {
     const answer = confirm('팔로우하시겠습니까?');
     if (!answer) return;
-    putMyFollowingMutation.mutate(userId);
+    followUserMutation.mutate(userId);
   };
 
   const handleClickUnfollow = (userId: number) => {
     const answer = confirm('언팔로우하시겠습니까?');
     if (!answer) return;
-    deleteMyFollowingMutation.mutate(Number(userId));
+    unfollowUserMutation.mutate(Number(userId));
   };
 
   const handleClickBlock = (userId: number) => {
     const answer = confirm('정말 차단하시겠습니까?');
     if (!answer) return;
-    putMyBlocksMutation.mutate(userId);
+    blockUserMutation.mutate(userId);
   };
 
   const handleClickUnblock = (userId: number) => {
     const answer = confirm('차단을 해제하시겠습니까?');
     if (!answer) return;
-    deleteMyBlocksMutation.mutate(userId);
+    unblockUserMutation.mutate(userId);
   };
 
   const handleClickDm = (userId: number) => {
-    getDmChannelMutation.mutate(userId, {
-      onError: () => alert('다시 시도해 주세요.'),
-      onSuccess: (data) => navigate(`/channel/${data.id}`),
-    });
+    getDmChannelMutation.mutate(userId);
   };
 
   return (
     <>
-      {(getUserQuery.isLoading || whoamiQuery.isLoading) && (
-        <div>Loading...</div>
-      )}
-      {getUserQuery.isError && <div>{getUserQuery.error.message}</div>}
-      {whoamiQuery.isError && <div>{whoamiQuery.error.message}</div>}
-      {getUserQuery.isSuccess && whoamiQuery.isSuccess && (
+      {getUserQuery.isSuccess && (
         <>
           <div>ProfilePage</div>
           <Profile
             user={getUserQuery.data}
-            myId={`${whoamiQuery.data.id}`}
             onClickFollow={handleClickFollow}
             onClickUnfollow={handleClickUnfollow}
             onClickBlock={handleClickBlock}

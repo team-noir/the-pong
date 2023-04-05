@@ -7,7 +7,7 @@ export default function MainGames() {
 
   return (
     <section>
-      <h2>Games</h2>
+      <h2>게임</h2>
       <Button type="button" onClick={handleClickStartGame}>
         게임 시작하기
       </Button>

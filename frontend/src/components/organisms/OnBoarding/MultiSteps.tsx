@@ -1,16 +1,16 @@
-import Button from 'components/atoms/Button';
 import { useState } from 'react';
-import Message from 'components/atoms/Message';
 import { FormData } from 'components/organisms/OnBoarding';
-import { ProfileFormType } from 'types/profileFormType';
+import Button from 'components/atoms/Button';
+import Message from 'components/atoms/Message';
+import { ProfileFormType } from 'types';
 
-type FunctionORNull = (() => any) | null;
+type ValidatorFunctionOrNull = (() => boolean) | null;
 
 interface Props {
   formData: FormData;
   stepComponents: React.ReactElement[];
   resultComponent: React.ReactElement;
-  validators: FunctionORNull[];
+  validators: ValidatorFunctionOrNull[];
   messages: string[];
   isSubmitted: boolean;
   onSubmit: (formData: ProfileFormType) => void;
