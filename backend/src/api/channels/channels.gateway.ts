@@ -10,9 +10,10 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { ChannelsService, ChannelUser } from './channels.service';
+import { ChannelsService } from './channels.service';
 import { AuthService } from '../auth/auth.service';
 import { parse } from 'cookie';
+import { ChannelUser } from './ChannelUserClass';
 
 @Injectable()
 @WebSocketGateway({
@@ -63,8 +64,8 @@ export class ChannelsGatway
       );
       return;
     }
-    if (this.channelsService.hasUser(userId)) {
-      const logged = this.channelsService.getUser(userId);
+    if (this.channelsService.channelUserClass.has(userId)) {
+      const logged = this.channelsService.channelUserClass.getUser(userId);
       logged.socket.disconnect(true);
       logged.socket = socket;
       socket.data = { user: logged };
@@ -83,7 +84,7 @@ export class ChannelsGatway
       blockUser: new Set<number>(),
     };
     socket.data = { user };
-    this.channelsService.setUser(userId, user);
+    this.channelsService.channelUserClass.setUser(userId, user);
     this.logger.log(
       `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
     );
