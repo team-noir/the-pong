@@ -5,7 +5,7 @@ import { ChannelUser } from './ChannelUserClass';
 type userId = number;
 type channelId = number;
 
-export interface Channel {
+export class Channel {
 	id: number;
 	title?: string;
 	// channelCode: string;
@@ -23,6 +23,33 @@ export interface Channel {
 	muted: Map<userId, Date>; // none
 
 	// messages: Message[]
+
+	constructor(id: number, isPrivate: boolean, isDm: boolean, title?: string, password?: string) {
+		this.id = id;
+		this.title = title;
+		this.isDm = isDm;
+		this.isPrivate = isPrivate;
+		this.createdAt = new Date();
+		this.password = password;
+
+		this.owner = null;
+		this.users = new Set<number>();
+		this.admin = new Set<number>();
+		this.muted = new Map<number, Date>();
+		this.banned = new Set<number>();
+	}
+
+	isUserJoinedAssert(user: ChannelUser) {
+		if (!this.users.has(user.id)) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This user is not in the channel';
+			throw { code, message };
+		}
+	}
+
+	isUserJoined(user: ChannelUser): boolean {
+		return this.users.has(user.id);
+	}
 }
 
 export class ChannelClass {
@@ -83,11 +110,6 @@ export class ChannelClass {
 	  );
 	}
   
-	// 채널에 유저가 참여 중인지 확인
-	checkIsJoined(channel: Channel, userId: number): boolean {
-	  return channel.users.has(userId);
-	}
-  
 	// 채널이 query에서 원하는 유형인지 알려준다.
 	checkListedRange(channel: Channel, query) {
 	  return (
@@ -106,21 +128,13 @@ export class ChannelClass {
   
 	// 채널 생성
 	createChannel(data) {
-	  const newChannelId: number = this.channelMap.size + 1;
-	  const newChannel: Channel = {
-		id: newChannelId,
-		title: data.title ? data.title : null,
-		isDm: data.isDm ? true : false,
-		isPrivate: data.isPrivate ? true : false,
-		createdAt: new Date(),
-		password: data.password ? data.password : null,
-  
-		owner: null,
-		users: new Set<number>(),
-		admin: new Set<number>(),
-		muted: new Map<number, Date>(),
-		banned: new Set<number>(),
-	  };
+	  const newChannel = new Channel(
+		this.channelMap.size + 1,
+		data.isPrivate,
+		data.isDm,
+		data.title,
+		data.password
+	  )
 	  this.addChannel(newChannel.id, newChannel);
 	  return newChannel;
 	}
