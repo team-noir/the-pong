@@ -5,9 +5,9 @@ import { ChannelsModule } from './channels.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { expect, jest, describe, afterEach, beforeEach, beforeAll, it, afterAll, test } from '@jest/globals';
 import { ChannelsService } from './channels.service';
-import { ChannelClass, Channel } from './ChannelClass';
+import { ChannelClass, Channel } from './classes/ChannelClass';
 import { CreateChannelDto } from './dtos/channel.dto';
-import { ChannelUserClass, ChannelUser } from './ChannelUserClass';
+import { ChannelUserClass, ChannelUser } from './classes/ChannelUserClass';
 
 const fakeSocket = {
 	emit: jest.fn(),

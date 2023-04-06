@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsOptional, IsNumber, IsArray } from 'class-validator';
-import { ChannelUser } from '../ChannelUserClass';
+import { ChannelUser } from '../classes/ChannelUserClass';
 
 export class CreateChannelDto {
   @ApiProperty({

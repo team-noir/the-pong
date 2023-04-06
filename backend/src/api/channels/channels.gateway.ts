@@ -13,7 +13,7 @@ import { Socket, Server } from 'socket.io';
 import { ChannelsService } from './channels.service';
 import { AuthService } from '../auth/auth.service';
 import { parse } from 'cookie';
-import { ChannelUser } from './ChannelUserClass';
+import { ChannelUser } from './classes/ChannelUserClass';
 
 @Injectable()
 @WebSocketGateway({
