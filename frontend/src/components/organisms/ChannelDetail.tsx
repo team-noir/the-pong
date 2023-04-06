@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 import Button from 'components/atoms/Button';
 import { ChannelType, USER_ROLES, ChannelUserType } from 'types';
-import styles from 'assets/styles/Channel.module.css';
 
 interface Props {
   channel: ChannelType;
@@ -43,7 +42,6 @@ export default function ChannelDetail({
       {myUser && channelUsers && (
         <ChannelUserList
           channelId={channel.id}
-          styles={styles}
           myUser={myUser}
           users={channelUsers}
           imageSize={52}

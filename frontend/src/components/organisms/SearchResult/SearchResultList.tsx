@@ -1,5 +1,4 @@
 import SearchResultItem from 'components/organisms/SearchResult/SearchResultItem';
-import styles from 'assets/styles/SearchResult.module.css';
 import { UserType } from 'types';
 
 interface Props {
@@ -8,7 +7,7 @@ interface Props {
 
 export default function SearchResultList({ users }: Props) {
   return (
-    <ul className={styles.ul}>
+    <ul>
       {users &&
         users.map((user) => {
           return <SearchResultItem key={user.id} user={user} />;

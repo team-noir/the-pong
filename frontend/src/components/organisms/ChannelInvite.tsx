@@ -5,7 +5,6 @@ import UserList from 'components/molecule/UserList';
 import SearchCombobox from 'components/molecule/SearchCombobox';
 import Button from 'components/atoms/Button';
 import { UserType, ChannelUserType } from 'types';
-import styles from 'assets/styles/ChannelInvite.module.css';
 
 interface Props {
   channelUsers: ChannelUserType[];
@@ -67,7 +66,6 @@ export default function ChannelInvite({
         onSelect={handleSelect}
       />
       <UserList
-        styles={styles}
         users={users}
         imageSize={52}
         buttons={[
