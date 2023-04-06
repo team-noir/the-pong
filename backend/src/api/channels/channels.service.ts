@@ -4,9 +4,9 @@ import { WebSocketServer } from '@nestjs/websockets';
 import { CreateChannelDto, ChannelMessageDto } from './dtos/channel.dto';
 import { ONESECOND } from '../../const';
 
-import { ChannelClass, Channel } from './ChannelClass';
-import { ChannelUserClass, ChannelUser } from './ChannelUserClass';
-import { MessageClass, Message } from './MessageClass';
+import { ChannelClass, Channel } from './classes/ChannelClass';
+import { ChannelUserClass, ChannelUser } from './classes/ChannelUserClass';
+import { MessageClass, Message } from './classes/MessageClass';
 
 @Injectable()
 export class ChannelsService {

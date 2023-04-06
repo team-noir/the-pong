@@ -4,7 +4,7 @@ import { CreateChannelDto } from './dtos/channel.dto';
 import { expect, jest, describe, beforeEach, beforeAll, it } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import { ChannelsModule } from './channels.module';
-import { ChannelUser } from './ChannelUserClass';
+import { ChannelUser } from './classes/ChannelUserClass';
 
 /*
 

@@ -3,7 +3,7 @@ import { ChannelUserClass, ChannelUser } from './ChannelUserClass';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { HttpStatus } from '@nestjs/common';
-import { ChannelMessageDto } from './dtos/channel.dto'
+import { ChannelMessageDto } from '../dtos/channel.dto'
 
 type messageId = number;
 
@@ -13,7 +13,6 @@ export interface Message {
 	createdAt: Date;
 	sender: ChannelUser;
 	channel: Channel;
-  
 	isLog: boolean;
 }
   
