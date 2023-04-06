@@ -10,7 +10,7 @@ import { ChannelUser } from './ChannelUserClass';
 
 model - view - controller
 
-serviece - controller
+model - service - controller
 
 
 

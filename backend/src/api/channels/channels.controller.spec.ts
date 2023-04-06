@@ -226,14 +226,14 @@ describe('Chat connection', () => {
 			});
 	
 			service.join(socketUser.id, channel.id, null);
-			service.messageToChannel(user.id, channel.id, "hello");
+			service.messageClass.messageToChannel(user, channel, "hello");
 		});
 	
 		it('참여 중인 채널에서 메세지를 가져오기', () => {
 			service.join(socketUser.id, channel.id, null);
-			service.messageToChannel(user.id, channel.id, "hello");
+			service.messageClass.messageToChannel(user, channel, "hello");
 	
-			const messages = service.getChannelMessages(socketUser.id, channel.id);
+			const messages = service.messageClass.getChannelMessages(socketUser, channel);
 			expect(messages.length).toBe(2);
 		})
 	});
@@ -255,14 +255,14 @@ describe('Chat connection', () => {
 	
 			service.mute(user, channel, socketUser, 1);
 			try {
-				service.messageToChannel(socketUser.id, channel.id, "hello 0");
+				service.messageClass.messageToChannel(socketUser, channel, "hello 0");
 			} catch (error) {
 				expect(error.code).toBe(403);
 			}
 	
 			setTimeout(() => {
 				try {
-					service.messageToChannel(socketUser.id, channel.id, "hello 1");
+					service.messageClass.messageToChannel(socketUser, channel, "hello 1");
 				} catch (error) {
 					expect(error.code).toBe(403);
 				}
@@ -270,7 +270,7 @@ describe('Chat connection', () => {
 			
 			setTimeout(() => {
 				try {
-					service.messageToChannel(socketUser.id, channel.id, "hello 2");
+					service.messageClass.messageToChannel(socketUser, channel, "hello 2");
 				} catch (error) {
 					expect(error.code).toBe(false);
 				}

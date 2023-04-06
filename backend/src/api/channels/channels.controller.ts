@@ -237,7 +237,8 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.messageToChannel(req.user.id, channelId, body.text);
+      const channel = this.channelsService.channelClass.get(channelId);
+      this.channelsService.messageClass.messageToChannel(req.user.id, channel, body.text);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
@@ -258,10 +259,9 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      const messages = this.channelsService.getChannelMessages(
-        req.user.id,
-        channelId
-      );
+      const channel = this.channelsService.channelClass.get(channelId);
+      const user = this.channelsService.channelUserClass.getUser(req.user.id);
+      const messages = this.channelsService.messageClass.getChannelMessages(user, channel);
       res.status(HttpStatus.OK);
       return messages;
     } catch (error) {

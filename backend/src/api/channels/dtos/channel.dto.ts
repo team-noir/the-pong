@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsBoolean, IsOptional, IsNumber, IsArray } from 'class-validator';
+import { ChannelUser } from '../ChannelUserClass';
 
 export class CreateChannelDto {
   @ApiProperty({
@@ -178,6 +179,18 @@ export class ChannelMessageDto {
 
   @ApiProperty()
   public createdAt: Date;
+
+  constructor(id: number, text: string, sender?: ChannelUser, isLog?: boolean) {
+    this.id = id;
+    this.text = text;
+    this.isLog = isLog;
+    this.createdAt = new Date();
+
+    if (sender) {
+      this.senderId = sender.id;
+      this.senderNickname = sender.name;
+    }
+  }
 }
 
 export class ChannelMessageTextDto {
@@ -185,4 +198,5 @@ export class ChannelMessageTextDto {
   @IsString()
   public text: string;
 }
+
 

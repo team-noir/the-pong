@@ -35,6 +35,7 @@ export class ChannelsGatway
   afterInit() {
     this.logger.log('웹소켓 서버 초기화 ✅');
     this.channelsService.server = this.server;
+    this.channelsService.messageClass.initServer(this.server);
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
@@ -102,9 +103,10 @@ export class ChannelsGatway
     @MessageBody('channelId') channelId: number,
     @MessageBody('message') message: string
   ) {
-    this.channelsService.messageToChannel(
+    const channel = this.channelsService.channelClass.get(channelId);
+    this.channelsService.messageClass.messageToChannel(
       socket.data.user.id,
-      channelId,
+      channel,
       message
     );
   }
