@@ -7,6 +7,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useUser } from 'hooks/useStore';
 import SearchBar from 'components/molecule/SearchBar';
 import ProfileImage from 'components/atoms/ProfileImage';
+import { classNames } from 'utils';
 
 const navigation = [
   { name: 'Game', href: '/game', current: false },
@@ -14,10 +15,6 @@ const navigation = [
   { name: 'Following', href: '/following', current: false },
   { name: 'Setting', href: '/setting', current: false },
 ];
-
-function classNames(...classes: string[]) {
-  return classes.filter(Boolean).join(' ');
-}
 
 function Logo() {
   return (
@@ -46,7 +43,7 @@ export default function HeaderGnb() {
   return (
     <Disclosure
       as="nav"
-      className="container mx-auto max-w-xl fixed top-0 left-0 right-0 backdrop-blur-md"
+      className="container mx-auto max-w-xl fixed top-0 left-0 right-0 backdrop-blur-md bg-gray-darker/30 z-50"
     >
       {({ open }) => (
         <>
