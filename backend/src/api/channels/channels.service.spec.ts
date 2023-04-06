@@ -4,17 +4,8 @@ import { CreateChannelDto } from './dtos/channel.dto';
 import { expect, jest, describe, beforeEach, beforeAll, it } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import { ChannelsModule } from './channels.module';
-import { ChannelUser } from './classes/ChannelUserClass';
-
-/*
-
-model - view - controller
-
-model - service - controller
-
-
-
-*/
+import { ChannelUser } from './models/user.model';
+import { PrismaService } from '../../prisma/prisma.service';
 
 const fakeSocket = {
   emit: jest.fn(),
@@ -68,14 +59,14 @@ describe('Channel list', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChannelsService],
+      providers: [ChannelsService, PrismaService],
     }).compile();
 
     service = module.get<ChannelsService>(ChannelsService);
 
-    service.channelUserClass.setUser(user1.id, user1);
-    service.channelUserClass.setUser(user2.id, user2);
-    service.channelUserClass.setUser(user3.id, user3);
+    service.userModel.setUser(user1.id, user1);
+    service.userModel.setUser(user2.id, user2);
+    service.userModel.setUser(user3.id, user3);
 
     service.create(1, publicChannelData);
     service.create(1, protectedChannelData);
@@ -430,14 +421,14 @@ describe('Channel info', () => {
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChannelsService],
+      providers: [ChannelsService, PrismaService],
     }).compile();
 
     service = module.get<ChannelsService>(ChannelsService);
 
-    service.channelUserClass.setUser(user1.id, user1);
-    service.channelUserClass.setUser(user2.id, user2);
-    service.channelUserClass.setUser(user3.id, user3);
+    service.userModel.setUser(user1.id, user1);
+    service.userModel.setUser(user2.id, user2);
+    service.userModel.setUser(user3.id, user3);
 
     service.create(user1.id, publicChannelData);
     service.create(user1.id, protectedChannelData);

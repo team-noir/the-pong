@@ -74,10 +74,9 @@ model BlockUser {
 
 model Channel {
   id              Int       @id @default(autoincrement())
-  title           String
-  channelCode     String    @unique
+  title           String?
   password        String?
-  idPublic        Boolean
+  isPrivate       Boolean
   isDm            Boolean
   createdAt       DateTime  @default(now())
   updatedAt       DateTime?

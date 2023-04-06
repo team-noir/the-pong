@@ -1,5 +1,5 @@
-import { ChannelClass, Channel } from './ChannelClass';
-import { ChannelUserClass, ChannelUser } from './ChannelUserClass';
+import { ChannelModel, Channel } from './channel.model';
+import { UserModel, ChannelUser } from './user.model';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { HttpStatus } from '@nestjs/common';
@@ -16,7 +16,7 @@ export interface Message {
 	isLog: boolean;
 }
   
-export class MessageClass {
+export class MessageModel {
 	private messageMap = new Map<messageId, Message>();
 	@WebSocketServer() server: Server;
   
