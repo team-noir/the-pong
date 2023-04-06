@@ -25,11 +25,11 @@ module.exports = {
       neutral: colors.neutral,
       green: {
         ...colors.green,
-        DEFAULT: '4BA19D',
+        DEFAULT: '#4BA19D',
       },
       red: {
         ...colors.red,
-        DEFAULT: 'CD392B',
+        DEFAULT: '#CD392B',
       },
       gray: {
         lighter: '#F5F0EE',
