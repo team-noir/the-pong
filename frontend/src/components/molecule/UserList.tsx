@@ -3,7 +3,6 @@ import UserItem from 'components/molecule/UserItem';
 import { UserType } from 'types';
 
 interface Props {
-  styles: { readonly [key: string]: string };
   users: UserType[] | null;
   imageSize: number;
   buttons?: ReactElement[];
@@ -12,7 +11,6 @@ interface Props {
 }
 
 export default function UserList({
-  styles,
   users,
   imageSize,
   buttons,
@@ -20,13 +18,12 @@ export default function UserList({
   myUserId,
 }: Props) {
   return (
-    <ul className={styles.ul}>
+    <ul>
       {users &&
         users.map((user) => {
           return (
             <UserItem
               key={user.id}
-              styles={styles}
               user={user}
               imageSize={imageSize}
               buttons={buttons}

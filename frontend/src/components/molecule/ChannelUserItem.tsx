@@ -12,7 +12,6 @@ import {
 
 interface Props {
   channelId: number;
-  styles: { readonly [key: string]: string };
   user: ChannelUserType;
   imageSize: number;
   myUser: ChannelUserType | null;
@@ -20,7 +19,6 @@ interface Props {
 
 export default function ChannelUserItem({
   channelId,
-  styles,
   user,
   imageSize,
   myUser,
@@ -58,7 +56,7 @@ export default function ChannelUserItem({
   };
 
   return (
-    <li className={styles.li} data-user-id={user.id}>
+    <li data-user-id={user.id}>
       <Link to={`/profile/${user.id}`}>
         <ProfileImage
           userId={user.id}

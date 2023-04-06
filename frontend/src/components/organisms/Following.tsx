@@ -1,7 +1,6 @@
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
 import { UserType } from 'types';
-import styles from 'assets/styles/Following.module.css';
 
 interface Props {
   users: UserType[];
@@ -13,7 +12,6 @@ export default function Following({ users, onClickUnfollow }: Props) {
     <>
       <h1>Following</h1>
       <UserList
-        styles={styles}
         users={users}
         imageSize={52}
         hasStatus={true}
