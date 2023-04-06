@@ -1,9 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChannelsService, ChannelUser } from './channels.service';
+import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dtos/channel.dto';
 import { expect, jest, describe, beforeEach, beforeAll, it } from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import { ChannelsModule } from './channels.module';
+import { ChannelUser } from './ChannelUserClass';
+
+/*
+
+model - view - controller
+
+serviece - controller
+
+
+
+*/
 
 const fakeSocket = {
   emit: jest.fn(),
@@ -62,9 +73,9 @@ describe('Channel list', () => {
 
     service = module.get<ChannelsService>(ChannelsService);
 
-    service.setUser(user1.id, user1);
-    service.setUser(user2.id, user2);
-    service.setUser(user3.id, user3);
+    service.channelUserClass.setUser(user1.id, user1);
+    service.channelUserClass.setUser(user2.id, user2);
+    service.channelUserClass.setUser(user3.id, user3);
 
     service.create(1, publicChannelData);
     service.create(1, protectedChannelData);
@@ -424,9 +435,9 @@ describe('Channel info', () => {
 
     service = module.get<ChannelsService>(ChannelsService);
 
-    service.setUser(user1.id, user1);
-    service.setUser(user2.id, user2);
-    service.setUser(user3.id, user3);
+    service.channelUserClass.setUser(user1.id, user1);
+    service.channelUserClass.setUser(user2.id, user2);
+    service.channelUserClass.setUser(user3.id, user3);
 
     service.create(user1.id, publicChannelData);
     service.create(user1.id, protectedChannelData);

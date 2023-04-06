@@ -1,6 +1,6 @@
 import { HttpStatus } from '@nestjs/common';
 
-import { ChannelUser } from './channels.service';
+import { ChannelUser } from './ChannelUserClass';
 
 type userId = number;
 type channelId = number;

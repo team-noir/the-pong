@@ -5,20 +5,10 @@ import { CreateChannelDto } from './dtos/channel.dto';
 import { ONESECOND } from '../../const';
 
 import { ChannelClass, Channel } from './ChannelClass';
+import { ChannelUserClass, ChannelUser } from './ChannelUserClass';
 
 type userId = number;
-type channelId = number;
 type messageId = number;
-
-export interface ChannelUser {
-  id: number;
-  name: string;               // nickname: string
-
-  joined: Set<channelId>;     // channels: channel
-  blockUser: Set<channelId>;  // blockeds: user
-
-  socket;
-}
 
 export interface Message {
   id: number;
@@ -33,67 +23,22 @@ export interface Message {
   // channel: channel;
 }
 
+
 @Injectable()
 export class ChannelsService {
   @WebSocketServer() server: Server;
-  private channelUserMap = new Map<userId, ChannelUser>();
+  
   private messageMap = new Map<messageId, Message>();
 
   public channelClass: ChannelClass = new ChannelClass();
-
-  // User getter
-
-  hasUser(userId: number): boolean {
-    return this.channelUserMap.has(userId);
-  }
-
-  getUser(userId: number): ChannelUser {
-    const user = this.channelUserMap.get(userId);
-
-    if (!user) {
-      const code = HttpStatus.BAD_REQUEST;
-      const message = 'This user does not exist.';
-      throw { code, message };
-    } 
-    return user;
-  }
-
-  getUserFromSocket(socket: Socket) {
-    if (!socket || !socket.data || !socket.data.user) {
-      return null;
-    } else {
-      return socket.data.user;
-    }
-  }
-
-  getUsernameList() {
-    return [...this.channelUserMap.keys()];
-  }
-
-
-
-  // User setter
-
-  setUser(userId: number, user: ChannelUser): void {
-    this.channelUserMap.set(userId, user);
-  }
-
-  setUserLeave(user: ChannelUser, channel: Channel) {
-    user.socket.leave(String(channel.id));
-    user.joined.delete(channel.id);
-    channel.users.delete(user.id);
-    channel.admin.delete(user.id);
-  }
-
-
-
+  public channelUserClass: ChannelUserClass = new ChannelUserClass();
 
   // Channel getter
 
   // 채널의 상세 정보를 찾는다.
   getUserJoinedChannel(userId: number, channelId: number): ChannelUser {
     const channel: Channel = this.channelClass.get(channelId);
-    const user: ChannelUser = this.getUser(userId);
+    const user: ChannelUser = this.channelUserClass.getUser(userId);
 
     if (!channel.users.has(user.id)) {
       const code = HttpStatus.BAD_REQUEST;
@@ -109,7 +54,7 @@ export class ChannelsService {
     const data = [];
 
     channel.users.forEach((userId) => {
-      const user = this.getUser(userId);
+      const user = this.channelUserClass.getUser(userId);
       const userRole = this.getChannelUserRole(channelId, user.id);
       data.push({
         id: user.id,
@@ -134,17 +79,8 @@ export class ChannelsService {
     return 'normal';
   }
 
-
-  // Channel setter
-
-  
-
-  
-
-  
-
   kick(user: ChannelUser, channel: Channel, kickedUser: ChannelUser) {
-    this.setUserLeave(kickedUser, channel);
+    this.channelUserClass.setUserLeave(kickedUser, channel);
     this.noticeToChannel(
       channel.id,
       `${user.name}님이 ${kickedUser.name} 님을 채널에서 강퇴하였습니다.`
@@ -152,7 +88,7 @@ export class ChannelsService {
   }
 
   ban(user: ChannelUser, channel: Channel, bannedUser: ChannelUser) {
-    this.setUserLeave(bannedUser, channel);
+    this.channelUserClass.setUserLeave(bannedUser, channel);
     channel.banned.add(bannedUser.id);
     this.noticeToChannel(
       channel.id,
@@ -263,7 +199,7 @@ export class ChannelsService {
         }
         
         if (message.senderId) {
-          tarMessage.senderNickname = this.getUser(message.senderId).name;
+          tarMessage.senderNickname = this.channelUserClass.getUser(message.senderId).name;
         }
 
         data.push(tarMessage);
@@ -284,7 +220,7 @@ export class ChannelsService {
   // Controller 
 
   create(userId: number, data: CreateChannelDto) {
-    const createdBy: ChannelUser = this.getUser(userId);
+    const createdBy: ChannelUser = this.channelUserClass.getUser(userId);
     const newChannel: Channel = this.channelClass.createChannel(data);
 
     newChannel.owner = createdBy.id;
@@ -300,7 +236,7 @@ export class ChannelsService {
 
   join(userId: number, channelId: number, password: string) {
     const channel: Channel = this.channelClass.get(channelId);
-    const user: ChannelUser = this.getUser(userId);
+    const user: ChannelUser = this.channelUserClass.getUser(userId);
 
     if (channel.password && password != channel.password) {
       throw {
@@ -334,11 +270,11 @@ export class ChannelsService {
 
     if (channel.owner == user.id) {
       channel.users.forEach((joinedUserId) => {
-        const joined = this.getUser(joinedUserId);
-        this.setUserLeave(joined, channel);
+        const joined = this.channelUserClass.getUser(joinedUserId);
+        this.channelUserClass.setUserLeave(joined, channel);
       });
     } else {
-      this.setUserLeave(user, channel);
+      this.channelUserClass.setUserLeave(user, channel);
     }
 
     this.noticeToChannel(channelId, `${user.name} 님이 나가셨습니다.`);
@@ -377,7 +313,7 @@ export class ChannelsService {
         channel.users.forEach((id) => {
           if (id != userId) {
             info.dmUserId = id;
-            info.title = this.getUser(id).name;
+            info.title = this.channelUserClass.getUser(id).name;
           }
         });
       }
@@ -399,7 +335,7 @@ export class ChannelsService {
 
     const users = [];
     channel.users.forEach((id) => {
-      const user = this.getUser(id);
+      const user = this.channelUserClass.getUser(id);
       const role = this.getChannelUserRole(channelId, id);
       users.push({
         id: user.id,
@@ -427,7 +363,7 @@ export class ChannelsService {
 
   setChannelInfo(userId: number, channelId: number, data) {
     const channel: Channel = this.channelClass.get(channelId);
-    const settedBy: ChannelUser = this.getUser(userId);
+    const settedBy: ChannelUser = this.channelUserClass.getUser(userId);
 
     if (channel.isDm) {
       throw {
@@ -491,8 +427,8 @@ export class ChannelsService {
   }
 
   initDirectMessage(userId: number, invitedUserId: number) {
-    const invitedUser: ChannelUser = this.getUser(invitedUserId);
-    const user: ChannelUser = this.getUser(userId);
+    const invitedUser: ChannelUser = this.channelUserClass.getUser(invitedUserId);
+    const user: ChannelUser = this.channelUserClass.getUser(userId);
 
     if (invitedUser.blockUser.has(userId)) {
       throw {
@@ -535,7 +471,7 @@ export class ChannelsService {
     }
 
     invitedUserId.forEach((id) => {
-      const invitedUser = this.getUser(id);
+      const invitedUser = this.channelUserClass.getUser(id);
 
       if (this.channelClass.checkIsJoined(channel, invitedUser.id)) {
         throw {

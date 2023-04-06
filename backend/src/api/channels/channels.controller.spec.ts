@@ -4,9 +4,10 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ChannelsModule } from './channels.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { expect, jest, describe, afterEach, beforeEach, beforeAll, it, afterAll, test } from '@jest/globals';
-import { ChannelsService, ChannelUser } from './channels.service';
+import { ChannelsService } from './channels.service';
 import { ChannelClass, Channel } from './ChannelClass';
 import { CreateChannelDto } from './dtos/channel.dto';
+import { ChannelUserClass, ChannelUser } from './ChannelUserClass';
 
 const fakeSocket = {
 	emit: jest.fn(),
@@ -86,7 +87,7 @@ describe('Chat connection', () => {
 	}
 
 	const initSocketUser = () => {
-		socketUser = service.getUser(1);
+		socketUser = service.channelUserClass.getUser(1);
 		socketUser.joined.forEach((channelId) => {
 			service.leave(socketUser.id, channelId);
 		})
@@ -103,13 +104,13 @@ describe('Chat connection', () => {
 			app.useWebSocketAdapter(new IoAdapter(app.getHttpServer()));
 			app.init();
 
-			service.setUser(user.id, user);
-			service.setUser(user2.id, user2);
+			service.channelUserClass.setUser(user.id, user);
+			service.channelUserClass.setUser(user2.id, user2);
 			socket = io(getSocketDsn(), {
 				extraHeaders: {"cookie": `Authorization=${process.env.TEST_JWT}`}
 			})
 			socket.on('connect', () => {
-				socketUser = service.getUser(1);
+				socketUser = service.channelUserClass.getUser(1);
 				done();
 			});
 		})
