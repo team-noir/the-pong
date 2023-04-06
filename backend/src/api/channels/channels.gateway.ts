@@ -13,7 +13,7 @@ import { Socket, Server } from 'socket.io';
 import { ChannelsService } from './channels.service';
 import { AuthService } from '../auth/auth.service';
 import { parse } from 'cookie';
-import { ChannelUser } from './classes/ChannelUserClass';
+import { ChannelUser } from './models/user.model';
 
 @Injectable()
 @WebSocketGateway({
@@ -35,7 +35,7 @@ export class ChannelsGatway
   afterInit() {
     this.logger.log('웹소켓 서버 초기화 ✅');
     this.channelsService.server = this.server;
-    this.channelsService.messageClass.initServer(this.server);
+    this.channelsService.messageModel.initServer(this.server);
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
@@ -65,8 +65,8 @@ export class ChannelsGatway
       );
       return;
     }
-    if (this.channelsService.channelUserClass.has(userId)) {
-      const logged = this.channelsService.channelUserClass.getUser(userId);
+    if (this.channelsService.userModel.has(userId)) {
+      const logged = this.channelsService.userModel.getUser(userId);
       logged.socket.disconnect(true);
       logged.socket = socket;
       socket.data = { user: logged };
@@ -85,7 +85,7 @@ export class ChannelsGatway
       blockUser: new Set<number>(),
     };
     socket.data = { user };
-    this.channelsService.channelUserClass.setUser(userId, user);
+    this.channelsService.userModel.setUser(userId, user);
     this.logger.log(
       `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
     );
@@ -103,8 +103,8 @@ export class ChannelsGatway
     @MessageBody('channelId') channelId: number,
     @MessageBody('message') message: string
   ) {
-    const channel = this.channelsService.channelClass.get(channelId);
-    this.channelsService.messageClass.messageToChannel(
+    const channel = this.channelsService.channelModel.get(channelId);
+    this.channelsService.messageModel.messageToChannel(
       socket.data.user.id,
       channel,
       message

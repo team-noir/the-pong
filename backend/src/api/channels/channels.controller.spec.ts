@@ -5,9 +5,10 @@ import { ChannelsModule } from './channels.module';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 import { expect, jest, describe, afterEach, beforeEach, beforeAll, it, afterAll, test } from '@jest/globals';
 import { ChannelsService } from './channels.service';
-import { ChannelClass, Channel } from './classes/ChannelClass';
+import { ChannelModel, Channel } from './models/channel.model';
 import { CreateChannelDto } from './dtos/channel.dto';
-import { ChannelUserClass, ChannelUser } from './classes/ChannelUserClass';
+import { UserModel, ChannelUser } from './models/user.model';
+import { PrismaService } from '../../prisma/prisma.service';
 
 const fakeSocket = {
 	emit: jest.fn(),
@@ -79,15 +80,15 @@ describe('Chat connection', () => {
 		});
 	}
 	
-	const initChannels = () => {
-		const publicObj = service.create(user.id, publicChannelData);
-		const privateObj = service.create(user.id, privateChannelData);
-		channel = service.channelClass.get(publicObj.id);
-		privateChannel = service.channelClass.get(privateObj.id);
+	const initChannels = async () => {
+		const publicObj = await service.create(user.id, publicChannelData);
+		const privateObj = await service.create(user.id, privateChannelData);
+		channel = service.channelModel.get(publicObj.id);
+		privateChannel = service.channelModel.get(privateObj.id);
 	}
 
 	const initSocketUser = () => {
-		socketUser = service.channelUserClass.getUser(1);
+		socketUser = service.userModel.getUser(1);
 		socketUser.joined.forEach((channelId) => {
 			service.leave(socketUser.id, channelId);
 		})
@@ -104,13 +105,13 @@ describe('Chat connection', () => {
 			app.useWebSocketAdapter(new IoAdapter(app.getHttpServer()));
 			app.init();
 
-			service.channelUserClass.setUser(user.id, user);
-			service.channelUserClass.setUser(user2.id, user2);
+			service.userModel.setUser(user.id, user);
+			service.userModel.setUser(user2.id, user2);
 			socket = io(getSocketDsn(), {
 				extraHeaders: {"cookie": `Authorization=${process.env.TEST_JWT}`}
 			})
 			socket.on('connect', () => {
-				socketUser = service.channelUserClass.getUser(1);
+				socketUser = service.userModel.getUser(1);
 				done();
 			});
 		})
@@ -226,14 +227,14 @@ describe('Chat connection', () => {
 			});
 	
 			service.join(socketUser.id, channel.id, null);
-			service.messageClass.messageToChannel(user, channel, "hello");
+			service.messageModel.messageToChannel(user, channel, "hello");
 		});
 	
 		it('참여 중인 채널에서 메세지를 가져오기', () => {
 			service.join(socketUser.id, channel.id, null);
-			service.messageClass.messageToChannel(user, channel, "hello");
+			service.messageModel.messageToChannel(user, channel, "hello");
 	
-			const messages = service.messageClass.getChannelMessages(socketUser, channel);
+			const messages = service.messageModel.getChannelMessages(socketUser, channel);
 			expect(messages.length).toBe(2);
 		})
 	});
@@ -255,14 +256,14 @@ describe('Chat connection', () => {
 	
 			service.mute(user, channel, socketUser, 1);
 			try {
-				service.messageClass.messageToChannel(socketUser, channel, "hello 0");
+				service.messageModel.messageToChannel(socketUser, channel, "hello 0");
 			} catch (error) {
 				expect(error.code).toBe(403);
 			}
 	
 			setTimeout(() => {
 				try {
-					service.messageClass.messageToChannel(socketUser, channel, "hello 1");
+					service.messageModel.messageToChannel(socketUser, channel, "hello 1");
 				} catch (error) {
 					expect(error.code).toBe(403);
 				}
@@ -270,7 +271,7 @@ describe('Chat connection', () => {
 			
 			setTimeout(() => {
 				try {
-					service.messageClass.messageToChannel(socketUser, channel, "hello 2");
+					service.messageModel.messageToChannel(socketUser, channel, "hello 2");
 				} catch (error) {
 					expect(error.code).toBe(false);
 				}

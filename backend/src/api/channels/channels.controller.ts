@@ -55,13 +55,13 @@ export class ChannelsController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @ApiBadRequestResponse({ description: 'This user does not exist.' })
   @UseGuards(AuthenticatedGuard)
-  create(
+  async create(
     @Req() req,
     @Body() body: CreateChannelDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      const result = this.channelsService.create(req.user.id, body);
+      const result = await this.channelsService.create(req.user.id, body);
       res.status(HttpStatus.OK);
       return result;
     } catch (error) {
@@ -237,8 +237,8 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      const channel = this.channelsService.channelClass.get(channelId);
-      this.channelsService.messageClass.messageToChannel(req.user.id, channel, body.text);
+      const channel = this.channelsService.channelModel.get(channelId);
+      this.channelsService.messageModel.messageToChannel(req.user.id, channel, body.text);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
@@ -259,9 +259,9 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      const channel = this.channelsService.channelClass.get(channelId);
-      const user = this.channelsService.channelUserClass.getUser(req.user.id);
-      const messages = this.channelsService.messageClass.getChannelMessages(user, channel);
+      const channel = this.channelsService.channelModel.get(channelId);
+      const user = this.channelsService.userModel.getUser(req.user.id);
+      const messages = this.channelsService.messageModel.getChannelMessages(user, channel);
       res.status(HttpStatus.OK);
       return messages;
     } catch (error) {

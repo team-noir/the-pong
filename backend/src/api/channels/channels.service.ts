@@ -4,24 +4,33 @@ import { WebSocketServer } from '@nestjs/websockets';
 import { CreateChannelDto, ChannelMessageDto } from './dtos/channel.dto';
 import { ONESECOND } from '../../const';
 
-import { ChannelClass, Channel } from './classes/ChannelClass';
-import { ChannelUserClass, ChannelUser } from './classes/ChannelUserClass';
-import { MessageClass, Message } from './classes/MessageClass';
+import { ChannelModel, Channel } from './models/channel.model';
+import { UserModel, ChannelUser } from './models/user.model';
+import { MessageModel, Message } from './models/message.model';
+
+import { PrismaService } from '../../prisma/prisma.service';
 
 @Injectable()
 export class ChannelsService {
   @WebSocketServer() server: Server;
+  public channelModel: ChannelModel;
+  public userModel: UserModel;
+  public messageModel: MessageModel;
 
-  public channelClass: ChannelClass = new ChannelClass();
-  public channelUserClass: ChannelUserClass = new ChannelUserClass();
-  public messageClass: MessageClass = new MessageClass();
+  constructor(private prismaService: PrismaService) {
+    this.channelModel = new ChannelModel(prismaService);
+    this.userModel = new UserModel();
+    this.messageModel = new MessageModel();
+
+    this.channelModel.initChannel();
+  }
 
   // Channel getter
 
   // 채널의 상세 정보를 찾는다.
   getUserJoinedChannel(userId: number, channelId: number): ChannelUser {
-    const channel: Channel = this.channelClass.get(channelId);
-    const user: ChannelUser = this.channelUserClass.getUser(userId);
+    const channel: Channel = this.channelModel.get(channelId);
+    const user: ChannelUser = this.userModel.getUser(userId);
 
     if (!channel.users.has(user.id)) {
       const code = HttpStatus.BAD_REQUEST;
@@ -33,11 +42,11 @@ export class ChannelsService {
 
   // 채널 목록을 찾는다.
   getUserArrayJoinedChannel(channelId: number) {
-    const channel: Channel = this.channelClass.get(channelId);
+    const channel: Channel = this.channelModel.get(channelId);
     const data = [];
 
     channel.users.forEach((userId) => {
-      const user = this.channelUserClass.getUser(userId);
+      const user = this.userModel.getUser(userId);
       const userRole = this.getChannelUserRole(channelId, user.id);
       data.push({
         id: user.id,
@@ -51,7 +60,7 @@ export class ChannelsService {
 
   // 채널에서 유저의 역할을 가져온다.
   getChannelUserRole(channelId: number, userId: number): string {
-    const channel: Channel = this.channelClass.get(channelId);
+    const channel: Channel = this.channelModel.get(channelId);
     const user = this.getUserJoinedChannel(userId, channelId);
 
     if (channel.owner == user.id) {
@@ -63,17 +72,17 @@ export class ChannelsService {
   }
 
   kick(user: ChannelUser, channel: Channel, kickedUser: ChannelUser) {
-    this.channelUserClass.setUserLeave(kickedUser, channel);
-    this.messageClass.noticeToChannel(
+    this.userModel.setUserLeave(kickedUser, channel);
+    this.messageModel.noticeToChannel(
       channel,
       `${user.name}님이 ${kickedUser.name} 님을 채널에서 강퇴하였습니다.`
     );
   }
 
   ban(user: ChannelUser, channel: Channel, bannedUser: ChannelUser) {
-    this.channelUserClass.setUserLeave(bannedUser, channel);
+    this.userModel.setUserLeave(bannedUser, channel);
     channel.banned.add(bannedUser.id);
-    this.messageClass.noticeToChannel(
+    this.messageModel.noticeToChannel(
       channel,
       `${user.name}님이 ${bannedUser.name} 님을 채널에서 차단하였습니다.`
     );
@@ -84,7 +93,7 @@ export class ChannelsService {
     const expiresAt = new Date(now.getTime() + (ONESECOND * seconds));
 
     channel.muted.set(mutedUser.id, expiresAt);
-    this.messageClass.noticeToChannel(
+    this.messageModel.noticeToChannel(
       channel,
       `${user.name}님이 ${mutedUser.name} 님을 채널에서 조용히 시켰습니다.`
     );
@@ -93,12 +102,12 @@ export class ChannelsService {
 
   // Controller 
 
-  create(userId: number, data: CreateChannelDto) {
-    const createdBy: ChannelUser = this.channelUserClass.getUser(userId);
-    const newChannel: Channel = this.channelClass.createChannel(data);
+  async create(userId: number, data: CreateChannelDto) {
+    const createdBy: ChannelUser = this.userModel.getUser(userId);
+    const newChannel: Channel = await this.channelModel.createChannel(data);
 
     newChannel.owner = createdBy.id;
-    this.channelClass.joinChannel(createdBy, newChannel);
+    this.channelModel.joinChannel(createdBy, newChannel);
 
     // socket message
     createdBy.socket.emit('message', {
@@ -109,56 +118,34 @@ export class ChannelsService {
   }
 
   join(userId: number, channelId: number, password: string) {
-    const channel: Channel = this.channelClass.get(channelId);
-    const user: ChannelUser = this.channelUserClass.getUser(userId);
+    const channel: Channel = this.channelModel.get(channelId);
+    const user: ChannelUser = this.userModel.getUser(userId);
 
-    if (channel.password && password != channel.password) {
-      throw {
-        code: HttpStatus.FORBIDDEN,
-        message: 'You entered an incorrect password.',
-      };
-    } else if (channel.banned.has(user.id)) {
-      throw {
-        code: HttpStatus.FORBIDDEN,
-        message: 'You are blocked from the channel.',
-      };
-    } else if (channel.isDm && channel.users.size > 1) {
-      throw {
-        code: HttpStatus.FORBIDDEN,
-        message: 'You are connot join the channel.',
-      };
-    } else if (channel.isUserJoined(user)) {
-      throw {
-        code: HttpStatus.CONFLICT,
-        message: 'This channel is already participating.',
-      };
-    }
-
-    this.channelClass.joinChannel(user, channel);
-    this.messageClass.noticeToChannel(channel, `${user.name} 님이 채널에 참여하였습니다.`);
+    this.channelModel.joinChannel(user, channel);
+    this.messageModel.noticeToChannel(channel, `${user.name} 님이 채널에 참여하였습니다.`);
   }
 
   leave(userId: number, channelId: number) {
-    const channel: Channel = this.channelClass.get(channelId);
-    const user: ChannelUser = this.channelUserClass.getUser(userId);
+    const channel: Channel = this.channelModel.get(channelId);
+    const user: ChannelUser = this.userModel.getUser(userId);
 
     channel.isUserJoinedAssert(user);
     if (channel.owner == user.id) {
       channel.users.forEach((joinedUserId) => {
-        const joined = this.channelUserClass.getUser(joinedUserId);
-        this.channelUserClass.setUserLeave(joined, channel);
+        const joined = this.userModel.getUser(joinedUserId);
+        this.userModel.setUserLeave(joined, channel);
       });
     } else {
-      this.channelUserClass.setUserLeave(user, channel);
+      this.userModel.setUserLeave(user, channel);
     }
 
-    this.messageClass.noticeToChannel(channel, `${user.name} 님이 나가셨습니다.`);
+    this.messageModel.noticeToChannel(channel, `${user.name} 님이 나가셨습니다.`);
   }
 
   list(userId: number, query) {
     const data = [];
-    const channels = this.channelClass.getAll();
-    const user = this.channelUserClass.getUser(userId);
+    const channels = this.channelModel.getAll();
+    const user = this.userModel.getUser(userId);
 
     if (!query.isPublic && !query.isPriv && !query.isDm) {
       query.isPublic = true;
@@ -166,9 +153,9 @@ export class ChannelsService {
 
     channels.forEach((channel) => {
       if (
-        !this.channelClass.checkCanListed(channel, user.id) ||
+        !this.channelModel.checkCanListed(channel, user.id) ||
         (query.isEnter && !channel.isUserJoined(user)) ||
-        this.channelClass.checkListedRange(channel, query)
+        this.channelModel.checkListedRange(channel, query)
       ) {
         return;
       }
@@ -189,7 +176,7 @@ export class ChannelsService {
         channel.users.forEach((id) => {
           if (id != user.id) {
             info.dmUserId = id;
-            info.title = this.channelUserClass.getUser(id).name;
+            info.title = this.userModel.getUser(id).name;
           }
         });
       }
@@ -200,9 +187,9 @@ export class ChannelsService {
   }
 
   getChannelInfo(userId: number, channelId: number) {
-    const channel: Channel = this.channelClass.get(channelId);
+    const channel: Channel = this.channelModel.get(channelId);
 
-    if (!this.channelClass.checkCanGetInfo(channel, userId)) {
+    if (!this.channelModel.checkCanGetInfo(channel, userId)) {
       throw {
         code: HttpStatus.FORBIDDEN,
         message: 'You are not authorized to this channel.',
@@ -211,7 +198,7 @@ export class ChannelsService {
 
     const users = [];
     channel.users.forEach((id) => {
-      const user = this.channelUserClass.getUser(id);
+      const user = this.userModel.getUser(id);
       const role = this.getChannelUserRole(channelId, id);
       users.push({
         id: user.id,
@@ -238,8 +225,8 @@ export class ChannelsService {
   }
 
   setChannelInfo(userId: number, channelId: number, data) {
-    const channel: Channel = this.channelClass.get(channelId);
-    const settedBy: ChannelUser = this.channelUserClass.getUser(userId);
+    const channel: Channel = this.channelModel.get(channelId);
+    const settedBy: ChannelUser = this.userModel.getUser(userId);
 
     if (channel.isDm) {
       throw {
@@ -272,7 +259,7 @@ export class ChannelsService {
     settedUserId: number,
     role: string
   ) {
-    const channel: Channel = this.channelClass.get(channelId);
+    const channel: Channel = this.channelModel.get(channelId);
     const settedBy: ChannelUser = this.getUserJoinedChannel(userId, channelId);
     const settedUser: ChannelUser = this.getUserJoinedChannel(settedUserId, channelId);
 
@@ -295,16 +282,16 @@ export class ChannelsService {
 
     if (role == 'admin') {
       channel.admin.add(settedUser.id);
-      this.messageClass.noticeToChannel(channel, `${settedUser.name} 님이 관리자 권한을 얻었습니다.`);
+      this.messageModel.noticeToChannel(channel, `${settedUser.name} 님이 관리자 권한을 얻었습니다.`);
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
-      this.messageClass.noticeToChannel(channel, `${settedUser.name} 님의 관리자 권한이 해제되었습니다.`);
+      this.messageModel.noticeToChannel(channel, `${settedUser.name} 님의 관리자 권한이 해제되었습니다.`);
     }
   }
 
-  initDirectMessage(userId: number, invitedUserId: number) {
-    const invitedUser: ChannelUser = this.channelUserClass.getUser(invitedUserId);
-    const user: ChannelUser = this.channelUserClass.getUser(userId);
+  async initDirectMessage(userId: number, invitedUserId: number) {
+    const invitedUser: ChannelUser = this.userModel.getUser(invitedUserId);
+    const user: ChannelUser = this.userModel.getUser(userId);
 
     if (invitedUser.blockUser.has(userId)) {
       throw {
@@ -313,16 +300,19 @@ export class ChannelsService {
       };
     }
 
-    const dms: Channel[] = this.channelClass.getAllDms(user);
+    const dms: Channel[] = this.channelModel.getAllDms(user);
     const found = dms.find(
       (channel) =>
         channel.users.has(user.id) && channel.users.has(invitedUserId)
     );
 
     if (!found) {
-      const newChannel = this.channelClass.createChannel({ isDm: true });
-      this.channelClass.joinChannel(user, newChannel);
-      this.channelClass.joinChannel(invitedUser, newChannel);
+      const newChannel = await this.channelModel.createChannel({ 
+        title: "Direct Message",
+        isDm: true 
+      });
+      this.channelModel.joinChannel(user, newChannel);
+      this.channelModel.joinChannel(invitedUser, newChannel);
       return { id: newChannel.id };
     }
 
@@ -330,7 +320,7 @@ export class ChannelsService {
   }
 
   invite(userId: number, channelId: number, invitedUserId: number[]) {
-    const channel = this.channelClass.get(channelId);
+    const channel = this.channelModel.get(channelId);
     const invitedBy = this.getUserJoinedChannel(userId, channelId);
     const role = this.getChannelUserRole(channel.id, invitedBy.id);
     
@@ -347,7 +337,7 @@ export class ChannelsService {
     }
 
     invitedUserId.forEach((id) => {
-      const invitedUser = this.channelUserClass.getUser(id);
+      const invitedUser = this.userModel.getUser(id);
 
       if (channel.isUserJoined(invitedUser)) {
         throw {
@@ -356,16 +346,16 @@ export class ChannelsService {
         };
       }
   
-      this.channelClass.joinChannel(invitedUser, channel);
+      this.channelModel.joinChannel(invitedUser, channel);
       
       // socket massage
       invitedUser.socket.emit('invited', { channelId: channel.id });
-      this.messageClass.noticeToChannel(channel, `${invitedUser.name} 님을 초대하였습니다.`);
+      this.messageModel.noticeToChannel(channel, `${invitedUser.name} 님을 초대하였습니다.`);
     });
   }
 
   setUserStatus(userId: number, channelId: number, settedUserId: number, status: string) {
-    const channel: Channel = this.channelClass.get(channelId);
+    const channel: Channel = this.channelModel.get(channelId);
     const user: ChannelUser = this.getUserJoinedChannel(userId, channelId);
     const settedUser: ChannelUser = this.getUserJoinedChannel(settedUserId, channelId);
 

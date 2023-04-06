@@ -1,6 +1,7 @@
 import { HttpStatus } from '@nestjs/common';
 
-import { ChannelUser } from './ChannelUserClass';
+import { ChannelUser } from './user.model';
+import { PrismaService } from '../../../prisma/prisma.service'
 
 type userId = number;
 type channelId = number;
@@ -50,10 +51,37 @@ export class Channel {
 	isUserJoined(user: ChannelUser): boolean {
 		return this.users.has(user.id);
 	}
+
+	join(user: ChannelUser) {
+		this.users.add(user.id);
+	}
+
 }
 
-export class ChannelClass {
-	private channelMap = new Map<channelId, Channel>();
+export class ChannelModel {
+	private channelMap : Map<channelId, Channel>;
+
+	constructor(private prismaService: PrismaService) {
+		this.channelMap = new Map<channelId, Channel>();
+	}
+
+	async initChannel() {
+		const dbChannels = await this.prismaService.channel.findMany();
+
+		dbChannels.forEach((dbChannel) => {
+			const channel = new Channel(
+				dbChannel.id,
+				dbChannel.isPrivate,
+				dbChannel.isDm,
+				dbChannel.title,
+				dbChannel.password
+			)
+
+			this.channelMap.set(channel.id, channel);
+		});
+
+		console.log(this.channelMap);
+	}
   
 	// Getter
   
@@ -112,38 +140,67 @@ export class ChannelClass {
   
 	// 채널이 query에서 원하는 유형인지 알려준다.
 	checkListedRange(channel: Channel, query) {
-	  return (
-		!(query.isPublic && !channel.isPrivate && !channel.isDm) &&
-		!(query.isPriv && channel.isPrivate && !channel.isDm) &&
-		!(query.isDm && !channel.isPrivate && channel.isDm)
-	  );
+		return (
+			!(query.isPublic && !channel.isPrivate && !channel.isDm) &&
+			!(query.isPriv && channel.isPrivate && !channel.isDm) &&
+			!(query.isDm && !channel.isPrivate && channel.isDm)
+		);
 	}
   
 	// Setter
   
-	// 채널 추가
-	addChannel(channelId: number, channel: Channel) {
-	  this.channelMap.set(channelId, channel);
-	}
-  
 	// 채널 생성
-	createChannel(data) {
-	  const newChannel = new Channel(
-		this.channelMap.size + 1,
-		data.isPrivate,
-		data.isDm,
-		data.title,
-		data.password
-	  )
-	  this.addChannel(newChannel.id, newChannel);
-	  return newChannel;
+	async createChannel(data) {
+		const created = await this.prismaService.channel.create({
+			data: {
+				title: data.title,
+				password: data.password,
+				isPrivate: data.isPrivate ? true : false,
+				isDm: data.isDm ? true : false,
+			}
+		});
+		const newChannel = new Channel(
+			created.id,
+			created.isPrivate,
+			created.isDm,
+			created.title,
+			created.password
+		);
+		this.channelMap.set(newChannel.id, newChannel);
+		return newChannel;
 	}
   
 	// 채널에 들어간다.
 	joinChannel(user: ChannelUser, channel: Channel) {
-	  user.socket.join(String(channel.id));
-	  user.joined.add(channel.id);
-	  channel.users.add(user.id);
+
+		
+
+		if (channel.password && password != channel.password) {
+			throw {
+			  code: HttpStatus.FORBIDDEN,
+			  message: 'You entered an incorrect password.',
+			};
+		  } else if (channel.banned.has(user.id)) {
+			throw {
+			  code: HttpStatus.FORBIDDEN,
+			  message: 'You are blocked from the channel.',
+			};
+		  } else if (channel.isDm && channel.users.size > 1) {
+			throw {
+			  code: HttpStatus.FORBIDDEN,
+			  message: 'You are connot join the channel.',
+			};
+		  } else if (channel.isUserJoined(user)) {
+			throw {
+			  code: HttpStatus.CONFLICT,
+			  message: 'This channel is already participating.',
+			};
+		}
+
+		user.socket.join(String(channel.id));
+		user.joined.add(channel.id);
+
+		channel.join(user);
 	}
-  }
-  
+
+}

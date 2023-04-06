@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io';
 import { HttpStatus } from '@nestjs/common';
-import { Channel } from './ChannelClass';
+import { Channel } from './channel.model';
 
 type userId = number;
 type channelId = number;
@@ -15,7 +15,7 @@ export interface ChannelUser {
 	socket;
 }
 
-export class ChannelUserClass {
+export class UserModel {
 	private channelUserMap = new Map<userId, ChannelUser>();
   
 	// Getter
