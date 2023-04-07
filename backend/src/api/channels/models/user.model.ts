@@ -5,7 +5,7 @@ import { Channel } from './channel.model';
 type userId = number;
 type channelId = number;
 
-export interface ChannelUser {
+export class ChannelUser {
 	id: number;
 	name: string;               // nickname: string
   
@@ -13,9 +13,29 @@ export interface ChannelUser {
 	blockUser: Set<channelId>;  // blockeds: user
   
 	socket;
+
+	constructor(id: number, name: string, socket) {
+		this.id = id;
+		this.name = name;
+		this.socket = socket;
+
+		this.joined = new Set<number>();
+		this.blockUser = new Set<number>();
+	}
+
+	join(channel: Channel) {
+		this.socket.join(String(channel.id));
+		this.joined.add(channel.id);
+	}
+
+	leave(channel: Channel) {
+		this.socket.leave(String(channel.id));
+		this.joined.delete(channel.id);
+	}
+
 }
 
-export class UserModel {
+export class UserModel {2
 	private channelUserMap = new Map<userId, ChannelUser>();
   
 	// Getter
@@ -49,18 +69,8 @@ export class UserModel {
   
 	// Setter
   
-  
 	setUser(userId: number, user: ChannelUser): void {
 	  this.channelUserMap.set(userId, user);
 	}
-  
-	setUserLeave(user: ChannelUser, channel: Channel) {
-	  user.socket.leave(String(channel.id));
-	  user.joined.delete(channel.id);
-	  channel.users.delete(user.id);
-	  channel.admin.delete(user.id);
-	}
-  
-  
-  
+
   }

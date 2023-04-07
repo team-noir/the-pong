@@ -38,6 +38,7 @@ export class MessageModel {
 	  this.messageMap.set(newMessage.id, newMessage);
   
 	  // socket message
+	  if (!this.server) { return; }
 	  this.server.to(String(channel.id)).emit('notice', {
 		id: newMessage.id,
 		channelId: newMessage.channel.id,
@@ -53,7 +54,7 @@ export class MessageModel {
 	  channel: Channel,
 	  message: string
 	): Message {
-	  channel.isUserJoinedAssert(user);
+	  channel.checkUserJoined(user);
   
 	  if (channel.muted.has(user.id)) {
 		const expiresAt = new Date(channel.muted.get(user.id));
@@ -94,7 +95,7 @@ export class MessageModel {
 	// Message getter
   
 	getChannelMessages(user: ChannelUser, channel: Channel): ChannelMessageDto[] {
-	  channel.isUserJoinedAssert(user);
+	  channel.checkUserJoined(user);
   
 	  const data = [];
 	  [ ...this.messageMap.values() ].forEach((message) => {
