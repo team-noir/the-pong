@@ -14,9 +14,7 @@ export default function ErrorFallback({
       </header>
       <div className="container mx-auto max-w-xl min-h-screen py-24 px-4">
         에러가 발생했습니다.
-        <Button type="button" onClick={() => resetErrorBoundary()}>
-          다시 시도
-        </Button>
+        <Button onClick={() => resetErrorBoundary()}>다시 시도</Button>
         <pre style={{ whiteSpace: 'normal' }}>{error.message}</pre>
       </div>
     </>

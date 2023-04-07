@@ -22,7 +22,7 @@ export default function Following({ users, onClickUnfollow }: Props) {
           <Button key="button1" type="button">
             메시지 보내기
           </Button>,
-          <Button key="button2" type="button" onClick={onClickUnfollow}>
+          <Button key="button2" onClick={onClickUnfollow}>
             언팔로우
           </Button>,
         ]}

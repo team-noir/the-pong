@@ -53,9 +53,7 @@ export default function ChannelInvite({
   return (
     <div>
       <div>
-        <Button type="button" onClick={onClickClose}>
-          x
-        </Button>
+        <Button onClick={onClickClose}>x</Button>
         <h2>채널 초대하기</h2>
       </div>
       <SearchCombobox
@@ -69,7 +67,7 @@ export default function ChannelInvite({
         users={users}
         imageSize={52}
         buttons={[
-          <Button key="button" type="button" onClick={handleClickDelete}>
+          <Button key="button" onClick={handleClickDelete}>
             x
           </Button>,
         ]}

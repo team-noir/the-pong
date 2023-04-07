@@ -21,11 +21,7 @@ export default function ChannelUserList({
 }: Props) {
   return (
     <ul>
-      {isPrivate && (
-        <Button type="button" onClick={onClickInvite}>
-          초대하기
-        </Button>
-      )}
+      {isPrivate && <Button onClick={onClickInvite}>초대하기</Button>}
       {myUser && (
         <ChannelUserItem
           channelId={channelId}

@@ -26,9 +26,7 @@ export default function ChannelSettingTitle({
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <Button type="button" onClick={onClickBack}>
-          &lt;
-        </Button>
+        <Button onClick={onClickBack}>&lt;</Button>
         <h2>채널 이름 수정</h2>
       </div>
       <TextInputWithMessage

@@ -38,9 +38,7 @@ export default function PasswordModal({ onClose, onSubmit, children }: Props) {
 
   return (
     <form onSubmit={handleSubmit} ref={modalRef}>
-      <Button type="button" onClick={onClose}>
-        x
-      </Button>
+      <Button onClick={onClose}>x</Button>
       <p>{children}</p>
       <PasswordInput id="password" value={password} onChange={handleChange} />
       <div>

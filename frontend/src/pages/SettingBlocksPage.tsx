@@ -33,7 +33,7 @@ export default function SettingBlocksPage() {
           users={getMyBlocksQuery.data || null}
           imageSize={52}
           buttons={[
-            <Button key="button0" type="button" onClick={handleClickUnblock}>
+            <Button key="button0" onClick={handleClickUnblock}>
               차단 해제
             </Button>,
           ]}
