@@ -126,11 +126,7 @@ export default function ChannelPage() {
       header={
         <HeaderWithBackButton
           title={getChannelQuery.data.title || ''}
-          button={
-            <Button type="button" onClick={() => setIsShowDetail(true)}>
-              메뉴
-            </Button>
-          }
+          button={<Button onClick={() => setIsShowDetail(true)}>메뉴</Button>}
         />
       }
     >

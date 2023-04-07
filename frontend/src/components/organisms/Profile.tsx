@@ -36,28 +36,18 @@ export default function Profile({
         <div>
           <div>
             {user.isFollowedByMyself ? (
-              <Button type="button" onClick={() => onClickUnfollow(user.id)}>
-                언팔로우
-              </Button>
+              <Button onClick={() => onClickUnfollow(user.id)}>언팔로우</Button>
             ) : (
-              <Button type="button" onClick={() => onClickFollow(user.id)}>
-                팔로우하기
-              </Button>
+              <Button onClick={() => onClickFollow(user.id)}>팔로우하기</Button>
             )}
             {!user.isBlockedByMyself && (
-              <Button type="button" onClick={() => onClickDm(user.id)}>
-                메시지 보내기
-              </Button>
+              <Button onClick={() => onClickDm(user.id)}>메시지 보내기</Button>
             )}
           </div>
           {user.isBlockedByMyself ? (
-            <Button type="button" onClick={() => onClickUnblock(user.id)}>
-              차단 해제
-            </Button>
+            <Button onClick={() => onClickUnblock(user.id)}>차단 해제</Button>
           ) : (
-            <Button type="button" onClick={() => onClickBlock(user.id)}>
-              차단하기
-            </Button>
+            <Button onClick={() => onClickBlock(user.id)}>차단하기</Button>
           )}
         </div>
       )}

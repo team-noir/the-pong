@@ -36,17 +36,15 @@ export default function ChannelSetting({
       {!isSettingTitle && !isSettingPassword && (
         <>
           <div>
-            <Button type="button" onClick={onClickClose}>
-              x
-            </Button>
+            <Button onClick={onClickClose}>x</Button>
             <h2>채널 설정</h2>
           </div>
           <div>
-            <Button type="button" onClick={() => setIsSettingTitle(true)}>
+            <Button onClick={() => setIsSettingTitle(true)}>
               채널 이름 수정 &gt;
             </Button>
             {!channel.isPrivate && (
-              <Button type="button" onClick={() => setIsSettingPassword(true)}>
+              <Button onClick={() => setIsSettingPassword(true)}>
                 채널 비밀번호 설정 &gt;
               </Button>
             )}

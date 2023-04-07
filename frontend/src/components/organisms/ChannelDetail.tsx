@@ -33,11 +33,7 @@ export default function ChannelDetail({
 
   return (
     <div>
-      {isMyUserRoleOwner && (
-        <Button type="button" onClick={onClickSetting}>
-          채널 설정
-        </Button>
-      )}
+      {isMyUserRoleOwner && <Button onClick={onClickSetting}>채널 설정</Button>}
       <h2>참가자</h2>
       {myUser && channelUsers && (
         <ChannelUserList
@@ -49,7 +45,7 @@ export default function ChannelDetail({
           onClickInvite={onClickInvite}
         />
       )}
-      <Button type="button" onClick={onClickLeave}>
+      <Button onClick={onClickLeave}>
         {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
       </Button>
     </div>

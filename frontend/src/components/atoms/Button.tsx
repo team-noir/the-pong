@@ -3,7 +3,7 @@ import { classNames } from 'utils';
 
 interface Props {
   children: React.ReactNode;
-  type: 'button' | 'submit' | 'reset';
+  type?: 'button' | 'submit' | 'reset';
   value?: string;
   logoImageUrl?: string;
   primary?: boolean;
@@ -14,7 +14,7 @@ interface Props {
 
 export default function Button({
   children,
-  type,
+  type = 'button',
   value,
   logoImageUrl,
   primary = false,

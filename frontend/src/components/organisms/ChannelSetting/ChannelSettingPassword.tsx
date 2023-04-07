@@ -36,9 +36,7 @@ export default function ChannelSettingPassword({
   return (
     <form onSubmit={handleSubmit}>
       <div>
-        <Button type="button" onClick={onClickBack}>
-          &lt;
-        </Button>
+        <Button onClick={onClickBack}>&lt;</Button>
         <h2>채널 비밀번호 수정</h2>
       </div>
       <CheckboxInputWithLabel
@@ -60,7 +58,7 @@ export default function ChannelSettingPassword({
           <>
             <p>비밀번호를 잊어버렸다면 재설정하세요.</p>
             {!isShowResetInput ? (
-              <Button type="button" onClick={() => setIsShowResetInput(true)}>
+              <Button onClick={() => setIsShowResetInput(true)}>
                 비밀번호 재설정
               </Button>
             ) : (

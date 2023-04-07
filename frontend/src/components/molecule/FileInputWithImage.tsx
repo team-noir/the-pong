@@ -51,10 +51,10 @@ export default function FileInputWithImage({
           onChange={handleFileChange}
           className="hidden"
         />
-        <Button type="button" primary onClick={handleClickFileUpload}>
+        <Button primary onClick={handleClickFileUpload}>
           이미지 업로드하기
         </Button>
-        <Button type="button" secondary onClick={handleClickFileRemove}>
+        <Button secondary onClick={handleClickFileRemove}>
           이미지 삭제하기
         </Button>
       </div>
