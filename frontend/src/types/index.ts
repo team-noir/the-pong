@@ -87,3 +87,18 @@ export interface MessageType {
   text: string;
   createdAt: string;
 }
+
+export interface PlayerType {
+  id: number;
+  nickname: string;
+  level: number;
+}
+export interface GameType {
+  id: number;
+  players: PlayerType[];
+  mode: 'normal' | 'hard';
+  theme: number;
+  viewerCount: number;
+  isLadder: boolean;
+  createdAt: string;
+}

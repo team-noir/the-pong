@@ -8,7 +8,7 @@ interface Props {
 
 export default function ChannelList({ channels, onClick }: Props) {
   return (
-    <ul>
+    <ul className="pt-4 border-t border-t-gray">
       {channels &&
         channels.map((channel) => {
           return (

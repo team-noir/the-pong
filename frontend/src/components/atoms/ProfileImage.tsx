@@ -7,17 +7,21 @@ interface Props {
 }
 
 export default function ProfileImage({ userId, alt, size }: Props) {
+  const style = {
+    width: size,
+    height: size,
+  };
   return (
-    <img
-      src={
-        userId !== undefined
-          ? `${API_PREFIX}/users/${userId}/profile-image`
-          : 'https://placekitten.com/800/800'
-      }
-      alt={alt}
-      width={size}
-      height={size}
-      className="h-8 w-8 rounded-full"
-    />
+    <div className={`image-wrapper rounded-full overflow-hidden`} style={style}>
+      <img
+        src={
+          userId !== undefined
+            ? `${API_PREFIX}/users/${userId}/profile-image`
+            : 'https://placekitten.com/800/800'
+        }
+        alt={alt}
+        width={size}
+      />
+    </div>
   );
 }
