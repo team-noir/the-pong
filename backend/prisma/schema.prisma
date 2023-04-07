@@ -78,6 +78,7 @@ model Channel {
   password        String?
   isPrivate       Boolean
   isDm            Boolean
+  ownerId         Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime?
   deletedAt       DateTime?
@@ -87,12 +88,16 @@ model Channel {
 }
 
 model Channel_User {
-  id              Int       @id @default(autoincrement())
+  @@id([channelId, userId], name: "id")
+
   channelId       Int
   userId          Int
-  userType        Int
-  status          Int
+  deleted         Boolean   @default(false)
   createdAt       DateTime  @default(now())
+
+  isAdmin         Boolean
+  isBanned        Boolean
+  isMuted         Boolean
 
   channel         Channel   @relation(fields: [channelId], references: [id])
   user            User      @relation(fields: [userId], references: [id])

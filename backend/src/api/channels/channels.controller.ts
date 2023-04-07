@@ -55,13 +55,13 @@ export class ChannelsController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @ApiBadRequestResponse({ description: 'This user does not exist.' })
   @UseGuards(AuthenticatedGuard)
-  async create(
+  async createChannel(
     @Req() req,
     @Body() body: CreateChannelDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      const result = await this.channelsService.create(req.user.id, body);
+      const result = await this.channelsService.createChannel(req.user.id, body);
       res.status(HttpStatus.OK);
       return result;
     } catch (error) {
@@ -187,13 +187,13 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Leave channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  leaveChannel(
+  async leaveChannel(
     @Req() req,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.leave(req.user.id, channelId);
+      await this.channelsService.leave(req.user.id, channelId);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {

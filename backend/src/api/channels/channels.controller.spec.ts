@@ -16,21 +16,8 @@ const fakeSocket = {
 	leave: jest.fn(),
 };
 
-const user: ChannelUser = {
-	id: 3,
-	name: 'user',
-	socket: fakeSocket,
-	joined: new Set(),
-	blockUser: new Set(),
-};
-
-const user2: ChannelUser = {
-	id: 5,
-	name: 'user2',
-	socket: fakeSocket,
-	joined: new Set(),
-	blockUser: new Set(),
-};
+const user = new ChannelUser(3, 'user', fakeSocket);
+const user2 = new ChannelUser(5, 'user2', fakeSocket);
 
 const publicChannelData: CreateChannelDto = {
 	title: 'public',
@@ -81,8 +68,8 @@ describe('Chat connection', () => {
 	}
 	
 	const initChannels = async () => {
-		const publicObj = await service.create(user.id, publicChannelData);
-		const privateObj = await service.create(user.id, privateChannelData);
+		const publicObj = await service.createChannel(user.id, publicChannelData);
+		const privateObj = await service.createChannel(user.id, privateChannelData);
 		channel = service.channelModel.get(publicObj.id);
 		privateChannel = service.channelModel.get(privateObj.id);
 	}
@@ -254,7 +241,7 @@ describe('Chat connection', () => {
 				}
 			});
 	
-			service.mute(user, channel, socketUser, 1);
+			service.channelModel.mute(user, channel, socketUser, 1);
 			try {
 				service.messageModel.messageToChannel(socketUser, channel, "hello 0");
 			} catch (error) {

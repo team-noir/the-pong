@@ -17,9 +17,7 @@ import { ChannelUser } from './models/user.model';
 
 @Injectable()
 @WebSocketGateway({
-  cors: {
-    credentials: true,
-  },
+  cors: { credentials: true }
 })
 export class ChannelsGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -76,15 +74,9 @@ export class ChannelsGatway
       return;
     }
 
-    const user: ChannelUser = {
-      id: userId,
-      name: username,
-      socket: socket,
-
-      joined: new Set<number>(),
-      blockUser: new Set<number>(),
-    };
+    const user = new ChannelUser(userId, username, socket);
     socket.data = { user };
+    
     this.channelsService.userModel.setUser(userId, user);
     this.logger.log(
       `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
@@ -115,7 +107,7 @@ export class ChannelsGatway
 
   @SubscribeMessage('create')
   create(@ConnectedSocket() socket: Socket, @MessageBody() data) {
-    this.channelsService.create(socket.data.user.id, data);
+    this.channelsService.createChannel(socket.data.user.id, data);
   }
 
   @SubscribeMessage('join')
