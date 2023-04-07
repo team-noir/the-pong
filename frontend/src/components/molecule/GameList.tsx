@@ -67,7 +67,7 @@ const games: GameType[] = [
 
 export default function GameList() {
   return (
-    <ul className="flex flex-col -mx-4 pt-2 overflow-x-hidden">
+    <ul className="flex flex-col -mx-4 overflow-x-hidden">
       {games && games.map((game) => <GameItem key={game.id} game={game} />)}
     </ul>
   );

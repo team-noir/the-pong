@@ -21,10 +21,10 @@
 
 @layer components {
   .section {
-    @apply mt-16;
+    @apply mb-16;
   }
   .section-title {
-    @apply text-2xl mt-8 mb-4;
+    @apply text-2xl mb-4 text-text-light;
   }
   .button {
     @apply text-lg font-bold py-2 px-4 rounded inline-flex items-center justify-center select-none;
