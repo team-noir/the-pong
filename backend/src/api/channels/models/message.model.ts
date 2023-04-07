@@ -5,55 +5,98 @@ import { Server } from 'socket.io';
 import { HttpStatus } from '@nestjs/common';
 import { ChannelMessageDto } from '../dtos/channel.dto'
 
-type messageId = number;
+import { PrismaService } from '../../../prisma/prisma.service'
 
-export interface Message {
+type messageId = number;
+type userId = number;
+type channelId = number;
+
+export class Message {
 	id: number;
 	text: string;
 	createdAt: Date;
-	sender: ChannelUser;
-	channel: Channel;
+	senderId: userId;
+	channelId: channelId;
 	isLog: boolean;
+
+	constructor(id: number, text: string, createdAt: Date, channel: userId, sender?: channelId) {
+		this.id = id;
+		this.text = text;
+		this.createdAt = createdAt;
+		this.channelId = channel;
+		this.senderId = sender;
+		this.isLog = sender ? false : true;
+	}
 }
   
 export class MessageModel {
 	private messageMap = new Map<messageId, Message>();
 	@WebSocketServer() server: Server;
+
+	constructor(private prismaService: PrismaService) {}
   
-	initServer(server: Server) {
+	async initServer(server: Server) {
 	  this.server = server;
+		const dbMessages = await this.prismaService.message.findMany({
+			select: {
+				id: true, 
+				text: true,
+				createdAt: true,
+				senderId: true,
+				channelId: true
+			}
+		});
+
+		dbMessages.forEach((dbMessage) => {
+			const message = new Message(
+				dbMessage.id,
+				dbMessage.text,
+				dbMessage.createdAt,
+				dbMessage.channelId,
+				dbMessage.senderId,
+			)
+			this.messageMap.set(message.id, message);
+		})
+
 	}
   
 	// 채널에 공지를 보낸다.
-	noticeToChannel(channel: Channel, message: string): Message {
-  
-	  const newMessage: Message = {
-		id: this.messageMap.size + 1,
-		sender: null,
-		channel: channel,
-		isLog: true,
-		text: message,
-		createdAt: new Date(),
-	  };
-	  this.messageMap.set(newMessage.id, newMessage);
-  
-	  // socket message
-	  if (!this.server) { return; }
-	  this.server.to(String(channel.id)).emit('notice', {
-		id: newMessage.id,
-		channelId: newMessage.channel.id,
-		text: newMessage.text,
-		createdAt: newMessage.createdAt,
-	  });
-	  return newMessage;
+	async noticeToChannel(channel: Channel, message: string): Promise<Message> {
+		const created = await this.prismaService.message.create({
+			data: {
+				senderId: null,
+				channelId: channel.id,
+				text: message
+			}
+		});
+
+		const newMessage: Message = {
+			id: created.id,
+			senderId: null,
+			channelId: channel.id,
+			isLog: true,
+			text: created.text,
+			createdAt: created.createdAt,
+		};
+		this.messageMap.set(newMessage.id, newMessage);
+
+		// socket message
+		if (!this.server) { return; }
+		this.server.to(String(channel.id)).emit('notice', {
+			id: newMessage.id,
+			channelId: newMessage.channelId,
+			text: newMessage.text,
+			createdAt: newMessage.createdAt,
+		});
+		return newMessage;
 	}
   
 	// 채널에 메세지를 보낸다.
-	messageToChannel(
+	async messageToChannel(
 	  user: ChannelUser,
 	  channel: Channel,
 	  message: string
-	): Message {
+	): Promise<Message> {
 	  channel.checkUserJoined(user);
   
 	  if (channel.muted.has(user.id)) {
@@ -67,21 +110,30 @@ export class MessageModel {
 		  throw { code, message };
 		}
 	  }
+
+	const created = await this.prismaService.message.create({
+		data: {
+			senderId: user.id,
+			channelId: channel.id,
+			text: message
+		}
+	});
   
-	  const newMessage: Message = {
-		id: this.messageMap.size + 1,
-		sender: user,
-		channel: channel,
+	const newMessage: Message = {
+		id: created.id,
+		senderId: null,
+		channelId: channel.id,
 		isLog: false,
-		text: message,
-		createdAt: new Date(),
-	  };
+		text: created.text,
+		createdAt: created.createdAt,
+	};
+
 	  this.messageMap.set(newMessage.id, newMessage);
   
 	  // socket message
 	  this.server.to(String(channel.id)).emit('message', {
 		id: newMessage.id,
-		channelId: newMessage.channel.id,
+		channelId: newMessage.channelId,
 		senderId: user.id,
 		senderNickname: user.name,
 		isLog: newMessage.isLog,
@@ -91,25 +143,9 @@ export class MessageModel {
   
 	  return newMessage;
 	}
-  
-	// Message getter
-  
-	getChannelMessages(user: ChannelUser, channel: Channel): ChannelMessageDto[] {
-	  channel.checkUserJoined(user);
-  
-	  const data = [];
-	  [ ...this.messageMap.values() ].forEach((message) => {
-		if (message.channel.id == channel.id) {
-		  const tarMessage = new ChannelMessageDto(
-			message.id,
-			message.text,
-			message.sender,
-			message.isLog
-		  )
-		  data.push(tarMessage);
-		}
-	  });
-	  return data;
+
+	getAllMessages() {
+		return [...this.messageMap.values()];
 	}
   
   

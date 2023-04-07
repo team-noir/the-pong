@@ -121,12 +121,16 @@ describe('Channel list', () => {
     service.userModel.setUser(user2.id, user2);
     service.userModel.setUser(user3.id, user3);
 
-    await service.createChannel(1, publicChannelData);
-    await service.createChannel(1, protectedChannelData);
-    await service.createChannel(1, privateChannelData);
-    await service.createChannel(2, publicChannelData);
-    await service.createChannel(2, protectedChannelData);
-    await service.initDirectMessage(1, 2);
+    try {
+      await service.createChannel(1, publicChannelData);
+      await service.createChannel(1, protectedChannelData);
+      await service.createChannel(1, privateChannelData);
+      await service.createChannel(2, publicChannelData);
+      await service.createChannel(2, protectedChannelData);
+      await service.initDirectMessage(1, 2);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   it('/channels \n\t: 모든 public, protected 채널', () => {
@@ -142,7 +146,6 @@ describe('Channel list', () => {
     let cntDm = 0;
 
     const channelList = service.list(1, query);
-    console.log(channelList);
     channelList.forEach((v) => {
       if (v.title == 'public') {
         ++cntPublic;
@@ -470,6 +473,9 @@ describe('Channel list', () => {
 
 describe('Channel info', () => {
   let service: ChannelsService;
+  let public1, private1, protected1;
+  let public2, private2, protected2;
+  let dm;
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -483,20 +489,20 @@ describe('Channel info', () => {
     service.userModel.setUser(user3.id, user3);
 
     try {
-      await service.createChannel(user1.id, publicChannelData);
-      await service.createChannel(user1.id, protectedChannelData);
-      await service.createChannel(user1.id, privateChannelData);
-      await service.createChannel(user2.id, publicChannelData);
-      await service.createChannel(user2.id, protectedChannelData);
-      await service.createChannel(user2.id, privateChannelData);
-      await service.initDirectMessage(user1.id, user2.id);
+      public1 = await service.createChannel(user1.id, publicChannelData);
+      private1 = await service.createChannel(user1.id, protectedChannelData);
+      protected1 = await service.createChannel(user1.id, privateChannelData);
+      public2 = await service.createChannel(user2.id, publicChannelData);
+      private2 = await service.createChannel(user2.id, protectedChannelData);
+      protected2 = await service.createChannel(user2.id, privateChannelData);
+      dm = await service.initDirectMessage(user1.id, user2.id);
     } catch (error) {
       console.log(error);
     }
   });
 
   it('유저 참여 중, public 채널 정보를 확인하는 경우', () => {
-    const channelId = 1;
+    const channelId = public1.id;
     const userId = 1;
 
     try {
@@ -508,7 +514,7 @@ describe('Channel info', () => {
   });
 
   it('유저 참여 중, protected 채널 정보를 확인하는 경우', () => {
-    const channelId = 2;
+    const channelId = protected1.id;
     const userId = 1;
 
     try {
@@ -520,7 +526,7 @@ describe('Channel info', () => {
   });
 
   it('유저 참여 중, private 채널 정보를 확인하는 경우', () => {
-    const channelId = 3;
+    const channelId = private1.id;
     const userId = 1;
 
     try {
@@ -532,7 +538,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, public 채널 정보를 확인하는 경우', () => {
-    const channelId = 4;
+    const channelId = public1.id;
     const userId = 1;
 
     try {
@@ -544,7 +550,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, protected 채널 정보를 확인하는 경우', () => {
-    const channelId = 5;
+    const channelId = protected2.id;
     const userId = 1;
 
     try {
@@ -556,7 +562,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, private 채널 정보를 확인하는 경우', () => {
-    const channelId = 6;
+    const channelId = private2.id;
     const userId = 1;
 
     try {
@@ -568,7 +574,7 @@ describe('Channel info', () => {
   });
 
   it('유저 참여 중, dm 채널 정보를 확인하는 경우', () => {
-    const channelId = 7;
+    const channelId = dm.id;
     const userId = 1;
 
     try {
@@ -580,7 +586,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, dm 채널 정보를 확인하는 경우', () => {
-    const channelId = 7;
+    const channelId = dm.id;
     const userId = 3;
 
     try {

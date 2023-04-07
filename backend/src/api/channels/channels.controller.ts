@@ -261,7 +261,7 @@ export class ChannelsController {
     try {
       const channel = this.channelsService.channelModel.get(channelId);
       const user = this.channelsService.userModel.getUser(req.user.id);
-      const messages = this.channelsService.messageModel.getChannelMessages(user, channel);
+      const messages = this.channelsService.getChannelMessages(user, channel);
       res.status(HttpStatus.OK);
       return messages;
     } catch (error) {

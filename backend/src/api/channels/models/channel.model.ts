@@ -35,7 +35,7 @@ export class Channel {
 		this.createdAt = new Date();
 		this.password = password;
 
-		this.owner = null;
+		this.owner = owner;
 		this.users = new Set<number>();
 		this.admin = new Set<number>();
 		this.muted = new Map<number, Date>();
@@ -109,7 +109,7 @@ export class Channel {
 		}
 	}
 
-	assertCanUserEditChannel(user: ChannelUser, password: string) {
+	assertCanUserEditChannel(user: ChannelUser, password?: string) {
 		if (this.isDm) {
 			throw {
 			  code: HttpStatus.BAD_REQUEST,

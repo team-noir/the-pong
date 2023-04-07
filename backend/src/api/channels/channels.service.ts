@@ -17,12 +17,12 @@ export class ChannelsService {
   public messageModel: MessageModel;
 
   constructor(private prismaService: PrismaService) {
-    this.channelModel = new ChannelModel(prismaService);
+    this.channelModel = new ChannelModel(this.prismaService);
     this.userModel = new UserModel();
-    this.messageModel = new MessageModel();
+    this.messageModel = new MessageModel(this.prismaService);
+    this.messageModel.server = this.server;
 
     this.channelModel.initChannel();
-    this.messageModel.server = this.server;
   }
 
   // Channel getter
@@ -185,6 +185,7 @@ export class ChannelsService {
     const channel: Channel = this.channelModel.get(channelId);
     const settedBy: ChannelUser = this.userModel.getUser(userId);
 
+    channel.assertCanUserEditChannel(settedBy, data.password);
 
     channel.title = data.title ? data.title : channel.title;
     channel.password = data.password ? data.password : null;
@@ -309,4 +310,23 @@ export class ChannelsService {
       );
     }
   }
+
+  getChannelMessages(user: ChannelUser, channel: Channel): ChannelMessageDto[] {
+	  channel.checkUserJoined(user);
+  
+	  const data = [];
+	  this.messageModel.getAllMessages().forEach((message) => {
+		const sender = this.userModel.getUser(message.senderId);
+		if (message.channelId == channel.id) {
+		  const tarMessage = new ChannelMessageDto(
+			message.id,
+			message.text,
+			sender,
+			message.isLog
+		  )
+		  data.push(tarMessage);
+		}
+	  });
+	  return data;
+	}
 }
