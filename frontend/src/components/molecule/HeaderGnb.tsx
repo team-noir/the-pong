@@ -10,10 +10,10 @@ import ProfileImage from 'components/atoms/ProfileImage';
 import { classNames } from 'utils';
 
 const navigation = [
-  { name: 'Game', href: '/game', current: false },
-  { name: 'Channel', href: '/channel', current: false },
-  { name: 'Following', href: '/following', current: false },
-  { name: 'Setting', href: '/setting', current: false },
+  { name: '게임', href: '/game', current: false },
+  { name: '채널', href: '/channel', current: false },
+  { name: '팔로잉', href: '/following', current: false },
+  { name: '설정', href: '/setting', current: false },
 ];
 
 function Logo() {
@@ -68,13 +68,13 @@ export default function HeaderGnb() {
               <div className="absolute inset-y-0 right-0 flex items-center pr-2">
                 <Menu as="div" className="relative ml-3">
                   <div>
-                    <Menu.Button className="flex rounded bg-gray-dark text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray min-w-13 min-h-13">
+                    <Menu.Button className="flex rounded-full bg-gray-dark text-sm focus:outline-none focus:ring-1 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray min-w-13 min-h-13">
                       <span className="sr-only">Open user menu</span>
                       {myUserId && (
                         <ProfileImage
                           userId={myUserId}
                           alt="My profile image"
-                          size={52}
+                          size={32}
                         />
                       )}
                     </Menu.Button>
@@ -98,7 +98,7 @@ export default function HeaderGnb() {
                               'block px-4 py-2 text-sm text-text-light'
                             )}
                           >
-                            Your Profile
+                            내 프로필
                           </Link>
                         )}
                       </Menu.Item>
@@ -111,7 +111,7 @@ export default function HeaderGnb() {
                               'block px-4 py-2 text-sm text-text-light'
                             )}
                           >
-                            Settings
+                            설정
                           </Link>
                         )}
                       </Menu.Item>
@@ -125,7 +125,7 @@ export default function HeaderGnb() {
                               'block px-4 py-2 text-sm text-text-light cursor-pointer'
                             )}
                           >
-                            Logout
+                            로그아웃
                           </span>
                         )}
                       </Menu.Item>

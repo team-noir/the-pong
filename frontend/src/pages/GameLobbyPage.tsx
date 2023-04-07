@@ -1,7 +1,7 @@
 import GameButtons from 'components/organisms/GameButtons';
-import ChannelButtons from 'components/organisms/ChannelButtons';
+import GameLives from 'components/organisms/GameLives';
 
-export default function MainPage() {
+export default function GameLobbyPage() {
   return (
     <>
       <section className="section">
@@ -9,8 +9,8 @@ export default function MainPage() {
         <GameButtons />
       </section>
       <section className="section">
-        <h2 className="section-title">채널</h2>
-        <ChannelButtons />
+        <h2 className="section-title">라이브 게임</h2>
+        <GameLives />
       </section>
     </>
   );

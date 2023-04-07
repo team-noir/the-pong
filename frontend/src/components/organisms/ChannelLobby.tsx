@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
 import ChannelList from 'components/molecule/ChannelList';
 import { ChannelType } from 'types';
+import ChannelButtons from 'components/organisms/ChannelButtons';
 
 interface Props {
   channels: ChannelType[] | null;
@@ -10,17 +10,18 @@ interface Props {
 export default function ChannelLobby({ channels, onClick }: Props) {
   return (
     <>
-      <h1>채널</h1>
-      <div>
-        <Link to="/channel/browse">채널 둘러보기</Link>
-        <Link to="/channel/new">새 채널 만들기</Link>
-      </div>
-      <h1>입장 중인 채널 목록</h1>
-      {channels?.length ? (
-        <ChannelList channels={channels} onClick={onClick} />
-      ) : (
-        <div>입장 중인 채널이 없습니다.</div>
-      )}
+      <section className="section">
+        <h2 className="section-title">채널</h2>
+        <ChannelButtons />
+      </section>
+      <section className="section">
+        <h2 className="section-title">입장 중인 채널 목록</h2>
+        {channels?.length ? (
+          <ChannelList channels={channels} onClick={onClick} />
+        ) : (
+          <div>입장 중인 채널이 없습니다.</div>
+        )}
+      </section>
     </>
   );
 }
