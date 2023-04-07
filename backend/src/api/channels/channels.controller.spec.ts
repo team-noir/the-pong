@@ -16,8 +16,8 @@ const fakeSocket = {
 	leave: jest.fn(),
 };
 
-const user = new ChannelUser(3, 'user', fakeSocket);
-const user2 = new ChannelUser(5, 'user2', fakeSocket);
+const user = new ChannelUser(2, 'user', fakeSocket);
+const user2 = new ChannelUser(3, 'user2', fakeSocket);
 
 const publicChannelData: CreateChannelDto = {
 	title: 'public',
@@ -70,6 +70,7 @@ describe('Chat connection', () => {
 	const initChannels = async () => {
 		const publicObj = await service.createChannel(user.id, publicChannelData);
 		const privateObj = await service.createChannel(user.id, privateChannelData);
+
 		channel = service.channelModel.get(publicObj.id);
 		privateChannel = service.channelModel.get(privateObj.id);
 	}
@@ -105,13 +106,13 @@ describe('Chat connection', () => {
     });
 
 	afterAll(() => {
-		// socket.disconnect();
+		// socket.disconnect();q
 		// app.getHttpServer().close();
 		// app.close();
 	})
 
 	describe('init', () => {
-		beforeAll(() => { initSocketUser(); initChannels(); });
+		beforeAll(async() => { initSocketUser(); await initChannels(); });
 		afterAll(() => { removeNoticeListeners(); });
 		
 		it('public 채널에 유저가 참가', (done) => {	
@@ -126,7 +127,7 @@ describe('Chat connection', () => {
 
 	describe('channel setting', () => {
 		beforeAll(() => { initSocketUser(); });
-		beforeEach(() => { initChannels(); });
+		beforeEach(async() => { await initChannels(); });
 
 		it('채널장이 public 채널을 protected로 수정', () => {
 			const newTitle = "protected";
@@ -202,7 +203,7 @@ describe('Chat connection', () => {
 
 	describe('Message', () => {
 		beforeAll(() => { initSocketUser(); });
-		beforeEach(() => { initChannels(); });
+		beforeEach(async() => { await initChannels(); });
 		afterAll(() => { removeAllListeners(); });
 
 		it('참여 중인 채널에서 메세지 수신', (done) => {
@@ -221,14 +222,14 @@ describe('Chat connection', () => {
 			service.join(socketUser.id, channel.id, null);
 			service.messageModel.messageToChannel(user, channel, "hello");
 	
-			const messages = service.messageModel.getChannelMessages(socketUser, channel);
+			const messages = service.getChannelMessages(socketUser, channel);
 			expect(messages.length).toBe(2);
 		})
 	});
 	
 	describe('mute', () => {
 		beforeAll(() => { initSocketUser(); });
-		beforeEach(() => { initChannels(); });
+		beforeEach(async() => { await initChannels(); });
 		afterAll(() => { removeAllListeners(); });
 
 		it('참여 중인 채널의 owner가 유저를 mute', (done) => {
@@ -268,7 +269,7 @@ describe('Chat connection', () => {
 
 	describe('invite', () => {
 		beforeAll(() => { initSocketUser(); });
-		beforeEach(() => { initChannels(); });
+		beforeEach(async() => { await initChannels(); });
 		afterAll(() => { removeAllListeners(); });
 
 		it('채널장이 유저를 초대', (done) => {

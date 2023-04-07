@@ -30,10 +30,10 @@ export class ChannelsGatway
   @WebSocketServer() server: Server;
   private logger = new Logger('Gateway');
 
-  afterInit() {
+  async afterInit() {
     this.logger.log('웹소켓 서버 초기화 ✅');
     this.channelsService.server = this.server;
-    this.channelsService.messageModel.initServer(this.server);
+    await this.channelsService.messageModel.initServer(this.server);
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
@@ -76,7 +76,7 @@ export class ChannelsGatway
 
     const user = new ChannelUser(userId, username, socket);
     socket.data = { user };
-    
+
     this.channelsService.userModel.setUser(userId, user);
     this.logger.log(
       `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
