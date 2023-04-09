@@ -10,6 +10,8 @@ interface Props {
   secondary?: boolean;
   fullLength?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export default function Button({
@@ -21,6 +23,8 @@ export default function Button({
   secondary = false,
   fullLength = false,
   onClick,
+  onMouseDown,
+  onMouseUp,
 }: Props) {
   return (
     <button
@@ -33,6 +37,8 @@ export default function Button({
       type={type}
       value={value}
       onClick={onClick}
+      onMouseDown={onMouseDown}
+      onMouseUp={onMouseUp}
     >
       {logoImageUrl && (
         <img
