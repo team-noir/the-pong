@@ -18,11 +18,12 @@ export class ChannelsService {
 
   constructor(private prismaService: PrismaService) {
     this.channelModel = new ChannelModel(this.prismaService);
-    this.userModel = new UserModel();
+    this.userModel = new UserModel(this.prismaService);
     this.messageModel = new MessageModel(this.prismaService);
     this.messageModel.server = this.server;
 
     this.channelModel.initChannel();
+    this.userModel.initUser();
   }
 
   // Channel getter

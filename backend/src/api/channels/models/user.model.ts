@@ -1,6 +1,7 @@
 import { Socket } from 'socket.io';
 import { HttpStatus } from '@nestjs/common';
 import { Channel } from './channel.model';
+import { PrismaService } from '../../../prisma/prisma.service';
 
 type userId = number;
 type channelId = number;
@@ -14,7 +15,7 @@ export class ChannelUser {
   
 	socket;
 
-	constructor(id: number, name: string, socket) {
+	constructor(id: number, name: string, socket?) {
 		this.id = id;
 		this.name = name;
 		this.socket = socket;
@@ -35,8 +36,44 @@ export class ChannelUser {
 
 }
 
-export class UserModel {2
-	private channelUserMap = new Map<userId, ChannelUser>();
+export class UserModel {
+	private channelUserMap : Map<userId, ChannelUser>;
+
+	constructor(private prismaService: PrismaService) {
+		this.channelUserMap = new Map<userId, ChannelUser>();
+	}
+
+	async initUser() {
+		const dbUsers = await this.prismaService.user.findMany({
+			select: {
+				id: true, 
+				nickname: true,
+				channels: { select: {
+					channelId: true
+				}},
+				blockeds: { select: {
+					blockedId: true,
+				}}
+			}
+		});
+
+		dbUsers.forEach((dbUser) => {
+			const newUser = new ChannelUser(
+				dbUser.id,
+				dbUser.nickname,
+			);
+
+			dbUser.channels.forEach((channel) => {
+				newUser.joined.add(channel.channelId);
+			});
+	
+			dbUser.blockeds.forEach((blocked) => {
+				newUser.blockUser.add(blocked.blockedId);
+			});
+			
+			this.channelUserMap.set(newUser.id, newUser);
+		});
+	}
   
 	// Getter
   

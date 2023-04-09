@@ -230,7 +230,7 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Send message to channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  sendChannelMessage(
+  async sendChannelMessage(
     @Req() req,
     @Param('channelId') channelId: number,
     @Body() body: ChannelMessageTextDto,
@@ -238,7 +238,8 @@ export class ChannelsController {
   ) {
     try {
       const channel = this.channelsService.channelModel.get(channelId);
-      this.channelsService.messageModel.messageToChannel(req.user.id, channel, body.text);
+      const user = this.channelsService.userModel.getUser(req.user.id);
+      await this.channelsService.messageModel.messageToChannel(user, channel, body.text);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
