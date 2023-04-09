@@ -15,7 +15,7 @@ model User {
   id                    Int           @id @default(autoincrement())
   imageUrl              String?
   nickname              String?       @unique
-  rank                  Int           @default(0)
+  rank                  Int           @default(1)
   isTwoFactor           Boolean       @default(false)
   ftId                  String        @unique
   ftUsername            String?

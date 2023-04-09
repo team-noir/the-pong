@@ -65,12 +65,18 @@ export class ChannelsGatway
     }
     if (this.channelsService.userModel.has(userId)) {
       const logged = this.channelsService.userModel.getUser(userId);
-      logged.socket.disconnect(true);
+      if (logged.socket) {
+        logged.socket.disconnect(true);
+      }
       logged.socket = socket;
       socket.data = { user: logged };
       this.logger.log(
         `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`
       );
+      const loggedUser = this.channelsService.userModel.getUser(userId);
+      loggedUser.joined.forEach((channelId) => {
+        logged.socket.join(String(channelId));
+      })
       return;
     }
 
@@ -90,17 +96,24 @@ export class ChannelsGatway
   // Message
 
   @SubscribeMessage('message')
-  handleMessage(
+  async handleMessage(
     @ConnectedSocket() socket: Socket,
     @MessageBody('channelId') channelId: number,
     @MessageBody('message') message: string
   ) {
-    const channel = this.channelsService.channelModel.get(channelId);
-    this.channelsService.messageModel.messageToChannel(
-      socket.data.user.id,
-      channel,
-      message
-    );
+    try {
+      const channel = this.channelsService.channelModel.get(channelId);
+      const user = this.channelsService.userModel.getUser(socket.data.user.id);
+
+      await this.channelsService.messageModel.messageToChannel(
+        user,
+        channel,
+        message
+      );
+      
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   // Channel
@@ -111,12 +124,16 @@ export class ChannelsGatway
   }
 
   @SubscribeMessage('join')
-  join(
+  async join(
     @ConnectedSocket() socket: Socket,
     @MessageBody('channelId') channelId: number,
     @MessageBody('password') password: string
   ) {
-    this.channelsService.join(socket.data.user.id, channelId, password);
+    try {
+      await this.channelsService.join(socket.data.user.id, channelId, password);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   @SubscribeMessage('leave')

@@ -197,7 +197,7 @@ export class ChannelModel {
 	// Getter
   
 	// 채널 아이디로 채널을 가져온다.
-	get(channelId: number) {
+	get(channelId: number): Channel {
 	  const channel = this.channelMap.get(channelId);
   
 	  if (!channel) {
