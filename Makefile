@@ -56,6 +56,7 @@ re: clean ## clean & build
 
 .PHONY: build-dev
 build-dev: ## [dev] Build containers
+	cd ./backend && yarn install
 	$(DOCKER_COMPOSE_DEV) build
 
 .PHONY: build-dev-no

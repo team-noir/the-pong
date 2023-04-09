@@ -1,7 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dtos/channel.dto';
-import { expect, jest, describe, beforeEach, beforeAll, it } from '@jest/globals';
+import {
+  expect,
+  jest,
+  describe,
+  beforeEach,
+  beforeAll,
+  it,
+} from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import { ChannelsModule } from './channels.module';
 import { ChannelUser } from './models/user.model';
@@ -36,26 +43,22 @@ const privateChannelData: CreateChannelDto = {
 };
 
 it('create channel', async () => {
-  let service: ChannelsService;
-
   const module: TestingModule = await Test.createTestingModule({
     providers: [ChannelsService, PrismaService],
   }).compile();
 
-  service = module.get<ChannelsService>(ChannelsService);
+  const service = module.get<ChannelsService>(ChannelsService);
 
   service.userModel.setUser(user1.id, user1);
   await service.createChannel(1, publicChannelData);
 });
 
 it('join channel', async () => {
-  let service: ChannelsService;
-
   const module: TestingModule = await Test.createTestingModule({
     providers: [ChannelsService, PrismaService],
   }).compile();
 
-  service = module.get<ChannelsService>(ChannelsService);
+  const service = module.get<ChannelsService>(ChannelsService);
 
   service.userModel.setUser(user1.id, user1);
   service.userModel.setUser(user2.id, user2);
@@ -64,13 +67,11 @@ it('join channel', async () => {
 });
 
 it('leave channel', async () => {
-  let service: ChannelsService;
-
   const module: TestingModule = await Test.createTestingModule({
     providers: [ChannelsService, PrismaService],
   }).compile();
 
-  service = module.get<ChannelsService>(ChannelsService);
+  const service = module.get<ChannelsService>(ChannelsService);
 
   try {
     service.userModel.setUser(user1.id, user1);
@@ -78,20 +79,17 @@ it('leave channel', async () => {
     const channelid = await service.createChannel(1, publicChannelData);
     await service.join(user2.id, channelid.id);
     await service.leave(user2.id, channelid.id);
-    
   } catch (error) {
     console.log(error);
   }
 });
 
 it('rejoin channel', async () => {
-  let service: ChannelsService;
-
   const module: TestingModule = await Test.createTestingModule({
     providers: [ChannelsService, PrismaService],
   }).compile();
 
-  service = module.get<ChannelsService>(ChannelsService);
+  const service = module.get<ChannelsService>(ChannelsService);
 
   try {
     service.userModel.setUser(user1.id, user1);
@@ -100,12 +98,10 @@ it('rejoin channel', async () => {
     await service.join(user2.id, channelid.id);
     await service.leave(user2.id, channelid.id);
     await service.join(user2.id, channelid.id);
-    
   } catch (error) {
     console.log(error);
   }
 });
-
 
 describe('Channel list', () => {
   let service: ChannelsService;
@@ -114,8 +110,6 @@ describe('Channel list', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [ChannelsService, PrismaService],
     }).compile();
-
-    service = module.get<ChannelsService>(ChannelsService);
 
     service.userModel.setUser(user1.id, user1);
     service.userModel.setUser(user2.id, user2);

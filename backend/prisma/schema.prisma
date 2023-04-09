@@ -92,12 +92,12 @@ model Channel_User {
 
   channelId       Int
   userId          Int
-  deleted         Boolean   @default(false)
   createdAt       DateTime  @default(now())
 
-  isAdmin         Boolean
-  isBanned        Boolean
-  isMuted         Boolean
+  isAdmin         Boolean   @default(false)
+  isBanned        Boolean   @default(false)
+  isMuted         Boolean   @default(false)
+  deleted         Boolean   @default(false)
 
   channel         Channel   @relation(fields: [channelId], references: [id])
   user            User      @relation(fields: [userId], references: [id])
