@@ -21,8 +21,11 @@
   .section-title {
     @apply text-2xl mb-4 text-text-light;
   }
+  .link {
+    @apply underline text-primary hover:text-primary-light;
+  }
   .button {
-    @apply font-bold rounded inline-flex items-center justify-center select-none;
+    @apply text-lg py-2 px-4 font-semibold rounded inline-flex items-center justify-center select-none;
   }
   .button.primary {
     @apply bg-primary hover:bg-primary-dark text-gray-darker;

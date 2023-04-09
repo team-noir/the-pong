@@ -23,7 +23,7 @@ export default function CheckboxInputWithLabel({
   return (
     <div className="flex items-center pl-4">
       <CheckboxInput id={id} checked={checked} onChange={handleChange} />
-      <Label id={id} label={label} />
+      <Label id={id} label={label} className="py-4 ml-2" />
     </div>
   );
 }

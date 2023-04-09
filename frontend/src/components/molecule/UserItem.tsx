@@ -42,7 +42,7 @@ export default function UserItem({
       </div>
 
       <div className="flex-1 truncate">
-        <div className="mb-2">
+        <div className="mb-1">
           <Link to={`/profile/${user.id}`}>
             <span className="text-lg font-medium">{user.nickname}</span>
           </Link>
