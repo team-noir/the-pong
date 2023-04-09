@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
-import PasswordInputWithMessage from 'components/molecule/PasswordInputWithMessage';
+import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import Button from 'components/atoms/Button';
 import { validateChannelPassword } from 'utils/validatorUtils';
 
@@ -91,7 +91,8 @@ function ChannelPasswordInput({
   setIsValid,
 }: PasswordInputProps) {
   return (
-    <PasswordInputWithMessage
+    <TextInputWithMessage
+      type="password"
       id="password"
       value={password}
       setValue={(value) => setValue(value)}

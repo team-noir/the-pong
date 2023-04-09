@@ -1,4 +1,5 @@
 interface Props {
+  type?: 'text' | 'password';
   id: string;
   value?: string;
   placeholder?: string;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function TextInput({
+  type = 'text',
   id,
   value,
   placeholder,
@@ -21,7 +23,7 @@ export default function TextInput({
 }: Props) {
   return (
     <input
-      type="text"
+      type={type}
       id={id}
       value={value}
       placeholder={placeholder}
