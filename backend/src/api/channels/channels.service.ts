@@ -1,5 +1,5 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
-import { Socket, Server } from 'socket.io';
+import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
 import { CreateChannelDto, ChannelMessageDto } from './dtos/channel.dto';
 
@@ -17,13 +17,17 @@ export class ChannelsService {
   public messageModel: MessageModel;
 
   constructor(private prismaService: PrismaService) {
-    this.channelModel = new ChannelModel(this.prismaService);
     this.userModel = new UserModel(this.prismaService);
+    this.channelModel = new ChannelModel(this.prismaService);
     this.messageModel = new MessageModel(this.prismaService);
     this.messageModel.server = this.server;
-
-    this.channelModel.initChannel();
-    this.userModel.initUser();
+  }
+  
+  async initModels() {
+    await this.userModel.initUser();
+    await this.channelModel.initChannel();
+    await this.messageModel.initMessage();
+    this.messageModel.initServer(this.server);
   }
 
   // Channel getter
@@ -59,11 +63,14 @@ export class ChannelsService {
     return data;
   }
 
-  // Controller 
+  // Controller
 
   async createChannel(userId: number, data: CreateChannelDto) {
     const createdBy: ChannelUser = this.userModel.getUser(userId);
-    const newChannel: Channel = await this.channelModel.createChannel(data, createdBy);
+    const newChannel: Channel = await this.channelModel.createChannel(
+      data,
+      createdBy
+    );
 
     await this.channelModel.joinChannel(createdBy, newChannel, null);
 
@@ -80,13 +87,16 @@ export class ChannelsService {
     const user: ChannelUser = this.userModel.getUser(userId);
 
     await this.channelModel.joinChannel(user, channel, password);
-    this.messageModel.noticeToChannel(channel, `${user.name} 님이 채널에 참여하였습니다.`);
+    this.noticeToChannel(
+      channel,
+      `${user.name} 님이 채널에 참여하였습니다.`
+    );
   }
 
   async leave(userId: number, channelId: number) {
     const channel: Channel = this.channelModel.get(channelId);
     const user: ChannelUser = this.userModel.getUser(userId);
-    
+
     channel.checkUserJoined(user);
     if (channel.owner == user.id) {
       channel.users.forEach(async (joinedUserId) => {
@@ -97,7 +107,10 @@ export class ChannelsService {
       await this.channelModel.leaveChannel(user, channel);
     }
 
-    this.messageModel.noticeToChannel(channel, `${user.name} 님이 나가셨습니다.`);
+    this.noticeToChannel(
+      channel,
+      `${user.name} 님이 나가셨습니다.`
+    );
   }
 
   list(userId: number, query) {
@@ -163,7 +176,7 @@ export class ChannelsService {
         nickname: user.name,
         role: role,
         isMuted: channel.muted.has(id),
-      })
+      });
     });
 
     const channelInfo = {
@@ -201,7 +214,10 @@ export class ChannelsService {
   ) {
     const channel: Channel = this.channelModel.get(channelId);
     const settedBy: ChannelUser = this.getUserJoinedChannel(userId, channelId);
-    const settedUser: ChannelUser = this.getUserJoinedChannel(settedUserId, channelId);
+    const settedUser: ChannelUser = this.getUserJoinedChannel(
+      settedUserId,
+      channelId
+    );
 
     if (channel.isDm) {
       throw {
@@ -222,10 +238,16 @@ export class ChannelsService {
 
     if (role == 'admin') {
       channel.admin.add(settedUser.id);
-      this.messageModel.noticeToChannel(channel, `${settedUser.name} 님이 관리자 권한을 얻었습니다.`);
+      this.noticeToChannel(
+        channel,
+        `${settedUser.name} 님이 관리자 권한을 얻었습니다.`
+      );
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
-      this.messageModel.noticeToChannel(channel, `${settedUser.name} 님의 관리자 권한이 해제되었습니다.`);
+      this.noticeToChannel(
+        channel,
+        `${settedUser.name} 님의 관리자 권한이 해제되었습니다.`
+      );
     }
   }
 
@@ -247,9 +269,9 @@ export class ChannelsService {
     );
 
     if (!found) {
-      const newChannel = await this.channelModel.createChannel({ 
-        title: "Direct Message",
-        isDm: true 
+      const newChannel = await this.channelModel.createChannel({
+        title: 'Direct Message',
+        isDm: true,
       });
       this.channelModel.joinChannel(user, newChannel, null);
       this.channelModel.joinChannel(invitedUser, newChannel, null);
@@ -263,7 +285,7 @@ export class ChannelsService {
     const channel = this.channelModel.get(channelId);
     const invitedBy = this.getUserJoinedChannel(userId, channelId);
     const role = channel.getChannelUserRole(invitedBy);
-    
+
     if (channel.isDm || !channel.isPrivate) {
       throw {
         code: HttpStatus.BAD_REQUEST,
@@ -279,33 +301,44 @@ export class ChannelsService {
     invitedUserId.forEach((id) => {
       const invitedUser = this.userModel.getUser(id);
       this.channelModel.inviteChannel(invitedUser, channel);
-      
+
       // socket massage
       invitedUser.socket.emit('invited', { channelId: channel.id });
-      this.messageModel.noticeToChannel(channel, `${invitedUser.name} 님을 초대하였습니다.`);
+      this.noticeToChannel(
+        channel,
+        `${invitedUser.name} 님을 초대하였습니다.`
+      );
     });
   }
 
-  setUserStatus(userId: number, channelId: number, settedUserId: number, status: string) {
+  setUserStatus(
+    userId: number,
+    channelId: number,
+    settedUserId: number,
+    status: string
+  ) {
     const channel: Channel = this.channelModel.get(channelId);
     const user: ChannelUser = this.getUserJoinedChannel(userId, channelId);
-    const settedUser: ChannelUser = this.getUserJoinedChannel(settedUserId, channelId);
+    const settedUser: ChannelUser = this.getUserJoinedChannel(
+      settedUserId,
+      channelId
+    );
 
-    if (status == "kick") {
+    if (status == 'kick') {
       this.channelModel.kick(user, channel, settedUser);
-      this.messageModel.noticeToChannel(
+      this.noticeToChannel(
         channel,
         `${user.name}님이 ${settedUser.name} 님을 채널에서 강퇴하였습니다.`
       );
-    } else if (status == "ban") {
-      this.channelModel.ban(user, channel, settedUser)
-      this.messageModel.noticeToChannel(
+    } else if (status == 'ban') {
+      this.channelModel.ban(user, channel, settedUser);
+      this.noticeToChannel(
         channel,
         `${user.name}님이 ${settedUser.name} 님을 채널에서 차단하였습니다.`
       );
-    } else if (status == "mute") {
+    } else if (status == 'mute') {
       this.channelModel.mute(user, channel, settedUser, 30);
-      this.messageModel.noticeToChannel(
+      this.noticeToChannel(
         channel,
         `${user.name}님이 ${settedUser.name} 님을 채널에서 조용히 시켰습니다.`
       );
@@ -313,21 +346,46 @@ export class ChannelsService {
   }
 
   getChannelMessages(user: ChannelUser, channel: Channel): ChannelMessageDto[] {
-	  channel.checkUserJoined(user);
-  
-	  const data = [];
-	  this.messageModel.getAllMessages().forEach((message) => {
-		const sender = this.userModel.getUser(message.senderId);
-		if (message.channelId == channel.id) {
-		  const tarMessage = new ChannelMessageDto(
-			message.id,
-			message.text,
-			sender,
-			message.isLog
-		  )
-		  data.push(tarMessage);
-		}
-	  });
-	  return data;
-	}
+    channel.checkUserJoined(user);
+
+    const data = [];
+    this.messageModel.getAllMessages().forEach((message) => {
+      const sender = this.userModel.getUser(message.senderId);
+      if (message.channelId == channel.id) {
+        const tarMessage = new ChannelMessageDto(
+          message.id,
+          message.text,
+          sender,
+          message.isLog
+        );
+        data.push(tarMessage);
+      }
+    });
+    return data;
+  }
+
+  // 채널에 메세지를 보낸다.
+  async messageToChannel(
+    user: ChannelUser,
+    channel: Channel,
+    message: string
+  ): Promise<Message> {
+    channel.checkUserJoined(user);
+    channel.checkUserMuted(user);
+    this.channelModel.unmute(channel, user);
+
+    const newMessage = await this.messageModel.createMessage(channel, message, user);
+    this.messageModel.sendMessage(channel, newMessage, user);
+    return newMessage;
+  }
+
+  // 채널에 공지를 보낸다.
+  async noticeToChannel(
+    channel: Channel, 
+    message: string
+  ): Promise<Message> {
+    const newMessage = await this.messageModel.createMessage(channel, message);
+    this.messageModel.sendMessage(channel, newMessage);
+    return newMessage;
+  }
 }

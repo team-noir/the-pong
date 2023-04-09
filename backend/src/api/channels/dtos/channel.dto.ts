@@ -1,23 +1,29 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsBoolean, IsOptional, IsNumber, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsBoolean,
+  IsOptional,
+  IsNumber,
+  IsArray,
+} from 'class-validator';
 import { ChannelUser } from '../models/user.model';
 
 export class CreateChannelDto {
   @ApiProperty({
-    example: "title"
+    example: 'title',
   })
   @IsString()
   public title: string;
 
   @ApiProperty({
-    example: true
+    example: true,
   })
   @IsBoolean()
   @IsOptional()
   public isPrivate?: boolean;
 
   @ApiProperty({
-    example: "title"
+    example: 'title',
   })
   @IsString()
   @IsOptional()
@@ -108,13 +114,13 @@ export class ChannelInfoDto {
 
 export class ChannelDetailUserDto {
   @ApiProperty()
-  public id: Number;
+  public id: number;
 
   @ApiProperty()
-  public nickname: String;
+  public nickname: string;
 
   @ApiProperty()
-  public role: String
+  public role: string;
 
   @ApiProperty()
   public isMuted: boolean;
@@ -135,22 +141,22 @@ export class ChannelDetailDto {
 
   @ApiProperty()
   public isDm: boolean;
-  
+
   @ApiProperty()
   public isBlocked: boolean;
-  
+
   @ApiProperty()
   public isJoined: boolean;
-  
+
   @ApiProperty()
   public userCount: number;
-  
+
   @ApiProperty({
     type: [ChannelDetailUserDto],
     example: [
-      {id: 1, nickname: 'nickname1', role: 'owner', isMuted: false},
-      {id: 2, nickname: 'nickname2', role: 'admin', isMuted: false},
-      {id: 3, nickname: 'nickname3', role: 'normal', isMuted: true}
+      { id: 1, nickname: 'nickname1', role: 'owner', isMuted: false },
+      { id: 2, nickname: 'nickname2', role: 'admin', isMuted: false },
+      { id: 3, nickname: 'nickname3', role: 'normal', isMuted: true },
     ],
   })
   public users: ChannelDetailUserDto[];
@@ -198,5 +204,3 @@ export class ChannelMessageTextDto {
   @IsString()
   public text: string;
 }
-
-

@@ -17,7 +17,7 @@ import { ChannelUser } from './models/user.model';
 
 @Injectable()
 @WebSocketGateway({
-  cors: { credentials: true }
+  cors: { credentials: true },
 })
 export class ChannelsGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -33,7 +33,7 @@ export class ChannelsGatway
   async afterInit() {
     this.logger.log('웹소켓 서버 초기화 ✅');
     this.channelsService.server = this.server;
-    await this.channelsService.messageModel.initServer(this.server);
+    await this.channelsService.initModels();
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
@@ -76,7 +76,7 @@ export class ChannelsGatway
       const loggedUser = this.channelsService.userModel.getUser(userId);
       loggedUser.joined.forEach((channelId) => {
         logged.socket.join(String(channelId));
-      })
+      });
       return;
     }
 
@@ -105,12 +105,11 @@ export class ChannelsGatway
       const channel = this.channelsService.channelModel.get(channelId);
       const user = this.channelsService.userModel.getUser(socket.data.user.id);
 
-      await this.channelsService.messageModel.messageToChannel(
+      await this.channelsService.messageToChannel(
         user,
         channel,
         message
       );
-      
     } catch (error) {
       console.log(error);
     }
@@ -152,5 +151,4 @@ export class ChannelsGatway
   ) {
     this.channelsService.invite(socket.data.user.id, channelId, userId);
   }
-
 }
