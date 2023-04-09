@@ -33,7 +33,6 @@ export default function OnBoarding({ isSubmitted, onSubmit }: Props) {
 
   return (
     <>
-      <h1>OnBoarding</h1>
       <MultiSteps
         formData={formData}
         stepComponents={[

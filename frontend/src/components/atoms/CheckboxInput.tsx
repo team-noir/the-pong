@@ -8,6 +8,12 @@ interface Props {
 
 export default function CheckboxInput({ id, checked, onChange }: Props) {
   return (
-    <input type="checkbox" id={id} checked={checked} onChange={onChange} />
+    <input
+      type="checkbox"
+      id={id}
+      checked={checked}
+      onChange={onChange}
+      className="w-4 h-4 text-green bg-gray-100 border-gray-300 rounded focus:ring-green focus:ring-2"
+    />
   );
 }

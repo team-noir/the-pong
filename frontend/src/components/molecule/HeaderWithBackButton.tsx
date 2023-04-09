@@ -5,9 +5,14 @@ import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 interface Props {
   title?: string;
   button?: ReactElement | boolean;
+  onClick?: () => void;
 }
 
-export default function HeaderWithBackButton({ title, button }: Props) {
+export default function HeaderWithBackButton({
+  title,
+  button,
+  onClick,
+}: Props) {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -23,7 +28,7 @@ export default function HeaderWithBackButton({ title, button }: Props) {
               <ChevronLeftIcon
                 className="w-6 h-6"
                 role="button"
-                onClick={handleClick}
+                onClick={onClick || handleClick}
               />
             </div>
           </div>

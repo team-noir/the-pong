@@ -6,13 +6,8 @@
   }
 
   #root {
-    @apply min-h-screen;
-    @apply container;
-    @apply mx-auto;
-    @apply max-w-xl;
-    @apply bg-gradient-to-b;
-    @apply from-gray-darker;
-    @apply to-[#433c3f];
+    @apply container mx-auto max-w-xl min-h-screen;
+    @apply bg-gradient-to-b from-gray-darker to-[#433c3f] bg-cover bg-center;
     @apply text-text-light;
   }
 }
@@ -35,11 +30,11 @@
   .button.secondary {
     @apply text-primary hover:text-primary-dark border border-primary hover:border-primary-dark;
   }
-  .image-wrapper {
-    @apply flex justify-center items-center overflow-hidden;
+  .button.link {
+    @apply border-none;
   }
-  .image-wrapper img {
-    @apply flex-shrink-0 min-w-full min-h-full;
+  .button.link span {
+    @apply underline;
   }
   .duotone-image {
     @apply bg-gray-light p-0 flex flex-1 basis-full overflow-hidden relative h-full;
