@@ -45,6 +45,9 @@
   .button.link span {
     @apply underline;
   }
+  .user-indicator {
+    @apply bottom-0 right-0 absolute border-2 border-white rounded-full;
+  }
   .duotone-image {
     @apply bg-gray-light p-0 flex flex-1 basis-full overflow-hidden relative h-full;
   }
