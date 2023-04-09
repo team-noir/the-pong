@@ -42,6 +42,11 @@ module.exports = {
         light: '#FBFBFB',
         dark: '#1A1C22',
       },
+      status: {
+        online: '#4BA19D',
+        offline: '#F5F0EE',
+        game: '#912EC0',
+      },
     },
     extend: {},
   },
