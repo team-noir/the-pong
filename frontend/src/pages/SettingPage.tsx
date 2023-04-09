@@ -10,12 +10,12 @@ const menuItems = [
 export default function SettingPage() {
   return (
     <div className="container max-w-xl">
-      <nav className="py-4 divide-y -mx-4">
+      <nav className="flex flex-col divide-y divide-gray-dark py-4 -mx-4">
         {menuItems.map((item) => (
           <Link
             key={item.to}
             to={item.to}
-            className="hover:bg-gray-200 px-6 py-5 text-xl flex items-center"
+            className="px-6 py-5 text-xl flex items-center"
           >
             {item.text}
             <ChevronRightIcon className="w-5 h-5 ml-auto" aria-hidden="true" />
