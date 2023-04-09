@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import Button from 'components/atoms/Button';
-import PasswordInput from 'components/atoms/PasswordInput';
+import TextInput from 'components/atoms/TextInput';
 
 interface Props {
   onClose: () => void;
@@ -40,7 +40,12 @@ export default function PasswordModal({ onClose, onSubmit, children }: Props) {
     <form onSubmit={handleSubmit} ref={modalRef}>
       <Button onClick={onClose}>x</Button>
       <p>{children}</p>
-      <PasswordInput id="password" value={password} onChange={handleChange} />
+      <TextInput
+        type="password"
+        id="password"
+        value={password}
+        onChange={handleChange}
+      />
       <div>
         <Button type="submit">확인</Button>
       </div>
