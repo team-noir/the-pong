@@ -10,6 +10,7 @@ interface Props {
   secondary?: boolean;
   fullLength?: boolean;
   linkStyle?: boolean;
+  size?: 'small' | 'medium' | 'large';
   className?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -25,6 +26,7 @@ export default function Button({
   secondary = false,
   fullLength = false,
   linkStyle = false,
+  size = 'medium',
   className,
   onClick,
   onMouseDown,
@@ -38,6 +40,9 @@ export default function Button({
         fullLength && 'w-full',
         linkStyle && 'link',
         'button',
+        size === 'small' && 'small',
+        size === 'medium' && 'medium',
+        size === 'large' && 'large',
         className ? className : ''
       )}
       type={type}
