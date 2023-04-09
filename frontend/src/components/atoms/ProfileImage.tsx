@@ -11,6 +11,12 @@ export default function ProfileImage({ userId, alt, size }: Props) {
     width: size,
     height: size,
   };
+
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = `${process.env.PUBLIC_URL}/images/default-profile-image.png`;
+  };
+
   return (
     <img
       src={
@@ -22,6 +28,7 @@ export default function ProfileImage({ userId, alt, size }: Props) {
       alt={alt}
       width={size}
       style={style}
+      onError={handleImgError}
     />
   );
 }
