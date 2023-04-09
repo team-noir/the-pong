@@ -1,7 +1,6 @@
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
 import { UserType } from 'types';
-import styles from 'assets/styles/Following.module.css';
 
 interface Props {
   users: UserType[];
@@ -13,7 +12,6 @@ export default function Following({ users, onClickUnfollow }: Props) {
     <>
       <h1>Following</h1>
       <UserList
-        styles={styles}
         users={users}
         imageSize={52}
         hasStatus={true}
@@ -24,7 +22,7 @@ export default function Following({ users, onClickUnfollow }: Props) {
           <Button key="button1" type="button">
             메시지 보내기
           </Button>,
-          <Button key="button2" type="button" onClick={onClickUnfollow}>
+          <Button key="button2" onClick={onClickUnfollow}>
             언팔로우
           </Button>,
         ]}

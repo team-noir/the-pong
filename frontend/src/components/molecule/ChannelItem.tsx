@@ -1,16 +1,18 @@
 import { ChannelType } from 'types';
 
 interface Props {
-  styles: { readonly [key: string]: string };
   channel: ChannelType;
   onClick?: (channel: ChannelType) => void;
 }
 
-export default function Channel({ styles, channel, onClick }: Props) {
+export default function Channel({ channel, onClick }: Props) {
   return (
-    <li className={styles.li} onClick={() => onClick && onClick(channel)}>
-      <span>{channel.title}</span>
-      {!channel.isDm && <span>{channel.userCount}명</span>}
+    <li
+      onClick={() => onClick && onClick(channel)}
+      className="pl-2 pr-2 pb-4 mb-4 border-b border-b-gray"
+    >
+      <h5 className="text-xl">{channel.title}</h5>
+      {!channel.isDm && <span className="text-sm">{channel.userCount}명</span>}
     </li>
   );
 }

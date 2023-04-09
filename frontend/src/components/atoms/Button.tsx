@@ -1,8 +1,9 @@
 import React from 'react';
+import { classNames } from 'utils';
 
 interface Props {
   children: React.ReactNode;
-  type: 'button' | 'submit' | 'reset';
+  type?: 'button' | 'submit' | 'reset';
   value?: string;
   logoImageUrl?: string;
   primary?: boolean;
@@ -13,7 +14,7 @@ interface Props {
 
 export default function Button({
   children,
-  type,
+  type = 'button',
   value,
   logoImageUrl,
   primary = false,
@@ -23,16 +24,12 @@ export default function Button({
 }: Props) {
   return (
     <button
-      className={`${
-        primary ? 'bg-primary hover:bg-primary-dark text-gray-darker' : ''
-      }
-      ${
-        secondary
-          ? 'text-primary hover:text-primary-dark border border-primary hover:border-primary-dark'
-          : ''
-      }
-      ${fullLength ? 'w-full' : ''}
-      font-bold py-2 px-4 rounded inline-flex items-center justify-center`}
+      className={classNames(
+        primary && 'primary',
+        secondary && 'secondary',
+        fullLength && 'w-full',
+        'button'
+      )}
       type={type}
       value={value}
       onClick={onClick}

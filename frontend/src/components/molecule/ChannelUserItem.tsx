@@ -12,7 +12,6 @@ import {
 
 interface Props {
   channelId: number;
-  styles: { readonly [key: string]: string };
   user: ChannelUserType;
   imageSize: number;
   myUser: ChannelUserType | null;
@@ -20,7 +19,6 @@ interface Props {
 
 export default function ChannelUserItem({
   channelId,
-  styles,
   user,
   imageSize,
   myUser,
@@ -58,7 +56,7 @@ export default function ChannelUserItem({
   };
 
   return (
-    <li className={styles.li} data-user-id={user.id}>
+    <li data-user-id={user.id}>
       <Link to={`/profile/${user.id}`}>
         <ProfileImage
           userId={user.id}
@@ -75,37 +73,30 @@ export default function ChannelUserItem({
       </Link>
       {!isSelf && (
         <div>
-          <Button type="button">게임 초대</Button>
+          <Button>게임 초대</Button>
 
           {amIOwner && (
             <>
               {user.role === USER_ROLES.ADMIN ? (
-                <Button type="button" onClick={handleClickRole}>
-                  관리자 해제
-                </Button>
+                <Button onClick={handleClickRole}>관리자 해제</Button>
               ) : (
-                <Button type="button" onClick={handleClickRole}>
-                  관리자 임명
-                </Button>
+                <Button onClick={handleClickRole}>관리자 임명</Button>
               )}
               {user.role !== USER_ROLES.OWNER && (
                 <>
                   <Button
-                    type="button"
                     value={CHANNEL_USER_STATUS.MUTE}
                     onClick={handleClickStatus}
                   >
                     조용히
                   </Button>
                   <Button
-                    type="button"
                     value={CHANNEL_USER_STATUS.KICK}
                     onClick={handleClickStatus}
                   >
                     내보내기
                   </Button>
                   <Button
-                    type="button"
                     value={CHANNEL_USER_STATUS.BAN}
                     onClick={handleClickStatus}
                   >

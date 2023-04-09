@@ -1,0 +1,57 @@
+@tailwind base;
+
+@layer base {
+  html {
+    @apply bg-gray-dark;
+  }
+
+  #root {
+    @apply min-h-screen;
+    @apply container;
+    @apply mx-auto;
+    @apply max-w-xl;
+    @apply bg-gradient-to-b;
+    @apply from-gray-darker;
+    @apply to-[#433c3f];
+    @apply text-text-light;
+  }
+}
+
+@tailwind components;
+
+@layer components {
+  .section {
+    @apply mb-16;
+  }
+  .section-title {
+    @apply text-2xl mb-4 text-text-light;
+  }
+  .button {
+    @apply text-lg font-bold py-2 px-4 rounded inline-flex items-center justify-center select-none;
+  }
+  .button.primary {
+    @apply bg-primary hover:bg-primary-dark text-gray-darker;
+  }
+  .button.secondary {
+    @apply text-primary hover:text-primary-dark border border-primary hover:border-primary-dark;
+  }
+  .image-wrapper {
+    @apply flex justify-center items-center overflow-hidden;
+  }
+  .image-wrapper img {
+    @apply flex-shrink-0 min-w-full min-h-full;
+  }
+  .duotone-image {
+    @apply bg-gray-light p-0 flex flex-1 basis-full overflow-hidden relative h-full;
+  }
+  .duotone-image img {
+    @apply w-full h-full max-w-full relative object-cover;
+    @apply flex-grow flex-shrink-0 basis-full;
+    @apply grayscale contrast-125 mix-blend-multiply;
+  }
+  .duotone-image::before {
+    @apply bg-[#4BA19D]/50 inset-0 h-full w-full absolute z-10 mix-blend-lighten content-[''];
+  }
+}
+
+@tailwind utilities;

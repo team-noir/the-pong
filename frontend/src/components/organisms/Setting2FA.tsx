@@ -18,15 +18,11 @@ export default function Setting2FA({ onClickSet, onClickUnset }: Props) {
       </p>
       <div>
         {!isTwoFactor ? (
-          <Button type="button" onClick={onClickSet}>
-            설정하기
-          </Button>
+          <Button onClick={onClickSet}>설정하기</Button>
         ) : (
           <>
             <span>보안 활성화됨</span>
-            <Button type="button" onClick={onClickUnset}>
-              보안 해제하기
-            </Button>
+            <Button onClick={onClickUnset}>보안 해제하기</Button>
           </>
         )}
       </div>

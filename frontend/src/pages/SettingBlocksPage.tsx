@@ -4,7 +4,6 @@ import AppTemplate from 'components/templates/AppTemplate';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
-import styles from 'assets/styles/Blocks.module.css';
 
 export default function SettingBlocksPage() {
   const getMyBlocksQuery = useQuery({
@@ -31,11 +30,10 @@ export default function SettingBlocksPage() {
     <AppTemplate header={<HeaderWithBackButton title={'차단 관리'} />}>
       {getMyBlocksQuery.isSuccess && (
         <UserList
-          styles={styles}
           users={getMyBlocksQuery.data || null}
           imageSize={52}
           buttons={[
-            <Button key="button0" type="button" onClick={handleClickUnblock}>
+            <Button key="button0" onClick={handleClickUnblock}>
               차단 해제
             </Button>,
           ]}

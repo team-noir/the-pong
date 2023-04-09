@@ -1,6 +1,5 @@
 import AchievementItem from 'components/organisms/Achievements/AchievementItem';
 import { AchievementType } from 'types';
-import styles from 'assets/styles/Achievement.module.css';
 
 interface Props {
   achievements: AchievementType[] | null;
@@ -8,7 +7,7 @@ interface Props {
 
 export default function AchievementList({ achievements }: Props) {
   return (
-    <ul className={styles.ul}>
+    <ul>
       {achievements &&
         achievements.map((achievement) => {
           return (

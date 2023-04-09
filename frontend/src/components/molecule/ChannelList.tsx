@@ -2,23 +2,17 @@ import ChannelItem from 'components/molecule/ChannelItem';
 import { ChannelType } from 'types';
 
 interface Props {
-  styles: { readonly [key: string]: string };
   channels: ChannelType[] | null;
   onClick?: (channel: ChannelType) => void;
 }
 
-export default function ChannelList({ styles, channels, onClick }: Props) {
+export default function ChannelList({ channels, onClick }: Props) {
   return (
-    <ul className={styles.ul}>
+    <ul className="pt-4 border-t border-t-gray">
       {channels &&
         channels.map((channel) => {
           return (
-            <ChannelItem
-              key={channel.id}
-              styles={styles}
-              channel={channel}
-              onClick={onClick}
-            />
+            <ChannelItem key={channel.id} channel={channel} onClick={onClick} />
           );
         })}
     </ul>

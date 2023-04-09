@@ -59,11 +59,7 @@ export default function MultiSteps({
 
   return (
     <>
-      {!isFirstStep && (
-        <Button type="button" onClick={handleClickPrevStep}>
-          &lt;
-        </Button>
-      )}
+      {!isFirstStep && <Button onClick={handleClickPrevStep}>&lt;</Button>}
       <form onSubmit={handleClickNextStep}>
         {stepComponents[stepIndex]}
         <Message isShow={!isValid} message={messages[stepIndex]} />

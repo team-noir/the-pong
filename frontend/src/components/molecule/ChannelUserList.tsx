@@ -4,7 +4,6 @@ import { ChannelUserType } from 'types';
 
 interface Props {
   channelId: number;
-  styles: { readonly [key: string]: string };
   users: ChannelUserType[] | null;
   imageSize: number;
   myUser: ChannelUserType | null;
@@ -14,7 +13,6 @@ interface Props {
 
 export default function ChannelUserList({
   channelId,
-  styles,
   users,
   imageSize,
   myUser,
@@ -22,17 +20,12 @@ export default function ChannelUserList({
   onClickInvite,
 }: Props) {
   return (
-    <ul className={styles.ul}>
-      {isPrivate && (
-        <Button type="button" onClick={onClickInvite}>
-          초대하기
-        </Button>
-      )}
+    <ul>
+      {isPrivate && <Button onClick={onClickInvite}>초대하기</Button>}
       {myUser && (
         <ChannelUserItem
           channelId={channelId}
           key={myUser?.id}
-          styles={styles}
           user={myUser}
           imageSize={imageSize}
           myUser={myUser}
@@ -44,7 +37,6 @@ export default function ChannelUserList({
             <ChannelUserItem
               channelId={channelId}
               key={user.id}
-              styles={styles}
               user={user}
               imageSize={imageSize}
               myUser={myUser}

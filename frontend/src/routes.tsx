@@ -4,7 +4,7 @@ import OnBoardingPage from 'pages/OnBoardingPage';
 import Root from 'pages/Root';
 import MainPage from 'pages/MainPage';
 import ErrorPage from 'pages/ErrorPage';
-import GamePage from 'pages/GamePage';
+import GameLobbyPage from 'pages/GameLobbyPage';
 import FollowingPage from 'pages/FollowingPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
@@ -100,7 +100,7 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
 
       {
         path: 'game',
-        element: <GamePage />,
+        element: <GameLobbyPage />,
       },
       {
         path: 'channel',
