@@ -18,7 +18,7 @@ export default function UserList({
   myUserId,
 }: Props) {
   return (
-    <ul>
+    <ul className="flex flex-col divide-y divide-gray-dark">
       {users &&
         users.map((user) => {
           return (
