@@ -52,6 +52,7 @@ export default function TextInputWithMessage({
         placeholder={placeholder}
         onChange={handleChange}
         onBlur={handleBlur}
+        fullLength
       />
       <Message isShow={!isValid && isTouched} message={message} />
     </div>

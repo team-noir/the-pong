@@ -9,6 +9,8 @@ interface Props {
   primary?: boolean;
   secondary?: boolean;
   fullLength?: boolean;
+  linkStyle?: boolean;
+  className?: string;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -22,6 +24,8 @@ export default function Button({
   primary = false,
   secondary = false,
   fullLength = false,
+  linkStyle = false,
+  className,
   onClick,
   onMouseDown,
   onMouseUp,
@@ -32,7 +36,9 @@ export default function Button({
         primary && 'primary',
         secondary && 'secondary',
         fullLength && 'w-full',
-        'button'
+        linkStyle && 'link',
+        'button',
+        className ? className : ''
       )}
       type={type}
       value={value}
