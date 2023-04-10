@@ -16,17 +16,14 @@ import {
 } from '@nestjs/common';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { ChannelsService } from './channels.service';
-import { 
-  ApiTags, 
-  ApiOperation, 
-  ApiQuery, 
-  ApiParam,
-  ApiOkResponse, 
-  ApiNoContentResponse, 
-  ApiNotFoundResponse,
+import {
+  ApiTags,
+  ApiOperation,
+  ApiQuery,
+  ApiOkResponse,
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
-  ApiForbiddenResponse
+  ApiForbiddenResponse,
 } from '@nestjs/swagger';
 import {
   CreateChannelDto,
@@ -55,13 +52,16 @@ export class ChannelsController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @ApiBadRequestResponse({ description: 'This user does not exist.' })
   @UseGuards(AuthenticatedGuard)
-  create(
+  async createChannel(
     @Req() req,
     @Body() body: CreateChannelDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      const result = this.channelsService.create(req.user.id, body);
+      const result = await this.channelsService.createChannel(
+        req.user.id,
+        body
+      );
       res.status(HttpStatus.OK);
       return result;
     } catch (error) {
@@ -105,7 +105,9 @@ export class ChannelsController {
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @ApiBadRequestResponse({ description: 'This channel does not exist.' })
-  @ApiForbiddenResponse({ description: 'You are not authorized to this channel.' })
+  @ApiForbiddenResponse({
+    description: 'You are not authorized to this channel.',
+  })
   @UseGuards(AuthenticatedGuard)
   getChannelInfo(
     @Req() req,
@@ -127,8 +129,12 @@ export class ChannelsController {
   @ApiBadRequestResponse({ description: 'This channel does not exist.' })
   @ApiBadRequestResponse({ description: 'This user does not exist.' })
   @ApiBadRequestResponse({ description: 'DM channel cannot change settings.' })
-  @ApiBadRequestResponse({ description: 'Private channel cannot set a password.' })
-  @ApiForbiddenResponse({ description: 'You do not have permission to change settings.' })
+  @ApiBadRequestResponse({
+    description: 'Private channel cannot set a password.',
+  })
+  @ApiForbiddenResponse({
+    description: 'You do not have permission to change settings.',
+  })
   @UseGuards(AuthenticatedGuard)
   setChannelInfo(
     @Req() req,
@@ -187,13 +193,13 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Leave channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  leaveChannel(
+  async leaveChannel(
     @Req() req,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.leave(req.user.id, channelId);
+      await this.channelsService.leave(req.user.id, channelId);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
@@ -230,14 +236,16 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Send message to channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  sendChannelMessage(
+  async sendChannelMessage(
     @Req() req,
     @Param('channelId') channelId: number,
     @Body() body: ChannelMessageTextDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.messageToChannel(req.user.id, channelId, body.text);
+      const channel = this.channelsService.channelModel.get(channelId);
+      const user = this.channelsService.userModel.getUser(req.user.id);
+      await this.channelsService.messageToChannel(user, channel, body.text);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
@@ -258,10 +266,9 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      const messages = this.channelsService.getChannelMessages(
-        req.user.id,
-        channelId
-      );
+      const channel = this.channelsService.channelModel.get(channelId);
+      const user = this.channelsService.userModel.getUser(req.user.id);
+      const messages = this.channelsService.getChannelMessages(user, channel);
       res.status(HttpStatus.OK);
       return messages;
     } catch (error) {
@@ -281,7 +288,12 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.setUserStatus(req.user.id, channelId, userId, body.status);
+      this.channelsService.setUserStatus(
+        req.user.id,
+        channelId,
+        userId,
+        body.status
+      );
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {

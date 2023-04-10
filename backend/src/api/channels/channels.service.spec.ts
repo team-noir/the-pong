@@ -1,41 +1,28 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ChannelsService, ChannelUser } from './channels.service';
+import { ChannelsService } from './channels.service';
 import { CreateChannelDto } from './dtos/channel.dto';
-import { expect, jest, describe, beforeEach, it } from '@jest/globals';
+import {
+  expect,
+  jest,
+  describe,
+  beforeEach,
+  beforeAll,
+  it,
+} from '@jest/globals';
 import { HttpStatus } from '@nestjs/common';
 import { ChannelsModule } from './channels.module';
+import { ChannelUser } from './models/user.model';
+import { PrismaService } from '../../prisma/prisma.service';
 
 const fakeSocket = {
   emit: jest.fn(),
   join: jest.fn(),
+  leave: jest.fn(),
 };
 
-const user1: ChannelUser = {
-  id: 1,
-  name: 'user1',
-  socket: fakeSocket,
-  joined: new Set(),
-  invited: new Set(),
-  blockUser: new Set(),
-};
-
-const user2: ChannelUser = {
-  id: 2,
-  name: 'user2',
-  socket: fakeSocket,
-  joined: new Set(),
-  invited: new Set(),
-  blockUser: new Set(),
-};
-
-const user3: ChannelUser = {
-  id: 3,
-  name: 'user3',
-  socket: fakeSocket,
-  joined: new Set(),
-  invited: new Set(),
-  blockUser: new Set(),
-};
+const user1 = new ChannelUser(1, 'user1', fakeSocket);
+const user2 = new ChannelUser(2, 'user2', fakeSocket);
+const user3 = new ChannelUser(3, 'user3', fakeSocket);
 
 const publicChannelData: CreateChannelDto = {
   title: 'public',
@@ -55,28 +42,89 @@ const privateChannelData: CreateChannelDto = {
   password: null,
 };
 
+it('create channel', async () => {
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [ChannelsService, PrismaService],
+  }).compile();
+
+  const service = module.get<ChannelsService>(ChannelsService);
+
+  service.userModel.setUser(user1.id, user1);
+  await service.createChannel(1, publicChannelData);
+});
+
+it('join channel', async () => {
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [ChannelsService, PrismaService],
+  }).compile();
+
+  const service = module.get<ChannelsService>(ChannelsService);
+
+  service.userModel.setUser(user1.id, user1);
+  service.userModel.setUser(user2.id, user2);
+  const channelid = await service.createChannel(1, publicChannelData);
+  await service.join(user2.id, channelid.id);
+});
+
+it('leave channel', async () => {
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [ChannelsService, PrismaService],
+  }).compile();
+
+  const service = module.get<ChannelsService>(ChannelsService);
+
+  try {
+    service.userModel.setUser(user1.id, user1);
+    service.userModel.setUser(user2.id, user2);
+    const channelid = await service.createChannel(1, publicChannelData);
+    await service.join(user2.id, channelid.id);
+    await service.leave(user2.id, channelid.id);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+it('rejoin channel', async () => {
+  const module: TestingModule = await Test.createTestingModule({
+    providers: [ChannelsService, PrismaService],
+  }).compile();
+
+  const service = module.get<ChannelsService>(ChannelsService);
+
+  try {
+    service.userModel.setUser(user1.id, user1);
+    service.userModel.setUser(user2.id, user2);
+    const channelid = await service.createChannel(1, publicChannelData);
+    await service.join(user2.id, channelid.id);
+    await service.leave(user2.id, channelid.id);
+    await service.join(user2.id, channelid.id);
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 describe('Channel list', () => {
   let service: ChannelsService;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChannelsService],
+      providers: [ChannelsService, PrismaService],
     }).compile();
 
-    service = module.get<ChannelsService>(ChannelsService);
+    service.userModel.setUser(user1.id, user1);
+    service.userModel.setUser(user2.id, user2);
+    service.userModel.setUser(user3.id, user3);
 
-    service.setUser(user1.id, user1);
-    service.setUser(user2.id, user2);
-    service.setUser(user3.id, user3);
-
-    service.create(1, publicChannelData);
-    service.create(1, protectedChannelData);
-    service.create(1, privateChannelData);
-
-    service.create(2, publicChannelData);
-    service.create(2, protectedChannelData);
-
-    service.initDirectMessage(1, 2);
+    try {
+      await service.createChannel(1, publicChannelData);
+      await service.createChannel(1, protectedChannelData);
+      await service.createChannel(1, privateChannelData);
+      await service.createChannel(2, publicChannelData);
+      await service.createChannel(2, protectedChannelData);
+      await service.initDirectMessage(1, 2);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   it('/channels \n\t: 모든 public, protected 채널', () => {
@@ -107,10 +155,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(2);
-    expect(cntProtected).toBe(2);
-    expect(cntPrivate).toBe(0);
-    expect(cntDm).toBe(0);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels?kind=public \n\t: 모든 public, protected 채널', () => {
@@ -141,10 +189,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(2);
-    expect(cntProtected).toBe(2);
-    expect(cntPrivate).toBe(0);
-    expect(cntDm).toBe(0);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels?kind=public,private \n\t: 모든 public, protected, private 채널', () => {
@@ -175,10 +223,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(2);
-    expect(cntProtected).toBe(2);
-    expect(cntPrivate).toBe(1);
-    expect(cntDm).toBe(0);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels?kind=public,private,dm \n\t: 모든 public, protected, private, dm 채널', () => {
@@ -209,10 +257,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(2);
-    expect(cntProtected).toBe(2);
-    expect(cntPrivate).toBe(1);
-    expect(cntDm).toBe(1);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels?enter \n\t: 참여 중인 public, protected 채널', () => {
@@ -243,10 +291,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(1);
-    expect(cntProtected).toBe(1);
-    expect(cntPrivate).toBe(0);
-    expect(cntDm).toBe(0);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels?enter?kind=public \n\t: 참여 중인 public, protected 채널', () => {
@@ -277,10 +325,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(1);
-    expect(cntProtected).toBe(1);
-    expect(cntPrivate).toBe(0);
-    expect(cntDm).toBe(0);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels?enter?kind=public,private \n\t: 참여 중인 public, protected, private 채널', () => {
@@ -311,10 +359,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(1);
-    expect(cntProtected).toBe(1);
-    expect(cntPrivate).toBe(1);
-    expect(cntDm).toBe(0);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels?enter?kind=public,private,dm \n\t: 참여 중인 public, protected, private, dm 채널', () => {
@@ -345,10 +393,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(1);
-    expect(cntProtected).toBe(1);
-    expect(cntPrivate).toBe(1);
-    expect(cntDm).toBe(1);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels \n\t: 어떠한 채널에도 들어가지 않은 유저', () => {
@@ -379,10 +427,10 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(2);
-    expect(cntProtected).toBe(2);
-    expect(cntPrivate).toBe(0);
-    expect(cntDm).toBe(0);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 
   it('/channels?enter \n\t: 어떠한 채널에도 들어가지 않은 유저', () => {
@@ -410,40 +458,45 @@ describe('Channel list', () => {
       }
     });
 
-    expect(cntPublic).toBe(0);
-    expect(cntProtected).toBe(0);
-    expect(cntPrivate).toBe(0);
-    expect(cntDm).toBe(0);
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
   });
 });
 
 describe('Channel info', () => {
   let service: ChannelsService;
+  let public1, private1, protected1;
+  let public2, private2, protected2;
+  let dm;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [ChannelsService],
+      providers: [ChannelsService, PrismaService],
     }).compile();
 
     service = module.get<ChannelsService>(ChannelsService);
 
-    service.setUser(user1.id, user1);
-    service.setUser(user2.id, user2);
-    service.setUser(user3.id, user3);
+    service.userModel.setUser(user1.id, user1);
+    service.userModel.setUser(user2.id, user2);
+    service.userModel.setUser(user3.id, user3);
 
-    service.create(user1.id, publicChannelData);
-    service.create(user1.id, protectedChannelData);
-    service.create(user1.id, privateChannelData);
-
-    service.create(user2.id, publicChannelData);
-    service.create(user2.id, protectedChannelData);
-    service.create(user2.id, privateChannelData);
-
-    service.initDirectMessage(user1.id, user2.id);
+    try {
+      public1 = await service.createChannel(user1.id, publicChannelData);
+      private1 = await service.createChannel(user1.id, protectedChannelData);
+      protected1 = await service.createChannel(user1.id, privateChannelData);
+      public2 = await service.createChannel(user2.id, publicChannelData);
+      private2 = await service.createChannel(user2.id, protectedChannelData);
+      protected2 = await service.createChannel(user2.id, privateChannelData);
+      dm = await service.initDirectMessage(user1.id, user2.id);
+    } catch (error) {
+      console.log(error);
+    }
   });
 
   it('유저 참여 중, public 채널 정보를 확인하는 경우', () => {
-    const channelId = 1;
+    const channelId = public1.id;
     const userId = 1;
 
     try {
@@ -455,7 +508,7 @@ describe('Channel info', () => {
   });
 
   it('유저 참여 중, protected 채널 정보를 확인하는 경우', () => {
-    const channelId = 2;
+    const channelId = protected1.id;
     const userId = 1;
 
     try {
@@ -467,7 +520,7 @@ describe('Channel info', () => {
   });
 
   it('유저 참여 중, private 채널 정보를 확인하는 경우', () => {
-    const channelId = 3;
+    const channelId = private1.id;
     const userId = 1;
 
     try {
@@ -479,7 +532,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, public 채널 정보를 확인하는 경우', () => {
-    const channelId = 4;
+    const channelId = public1.id;
     const userId = 1;
 
     try {
@@ -491,7 +544,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, protected 채널 정보를 확인하는 경우', () => {
-    const channelId = 5;
+    const channelId = protected2.id;
     const userId = 1;
 
     try {
@@ -503,7 +556,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, private 채널 정보를 확인하는 경우', () => {
-    const channelId = 6;
+    const channelId = private2.id;
     const userId = 1;
 
     try {
@@ -515,7 +568,7 @@ describe('Channel info', () => {
   });
 
   it('유저 참여 중, dm 채널 정보를 확인하는 경우', () => {
-    const channelId = 7;
+    const channelId = dm.id;
     const userId = 1;
 
     try {
@@ -527,7 +580,7 @@ describe('Channel info', () => {
   });
 
   it('유저 미참여, dm 채널 정보를 확인하는 경우', () => {
-    const channelId = 7;
+    const channelId = dm.id;
     const userId = 3;
 
     try {

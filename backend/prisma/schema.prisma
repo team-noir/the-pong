@@ -15,7 +15,7 @@ model User {
   id                    Int           @id @default(autoincrement())
   imageUrl              String?
   nickname              String?       @unique
-  rank                  Int           @default(0)
+  rank                  Int           @default(1)
   isTwoFactor           Boolean       @default(false)
   ftId                  String        @unique
   ftUsername            String?
@@ -74,11 +74,11 @@ model BlockUser {
 
 model Channel {
   id              Int       @id @default(autoincrement())
-  title           String
-  channelCode     String    @unique
+  title           String?
   password        String?
-  idPublic        Boolean
+  isPrivate       Boolean
   isDm            Boolean
+  ownerId         Int?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime?
   deletedAt       DateTime?
@@ -88,12 +88,16 @@ model Channel {
 }
 
 model Channel_User {
-  id              Int       @id @default(autoincrement())
+  @@id([channelId, userId], name: "id")
+
   channelId       Int
   userId          Int
-  userType        Int
-  status          Int
   createdAt       DateTime  @default(now())
+
+  isAdmin         Boolean   @default(false)
+  isBanned        Boolean   @default(false)
+  isMuted         Boolean   @default(false)
+  deleted         Boolean   @default(false)
 
   channel         Channel   @relation(fields: [channelId], references: [id])
   user            User      @relation(fields: [userId], references: [id])
@@ -101,12 +105,12 @@ model Channel_User {
 
 model Message {
   id              Int       @id @default(autoincrement())
-  senderId        Int
+  senderId        Int?
   channelId       Int
   text            String
   createdAt       DateTime  @default(now())
 
-  sender          User      @relation(fields: [senderId], references: [id])
+  sender          User?      @relation(fields: [senderId], references: [id])
   channel         Channel   @relation(fields: [channelId], references: [id])
 }
 

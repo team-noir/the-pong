@@ -10,15 +10,14 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { ChannelsService, ChannelUser } from './channels.service';
+import { ChannelsService } from './channels.service';
 import { AuthService } from '../auth/auth.service';
 import { parse } from 'cookie';
+import { ChannelUser } from './models/user.model';
 
 @Injectable()
 @WebSocketGateway({
-  cors: {
-    credentials: true,
-  },
+  cors: { credentials: true },
 })
 export class ChannelsGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
@@ -31,9 +30,10 @@ export class ChannelsGatway
   @WebSocketServer() server: Server;
   private logger = new Logger('Gateway');
 
-  afterInit() {
+  async afterInit() {
     this.logger.log('웹소켓 서버 초기화 ✅');
     this.channelsService.server = this.server;
+    await this.channelsService.initModels();
   }
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
@@ -63,28 +63,27 @@ export class ChannelsGatway
       );
       return;
     }
-    if (this.channelsService.hasUser(userId)) {
-      const logged = this.channelsService.getUser(userId);
-      logged.socket.disconnect(true);
+    if (this.channelsService.userModel.has(userId)) {
+      const logged = this.channelsService.userModel.getUser(userId);
+      if (logged.socket) {
+        logged.socket.disconnect(true);
+      }
       logged.socket = socket;
       socket.data = { user: logged };
       this.logger.log(
         `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`
       );
+      const loggedUser = this.channelsService.userModel.getUser(userId);
+      loggedUser.joined.forEach((channelId) => {
+        logged.socket.join(String(channelId));
+      });
       return;
     }
 
-    const user: ChannelUser = {
-      id: userId,
-      name: username,
-      socket: socket,
-
-      joined: new Set<number>(),
-      invited: new Set<number>(),
-      blockUser: new Set<number>(),
-    };
+    const user = new ChannelUser(userId, username, socket);
     socket.data = { user };
-    this.channelsService.setUser(userId, user);
+
+    this.channelsService.userModel.setUser(userId, user);
     this.logger.log(
       `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
     );
@@ -97,32 +96,43 @@ export class ChannelsGatway
   // Message
 
   @SubscribeMessage('message')
-  handleMessage(
+  async handleMessage(
     @ConnectedSocket() socket: Socket,
     @MessageBody('channelId') channelId: number,
     @MessageBody('message') message: string
   ) {
-    this.channelsService.messageToChannel(
-      socket.data.user.id,
-      channelId,
-      message
-    );
+    try {
+      const channel = this.channelsService.channelModel.get(channelId);
+      const user = this.channelsService.userModel.getUser(socket.data.user.id);
+
+      await this.channelsService.messageToChannel(
+        user,
+        channel,
+        message
+      );
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   // Channel
 
   @SubscribeMessage('create')
   create(@ConnectedSocket() socket: Socket, @MessageBody() data) {
-    this.channelsService.create(socket.data.user.id, data);
+    this.channelsService.createChannel(socket.data.user.id, data);
   }
 
   @SubscribeMessage('join')
-  join(
+  async join(
     @ConnectedSocket() socket: Socket,
     @MessageBody('channelId') channelId: number,
     @MessageBody('password') password: string
   ) {
-    this.channelsService.join(socket.data.user.id, channelId, password);
+    try {
+      await this.channelsService.join(socket.data.user.id, channelId, password);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   @SubscribeMessage('leave')
@@ -133,14 +143,6 @@ export class ChannelsGatway
     this.channelsService.leave(socket.data.user.id, channelId);
   }
 
-  @SubscribeMessage('names')
-  names(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody('channelId') channelId: number
-  ) {
-    this.channelsService.names(socket, channelId);
-  }
-
   @SubscribeMessage('invite')
   invite(
     @ConnectedSocket() socket: Socket,
@@ -149,5 +151,4 @@ export class ChannelsGatway
   ) {
     this.channelsService.invite(socket.data.user.id, channelId, userId);
   }
-
 }
