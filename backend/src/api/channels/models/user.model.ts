@@ -37,7 +37,11 @@ export class ChannelUser {
   }
 
   isOnline() {
-    return (this.socket != null);
+    return this.socket != null;
+  }
+
+  isBlockUser(userId: number) {
+    return this.blockUser.has(userId);
   }
 }
 
