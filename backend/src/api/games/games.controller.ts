@@ -5,7 +5,7 @@ import {
 	Delete,
 	Req,
 	Body,
-	param,
+	Param,
 	Res,
 	UseGuards,
 	HttpException,
@@ -35,23 +35,5 @@ export class GamesController {
 			throw new HttpException(error.message, error.code);
 		}
 	}
-
-	@Delete(':gameId/users')
-	@UseGuards(AuthenticatedGuard)
-	removeUserToQueue(
-		@Req() req,
-		@param('gameId') gameId: number,
-		@Res({ passthrough: true }) res
-	) {
-		try {
-			const isLadder = body.isLadder;
-			this.gamesService.addUserToQueue(req.user.id, isLadder);
-			res.status(HttpStatus.NO_CONTENT);
-			return;
-		} catch (error) {
-			throw new HttpException(error.message, error.code);
-		}
-	}
-
 
 }
