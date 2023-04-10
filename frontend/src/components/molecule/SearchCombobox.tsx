@@ -2,6 +2,7 @@ import { Fragment, useEffect, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType, ChannelUserType } from 'types';
+import { classNames } from 'utils';
 interface Props {
   placeholder?: string;
   dataList?: UserType[];
@@ -30,8 +31,9 @@ export default function SearchCombobox({
         <Combobox.Input
           placeholder={placeholder}
           onChange={(e) => setValue(e.target.value)}
+          className="w-full bg-transparent text-white border-0 border-b border-gray py-4 px-2 focus:outline-none focus:ring-gray focus:border-gray focus:rounded"
         />
-        <Combobox.Options className="absolute w-1/2">
+        <Combobox.Options className="absolute w-full z-50">
           {dataList?.map((user) => {
             const isJoined = channelUsers?.some(
               (channelUser) => channelUser.id === user.id
@@ -46,11 +48,13 @@ export default function SearchCombobox({
               >
                 {({ active }) => (
                   <li
-                    className={`flex ${isJoined ? '' : 'cursor-pointer'} ${
+                    className={classNames(
+                      'px-2 py-2 flex items-center space-x-4',
+                      isJoined ? 'cursor-pointer' : '',
                       active
                         ? 'bg-gray-dark text-text-light'
                         : 'bg-white text-text-dark'
-                    }`}
+                    )}
                   >
                     <ProfileImage
                       userId={user.id}
@@ -58,9 +62,10 @@ export default function SearchCombobox({
                       size={40}
                     />
                     <div
-                      className={`flex-1 flex justify-between items-center ${
+                      className={classNames(
+                        'flex-1 flex justify-between items-center',
                         isJoined ? 'text-slate-400' : ''
-                      }`}
+                      )}
                     >
                       <span>{user.nickname}</span>
                       <span className="text-xs">

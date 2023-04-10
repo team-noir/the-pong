@@ -43,7 +43,7 @@ export default function HeaderGnb() {
   return (
     <Disclosure
       as="nav"
-      className="container mx-auto max-w-xl fixed top-0 left-0 right-0 backdrop-blur-md bg-gray-darker/30 z-50"
+      className="container mx-auto max-w-xl fixed top-0 left-0 right-0 backdrop-blur-md bg-gray-darker/50 z-50"
     >
       {({ open }) => (
         <>
