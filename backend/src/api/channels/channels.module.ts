@@ -10,5 +10,6 @@ import { DmController } from './dm.controller';
   imports: [AuthModule],
   providers: [ChannelsGatway, ChannelsService, PrismaService],
   controllers: [ChannelsController, DmController],
+  exports: [ChannelsService]
 })
 export class ChannelsModule {}

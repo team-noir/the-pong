@@ -33,6 +33,10 @@ export class ChannelUser {
     this.socket.leave(String(channel.id));
     this.joined.delete(channel.id);
   }
+
+  isBlockUser(userId: number) {
+    return this.blockUser.has(userId);
+  }
 }
 
 export class UserModel {
