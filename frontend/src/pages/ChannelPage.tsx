@@ -141,6 +141,7 @@ export default function ChannelPage() {
         <ChannelDetail
           channel={getChannelQuery.data}
           myUserId={myUserId}
+          onClickClose={() => setIsShowDetail(false)}
           onClickSetting={() => setIsShowSetting(true)}
           onClickInvite={() => setIsShowInvite(true)}
           onClickLeave={leaveChannel}

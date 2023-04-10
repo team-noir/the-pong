@@ -47,7 +47,11 @@ export default function TextInputWithMessage({
 
   return (
     <div className="w-full group mb-6">
-      {label && <Label id={id} label={label} />}
+      {label && (
+        <div className="mb-2">
+          <Label id={id} label={label} />
+        </div>
+      )}
       <TextInput
         type={type}
         id={id}

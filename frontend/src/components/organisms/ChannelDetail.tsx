@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Modal from 'components/templates/Modal';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 import Button from 'components/atoms/Button';
 import { ChannelType, USER_ROLES, ChannelUserType } from 'types';
@@ -6,6 +7,7 @@ import { ChannelType, USER_ROLES, ChannelUserType } from 'types';
 interface Props {
   channel: ChannelType;
   myUserId: number;
+  onClickClose: () => void;
   onClickSetting: () => void;
   onClickInvite: () => void;
   onClickLeave: () => void;
@@ -14,6 +16,7 @@ interface Props {
 export default function ChannelDetail({
   channel,
   myUserId,
+  onClickClose,
   onClickSetting,
   onClickInvite,
   onClickLeave,
@@ -32,23 +35,39 @@ export default function ChannelDetail({
   const isMyUserRoleOwner = myUser?.role === USER_ROLES.OWNER;
 
   return (
-    <div>
-      {isMyUserRoleOwner && <Button onClick={onClickSetting}>채널 설정</Button>}
-      <h2>참가자</h2>
-      {myUser && channelUsers && (
-        <ChannelUserList
-          channelId={channel.id}
-          myUser={myUser}
-          users={channelUsers}
-          imageSize={52}
-          isPrivate={channel.isPrivate}
-          onClickInvite={onClickInvite}
-        />
-      )}
-      <Button onClick={onClickLeave}>
-        {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
-      </Button>
-    </div>
+    <Modal onClickClose={onClickClose}>
+      <section className="section small">
+        {isMyUserRoleOwner && (
+          <Button onClick={onClickSetting} primary fullLength>
+            채널 설정
+          </Button>
+        )}
+      </section>
+      <section className="section small">
+        <h3 className="section-title">참가자</h3>
+        {myUser && channelUsers && (
+          <ChannelUserList
+            channelId={channel.id}
+            myUser={myUser}
+            users={channelUsers}
+            imageSize={52}
+            isPrivate={channel.isPrivate}
+            onClickInvite={onClickInvite}
+          />
+        )}
+      </section>
+      <section className="section small">
+        <Button
+          onClick={onClickLeave}
+          linkStyle
+          size="small"
+          className="text-red"
+          fullLength
+        >
+          {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
+        </Button>
+      </section>
+    </Modal>
   );
 }
 

@@ -1,7 +1,8 @@
 import { useState } from 'react';
+import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import Modal from 'components/templates/Modal';
 import ChannelSettingPassword from 'components/organisms/ChannelSetting/ChannelSettingPassword';
 import ChannelSettingTitle from 'components/organisms/ChannelSetting/ChannelSettingTitle';
-import Button from 'components/atoms/Button';
 import { ChannelFormType, ChannelType } from 'types';
 
 interface Props {
@@ -32,24 +33,37 @@ export default function ChannelSetting({
   };
 
   return (
-    <>
+    <Modal onClickClose={onClickClose}>
       {!isSettingTitle && !isSettingPassword && (
-        <>
-          <div>
-            <Button onClick={onClickClose}>x</Button>
-            <h2>채널 설정</h2>
-          </div>
-          <div>
-            <Button onClick={() => setIsSettingTitle(true)}>
-              채널 이름 수정 &gt;
-            </Button>
+        <section className="section small">
+          <h3 className="section-title">채널 설정</h3>
+          <ul className="flex flex-col divide-y divide-gray-dark py-4 -mx-4">
+            <li
+              role="button"
+              onClick={() => setIsSettingTitle(true)}
+              className="px-6 py-5 text-xl flex items-center"
+            >
+              <span>채널 이름 수정</span>
+              <ChevronRightIcon
+                className="w-5 h-5 ml-auto"
+                aria-hidden="true"
+              />
+            </li>
             {!channel.isPrivate && (
-              <Button onClick={() => setIsSettingPassword(true)}>
-                채널 비밀번호 설정 &gt;
-              </Button>
+              <li
+                role="button"
+                onClick={() => setIsSettingPassword(true)}
+                className="px-6 py-5 text-xl flex items-center"
+              >
+                <span>채널 비밀번호 설정</span>
+                <ChevronRightIcon
+                  className="w-5 h-5 ml-auto"
+                  aria-hidden="true"
+                />
+              </li>
             )}
-          </div>
-        </>
+          </ul>
+        </section>
       )}
       {isSettingTitle && (
         <ChannelSettingTitle
@@ -65,6 +79,6 @@ export default function ChannelSetting({
           onSubmit={handleSubmitPassword}
         />
       )}
-    </>
+    </Modal>
   );
 }

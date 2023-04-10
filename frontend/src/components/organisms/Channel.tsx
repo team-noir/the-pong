@@ -45,14 +45,21 @@ export default function Channel({ messages, postMessage, myUserId }: Props) {
       >
         <MessageList messages={messages} myUserId={myUserId} />
       </div>
-      <form onSubmit={handleSubmit}>
-        <TextInput
-          id="message"
-          value={formData.message}
-          placeholder="메시지를 입력해 주세요"
-          onChange={handleChange}
-        />
-        <Button type="submit">보내기</Button>
+      <form onSubmit={handleSubmit} className="inline-flex w-full">
+        <div className="w-10/12 flex items-center justify-center pr-2">
+          <TextInput
+            id="message"
+            value={formData.message}
+            placeholder="메시지를 입력해 주세요"
+            onChange={handleChange}
+            fullLength
+          />
+        </div>
+        <div className="w-2/12 flex items-center justify-center pl-2">
+          <Button type="submit" primary fullLength>
+            보내기
+          </Button>
+        </div>
       </form>
     </>
   );
