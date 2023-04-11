@@ -350,7 +350,8 @@ export class ChannelsService {
 
     const data = [];
     this.messageModel.getAllMessages().forEach((message) => {
-      const sender = this.userModel.getUser(message.senderId);
+      const sender = message.senderId ? this.userModel.getUser(message.senderId) : null;
+
       if (message.channelId == channel.id) {
         const tarMessage = new ChannelMessageDto(
           message.id,
