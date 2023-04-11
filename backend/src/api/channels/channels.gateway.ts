@@ -73,8 +73,7 @@ export class ChannelsGatway
       this.logger.log(
         `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`
       );
-      const loggedUser = this.channelsService.userModel.getUser(userId);
-      loggedUser.joined.forEach((channelId) => {
+      logged.joined.forEach((channelId) => {
         logged.socket.join(String(channelId));
       });
       return;
