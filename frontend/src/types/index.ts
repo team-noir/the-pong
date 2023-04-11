@@ -102,3 +102,21 @@ export interface GameType {
   isLadder: boolean;
   createdAt: string;
 }
+
+export interface GameHistoryType {
+  id: number;
+  isLadder: boolean;
+  winner: {
+    id: number;
+    nickname: string;
+    level: number;
+    score: number;
+  };
+  loser: {
+    id: number;
+    nickname: string;
+    level: number;
+    score: number;
+  };
+  createdAt: string;
+}
