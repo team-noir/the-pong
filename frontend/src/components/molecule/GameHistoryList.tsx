@@ -1,6 +1,7 @@
 import ProfileImage from 'components/atoms/ProfileImage';
 import { GameHistoryType, PlayerType } from 'types';
 import { classNames } from 'utils';
+import { GameHistoryPlayerType } from 'types';
 
 interface Props {
   histories: GameHistoryType[];
@@ -83,10 +84,6 @@ function GameHistoryItem({
       </div>
     </>
   );
-}
-
-interface GameHistoryPlayerType extends PlayerType {
-  score: number;
 }
 
 function GameHistoryItemPlayer({
