@@ -93,6 +93,11 @@ export interface PlayerType {
   nickname: string;
   level: number;
 }
+
+export interface GameHistoryPlayerType extends PlayerType {
+  score: number;
+}
+
 export interface GameType {
   id: number;
   players: PlayerType[];
@@ -100,5 +105,23 @@ export interface GameType {
   theme: number;
   viewerCount: number;
   isLadder: boolean;
+  createdAt: string;
+}
+
+export interface GameHistoryType {
+  id: number;
+  isLadder: boolean;
+  winner: {
+    id: number;
+    nickname: string;
+    level: number;
+    score: number;
+  };
+  loser: {
+    id: number;
+    nickname: string;
+    level: number;
+    score: number;
+  };
   createdAt: string;
 }
