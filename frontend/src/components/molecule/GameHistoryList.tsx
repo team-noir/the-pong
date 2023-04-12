@@ -47,7 +47,10 @@ function GameHistoryItem({
             </div>
 
             <div className="relative">
-              <GameHistoryItemBackground />
+              {/* Background */}
+              <div className="absolute flex items-stretch w-[130%] h-full select-none">
+                <div className="bg-gray h-full flex-1 transform skew-x-[335deg]"></div>
+              </div>
 
               <div className="relative inline-flex items-center gap-2 pl-12">
                 <GameHistoryItemPlayer player={history.winner} isWinner />
@@ -77,16 +80,6 @@ function GameHistoryItem({
         <div className="flex items-center mx-4 my-1 text-xs text-gray-light justify-end">
           <span>{formatDate(history.createdAt)}</span>
         </div>
-      </div>
-    </>
-  );
-}
-
-function GameHistoryItemBackground() {
-  return (
-    <>
-      <div className="absolute flex items-stretch w-[130%] h-full select-none">
-        <div className="bg-gray h-full flex-1 transform skew-x-[335deg]"></div>
       </div>
     </>
   );
@@ -124,16 +117,10 @@ function GameHistoryItemPlayer({
       </div>
 
       <span className="mt-1">{player.nickname}</span>
-      <GameHistoryPlayerLevel level={player.level} />
+      <span className="items-center mt-1 px-2 py-1 bg-gray-dark rounded-full text-xs text-text-light">
+        Lv. {player.level}
+      </span>
     </div>
-  );
-}
-
-function GameHistoryPlayerLevel({ level }: { level: number }) {
-  return (
-    <span className="items-center mt-1 px-2 py-1 bg-gray-dark rounded-full text-xs text-text-light">
-      Lv. {level}
-    </span>
   );
 }
 
