@@ -83,9 +83,9 @@ export class MessageModel {
 
     const newMessage: Message = {
       id: created.id,
-      senderId: null,
-      channelId: sender ? sender.id : null,
-      isLog: false,
+      senderId: created.senderId,
+      channelId: created.channelId,
+      isLog: created.senderId ? false : true,
       text: created.text,
       createdAt: created.createdAt,
     };
