@@ -10,21 +10,23 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { ChannelsService } from './channels.service';
-import { AuthService } from '../auth/auth.service';
+import { ChannelsService } from './api/channels/channels.service';
+import { AuthService } from './api/auth/auth.service';
 import { parse } from 'cookie';
-import { ChannelUser } from './models/user.model';
+import { ChannelUser } from './api/channels/models/user.model';
+import { GamesService } from './api/games/games.service';
 
 @Injectable()
 @WebSocketGateway({
   cors: { credentials: true },
 })
-export class ChannelsGatway
+export class AppGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
+    private authService: AuthService,
     private channelsService: ChannelsService,
-    private authService: AuthService
+    public gamesService: GamesService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -33,6 +35,7 @@ export class ChannelsGatway
   async afterInit() {
     this.logger.log('웹소켓 서버 초기화 ✅');
     this.channelsService.server = this.server;
+    this.gamesService.init(this.server);
     await this.channelsService.initModels();
   }
 

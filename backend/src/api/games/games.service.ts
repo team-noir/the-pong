@@ -9,15 +9,14 @@ type userId = number;
 
 export class Player {
 	userId: number;
-	socket: Socket;
+	socket;
 	game?: Game;
 	blockUser?: Set<playerId>;
 
-	constructor(userId: number, socket: Socket, game?: Game, blockUser?: Set<playerId>) {
+	constructor(userId: number, socket, blockUser?: playerId[]) {
 		this.userId = userId;
 		this.socket = socket;
-		this.game = game;
-		this.blockUser = blockUser;
+		this.blockUser = new Set(blockUser);
 	}
 
 	isBlockUser(playerId: number) : boolean {
@@ -36,29 +35,50 @@ class Game {
 	gameId: number;
 	players: Player[];
 	isLadder: boolean;
+	isInvite: boolean;
+	readyInterval;
 
-	readyInterval: intervalId;
-
-	constructor(gameId: number, isLadder?: boolean) {
+	constructor(gameId: number, isLadder?: boolean, isInvite?: boolean) {
 		this.gameId = gameId;
 		this.isLadder = isLadder ? true : false;
+		this.isInvite = isInvite ? true : false;
+		this.players = [];
+	}
+
+	noticeToPlayers(event: string, message: string) {
+		this.players.forEach((player) => {
+			player.socket.emit(event, {
+				message: message
+			})
+		})
 	}
 
 	getName() : string {
 		return `game-${this.gameId}`;
 	}
 
-	join(player: Player, isLadder?: boolean) : boolean {
+	getPlayers() : Player[] {
+		return this.players;
+	}
+
+	removePlayers() {
+		this.players = [];
+	}
+
+	join(player: Player, isLadder: boolean) : boolean {
 		if (!this.canJoin(player, isLadder)) { 
 			return false; 
 		}
 		this.players.push(player);
 		player.socket.join(this.getName());
+		if (this.isFull()) {
+			this.noticeToPlayers('queue', 'matched');
+		}
 		return true;
 	}
 
 	// Check isFull, isLadder, isBlocked
-	canJoin(tarPlayer: Player, isLadder?: boolean) : boolean {
+	canJoin(tarPlayer: Player, isLadder: boolean) : boolean {
 		if (this.isFull() || (this.isLadder != isLadder)) { 
 			return false; 
 		}
@@ -93,6 +113,7 @@ class Game {
 	isFull() : boolean {
 		return (this.players.length > 1);
 	}
+
 }
 
 class GameModel {
@@ -102,30 +123,61 @@ class GameModel {
 	private queue = new Array<gameId>();
 	private pongRecords = new Set<playerId>();
 
-	joinQueue(player: Player) : number {
+	setGameRoomTimeout(gameId: number) {
+		const game = this.games.get(gameId);
+		
+		game.readyInterval = setTimeout(() => {
+			game.noticeToPlayers('queue', 'timeout');
+			this.removePlayers(game);
+			if (!game.isInvite) {
+				this.removeQueue(game);
+			} 
+			this.removeGame(game);
+		}, 60000);
+	}
+
+	addQueue(player: Player, isLadder: boolean) : number {
+		const gameId = this.games.size + 1;
+		const newGame = new Game(gameId, isLadder);
+		newGame.join(player, isLadder);
+
+		player.setGame(newGame);
+		this.players.set(player.userId, player);
+		this.games.set(newGame.gameId, newGame);
+		this.queue.push(newGame.gameId);
+		this.receivePong({ userId: player.userId });
+		return newGame.gameId;
+	}
+
+	joinQueue(player: Player, isLadder: boolean) : number {
 		this.queue.forEach((id) => {
 			const game = this.games.get(id);
-			if (game.join(player)) {
+			if (game.join(player, isLadder)) {
 				player.setGame(game);
+				this.receivePong({ userId: player.userId });
 				return id;
 			}
 		});
 		return 0;
 	}
 
-	addQueue(player: Player, isLadder?: boolean) : number {
-		const gameId = this.games.size + 1;
-		const newGame = new Game(gameId, isLadder);
-		newGame.join(player);
+	removeQueue(game: Game) {
+		this.queue = this.queue.filter((id) => id != game.gameId);
+	}
 
-		player.setGame(newGame);
-		this.players.set(player.userId, player);
-		this.games.set(newGame.gameId, newGame);
-		this.queue.push(newGame.gameId);
-		return newGame.gameId;
+	removeGame(game: Game) {
+		this.games.delete(game.gameId);
+	}
+
+	removePlayers(game: Game) {
+		game.getPlayers().forEach((player) => {
+			this.players.delete(player.userId);
+		});
+		game.removePlayers();
 	}
 
 	sendPingToAllPlayers() {
+		if (this.players.size == 0) { return; }
 		const playerIdList = [...this.players.keys()];
 
 		playerIdList.forEach((playerId) => {
@@ -153,19 +205,24 @@ class GameModel {
 
 @Injectable()
 export class GamesService {
-	@WebSocketServer() server: Server;
-	private gameModel: GameModel;
+	@WebSocketServer() server;
+	public gameModel: GameModel;
 	private pingInterval;
 
 	constructor() {
 		this.gameModel = new GameModel();
+	}
 
-		this.pingInterval = setInterval(this.gameModel.sendPingToAllPlayers, 5000);
+	init(server) {
+		this.server = server;
+		this.pingInterval = setInterval(() => {
+			this.gameModel.sendPingToAllPlayers(); 
+		}, 5000);
 		this.server.on('pong', (data) => this.gameModel.receivePong(data));
 	}
 
 	addUserToQueue(player: Player, isLadder: boolean) {
-		const gameId = this.gameModel.joinQueue(player);
+		const gameId = this.gameModel.joinQueue(player, isLadder);
 
 		if (gameId == 0) {
 			return this.gameModel.addQueue(player, isLadder);
