@@ -64,12 +64,16 @@ export class Channel {
     this.password = password;
   }
 
-  isUserJoined(user: ChannelUser): boolean {
-    return this.users.has(user.id);
+  isUserJoined(userId: number): boolean {
+    return this.users.has(userId);
   }
 
-  isUserMuted(user: ChannelUser): boolean {
-	return this.muted.has(user.id);
+  isUserMuted(userId: number): boolean {
+	  return this.muted.has(userId);
+  }
+  
+  isUserBanned(userId: number): boolean {
+	  return this.banned.has(userId);
   }
 
   // 채널에서 유저의 역할을 가져온다.
@@ -93,7 +97,7 @@ export class Channel {
   }
 
   checkUserMuted(user: ChannelUser) {
-	if (this.isUserMuted(user)) {
+	if (this.isUserMuted(user.id)) {
 		const expiresAt = new Date(this.muted.get(user.id));
 
 		if (expiresAt.getTime() > new Date().getTime()) {
@@ -124,7 +128,7 @@ export class Channel {
         code: HttpStatus.FORBIDDEN,
         message: 'You are connot join the channel.',
       };
-    } else if (this.isUserJoined(user)) {
+    } else if (this.isUserJoined(user.id)) {
       throw {
         code: HttpStatus.CONFLICT,
         message: 'This channel is already participating.',
@@ -182,8 +186,6 @@ export class ChannelModel {
             userId: true,
             isAdmin: true,
             isBanned: true,
-            isMuted: true,
-            deleted: true,
           },
         },
       },
@@ -205,8 +207,7 @@ export class ChannelModel {
         }
         if (user.isBanned) {
           channel.banned.add(user.userId);
-        }
-        if (!user.deleted) {
+        } else {
           channel.users.add(user.userId);
         }
       });
@@ -308,42 +309,27 @@ export class ChannelModel {
     channel.join(user);
     user.join(channel);
 
-    await this.prismaService.channel_User.upsert({
-      where: {
-        id: {
-          channelId: channel.id,
-          userId: user.id,
-        },
-      },
-      create: {
+    await this.prismaService.channel_User.create({
+      data: {
         channelId: channel.id,
         userId: user.id,
-        isAdmin: false,
-        isBanned: false,
-        isMuted: false,
-      },
-      update: {
-        createdAt: new Date(),
-        deleted: false,
-      },
+      }
     });
   }
 
   async leaveChannel(user: ChannelUser, channel: Channel) {
-    await this.prismaService.channel_User.update({
+    channel.leave(user);
+    user.leave(channel);
+
+    if (channel.isUserBanned(user.id)) { return; }
+    await this.prismaService.channel_User.delete({
       where: {
         id: {
           channelId: channel.id,
           userId: user.id,
         },
-      },
-      data: {
-        deleted: true,
-      },
+      }
     });
-
-    channel.leave(user);
-    user.leave(channel);
   }
 
   async inviteChannel(user: ChannelUser, channel: Channel) {
@@ -357,7 +343,6 @@ export class ChannelModel {
 
   async ban(user: ChannelUser, channel: Channel, bannedUser: ChannelUser) {
     channel.assertUserPermission(user);
-    await this.leaveChannel(bannedUser, channel);
     channel.banned.add(bannedUser.id);
 
     await this.prismaService.channel_User.update({
@@ -371,6 +356,9 @@ export class ChannelModel {
         isBanned: true,
       },
     });
+
+    channel.leave(bannedUser);
+    bannedUser.leave(channel);
   }
 
   async mute(
@@ -384,32 +372,9 @@ export class ChannelModel {
 
     channel.assertUserPermission(user);
     channel.muted.set(mutedUser.id, expiresAt);
-
-    await this.prismaService.channel_User.update({
-      where: {
-        id: {
-          channelId: channel.id,
-          userId: mutedUser.id,
-        },
-      },
-      data: {
-        isMuted: true,
-      },
-    });
   }
 
   async unmute(channel: Channel, mutedUser: ChannelUser) {
-	channel.muted.delete(mutedUser.id);
-	await this.prismaService.channel_User.update({
-		where: {
-		  id: {
-			channelId: channel.id,
-			userId: mutedUser.id,
-		  },
-		},
-		data: {
-		  isMuted: false,
-		},
-	  });
+    channel.muted.delete(mutedUser.id);
   }
 }

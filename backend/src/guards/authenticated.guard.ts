@@ -22,7 +22,11 @@ export class AuthenticatedGuard implements CanActivate {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt) {
-      this.authService.refreshToken(user.ftRefreshToken);
+      try {
+        this.authService.refreshToken(user.ftRefreshToken);
+      } catch (err) {
+        console.log(err);
+      }
     }
     req.user = user;
 
