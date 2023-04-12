@@ -28,7 +28,7 @@ export default function HeaderWithBackButton({
               <ChevronLeftIcon
                 className="w-6 h-6"
                 role="button"
-                onClick={handleClick}
+                onClick={onClick || handleClick}
               />
             </div>
           </div>

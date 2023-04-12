@@ -46,6 +46,9 @@ export default function AppTemplate({ header, children }: Props) {
           <li>
             <Link to="/on-boarding">On Boarding</Link>
           </li>
+          <li>
+            <Link to="/profile/3">user3 profile</Link>
+          </li>
         </nav>
       </footer>
     </>

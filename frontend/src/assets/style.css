@@ -6,13 +6,8 @@
   }
 
   #root {
-    @apply min-h-screen;
-    @apply container;
-    @apply mx-auto;
-    @apply max-w-xl;
-    @apply bg-gradient-to-b;
-    @apply from-gray-darker;
-    @apply to-[#433c3f];
+    @apply container mx-auto max-w-xl min-h-screen;
+    @apply bg-gradient-to-b from-gray-darker to-[#433c3f] bg-cover bg-center;
     @apply text-text-light;
   }
 }
@@ -20,14 +15,38 @@
 @tailwind components;
 
 @layer components {
+  .modal-wrapper {
+    @apply relative z-10 text-text-light;
+  }
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black bg-opacity-50;
+    @apply transition-opacity;
+  }
+  .modal-panel-wrapper {
+    @apply fixed inset-0 z-10 overflow-y-auto;
+    @apply flex min-h-full items-end justify-center p-4 sm:items-center sm:p-0;
+  }
+  .modal-panel {
+    @apply relative container mx-auto max-w-xl min-h-screen;
+    @apply mt-24 px-4 pb-6 pt-14 overflow-hidden;
+    @apply rounded-2xl shadow-lg;
+    @apply bg-gradient-to-b from-[#484649] to-[#433c3f] bg-cover bg-center;
+    @apply transform transition-all;
+  }
   .section {
     @apply mb-16;
+  }
+  .section.small {
+    @apply mb-8;
   }
   .section-title {
     @apply text-2xl mb-4 text-text-light;
   }
+  .link {
+    @apply underline text-primary hover:text-primary-light;
+  }
   .button {
-    @apply text-lg font-bold py-2 px-4 rounded inline-flex items-center justify-center select-none;
+    @apply text-lg py-2 px-4 font-semibold rounded inline-flex items-center justify-center select-none;
   }
   .button.primary {
     @apply bg-primary hover:bg-primary-dark text-gray-darker;
@@ -35,11 +54,23 @@
   .button.secondary {
     @apply text-primary hover:text-primary-dark border border-primary hover:border-primary-dark;
   }
-  .image-wrapper {
-    @apply flex justify-center items-center overflow-hidden;
+  .button.small {
+    @apply text-sm py-1 px-3;
   }
-  .image-wrapper img {
-    @apply flex-shrink-0 min-w-full min-h-full;
+  .button.medium {
+    @apply text-lg py-2 px-4;
+  }
+  .button.large {
+    @apply text-xl py-3 px-6;
+  }
+  .button.link {
+    @apply border-none py-2 px-2;
+  }
+  .button.link span {
+    @apply underline;
+  }
+  .user-indicator {
+    @apply bottom-0 right-0 absolute border-2 border-white rounded-full;
   }
   .duotone-image {
     @apply bg-gray-light p-0 flex flex-1 basis-full overflow-hidden relative h-full;

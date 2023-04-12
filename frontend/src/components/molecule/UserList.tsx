@@ -8,6 +8,7 @@ interface Props {
   buttons?: ReactElement[];
   hasStatus?: boolean;
   myUserId?: number;
+  inviteList?: boolean;
 }
 
 export default function UserList({
@@ -16,9 +17,10 @@ export default function UserList({
   buttons,
   hasStatus = false,
   myUserId,
+  inviteList = false,
 }: Props) {
   return (
-    <ul>
+    <ul className="flex flex-col divide-y divide-gray-dark">
       {users &&
         users.map((user) => {
           return (
@@ -29,6 +31,7 @@ export default function UserList({
               buttons={buttons}
               hasStatus={hasStatus}
               myUserId={myUserId}
+              inviteList={inviteList}
             />
           );
         })}

@@ -25,32 +25,67 @@ export default function Profile({
   const isMyPage = user.id === myUserId;
 
   return (
-    <>
-      <h1>Profile</h1>
-      <ProfileImage userId={user.id} alt="profile image" size={320} />
-      <p data-testid={user.id}>{user.nickname}</p>
-      {/* TODO: 나중에 지우기 (다른 회원 프로필 테스트용) */}
-      <Link to="/profile/3">user3</Link>
-      {isMyPage && <Link to="/setting">프로필 수정하기</Link>}
+    <div className="flex flex-col items-center">
+      <ProfileImage userId={user.id} alt="profile image" size={192} />
+      <p data-testid={user.id} className="text-2xl font-semibold mt-4 mb-8">
+        {user.nickname}
+      </p>
+      {isMyPage && (
+        <Link to="/setting" className="button primary small">
+          프로필 수정하기
+        </Link>
+      )}
       {!isMyPage && (
-        <div>
-          <div>
+        <div className="flex flex-col items-center">
+          <div className="inline-flex gap-4 mb-4">
             {user.isFollowedByMyself ? (
-              <Button onClick={() => onClickUnfollow(user.id)}>언팔로우</Button>
+              <Button
+                onClick={() => onClickUnfollow(user.id)}
+                secondary
+                className="w-36"
+              >
+                언팔로우
+              </Button>
             ) : (
-              <Button onClick={() => onClickFollow(user.id)}>팔로우하기</Button>
+              <Button
+                onClick={() => onClickFollow(user.id)}
+                primary
+                className="w-36"
+              >
+                팔로우하기
+              </Button>
             )}
             {!user.isBlockedByMyself && (
-              <Button onClick={() => onClickDm(user.id)}>메시지 보내기</Button>
+              <Button
+                onClick={() => onClickDm(user.id)}
+                primary
+                className="w-36"
+              >
+                메시지 보내기
+              </Button>
             )}
           </div>
           {user.isBlockedByMyself ? (
-            <Button onClick={() => onClickUnblock(user.id)}>차단 해제</Button>
+            <Button
+              onClick={() => onClickUnblock(user.id)}
+              linkStyle
+              className="text-red"
+              size="small"
+            >
+              차단 해제
+            </Button>
           ) : (
-            <Button onClick={() => onClickBlock(user.id)}>차단하기</Button>
+            <Button
+              onClick={() => onClickBlock(user.id)}
+              linkStyle
+              className="text-red"
+              size="small"
+            >
+              차단하기
+            </Button>
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }

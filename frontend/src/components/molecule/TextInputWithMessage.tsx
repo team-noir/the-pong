@@ -4,6 +4,7 @@ import TextInput from 'components/atoms/TextInput';
 import Message from 'components/atoms/Message';
 
 interface Props {
+  type?: 'text' | 'password';
   id: string;
   label?: string;
   value: string;
@@ -16,6 +17,7 @@ interface Props {
 }
 
 export default function TextInputWithMessage({
+  type = 'text',
   id,
   label,
   value,
@@ -45,13 +47,19 @@ export default function TextInputWithMessage({
 
   return (
     <div className="w-full group mb-6">
-      {label && <Label id={id} label={label} />}
+      {label && (
+        <div className="mb-2">
+          <Label id={id} label={label} />
+        </div>
+      )}
       <TextInput
+        type={type}
         id={id}
         value={value}
         placeholder={placeholder}
         onChange={handleChange}
         onBlur={handleBlur}
+        fullLength
       />
       <Message isShow={!isValid && isTouched} message={message} />
     </div>

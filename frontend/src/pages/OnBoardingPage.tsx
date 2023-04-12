@@ -21,7 +21,6 @@ export default function OnBoardingPage() {
         (hasImageFile && updateMyProfileImageMutation.isSuccess))
     ) {
       setIsSubmitted(true);
-      setIsOnboarded(true);
     }
   }, [updateMyProfileMutation, updateMyProfileImageMutation]);
 
@@ -29,7 +28,10 @@ export default function OnBoardingPage() {
     updateMyProfileMutation.mutate(formData.nickname);
     if (formData.imageFile) {
       updateMyProfileImageMutation.mutate(formData.imageFile, {
-        onSuccess: () => setNickname(formData.nickname),
+        onSuccess: () => {
+          setNickname(formData.nickname);
+          setIsOnboarded(true);
+        },
       });
       setHasImageFile(true);
     }
