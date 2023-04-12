@@ -93,6 +93,11 @@ export interface PlayerType {
   nickname: string;
   level: number;
 }
+
+export interface GameHistoryPlayerType extends PlayerType {
+  score: number;
+}
+
 export interface GameType {
   id: number;
   players: PlayerType[];
