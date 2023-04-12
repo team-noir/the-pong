@@ -96,8 +96,7 @@ model Channel_User {
 
   isAdmin         Boolean   @default(false)
   isBanned        Boolean   @default(false)
-  isMuted         Boolean   @default(false)
-  deleted         Boolean   @default(false)
+  isInvited        Boolean   @default(false)
 
   channel         Channel   @relation(fields: [channelId], references: [id])
   user            User      @relation(fields: [userId], references: [id])

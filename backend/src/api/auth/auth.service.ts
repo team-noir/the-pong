@@ -106,6 +106,9 @@ export class AuthService {
       'refresh-42',
       refreshToken,
       async (err, newAccessToken, newRefreshToken, results) => {
+        if (err) {
+          throw err;
+        }
         const accessExpiresAt = new Date(
           (results.created_at + results.expires_in) * ONESECOND
         ); // 2 hours later
