@@ -6,6 +6,8 @@ import { MyModule } from './api/my/my.module';
 import { AuthModule } from './api/auth/auth.module';
 import { AppController } from './app.controller';
 import { ChannelsModule } from './api/channels/channels.module';
+import { GamesModule } from './api/games/games.module';
+import { AppGatway } from './app.gateway';
 
 @Module({
   imports: [
@@ -17,8 +19,9 @@ import { ChannelsModule } from './api/channels/channels.module';
     PrismaModule,
     AuthModule,
     ChannelsModule,
+    GamesModule
   ],
   controllers: [AppController],
-  providers: [],
+  providers: [AppGatway],
 })
 export class AppModule {}

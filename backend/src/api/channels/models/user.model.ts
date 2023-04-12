@@ -11,7 +11,7 @@ export class ChannelUser {
   name: string; // nickname: string
 
   joined: Set<channelId>; // channels: channel
-  blockUser: Set<channelId>; // blockeds: user
+  blockUser: Set<userId>; // blockeds: user
 
   socket;
 
@@ -32,6 +32,10 @@ export class ChannelUser {
   leave(channel: Channel) {
     this.socket.leave(String(channel.id));
     this.joined.delete(channel.id);
+  }
+
+  isBlockUser(userId: number) {
+    return this.blockUser.has(userId);
   }
 }
 
