@@ -14,6 +14,7 @@ import { ChannelsService } from './api/channels/channels.service';
 import { AuthService } from './api/auth/auth.service';
 import { parse } from 'cookie';
 import { ChannelUser } from './api/channels/models/user.model';
+import { GamesService } from './api/games/games.service';
 
 @Injectable()
 @WebSocketGateway({
@@ -23,8 +24,9 @@ export class AppGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
+    private authService: AuthService,
     private channelsService: ChannelsService,
-    private authService: AuthService
+    public gamesService: GamesService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -33,6 +35,7 @@ export class AppGatway
   async afterInit() {
     this.logger.log('웹소켓 서버 초기화 ✅');
     this.channelsService.server = this.server;
+    this.gamesService.init(this.server);
     await this.channelsService.initModels();
   }
 
@@ -69,8 +72,8 @@ export class AppGatway
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     const userInfo = this.getUserInfoFromSocket(socket);
-    if (!userInfo || !userInfo.userId || !userInfo.username) { 
-      return ;
+    if (!userInfo || !userInfo.userId || !userInfo.username) {
+      return;
     }
 
     const userId = userInfo.userId;
@@ -102,8 +105,8 @@ export class AppGatway
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     const userInfo = this.getUserInfoFromSocket(socket);
-    if (!userInfo || !userInfo.userId || !userInfo.username) { 
-      return ;
+    if (!userInfo || !userInfo.userId || !userInfo.username) {
+      return;
     }
 
     const logged = this.channelsService.userModel.getUser(userInfo.userId);
@@ -123,11 +126,7 @@ export class AppGatway
       const channel = this.channelsService.channelModel.get(channelId);
       const user = this.channelsService.userModel.getUser(socket.data.user.id);
 
-      await this.channelsService.messageToChannel(
-        user,
-        channel,
-        message
-      );
+      await this.channelsService.messageToChannel(user, channel, message);
     } catch (error) {
       console.log(error);
     }
