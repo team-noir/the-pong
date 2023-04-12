@@ -57,19 +57,8 @@ function GameHistoryItem({
                 <GameHistoryItemPlayer player={history.winner} isWinner />
                 <span className="text-4xl text-gray-lighter font-light italic">
                   <span className="text-green">{history.winner.score}</span> :{' '}
-                  <span
-                    className={classNames(
-                      'relative',
-                      history.winner.score < history.loser.score &&
-                        'line-through'
-                    )}
-                  >
+                  <span className={classNames('relative')}>
                     {history.loser.score}
-                    {history.winner.score < history.loser.score && (
-                      <span className="absolute -top-2 left-2 text-xs">
-                        기권
-                      </span>
-                    )}
                   </span>
                 </span>
                 <GameHistoryItemPlayer player={history.loser} />
