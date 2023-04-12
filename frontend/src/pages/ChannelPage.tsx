@@ -28,7 +28,7 @@ export default function ChannelPage() {
     <AppTemplate
       header={
         <HeaderWithBackButton
-          title={getChannelQuery.data.title || ''}
+          title={getChannelQuery.data?.title || ''}
           button={<Button onClick={() => setIsShowDetail(true)}>메뉴</Button>}
         />
       }
@@ -36,7 +36,7 @@ export default function ChannelPage() {
       {myUserId && (
         <Channel channel={getChannelQuery.data} myUserId={myUserId} />
       )}
-      {isShowDetail && myUserId && (
+      {isShowDetail && myUserId && getChannelQuery.data && (
         <ChannelDetail
           channel={getChannelQuery.data}
           myUserId={myUserId}
@@ -45,13 +45,13 @@ export default function ChannelPage() {
           onClickInvite={() => setIsShowInvite(true)}
         />
       )}
-      {isShowSetting && (
+      {isShowSetting && getChannelQuery.data && (
         <ChannelSetting
           channel={getChannelQuery.data}
           onClickClose={() => setIsShowSetting(false)}
         />
       )}
-      {isShowInvite && getChannelQuery.data.users && (
+      {isShowInvite && getChannelQuery.data?.users && (
         <ChannelInvite
           channelId={Number(channelId)}
           channelUsers={getChannelQuery.data.users}

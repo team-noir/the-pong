@@ -1,3 +1,5 @@
+import { classNames } from 'utils';
+
 interface Props {
   type?: 'text' | 'password';
   id: string;
@@ -33,9 +35,10 @@ export default function TextInput({
       list={listId}
       onChange={onChange}
       onBlur={onBlur}
-      className={`${
-        fullLength ? 'w-full' : ''
-      } bg-transparent text-white border-0 border-b border-gray py-4 px-2 focus:outline-none focus:ring-gray focus:border-gray focus:rounded`}
+      className={classNames(
+        'bg-transparent text-white border-0 border-b border-gray py-4 px-2 focus:outline-none focus:ring-gray focus:border-gray focus:rounded',
+        fullLength && 'w-full'
+      )}
       disabled={disabled}
     />
   );

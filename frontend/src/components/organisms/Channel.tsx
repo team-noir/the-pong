@@ -12,6 +12,7 @@ import { NOTICE_STATUS } from 'constants/index';
 interface Props {
   channel: ChannelType;
   myUserId: number;
+  isMuted: boolean;
 }
 
 interface FormData {
@@ -171,7 +172,7 @@ export default function Channel({ channel, myUserId }: Props) {
           />
         </div>
         <div className="w-2/12 flex items-center justify-center pl-2">
-          <Button type="submit" primary fullLength>
+          <Button type="submit" primary fullLength disabled={formData.disabled}>
             보내기
           </Button>
         </div>
