@@ -334,3 +334,13 @@ export const leaveChannel = async (channelId: number) => {
   }
   return res;
 };
+
+/** Game */
+
+export const waitGame = async (isLadder: boolean) => {
+  const res = await axiosWithInterceptors.post(`/games/queue`, { isLadder });
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
