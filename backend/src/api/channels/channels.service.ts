@@ -289,7 +289,7 @@ export class ChannelsService {
     const invitedBy = this.getUserJoinedChannel(userId, channelId);
     const role = channel.getChannelUserRole(invitedBy);
 
-    if (channel.isDm || !channel.isPrivate) {
+    if (channel.isDm || channel.isPrivate) {
       throw {
         code: HttpStatus.BAD_REQUEST,
         message: 'You invited the user to the wrong channel.',
@@ -306,11 +306,14 @@ export class ChannelsService {
       this.channelModel.inviteChannel(invitedUser, channel);
 
       // socket massage
-      invitedUser.socket.emit('invited', { channelId: channel.id });
       this.noticeToChannel(
         channel,
         `${invitedUser.name} 님을 초대하였습니다.`
       );
+      
+      if (!invitedUser.socket) { return; }
+      invitedUser.socket.emit('invited', { channelId: channel.id });
+
     });
   }
 

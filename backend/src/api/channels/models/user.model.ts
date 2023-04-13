@@ -25,8 +25,10 @@ export class ChannelUser {
   }
 
   join(channel: Channel) {
-    this.socket.join(String(channel.id));
     this.joined.add(channel.id);
+    if (this.socket) {
+      this.socket.join(String(channel.id));
+    }
   }
 
   leave(channel: Channel) {
