@@ -1,5 +1,6 @@
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
+import GameInviteButton from 'components/molecule/GameInviteButton';
 import { UserType } from 'types';
 
 interface Props {
@@ -16,9 +17,7 @@ export default function Following({ users, onClickUnfollow }: Props) {
         imageSize={52}
         hasStatus={true}
         buttons={[
-          <Button key="button0" primary size="small">
-            게임 초대
-          </Button>,
+          <GameInviteButton key="button0" />,
           <Button key="button1" primary size="small">
             메시지 보내기
           </Button>,

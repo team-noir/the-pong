@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateChannelUserRole, updateChannelUserStatus } from 'api/api.v1';
 import ProfileImage from 'components/atoms/ProfileImage';
 import Button from 'components/atoms/Button';
+import GameInviteButton from './GameInviteButton';
 import {
   ChannelUserStatusType,
   ChannelUserType,
@@ -88,9 +89,7 @@ export default function ChannelUserItem({
 
         {!isSelf && (
           <div className="inline-flex items-center space-x-2">
-            <Button primary size="small">
-              게임 초대
-            </Button>
+            <GameInviteButton />
 
             {amIOwner && (
               <>
