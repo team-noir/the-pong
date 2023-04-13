@@ -61,6 +61,7 @@ build-dev: ## [dev] Build containers
 
 .PHONY: build-dev-no
 build-dev-no: ## [dev] Build containers no cache
+	cd ./backend && yarn install
 	$(DOCKER_COMPOSE_DEV) build --no-cache
 
 .PHONY: up-dev
