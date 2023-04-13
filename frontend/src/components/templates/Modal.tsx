@@ -5,9 +5,14 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 interface Props {
   children: React.ReactNode;
   onClickClose: () => void;
+  fitContent?: boolean;
 }
 
-export default function Modal({ children, onClickClose }: Props) {
+export default function Modal({
+  children,
+  onClickClose,
+  fitContent = false,
+}: Props) {
   const closeButtonRef = useRef(null);
 
   return (
@@ -40,7 +45,9 @@ export default function Modal({ children, onClickClose }: Props) {
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <Dialog.Panel className="modal-panel">
+            <Dialog.Panel
+              className={`modal-panel ${fitContent && 'h-fit w-fit'}`}
+            >
               <XMarkIcon
                 className="absolute top-4 right-4 block h-6 w-6 text-text-light"
                 aria-hidden="true"
