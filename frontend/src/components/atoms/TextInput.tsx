@@ -8,6 +8,7 @@ interface Props {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   fullLength?: boolean;
+  disabled?: boolean;
 }
 
 export default function TextInput({
@@ -20,6 +21,7 @@ export default function TextInput({
   onChange,
   onBlur,
   fullLength = false,
+  disabled = false,
 }: Props) {
   return (
     <input
@@ -34,6 +36,7 @@ export default function TextInput({
       className={`${
         fullLength ? 'w-full' : ''
       } bg-transparent text-white border-0 border-b border-gray py-4 px-2 focus:outline-none focus:ring-gray focus:border-gray focus:rounded`}
+      disabled={disabled}
     />
   );
 }

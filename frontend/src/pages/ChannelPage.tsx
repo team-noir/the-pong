@@ -34,7 +34,7 @@ export default function ChannelPage() {
       }
     >
       {myUserId && (
-        <Channel channelId={Number(channelId)} myUserId={myUserId} />
+        <Channel channel={getChannelQuery.data} myUserId={myUserId} />
       )}
       {isShowDetail && myUserId && (
         <ChannelDetail
