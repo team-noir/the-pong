@@ -1,12 +1,14 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useContext } from 'react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import { getMessages, sendMessage } from 'api/api.v1';
+import { SocketContext } from 'contexts/socket';
 import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
 import MessageList from 'components/molecule/MessageList';
 import { MessageType } from 'types';
 
 interface Props {
-  messages: MessageType[];
-  postMessage: (message: string) => void;
+  channelId: number;
   myUserId: number;
 }
 
@@ -14,8 +16,12 @@ interface FormData {
   message: string;
 }
 
-export default function Channel({ messages, postMessage, myUserId }: Props) {
+export default function Channel({ channelId, myUserId }: Props) {
+  const socket = useContext(SocketContext);
+
   const [formData, setFormData] = useState<FormData>({ message: '' });
+  const [messages, setMessages] = useState<MessageType[]>([]);
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,6 +29,49 @@ export default function Channel({ messages, postMessage, myUserId }: Props) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
+
+  const getMessagesQuery = useQuery({
+    queryKey: ['getMessages'],
+    queryFn: () => getMessages(Number(channelId)),
+    staleTime: Infinity,
+  });
+
+  useEffect(() => {
+    if (getMessagesQuery.data) {
+      setMessages([...getMessagesQuery.data]);
+    }
+  }, [getMessagesQuery.data]);
+
+  const sendMessageMutation = useMutation(sendMessage);
+
+  useEffect(() => {
+    socket.on('message', (data: MessageType) => {
+      const newMessage: MessageType = {
+        id: data.id,
+        senderId: data.senderId,
+        senderNickname: data.senderNickname,
+        isLog: false,
+        text: data.text,
+        createdAt: data.createdAt,
+      };
+      setMessages((prev) => [...prev, newMessage]);
+    });
+    socket.on('notice', (data: MessageType) => {
+      const newNotice: MessageType = {
+        id: data.id,
+        isLog: true,
+        text: data.text,
+        createdAt: data.createdAt,
+      };
+      setMessages((prev) => [...prev, newNotice]);
+      console.log('notice', data);
+      // queryClient.refetchQueries(['getChannel', String(channelId)]);
+    });
+    return () => {
+      socket.off('message');
+      socket.off('notice');
+    };
+  }, [socket]);
 
   const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
     const { value } = event.currentTarget;
@@ -32,7 +81,12 @@ export default function Channel({ messages, postMessage, myUserId }: Props) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!formData.message) return;
-    postMessage(formData.message);
+
+    sendMessageMutation.mutate({
+      channelId: Number(channelId),
+      message: formData.message,
+    });
+
     setFormData({ message: '' });
   };
 

@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { leaveChannel } from 'api/api.v1';
 import Modal from 'components/templates/Modal';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 import Button from 'components/atoms/Button';
@@ -10,7 +13,6 @@ interface Props {
   onClickClose: () => void;
   onClickSetting: () => void;
   onClickInvite: () => void;
-  onClickLeave: () => void;
 }
 
 export default function ChannelDetail({
@@ -19,8 +21,8 @@ export default function ChannelDetail({
   onClickClose,
   onClickSetting,
   onClickInvite,
-  onClickLeave,
 }: Props) {
+  const navigate = useNavigate();
   const [myUser, setMyUser] = useState<ChannelUserType | null>(null);
   const [channelUsers, setChannelUsers] = useState<ChannelUserType[]>([]);
 
@@ -32,17 +34,28 @@ export default function ChannelDetail({
     );
   }, [channel.users, myUserId]);
 
+  const leaveChannelMutation = useMutation({
+    mutationFn: leaveChannel,
+    onSuccess: () => {
+      navigate('/channel');
+    },
+  });
+
   const isMyUserRoleOwner = myUser?.role === USER_ROLES.OWNER;
+
+  const onClickLeave = () => {
+    leaveChannelMutation.mutate(Number(channel.id));
+  };
 
   return (
     <Modal onClickClose={onClickClose}>
-      <section className="section small">
-        {isMyUserRoleOwner && (
+      {isMyUserRoleOwner && (
+        <section className="section small">
           <Button onClick={onClickSetting} primary fullLength>
             채널 설정
           </Button>
-        )}
-      </section>
+        </section>
+      )}
       <section className="section small">
         <h3 className="section-title">참가자</h3>
         {myUser && channelUsers && (
