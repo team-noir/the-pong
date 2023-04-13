@@ -7,8 +7,8 @@ import { DmController } from './dm.controller';
 
 @Module({
   imports: [AuthModule],
+  exports: [ChannelsService],
   providers: [ChannelsService, PrismaService],
-  controllers: [ChannelsController, DmController],
-  exports: [ChannelsService]
+  controllers: [ChannelsController, DmController]
 })
 export class ChannelsModule {}

@@ -280,7 +280,7 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Set user status in channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  setUserStatus(
+  async setUserStatus(
     @Req() req,
     @Param('channelId') channelId: number,
     @Param('userId') userId: number,
@@ -288,7 +288,7 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.setUserStatus(
+      await this.channelsService.setUserStatus(
         req.user.id,
         channelId,
         userId,
