@@ -332,8 +332,17 @@ export class ChannelModel {
     });
   }
 
-  async inviteChannel(user: ChannelUser, channel: Channel) {
-    this.joinChannel(user, channel);
+  async inviteChannel(invitedUser: ChannelUser, channel: Channel) {
+    channel.assertCanUserJoinChannel(invitedUser);
+    channel.join(invitedUser);
+    invitedUser.join(channel);
+
+    await this.prismaService.channel_User.create({
+      data: {
+        channelId: channel.id,
+        userId: invitedUser.id,
+      }
+    });
   }
 
   async kick(user: ChannelUser, channel: Channel, kickedUser: ChannelUser) {
