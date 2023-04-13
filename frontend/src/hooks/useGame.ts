@@ -10,7 +10,7 @@ type ReturnType = [
 
 export default function useGame(): ReturnType {
   const [isWating, setIsWating] = useState(false);
-  const [alert, setAlert] = useState<string | null>(null);
+  const [alertCode, setAlertCode] = useState<string | null>(null);
   const socket = useContext(SocketContext);
 
   useEffect(() => {
@@ -24,7 +24,7 @@ export default function useGame(): ReturnType {
       if (data.gameId) {
         // TODO: 게임 설정 페이지로 이동
       } else {
-        setAlert(data.text);
+        setAlertCode(data.text);
         setIsWating(false);
       }
     });
@@ -35,5 +35,5 @@ export default function useGame(): ReturnType {
     };
   }, [isWating]);
 
-  return [isWating, setIsWating, alert, setAlert];
+  return [isWating, setIsWating, alertCode, setAlertCode];
 }
