@@ -1,26 +1,17 @@
 import { useContext, useEffect, useState } from 'react';
-import { useMutation, UseMutationResult } from '@tanstack/react-query';
-import { AxiosResponse, AxiosError } from 'axios';
-import { waitGame } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 
 type ReturnType = [
   boolean,
   React.Dispatch<React.SetStateAction<boolean>>,
-  boolean,
-  React.Dispatch<React.SetStateAction<boolean>>,
-  UseMutationResult<AxiosResponse, AxiosError, boolean>
+  string | null,
+  React.Dispatch<React.SetStateAction<string | null>>
 ];
 
 export default function useGame(): ReturnType {
   const [isWating, setIsWating] = useState(false);
-  const [isTimeOut, setIsTimeOut] = useState(false);
+  const [alert, setAlert] = useState<string | null>(null);
   const socket = useContext(SocketContext);
-
-  const waitGameMutation = useMutation<AxiosResponse, AxiosError, boolean>({
-    mutationFn: waitGame,
-    onSuccess: () => setIsWating(true),
-  });
 
   useEffect(() => {
     if (!isWating) return;
@@ -29,11 +20,11 @@ export default function useGame(): ReturnType {
       socket.emit('pong');
     });
 
-    socket.on('queue', (data: { gameId?: number }) => {
+    socket.on('queue', (data: { text: string; gameId?: number }) => {
       if (data.gameId) {
         // TODO: 게임 설정 페이지로 이동
       } else {
-        setIsTimeOut(true);
+        setAlert(data.text);
         setIsWating(false);
       }
     });
@@ -44,5 +35,5 @@ export default function useGame(): ReturnType {
     };
   }, [isWating]);
 
-  return [isWating, setIsWating, isTimeOut, setIsTimeOut, waitGameMutation];
+  return [isWating, setIsWating, alert, setAlert];
 }

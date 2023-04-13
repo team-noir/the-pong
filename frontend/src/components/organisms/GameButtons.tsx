@@ -1,10 +1,16 @@
+import { useMutation } from '@tanstack/react-query';
+import { waitGame } from 'api/api.v1';
 import useGame from 'hooks/useGame';
 import Modal from 'components/templates/Modal';
 import Button from 'components/atoms/Button';
 
 export default function GameButtons() {
-  const [isWating, setIsWating, isTimeOut, setIsTimeOut, waitGameMutation] =
-    useGame();
+  const [isWating, setIsWating, alert, setAlert] = useGame();
+
+  const waitGameMutation = useMutation({
+    mutationFn: waitGame,
+    onSuccess: () => setIsWating(true),
+  });
 
   const cancelWaiting = () => {
     // TODO: 취소 API 요청
@@ -32,13 +38,13 @@ export default function GameButtons() {
         </Button>
       </div>
       {isWating && (
-        <Modal onClickClose={cancelWaiting}>
+        <Modal onClickClose={cancelWaiting} fitContent>
           <p>게임 상대를 기다리는 중...</p>
           <Button onClick={cancelWaiting}>취소</Button>
         </Modal>
       )}
-      {isTimeOut && (
-        <Modal onClickClose={() => setIsTimeOut(false)}>
+      {alert && (
+        <Modal onClickClose={() => setAlert(null)} fitContent>
           <p>게임 상대를 찾을 수 없습니다.</p>
         </Modal>
       )}
