@@ -10,16 +10,16 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
-import { ChannelsService } from './channels.service';
-import { AuthService } from '../auth/auth.service';
+import { ChannelsService } from './api/channels/channels.service';
+import { AuthService } from './api/auth/auth.service';
 import { parse } from 'cookie';
-import { ChannelUser } from './models/user.model';
+import { ChannelUser } from './api/channels/models/user.model';
 
 @Injectable()
 @WebSocketGateway({
   cors: { credentials: true },
 })
-export class ChannelsGatway
+export class AppGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
@@ -36,7 +36,7 @@ export class ChannelsGatway
     await this.channelsService.initModels();
   }
 
-  async handleConnection(@ConnectedSocket() socket: Socket) {
+  getUserInfoFromSocket(socket: Socket) {
     const cookie = parse(String(socket.handshake.headers.cookie));
     if (!cookie.Authorization) {
       this.logger.log(
@@ -63,6 +63,18 @@ export class ChannelsGatway
       );
       return;
     }
+
+    return { userId: userId, username: username };
+  }
+
+  async handleConnection(@ConnectedSocket() socket: Socket) {
+    const userInfo = this.getUserInfoFromSocket(socket);
+    if (!userInfo || !userInfo.userId || !userInfo.username) { 
+      return ;
+    }
+
+    const userId = userInfo.userId;
+    const username = userInfo.username;
     if (this.channelsService.userModel.has(userId)) {
       const logged = this.channelsService.userModel.getUser(userId);
       if (logged.socket) {
@@ -89,6 +101,13 @@ export class ChannelsGatway
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
+    const userInfo = this.getUserInfoFromSocket(socket);
+    if (!userInfo || !userInfo.userId || !userInfo.username) { 
+      return ;
+    }
+
+    const logged = this.channelsService.userModel.getUser(userInfo.userId);
+    logged.socket = null;
     this.logger.log(`${socket.handshake.query.username} 소켓 연결 해제 ❌`);
   }
 

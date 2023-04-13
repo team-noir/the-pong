@@ -35,6 +35,10 @@ export class ChannelUser {
     this.socket.leave(String(channel.id));
     this.joined.delete(channel.id);
   }
+
+  isOnline() {
+    return (this.socket != null);
+  }
 }
 
 export class UserModel {
