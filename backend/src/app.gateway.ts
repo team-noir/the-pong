@@ -14,6 +14,7 @@ import { ChannelsService } from './api/channels/channels.service';
 import { AuthService } from './api/auth/auth.service';
 import { parse } from 'cookie';
 import { ChannelUser } from './api/channels/models/user.model';
+import { GamesService } from './api/games/games.service';
 
 @Injectable()
 @WebSocketGateway({
@@ -23,8 +24,9 @@ export class AppGatway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   constructor(
+    private authService: AuthService,
     private channelsService: ChannelsService,
-    private authService: AuthService
+    public gamesService: GamesService
   ) {}
 
   @WebSocketServer() server: Server;
@@ -33,6 +35,7 @@ export class AppGatway
   async afterInit() {
     this.logger.log('웹소켓 서버 초기화 ✅');
     this.channelsService.server = this.server;
+    this.gamesService.init(this.server);
     await this.channelsService.initModels();
   }
 
@@ -63,7 +66,6 @@ export class AppGatway
       );
       return;
     }
-
     return { userId: userId, username: username };
   }
 
@@ -85,7 +87,7 @@ export class AppGatway
       this.logger.log(
         `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`
       );
-      logged.joined.forEach((channelId) => {
+      loggedUser.joined.forEach((channelId) => {
         logged.socket.join(String(channelId));
       });
       return;

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import * as api from 'api/api.v1';
 import Profile from 'components/organisms/Profile';
 // import Achievements from 'components/organisms/Achievements';
+import GameHistory from 'components/organisms/GameHistory';
 
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };
@@ -71,16 +72,21 @@ export default function ProfilePage() {
     <>
       {getUserQuery.isSuccess && (
         <>
-          <div>ProfilePage</div>
-          <Profile
-            user={getUserQuery.data}
-            onClickFollow={handleClickFollow}
-            onClickUnfollow={handleClickUnfollow}
-            onClickBlock={handleClickBlock}
-            onClickUnblock={handleClickUnblock}
-            onClickDm={handleClickDm}
-          />
-          {/* <Achievements id={profileQuery.data.id} /> */}
+          <section className="section">
+            <Profile
+              user={getUserQuery.data}
+              onClickFollow={handleClickFollow}
+              onClickUnfollow={handleClickUnfollow}
+              onClickBlock={handleClickBlock}
+              onClickUnblock={handleClickUnblock}
+              onClickDm={handleClickDm}
+            />
+          </section>
+          <section className="section">
+            <h2 className="section-title">업적</h2>
+            {/* <Achievements id={profileQuery.data.id} /> */}
+          </section>
+          <GameHistory />
         </>
       )}
     </>

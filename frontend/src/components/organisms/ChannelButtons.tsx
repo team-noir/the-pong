@@ -7,7 +7,7 @@ export default function ChannelButtons() {
         채널 둘러보기
       </Link>
       <Link to="/channel/new" className="button secondary w-full">
-        채널 만들기
+        새 채널 만들기
       </Link>
     </div>
   );

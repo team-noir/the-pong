@@ -11,7 +11,7 @@ export class ChannelUser {
   name: string; // nickname: string
 
   joined: Set<channelId>; // channels: channel
-  blockUser: Set<channelId>; // blockeds: user
+  blockUser: Set<userId>; // blockeds: user
 
   socket;
 
@@ -38,6 +38,10 @@ export class ChannelUser {
 
   isOnline() {
     return (this.socket != null);
+  }
+  
+  isBlockUser(userId: number) {
+    return this.blockUser.has(userId);
   }
 }
 

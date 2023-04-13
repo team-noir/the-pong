@@ -25,7 +25,6 @@ export default function FollowingPage() {
 
   return (
     <>
-      <h1>FollowingPage</h1>
       {getMyFollowingQuery.isSuccess && (
         <Following
           users={getMyFollowingQuery.data}

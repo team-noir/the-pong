@@ -6,6 +6,7 @@ import { MyModule } from './api/my/my.module';
 import { AuthModule } from './api/auth/auth.module';
 import { AppController } from './app.controller';
 import { ChannelsModule } from './api/channels/channels.module';
+import { GamesModule } from './api/games/games.module';
 import { AppGatway } from './app.gateway';
 
 @Module({
@@ -18,6 +19,7 @@ import { AppGatway } from './app.gateway';
     PrismaModule,
     AuthModule,
     ChannelsModule,
+    GamesModule
   ],
   controllers: [AppController],
   providers: [AppGatway],

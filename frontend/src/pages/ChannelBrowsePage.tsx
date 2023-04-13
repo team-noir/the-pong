@@ -60,9 +60,7 @@ export default function ChannelBrowsePage() {
         <PasswordModal
           onClose={() => setIsShowPasswordInput(false)}
           onSubmit={handlePasswordSubmit}
-        >
-          비밀번호 입력이 필요한 채널입니다.
-        </PasswordModal>
+        />
       )}
     </AppTemplate>
   );

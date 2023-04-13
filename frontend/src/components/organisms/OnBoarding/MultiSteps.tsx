@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { FormData } from 'components/organisms/OnBoarding';
+import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import Button from 'components/atoms/Button';
 import Message from 'components/atoms/Message';
 import { ProfileFormType } from 'types';
@@ -59,11 +60,16 @@ export default function MultiSteps({
 
   return (
     <>
-      {!isFirstStep && <Button onClick={handleClickPrevStep}>&lt;</Button>}
-      <form onSubmit={handleClickNextStep}>
+      {!isFirstStep && <HeaderWithBackButton onClick={handleClickPrevStep} />}
+      <form
+        onSubmit={handleClickNextStep}
+        className="container mx-auto max-w-xl min-h-screen py-24 px-4"
+      >
         {stepComponents[stepIndex]}
         <Message isShow={!isValid} message={messages[stepIndex]} />
-        <Button type="submit">{isLastStep ? '완료' : '다음'}</Button>
+        <Button type="submit" primary fullLength>
+          {isLastStep ? '완료' : '다음'}
+        </Button>
       </form>
     </>
   );

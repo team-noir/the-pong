@@ -20,29 +20,37 @@ export default function ChannelUserList({
   onClickInvite,
 }: Props) {
   return (
-    <ul>
-      {isPrivate && <Button onClick={onClickInvite}>초대하기</Button>}
-      {myUser && (
-        <ChannelUserItem
-          channelId={channelId}
-          key={myUser?.id}
-          user={myUser}
-          imageSize={imageSize}
-          myUser={myUser}
-        />
+    <>
+      {isPrivate && (
+        <div className="mb-6">
+          <Button onClick={onClickInvite} secondary fullLength>
+            초대하기
+          </Button>
+        </div>
       )}
-      {users &&
-        users.map((user) => {
-          return (
-            <ChannelUserItem
-              channelId={channelId}
-              key={user.id}
-              user={user}
-              imageSize={imageSize}
-              myUser={myUser}
-            />
-          );
-        })}
-    </ul>
+      <ul className="flex flex-col divide-y divide-gray-dark">
+        {myUser && (
+          <ChannelUserItem
+            channelId={channelId}
+            key={myUser?.id}
+            user={myUser}
+            imageSize={imageSize}
+            myUser={myUser}
+          />
+        )}
+        {users &&
+          users.map((user) => {
+            return (
+              <ChannelUserItem
+                channelId={channelId}
+                key={user.id}
+                user={user}
+                imageSize={imageSize}
+                myUser={myUser}
+              />
+            );
+          })}
+      </ul>
+    </>
   );
 }

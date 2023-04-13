@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { ChevronLeftIcon } from '@heroicons/react/24/outline';
 import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
-import PasswordInputWithMessage from 'components/molecule/PasswordInputWithMessage';
+import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import Button from 'components/atoms/Button';
 import { validateChannelPassword } from 'utils/validatorUtils';
 
@@ -35,30 +36,43 @@ export default function ChannelSettingPassword({
 
   return (
     <form onSubmit={handleSubmit}>
-      <div>
-        <Button onClick={onClickBack}>&lt;</Button>
-        <h2>채널 비밀번호 수정</h2>
-      </div>
-      <CheckboxInputWithLabel
-        id="password-check"
-        label="비밀번호 걸기"
-        checked={hasPassword}
-        setValue={(value) => setHasPassword(value)}
+      <ChevronLeftIcon
+        className="absolute top-4 left-4 block h-6 w-6"
+        aria-hidden="true"
+        onClick={onClickBack}
       />
-      <div>
-        {!isProtected && hasPassword && (
-          <ChannelPasswordInput
-            password={password}
-            setValue={setPassword}
-            isValid={isValid}
-            setIsValid={setIsValid}
+      <h3 className="section-title">
+        <h2>채널 비밀번호 수정</h2>
+      </h3>
+      <div className="my-16">
+        <div className="my-4 border border-gray-dark rounded">
+          <CheckboxInputWithLabel
+            id="password-check"
+            label="비밀번호 걸기"
+            checked={hasPassword}
+            setValue={(value) => setHasPassword(value)}
           />
+        </div>
+
+        {!isProtected && hasPassword && (
+          <div className="mb-6">
+            <ChannelPasswordInput
+              password={password}
+              setValue={setPassword}
+              isValid={isValid}
+              setIsValid={setIsValid}
+            />
+          </div>
         )}
         {isProtected && hasPassword && (
-          <>
-            <p>비밀번호를 잊어버렸다면 재설정하세요.</p>
+          <div className="mb-6">
+            <p className="mb-4">비밀번호를 잊어버렸다면 재설정하세요.</p>
             {!isShowResetInput ? (
-              <Button onClick={() => setIsShowResetInput(true)}>
+              <Button
+                onClick={() => setIsShowResetInput(true)}
+                primary
+                fullLength
+              >
                 비밀번호 재설정
               </Button>
             ) : (
@@ -69,10 +83,12 @@ export default function ChannelSettingPassword({
                 setIsValid={setIsValid}
               />
             )}
-          </>
+          </div>
         )}
       </div>
-      <Button type="submit">저장하기</Button>
+      <Button type="submit" primary fullLength>
+        저장하기
+      </Button>
     </form>
   );
 }
@@ -91,8 +107,10 @@ function ChannelPasswordInput({
   setIsValid,
 }: PasswordInputProps) {
   return (
-    <PasswordInputWithMessage
+    <TextInputWithMessage
+      type="password"
       id="password"
+      label="비밀번호"
       value={password}
       setValue={(value) => setValue(value)}
       isValid={isValid}

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { getUsers } from 'api/api.v1';
+import { XMarkIcon } from '@heroicons/react/20/solid';
+import Modal from 'components/templates/Modal';
 import UserList from 'components/molecule/UserList';
 import SearchCombobox from 'components/molecule/SearchCombobox';
 import Button from 'components/atoms/Button';
@@ -51,33 +53,38 @@ export default function ChannelInvite({
   };
 
   return (
-    <div>
-      <div>
-        <Button onClick={onClickClose}>x</Button>
-        <h2>채널 초대하기</h2>
-      </div>
-      <SearchCombobox
-        placeholder="닉네임을 입력해주세요."
-        dataList={getUsersMutation.isSuccess ? getUsersMutation.data : []}
-        channelUsers={channelUsers}
-        setValue={(value) => setNickname(value)}
-        onSelect={handleSelect}
-      />
-      <UserList
-        users={users}
-        imageSize={52}
-        buttons={[
-          <Button key="button" onClick={handleClickDelete}>
-            x
-          </Button>,
-        ]}
-      />
-      <Button
-        type="button"
-        onClick={() => inviteUsers(users.map((user) => user.id))}
-      >
-        초대하기
-      </Button>
-    </div>
+    <Modal onClickClose={onClickClose}>
+      <section>
+        <h3 className="section-title">채널 초대하기</h3>
+        <div className="mb-4 relative">
+          <SearchCombobox
+            placeholder="닉네임을 입력해주세요."
+            dataList={getUsersMutation.isSuccess ? getUsersMutation.data : []}
+            channelUsers={channelUsers}
+            setValue={(value) => setNickname(value)}
+            onSelect={handleSelect}
+          />
+        </div>
+
+        <UserList
+          users={users}
+          imageSize={52}
+          buttons={[
+            <Button key="button" onClick={handleClickDelete}>
+              <XMarkIcon className="w-6 h-6" />
+            </Button>,
+          ]}
+          inviteList
+        />
+
+        <Button
+          onClick={() => inviteUsers(users.map((user) => user.id))}
+          primary
+          fullLength
+        >
+          초대하기
+        </Button>
+      </section>
+    </Modal>
   );
 }

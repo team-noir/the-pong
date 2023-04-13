@@ -41,9 +41,9 @@ export default function FileInputWithImage({
       <img
         src={imagePreviewUrl || imageUrl}
         alt="profile image"
-        className="h-32 w-32 rounded-full mb-4"
+        className="h-32 w-32 rounded-full mb-6 object-cover"
       />
-      <div className="flex items-center gap-2 mb-4">
+      <div className="flex flex-col items-center gap-2 mb-4">
         <input
           type="file"
           accept="image/*"
@@ -54,7 +54,7 @@ export default function FileInputWithImage({
         <Button primary onClick={handleClickFileUpload}>
           이미지 업로드하기
         </Button>
-        <Button secondary onClick={handleClickFileRemove}>
+        <Button linkStyle onClick={handleClickFileRemove} className="text-red">
           이미지 삭제하기
         </Button>
       </div>

@@ -5,6 +5,7 @@ import Root from 'pages/Root';
 import MainPage from 'pages/MainPage';
 import ErrorPage from 'pages/ErrorPage';
 import GameLobbyPage from 'pages/GameLobbyPage';
+import GamePage from 'pages/GamePage';
 import FollowingPage from 'pages/FollowingPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
@@ -77,6 +78,16 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
       {
         path: ':channelId',
         element: <ChannelPage />,
+      },
+    ],
+  },
+  {
+    path: '/game/*',
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: ':gameId',
+        element: <GamePage />,
       },
     ],
   },
