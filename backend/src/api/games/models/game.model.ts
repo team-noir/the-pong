@@ -12,6 +12,37 @@ export class GameModel {
 	private queue = new Array<gameId>();
 	private pongRecords = new Set<playerId>();
 
+	isPlayerInGame(playerId: number): boolean {
+		return this.players.has(playerId);
+	}
+
+	checkPlayersConnection() {
+		const playerIdList = [...this.players.keys()];
+		playerIdList.forEach((playerId) => {
+			if (!this.pongRecords.has(playerId)) {
+				this.disconnectPlayer(playerId);
+			}
+		});
+		this.pongRecords.clear();
+	}
+
+	addQueue(game: Game) {
+		this.queue.push(game.gameId);
+	}
+
+	getGame(gameId: number): Game {
+		return this.games.get(gameId);
+	}
+
+	setGame(game: Game) {
+		this.games.set(game.gameId, game);
+	}
+
+	setPlayer(player: Player) {
+		this.players.set(player.userId, player);
+		this.receivePong(player.userId);
+	}
+
 	gameStatus(socket: Socket) {
 		socket.emit('gameStatus', {
 			games: [...this.games.keys()],
@@ -25,37 +56,39 @@ export class GameModel {
 		const game = this.games.get(gameId);
 		
 		game.readyTimeout = setTimeout(() => {
-			if (this.queue.includes(gameId)) { return; }
+			if (!this.queue.includes(gameId)) { return; }
 			game.noticeToPlayers('queue', { text: 'timeout'});
 			this.removeGame(game);
-		}, 10000);
+		}, 60000);
 	}
 
-	addQueue(player: Player, isLadder: boolean) : number {
+	newQueue(player: Player, isLadder: boolean) : number {
 		const gameId = this.games.size + 1;
 		const newGame = new Game(gameId, isLadder);
-		newGame.join(player, isLadder);
 
+		newGame.join(player, isLadder);
 		player.joinGame(newGame);
-		this.players.set(player.userId, player);
-		this.games.set(newGame.gameId, newGame);
-		this.queue.push(newGame.gameId);
-		this.receivePong(player.userId);
+
+		this.setPlayer(player);
+		this.setGame(newGame);
+		this.addQueue(newGame);
 		this.setGameRoomTimeout(newGame.gameId);
 		return newGame.gameId;
 	}
 
-	joinQueue(player: Player, isLadder: boolean) : number {
+	findQueue(player: Player, isLadder: boolean) : Game | undefined {
 		for (const id of this.queue) {
-			const game = this.games.get(id);
+			const game = this.getGame(id);
 			if (game.canJoin(player, isLadder)) {
-				this.players.set(player.userId, player);
-				player.joinGame(game);
-				this.receivePong(player.userId);
-				return id;
+				return game;
 			}
 		};
-		return 0;
+		return undefined;
+	}
+
+	joinQueue(player: Player, game: Game) {
+		this.setPlayer(player);
+		player.joinGame(game);
 	}
 
 	removeQueue(game: Game) {
@@ -82,16 +115,6 @@ export class GameModel {
 		}
 	}
 
-	checkPlayersConnection() {
-		const playerIdList = [...this.players.keys()];
-		playerIdList.forEach((playerId) => {
-			if (!this.pongRecords.has(playerId)) {
-				this.disconnectPlayer(playerId);
-			}
-		});
-		this.pongRecords.clear();
-	}
-
 	sendPingToAllPlayers() {
 		if (this.players.size == 0) { return; }
 		const playerIdList = [...this.players.keys()];
@@ -113,7 +136,4 @@ export class GameModel {
 		}
 	}
 
-	isPlayerInGame(playerId: number): boolean {
-		return this.players.has(playerId);
-	}
 }

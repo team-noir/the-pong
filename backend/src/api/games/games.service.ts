@@ -20,9 +20,9 @@ export class GamesService {
 
 	init(server) {
 		this.server = server;
-		// this.pingInterval = setInterval(() => {
-		// 	this.gameModel.sendPingToAllPlayers(); 
-		// }, 5000);
+		this.pingInterval = setInterval(() => {
+			this.gameModel.sendPingToAllPlayers(); 
+		}, 5000);
 	}
 
 	addUserToQueue(player: Player, isLadder: boolean) {
@@ -31,15 +31,15 @@ export class GamesService {
 			const message = 'This user is already in queue';
 			throw { code, message };
 		}
-		const gameId = this.gameModel.joinQueue(player, isLadder);
+		const game = this.gameModel.findQueue(player, isLadder);
 
-		if (gameId == 0) {
-			return this.gameModel.addQueue(player, isLadder);
+		if (game == undefined) {
+			return this.gameModel.newQueue(player, isLadder);
+		} else {
+			this.gameModel.joinQueue(player, game);
+			this.gameModel.removeQueue(game);
+			return game.gameId;
 		}
-		this.gameModel.removeQueue(player.game);
-		return gameId;
 	}
-
-
 
 }
