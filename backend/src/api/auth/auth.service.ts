@@ -28,6 +28,36 @@ export class AuthService {
     await this.removeJwt(res);
   }
 
+  generateRandomString(num) {
+    const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    let result = '';
+    const charactersLength = characters.length;
+    for (let i = 0; i < num; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  }
+
+  async login(@Res() res) {
+    let userId = 10000;
+    let find;
+    
+    while (find = await this.prismaService.user.findUnique({ where: { id: userId }}))
+    { userId++; }
+
+    let user = await this.prismaService.user.create({
+      data: {
+        id: userId,
+        ftId: `${userId}`,
+        nickname: this.generateRandomString(10),
+      }
+    });
+
+    const jwt = this.signJwt(user.id, user.nickname);
+    await this.setJwt(res, jwt);
+    res.redirect(process.env.CLIENT_APP_URL);
+  }
+
   signJwt(id: number, nickname: string): string {
     return this.jwtService.sign({ id, nickname });
   }

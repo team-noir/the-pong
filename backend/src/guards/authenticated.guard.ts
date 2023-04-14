@@ -18,6 +18,13 @@ export class AuthenticatedGuard implements CanActivate {
     const user: User = await this.authService.getUserFromJwt(req);
     const now: Date = new Date(Date.now());
 
+    if (user.id >= 10000) {
+      req.user = user;
+      const newJwt = this.authService.signJwt(user.id, user.nickname);
+      this.authService.setJwt(res, newJwt);
+      return true;
+    }
+
     if (user == null || now > user.ftRefreshExpiresAt) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
@@ -29,10 +36,8 @@ export class AuthenticatedGuard implements CanActivate {
       }
     }
     req.user = user;
-
     const newJwt = this.authService.signJwt(user.id, user.nickname);
     this.authService.setJwt(res, newJwt);
-
     return true;
   }
 }

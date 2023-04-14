@@ -45,6 +45,17 @@ export class AuthController {
     return this.authService.auth(req, res);
   }
 
+  @Post('login')
+  @ApiOperation({ summary: 'Login' })
+  @ApiNoContentResponse({ description: 'Login. Remove cookie.' })
+  async login(@Res({ passthrough: true }) res) {
+    try {
+      return await this.authService.login(res);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   @Post('logout')
   @ApiOperation({ summary: 'Logout' })
   @ApiNoContentResponse({ description: 'Logout. Remove cookie.' })

@@ -46,8 +46,12 @@ export class MyController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async whoami(@Req() req, @Res() res) {
-    const user: MyDto = await this.myService.whoami(req);
-    res.status(HttpStatus.OK).send(user);
+    try {
+      const user: MyDto = await this.myService.whoami(req);
+      res.status(HttpStatus.OK).send(user);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Patch('settings')
@@ -56,8 +60,12 @@ export class MyController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async setMyProfile(@Req() req, @Body() body: SettingDto, @Res() res) {
-    const user: MyDto = await this.myService.setMyProfile(req, body);
-    res.status(HttpStatus.OK).send(user);
+    try {
+      const user: MyDto = await this.myService.setMyProfile(req, body);
+      res.status(HttpStatus.OK).send(user);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Post('profile-image')
@@ -95,10 +103,14 @@ export class MyController {
     })
   )
   async uploadProfileImage(@Req() req, @Res() res, @UploadedFile() file) {
-    // TODO: file validation(format, size, etc...)
-    const statusCode = file ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST;
-    await this.myService.uploadProfileImage(req.user.id, file);
-    res.status(statusCode).send();
+    try {
+      // TODO: file validation(format, size, etc...)
+      const statusCode = file ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST;
+      await this.myService.uploadProfileImage(req.user.id, file);
+      res.status(statusCode).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get('following')
@@ -110,7 +122,11 @@ export class MyController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async getFollowing(@Req() req) {
-    return this.myService.getFollowing(req);
+    try {
+      return this.myService.getFollowing(req);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Put('following/:userId')
@@ -155,7 +171,11 @@ export class MyController {
   })
   @UseGuards(AuthenticatedGuard)
   async getBlocks(@Req() req) {
-    return this.myService.getBlocks(req);
+    try {
+      return this.myService.getBlocks(req);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Put('blocks/:userId')

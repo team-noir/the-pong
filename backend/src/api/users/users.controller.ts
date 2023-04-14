@@ -74,10 +74,14 @@ export class UsersController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async requestProfile(@Param('userId') userId: number, @Res() res: Response) {
-    const user: UserDto = await this.usersService.getUser(Number(userId));
-    const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-    res.status(statusCode).send(user);
+  async requestProfile(@Param('userId') userId: number, @Res() res: Response) { 
+    try {
+      const user: UserDto = await this.usersService.getUser(Number(userId));
+      const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+      res.status(statusCode).send(user);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get(':userId/profile-image')
@@ -97,18 +101,22 @@ export class UsersController {
     @Param('userId') userId: number,
     @Res({ passthrough: true }) res: Response
   ): Promise<StreamableFile> {
-    const result = await this.usersService.downloadProfileImage(userId);
-    if (!result) {
-      throw new HttpException(
-        'No profile image file found',
-        HttpStatus.NOT_FOUND
-      );
+    try {
+      const result = await this.usersService.downloadProfileImage(userId);
+      if (!result) {
+        throw new HttpException(
+          'No profile image file found',
+          HttpStatus.NOT_FOUND
+        );
+      }
+      res.set({
+        'Content-Type': `${result.mimetype}`,
+        'Content-Disposition': `attachment; filename=${result.filename}`,
+        'Cache-Control': 'no-cache, max-age=0',
+      });
+      return new StreamableFile(result.file);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
-    res.set({
-      'Content-Type': `${result.mimetype}`,
-      'Content-Disposition': `attachment; filename=${result.filename}`,
-      'Cache-Control': 'no-cache, max-age=0',
-    });
-    return new StreamableFile(result.file);
   }
 }
