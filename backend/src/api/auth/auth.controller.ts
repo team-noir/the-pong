@@ -6,6 +6,7 @@ import {
   Post,
   UseGuards,
   HttpStatus,
+  HttpException
 } from '@nestjs/common';
 import { FtOauthGuard } from '../../guards/ft-oauth.guard';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
@@ -42,7 +43,11 @@ export class AuthController {
   @ApiHeader({ name: 'Authorization', description: 'jwt' })
   @UseGuards(FtOauthGuard)
   async auth(@Req() req, @Res({ passthrough: true }) res) {
-    return this.authService.auth(req, res);
+    try {
+      return this.authService.auth(req, res);
+    } catch (error) {
+      throw new HttpException(error.message, error.code);
+    }
   }
 
   @Post('login')
@@ -52,7 +57,7 @@ export class AuthController {
     try {
       return await this.authService.login(res);
     } catch (error) {
-      console.log(error);
+      throw new HttpException(error.message, error.code);
     }
   }
 
@@ -61,8 +66,13 @@ export class AuthController {
   @ApiNoContentResponse({ description: 'Logout. Remove cookie.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async logout(@Res() res) {
-    this.authService.logout(res);
-    res.status(HttpStatus.NO_CONTENT).send();
+  async logout(@Res({ passthrough: true }) res) {
+    try {
+      this.authService.logout(res);
+      res.status(HttpStatus.NO_CONTENT);
+      return;
+    } catch (error) {
+      throw new HttpException(error.message, error.code);
+    }
   }
 }
