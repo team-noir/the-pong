@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useUser } from 'hooks/useStore';
-import { classNames } from 'utils';
-import RadioGroup from 'components/molecule/RadioGroup';
+import { RadioGroup } from '@headlessui/react';
 import ProfileImage from 'components/atoms/ProfileImage';
 import Button from 'components/atoms/Button';
+import { classNames } from 'utils';
 import { GameSettingType } from 'types';
 
 interface Props {
@@ -19,7 +19,7 @@ export default function GameSetting({ gameSetting }: Props) {
 
   const myPlayer = gameSetting.players.find((user) => user.id === myUserId);
   const otherPlayer = gameSetting.players.find((user) => user.id !== myUserId);
-  const amIOwner = myPlayer?.isOwner;
+  const amIOwner = !!myPlayer?.isOwner;
 
   useEffect(() => {
     // TODO: 게임 설정 변경 API 호출
@@ -29,38 +29,23 @@ export default function GameSetting({ gameSetting }: Props) {
     <section>
       <h2 className="section-title">게임 설정</h2>
       <h3>모드 선택</h3>
-      {amIOwner ? (
-        <RadioGroup
-          values={gameSetting.modes}
-          selectedValue={formData.mode}
-          setValue={(value: string) =>
-            setFormData((prevState) => ({ ...prevState, mode: value }))
-          }
-        />
-      ) : (
-        <GameOptionList
-          values={gameSetting.modes}
-          selectedValue={formData.mode}
-        />
-      )}
+      <GameOptionList
+        values={gameSetting.modes}
+        selectedValue={formData.mode}
+        setValue={(value: string) =>
+          setFormData((prevState) => ({ ...prevState, mode: value }))
+        }
+        amIOwner={amIOwner}
+      />
       <h3>테마 선택</h3>
-      {amIOwner ? (
-        <RadioGroup
-          values={gameSetting.themes}
-          selectedValue={formData.theme}
-          setValue={(value: string) =>
-            setFormData((prevState) => ({
-              ...prevState,
-              theme: parseInt(value),
-            }))
-          }
-        />
-      ) : (
-        <GameOptionList
-          values={gameSetting.themes}
-          selectedValue={formData.theme}
-        />
-      )}
+      <GameOptionList
+        values={gameSetting.themes}
+        selectedValue={formData.theme}
+        setValue={(value: number) =>
+          setFormData((prevState) => ({ ...prevState, theme: value }))
+        }
+        amIOwner={amIOwner}
+      />
 
       <div className="flex items-center justify-around">
         <div className="flex flex-col items-center">
@@ -100,35 +85,36 @@ export default function GameSetting({ gameSetting }: Props) {
 function GameOptionList({
   values,
   selectedValue,
+  setValue,
+  amIOwner,
 }: {
   values: string[] | number[];
   selectedValue: string | number;
+  setValue: ((value: string) => void) | ((value: number) => void);
+  amIOwner: boolean;
 }) {
   return (
-    <div className="flex">
-      {values.map((value) => {
-        return (
-          <GameOptionItem
-            key={value}
-            value={value}
-            selected={value === selectedValue}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
-function GameOptionItem({
-  value,
-  selected,
-}: {
-  value: string | number;
-  selected: boolean;
-}) {
-  return (
-    <span className={classNames(`mr-4 ${selected && 'text-green'}`)}>
-      {value}
-    </span>
+    <RadioGroup
+      value={selectedValue}
+      onChange={setValue}
+      className="flex gap-x-5"
+      disabled={!amIOwner}
+    >
+      {values.map((value) => (
+        <RadioGroup.Option
+          key={value}
+          value={value}
+          className={classNames(
+            `p-2 rounded focus-visible:outline-none ${
+              amIOwner && 'cursor-pointer'
+            }`
+          )}
+        >
+          {({ checked }) => (
+            <span className={`${checked ? 'text-green' : ''}`}>{value}</span>
+          )}
+        </RadioGroup.Option>
+      ))}
+    </RadioGroup>
   );
 }

@@ -46,15 +46,21 @@ export default function GameSettingPage() {
       socket.emit('pong');
     });
 
-    socket.on('gameSetting', (data: { text: string }) => {
-      if (data.text === 'change') {
-        // TODO: 게임 설정 정보 다시 가져오기
-      } else if (data.text === 'done') {
-        navigate(`/game/${gameId}`);
-      } else if (data.text === 'leave') {
-        setIsOtherUserLeft(true);
+    socket.on(
+      'gameSetting',
+      (data: { text: string; mode?: string; theme?: number }) => {
+        const { text, mode, theme } = data;
+        if (text === 'change') {
+          // TODO: 게임 설정 정보 다시 가져오기
+          mode && setGameSetting((prevState) => ({ ...prevState, mode }));
+          theme && setGameSetting((prevState) => ({ ...prevState, theme }));
+        } else if (text === 'done') {
+          navigate(`/game/${gameId}`);
+        } else if (text === 'leave') {
+          setIsOtherUserLeft(true);
+        }
       }
-    });
+    );
 
     return () => {
       socket.off('ping');
