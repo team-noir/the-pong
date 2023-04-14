@@ -38,6 +38,10 @@ export class GameModel {
 		this.games.set(game.gameId, game);
 	}
 
+	getPlayer(playerId: number): Player {
+		return this.players.get(playerId);
+	}
+
 	setPlayer(player: Player) {
 		this.players.set(player.userId, player);
 		this.receivePong(player.userId);

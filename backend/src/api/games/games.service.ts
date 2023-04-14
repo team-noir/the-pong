@@ -3,11 +3,6 @@ import { WebSocketServer } from '@nestjs/websockets';
 import { Player } from './dtos/player.dto';
 import { GameModel } from './models/game.model';
 
-type gameId = number;
-type intervalId = number;
-type playerId = number;
-type userId = number;
-
 @Injectable()
 export class GamesService {
 	@WebSocketServer() server;
@@ -39,6 +34,15 @@ export class GamesService {
 			this.gameModel.joinQueue(player, game);
 			this.gameModel.removeQueue(game);
 			return game.gameId;
+		}
+	}
+
+	removeUserFromQueue(playerId: number) {
+		if (this.gameModel.isPlayerInGame(playerId)) {
+			const player = this.gameModel.getPlayer(playerId);
+			if (player.game) {
+				this.gameModel.removeGame(player.game);
+			}
 		}
 	}
 

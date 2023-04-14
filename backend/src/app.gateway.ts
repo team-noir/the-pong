@@ -184,6 +184,15 @@ export class AppGatway
     this.gamesService.addUserToQueue(player, isLadder);
   }
   
+  @SubscribeMessage('removeQueue')
+  removeQueue(
+    @ConnectedSocket() socket: Socket,
+  ) {
+    const userId = socket.data.user.id;
+    const user = this.channelsService.userModel.getUser(userId);
+    this.gamesService.removeUserFromQueue(user.id);
+  }
+  
   @SubscribeMessage('pong')
   pong(
     @ConnectedSocket() socket: Socket

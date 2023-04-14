@@ -22,20 +22,8 @@ export class Game {
 		return this.players;
 	}
 
-	removePlayers() {
-		for (const player of this.players) {
-			player.leaveGame();
-	
-			// socket message
-			player.socket.emit('message', 'disconnected player');
-		};
-		this.players = [];
-	}
-
-	noticeToPlayers(event: string, data) {
-		this.players.forEach((player) => {
-			player.socket.emit(event, data);
-		})
+	isFull() : boolean {
+		return (this.players.length > 1);
 	}
 
 	has(tarPlayer: Player) : boolean {
@@ -47,8 +35,27 @@ export class Game {
 		return false;
 	}
 
-	isFull() : boolean {
-		return (this.players.length > 1);
+	// Check isFull, isLadder, isBlocked
+	canJoin(tarPlayer: Player, isLadder: boolean) : boolean {
+		if (this.isFull() || (this.isLadder != isLadder)) { 
+			return false; 
+		}
+		this.players.forEach((player) => {
+			if (player.isBlockUser(tarPlayer.userId) || tarPlayer.isBlockUser(player.userId)) {
+				return false;
+			}
+		});
+		return true;
+	}
+
+	removePlayers() {
+		for (const player of this.players) {
+			player.leaveGame();
+	
+			// socket message
+			player.socket.emit('message', 'disconnected player');
+		};
+		this.players = [];
 	}
 
 	join(player: Player, isLadder: boolean) : boolean {
@@ -66,19 +73,6 @@ export class Game {
 		return true;
 	}
 
-	// Check isFull, isLadder, isBlocked
-	canJoin(tarPlayer: Player, isLadder: boolean) : boolean {
-		if (this.isFull() || (this.isLadder != isLadder)) { 
-			return false; 
-		}
-		this.players.forEach((player) => {
-			if (player.isBlockUser(tarPlayer.userId) || tarPlayer.isBlockUser(player.userId)) {
-				return false;
-			}
-		});
-		return true;
-	}
-
 	leave(tarPlayer: Player) : void {
 		if (this.has(tarPlayer)) {
 			this.players.forEach((player) => {
@@ -88,5 +82,13 @@ export class Game {
 				player.socket.emit('message', '대기열에서 나왔습니다.');
 			});
 		}
+	}
+
+	// socket 
+
+	noticeToPlayers(event: string, data) {
+		this.players.forEach((player) => {
+			player.socket.emit(event, data);
+		})
 	}
 }
