@@ -12,7 +12,6 @@ import { NOTICE_STATUS } from 'constants/index';
 interface Props {
   channel: ChannelType;
   myUserId: number;
-  isMuted: boolean;
 }
 
 interface FormData {

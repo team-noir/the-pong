@@ -1,4 +1,4 @@
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosResponse, AxiosError } from 'axios';
 import {
   UserType,
   ChannelType,
@@ -199,7 +199,7 @@ export const getChannels = async ({
   return res.data;
 };
 
-export const getChannel = async (channelId: number): Promise<ChannelType> => {
+export const getChannel = async (channelId: number) => {
   const res = await axiosWithInterceptors.get(`/channels/${channelId}`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -330,6 +330,24 @@ export const updateChannelUserStatus = async ({
 export const leaveChannel = async (channelId: number) => {
   const res = await axiosWithInterceptors.delete(`/channels/${channelId}`);
   if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+/** Game */
+
+export const waitGame = async (isLadder: boolean): Promise<AxiosResponse> => {
+  const res = await axiosWithInterceptors.post(`/games/queue`, { isLadder });
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const inviteGame = async (userId: number): Promise<AxiosResponse> => {
+  const res = await axiosWithInterceptors.post(`/games/invite`, { userId });
+  if (res.status !== 201) {
     throw new Error(res.statusText);
   }
   return res;

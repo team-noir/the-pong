@@ -40,7 +40,7 @@ export default function MessageItem({
           </div>
         )}
         <li
-          className={`flex 
+          className={`flex
         ${isMyMessage ? 'flex-row-reverse' : 'flex-row'}`}
         >
           <p

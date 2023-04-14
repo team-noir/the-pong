@@ -1,9 +1,7 @@
-import { ChannelModel, Channel } from './channel.model';
-import { UserModel, ChannelUser } from './user.model';
+import { Channel } from './channel.model';
+import { ChannelUser } from './user.model';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { HttpStatus } from '@nestjs/common';
-import { ChannelMessageDto } from '../dtos/channel.dto';
 
 import { PrismaService } from '../../../prisma/prisma.service';
 

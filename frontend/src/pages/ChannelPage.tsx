@@ -28,7 +28,7 @@ export default function ChannelPage() {
     <AppTemplate
       header={
         <HeaderWithBackButton
-          title={getChannelQuery.data?.title || ''}
+          title={getChannelQuery.data.title || ''}
           button={<Button onClick={() => setIsShowDetail(true)}>메뉴</Button>}
         />
       }
