@@ -1,6 +1,7 @@
 import { Fragment, useRef } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XMarkIcon } from '@heroicons/react/24/outline';
+import { classNames } from 'utils';
 
 interface Props {
   children: React.ReactNode;
@@ -46,7 +47,9 @@ export default function Modal({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <Dialog.Panel
-              className={`modal-panel ${fitContent && 'h-fit w-fit'}`}
+              className={classNames(
+                `modal-panel ${fitContent && 'h-fit w-fit'}`
+              )}
             >
               <XMarkIcon
                 className="absolute top-4 right-4 block h-6 w-6 text-text-light"
