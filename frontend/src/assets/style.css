@@ -27,7 +27,7 @@
     @apply flex min-h-full items-end justify-center p-4 sm:items-center sm:p-0;
   }
   .modal-panel {
-    @apply relative container mx-auto max-w-xl min-h-screen;
+    @apply relative container mx-auto max-w-xl h-screen;
     @apply mt-24 px-4 pb-6 pt-14 overflow-hidden;
     @apply rounded-2xl shadow-lg;
     @apply bg-gradient-to-b from-[#484649] to-[#433c3f] bg-cover bg-center;
