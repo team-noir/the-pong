@@ -15,6 +15,7 @@ import { AuthService } from './api/auth/auth.service';
 import { parse } from 'cookie';
 import { ChannelUser } from './api/channels/models/user.model';
 import { GamesService } from './api/games/games.service';
+import { Player } from './api/games/dtos/player.dto';
 
 @Injectable()
 @WebSocketGateway({
@@ -170,5 +171,31 @@ export class AppGatway
     @MessageBody('userId') userId: number[]
   ) {
     this.channelsService.invite(socket.data.user.id, channelId, userId);
+  }
+  
+  @SubscribeMessage('queue')
+  queue(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('isLadder') isLadder: boolean
+  ) {
+    const userId = socket.data.user.id;
+    const user = this.channelsService.userModel.getUser(userId);
+    const player = new Player(user.id, user.socket);
+    this.gamesService.addUserToQueue(player, isLadder);
+  }
+  
+  @SubscribeMessage('pong')
+  pong(
+    @ConnectedSocket() socket: Socket
+  ) {
+    const userId = socket.data.user.id;
+    this.gamesService.gameModel.receivePong(userId);
+  }
+
+  @SubscribeMessage('gameStatus')
+  gameStatus(
+    @ConnectedSocket() socket: Socket
+  ) {
+    this.gamesService.gameModel.gameStatus(socket);
   }
 }

@@ -15,7 +15,7 @@ import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { GamesService } from './games.service';
 import { AddUserToQueueDto } from './dtos/games.dto';
 import { ChannelsService } from '../channels/channels.service';
-import { Player } from './games.service';
+import { Player } from './dtos/player.dto';
 
 @Controller('games')
 export class GamesController {
