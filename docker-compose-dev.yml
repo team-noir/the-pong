@@ -63,9 +63,9 @@ services:
       - the-pong-dev-net
     ports:
       - '3000:3000'
-    # volumes:
-    #   - ./frontend/src:/usr/src/app/src:ro
-    #   - ./frontend/src/tests/__snapshots__:/usr/src/app/src/tests/__snapshots__:rw
+    volumes:
+      - ./frontend/src:/usr/src/app/src:ro
+      - ./frontend/src/tests/__snapshots__:/usr/src/app/src/tests/__snapshots__:rw
 
 networks:
   the-pong-dev-net:

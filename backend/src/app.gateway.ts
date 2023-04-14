@@ -39,7 +39,7 @@ export class AppGatway
     await this.channelsService.initModels();
   }
 
-  async handleConnection(@ConnectedSocket() socket: Socket) {
+  getUserInfoFromSocket(socket: Socket) {
     const cookie = parse(String(socket.handshake.headers.cookie));
     if (!cookie.Authorization) {
       this.logger.log(
@@ -66,6 +66,17 @@ export class AppGatway
       );
       return;
     }
+    return { userId: userId, username: username };
+  }
+
+  async handleConnection(@ConnectedSocket() socket: Socket) {
+    const userInfo = this.getUserInfoFromSocket(socket);
+    if (!userInfo || !userInfo.userId || !userInfo.username) { 
+      return ;
+    }
+
+    const userId = userInfo.userId;
+    const username = userInfo.username;
     if (this.channelsService.userModel.has(userId)) {
       const logged = this.channelsService.userModel.getUser(userId);
       if (logged.socket) {
@@ -76,8 +87,7 @@ export class AppGatway
       this.logger.log(
         `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`
       );
-      const loggedUser = this.channelsService.userModel.getUser(userId);
-      loggedUser.joined.forEach((channelId) => {
+      logged.joined.forEach((channelId) => {
         logged.socket.join(String(channelId));
       });
       return;
@@ -93,6 +103,13 @@ export class AppGatway
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
+    const userInfo = this.getUserInfoFromSocket(socket);
+    if (!userInfo || !userInfo.userId || !userInfo.username) { 
+      return ;
+    }
+
+    const logged = this.channelsService.userModel.getUser(userInfo.userId);
+    logged.socket = null;
     this.logger.log(`${socket.handshake.query.username} 소켓 연결 해제 ❌`);
   }
 

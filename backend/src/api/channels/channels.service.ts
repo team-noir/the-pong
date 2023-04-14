@@ -51,6 +51,7 @@ export class ChannelsService {
     const data = [];
 
     channel.users.forEach((userId) => {
+      if (channel.isUserBanned(userId)) { return; }
       const user = this.userModel.getUser(userId);
       const userRole = channel.getChannelUserRole(user);
       data.push({
@@ -125,7 +126,7 @@ export class ChannelsService {
     channels.forEach((channel) => {
       if (
         !this.channelModel.checkCanListed(channel, user.id) ||
-        (query.isEnter && !channel.isUserJoined(user)) ||
+        (query.isEnter && !channel.isUserJoined(user.id)) ||
         this.channelModel.checkListedRange(channel, query)
       ) {
         return;
@@ -169,14 +170,16 @@ export class ChannelsService {
 
     const users = [];
     channel.users.forEach((id) => {
-      const user = this.userModel.getUser(id);
-      const role = channel.getChannelUserRole(user);
-      users.push({
-        id: user.id,
-        nickname: user.name,
-        role: role,
-        isMuted: channel.muted.has(id),
-      });
+      if (!channel.isUserBanned(userId)) {
+        const user = this.userModel.getUser(id);
+        const role = channel.getChannelUserRole(user);
+        users.push({
+          id: user.id,
+          nickname: user.name,
+          role: role,
+          isMuted: channel.muted.has(id),
+        });
+      }
     });
 
     const channelInfo = {
@@ -186,8 +189,8 @@ export class ChannelsService {
       isPrivate: channel.isPrivate,
       isDm: channel.isDm,
       isBlocked: channel.banned.has(userId),
-      isJoined: channel.users.has(userId),
-      userCount: channel.users.size,
+      isJoined: users.includes(userId),
+      userCount: users.length,
       users: users,
       createdAt: channel.createdAt,
     };
@@ -286,7 +289,7 @@ export class ChannelsService {
     const invitedBy = this.getUserJoinedChannel(userId, channelId);
     const role = channel.getChannelUserRole(invitedBy);
 
-    if (channel.isDm || !channel.isPrivate) {
+    if (channel.isDm || channel.isPrivate) {
       throw {
         code: HttpStatus.BAD_REQUEST,
         message: 'You invited the user to the wrong channel.',
@@ -303,15 +306,18 @@ export class ChannelsService {
       this.channelModel.inviteChannel(invitedUser, channel);
 
       // socket massage
-      invitedUser.socket.emit('invited', { channelId: channel.id });
       this.noticeToChannel(
         channel,
         `${invitedUser.name} 님을 초대하였습니다.`
       );
+      
+      if (!invitedUser.socket) { return; }
+      invitedUser.socket.emit('invited', { channelId: channel.id });
+
     });
   }
 
-  setUserStatus(
+  async setUserStatus(
     userId: number,
     channelId: number,
     settedUserId: number,
@@ -325,19 +331,19 @@ export class ChannelsService {
     );
 
     if (status == 'kick') {
-      this.channelModel.kick(user, channel, settedUser);
+      await this.channelModel.kick(user, channel, settedUser);
       this.noticeToChannel(
         channel,
         `${user.name}님이 ${settedUser.name} 님을 채널에서 강퇴하였습니다.`
       );
     } else if (status == 'ban') {
-      this.channelModel.ban(user, channel, settedUser);
+      await this.channelModel.ban(user, channel, settedUser);
       this.noticeToChannel(
         channel,
         `${user.name}님이 ${settedUser.name} 님을 채널에서 차단하였습니다.`
       );
     } else if (status == 'mute') {
-      this.channelModel.mute(user, channel, settedUser, 30);
+      await this.channelModel.mute(user, channel, settedUser, 30);
       this.noticeToChannel(
         channel,
         `${user.name}님이 ${settedUser.name} 님을 채널에서 조용히 시켰습니다.`
@@ -350,7 +356,8 @@ export class ChannelsService {
 
     const data = [];
     this.messageModel.getAllMessages().forEach((message) => {
-      const sender = this.userModel.getUser(message.senderId);
+      const sender = message.senderId ? this.userModel.getUser(message.senderId) : null;
+
       if (message.channelId == channel.id) {
         const tarMessage = new ChannelMessageDto(
           message.id,

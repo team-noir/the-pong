@@ -1,20 +1,24 @@
 import { useMutation } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { inviteGame } from 'api/api.v1';
 import Button from 'components/atoms/Button';
 import Modal from 'components/templates/Modal';
 import useGame from 'hooks/useGame';
 
 export default function GameInviteButton() {
-  const [isWating, setIsWating, alert, setAlert] = useGame();
+  const [isWating, setIsWating, alertCode, setAlertCode] = useGame();
 
   const inviteGameMutation = useMutation({
     mutationFn: inviteGame,
     onSuccess: () => setIsWating(true),
-    onError: () => {
-      // TODO: 초대 불가능한 경우만 처리(이미 게임중, 내가 차단한/나를 차단한 회원)
-      setAlert('unavailable');
-      // 그 외의 경우
-      // alert('다시 시도해 주세요.');
+    onError: (error: AxiosError) => {
+      if (!error.status) return;
+
+      if ([400, 409].includes(error.status)) {
+        setAlertCode('unavailable');
+      } else {
+        alert('다시 시도해 주세요.');
+      }
     },
   });
 
@@ -42,12 +46,13 @@ export default function GameInviteButton() {
           <Button onClick={cancelWaiting}>취소</Button>
         </Modal>
       )}
-      {alert && (
-        <Modal onClickClose={() => setAlert(null)} fitContent>
+      {alertCode && (
+        <Modal onClickClose={() => setAlertCode(null)} fitContent>
           <p>
-            {alert === 'rejected' && '초대가 거절되었습니다.'}
-            {alert === 'timeout' && '60초 동안 응답이 없어 대기를 종료합니다.'}
-            {alert == 'unavailable' && '초대할 수 없는 회원입니다.'}
+            {alertCode === 'rejected' && '초대가 거절되었습니다.'}
+            {alertCode === 'timeout' &&
+              '60초 동안 응답이 없어 대기를 종료합니다.'}
+            {alertCode == 'unavailable' && '초대할 수 없는 회원입니다.'}
           </p>
         </Modal>
       )}
