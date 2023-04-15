@@ -85,11 +85,7 @@ function GameHistoryItemPlayer({
   const imageSize = 52;
 
   return (
-    <div
-      className={classNames(
-        'flex-initial p-4 flex flex-col items-center justify-between'
-      )}
-    >
+    <div className="flex-initial p-4 flex flex-col items-center justify-between">
       <div
         className={`flex-1 rounded-full max-w-${imageSize / 4} max-h-${
           imageSize / 4
@@ -103,9 +99,7 @@ function GameHistoryItemPlayer({
       </div>
 
       <span className="mt-1">{player.nickname}</span>
-      <span className="items-center mt-1 px-2 py-1 bg-gray-dark rounded-full text-xs text-text-light">
-        Lv. {player.level}
-      </span>
+      <span className="badge">Lv. {player.level}</span>
     </div>
   );
 }
