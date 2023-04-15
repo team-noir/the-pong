@@ -1,26 +1,33 @@
-import { Injectable, HttpStatus } from '@nestjs/common';
+import { Injectable, HttpStatus, Inject, forwardRef, OnModuleInit } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core'
 
 import { Player } from '../dtos/player.dto';
 import { Game } from '../dtos/game.dto';
 import { Socket } from 'socket.io';
 import { PrismaService } from '../../../prisma/prisma.service';
-import { AppGatway } from 'src/app.gateway';
+import { AppGateway } from '../../../app.gateway';
+import { PrismaClient } from '@prisma';
 
 type gameId = number;
 type playerId = number;
 
 @Injectable()
-export class GameModel {
+export class GameModel implements OnModuleInit {
 	private games = new Map<gameId, Game>();
-	private players = new Map<playerId, Player>();
-	
+	private players = new Map<playerId, Player>();	
 	private queue = new Array<gameId>();
 	private pongRecords = new Set<playerId>();
 
+	private appGateway: AppGateway;
+
 	constructor(
 		private prismaService: PrismaService,
-		private appGateway: AppGatway,
+		private moduleRef: ModuleRef
 	) {}
+
+	onModuleInit() {
+		this.appGateway = this.moduleRef.get(AppGateway, { strict: false });
+	}
 
 	isPlayerInGame(playerId: number): boolean {
 		return this.players.has(playerId);
@@ -71,6 +78,12 @@ export class GameModel {
 				blockeds: { select: { blockedId: true } }
 			}
 		});
+
+		if (!data) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This user is not exist';
+			throw { code, message };
+		}
 
 		const blocks = [];
 		for (const blocked of data.blockeds) {

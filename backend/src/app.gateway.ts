@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef, HttpException } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -10,11 +10,13 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { parse } from 'cookie';
+
 import { ChannelsService } from './api/channels/channels.service';
 import { AuthService } from './api/auth/auth.service';
-import { parse } from 'cookie';
-import { ChannelUser } from './api/channels/models/user.model';
 import { GamesService } from './api/games/games.service';
+
+import { ChannelUser } from './api/channels/models/user.model';
 import { Player } from './api/games/dtos/player.dto';
 
 type userId = number;
@@ -23,7 +25,7 @@ type userId = number;
 @WebSocketGateway({
   cors: { credentials: true },
 })
-export class AppGatway
+export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   private userSockets: Map<userId, Socket>;
@@ -31,6 +33,7 @@ export class AppGatway
   constructor(
     private authService: AuthService,
     private channelsService: ChannelsService,
+    @Inject(forwardRef(() => GamesService))
     public gamesService: GamesService
   ) {
     this.userSockets = new Map<userId, Socket>();
@@ -187,14 +190,16 @@ export class AppGatway
   }
   
   @SubscribeMessage('queue')
-  queue(
+  async queue(
     @ConnectedSocket() socket: Socket,
     @MessageBody('isLadder') isLadder: boolean
   ) {
-    const userId = socket.data.userId;
-    const user = this.channelsService.userModel.getUser(userId);
-    const player = new Player(user.id, user.socket);
-    this.gamesService.addUserToQueue(player, isLadder);
+    try {
+      const userId = socket.data.userId;
+      await this.gamesService.addUserToQueue(userId, isLadder);
+    } catch (error) {
+      throw new HttpException(error.message, error.code);
+    }
   }
   
   @SubscribeMessage('removeQueue')

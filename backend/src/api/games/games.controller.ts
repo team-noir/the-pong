@@ -14,16 +14,11 @@ import {
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { GamesService } from './games.service';
 import { AddUserToQueueDto, InviteUserToGameDto, AnswerInvitationDto } from './dtos/games.dto';
-import { ChannelsService } from '../channels/channels.service';
-import { Player } from './dtos/player.dto';
-import { AppGatway } from 'src/app.gateway';
 
 @Controller('games')
 export class GamesController {
 	constructor(
 		private gamesService: GamesService,
-		private channelsService: ChannelsService,
-		private appGateway: AppGatway,
 	) {}
 
 	@Post('queue')
@@ -60,7 +55,7 @@ export class GamesController {
 
 	@Post('invite')
 	@UseGuards(AuthenticatedGuard)
-	inviteUserToGame(
+	async inviteUserToGame(
 		@Req() req,
 		@Body() body : InviteUserToGameDto,
 		@Res({ passthrough: true }) res
@@ -68,7 +63,7 @@ export class GamesController {
 		try {
 			const userId = req.user.id;
 			const invitedUserId = body.userId;
-			this.gamesService.inviteUserToGame(userId, invitedUserId);
+			await this.gamesService.inviteUserToGame(userId, invitedUserId);
 			res.status(HttpStatus.NO_CONTENT);
 			return;
 		} catch (error) {
@@ -94,7 +89,7 @@ export class GamesController {
 
 	@Patch(':gameId/invite')
 	@UseGuards(AuthenticatedGuard)
-	answerInvitation(
+	async answerInvitation(
 		@Req() req,
 		@Param('gameId') gameId: number,
 		@Body() body: AnswerInvitationDto,
@@ -102,7 +97,7 @@ export class GamesController {
 	) {
 		try {
 			const userId = req.user.id;
-			this.gamesService.answerInvitation(userId, gameId, body.isAccepted);
+			await this.gamesService.answerInvitation(userId, gameId, body.isAccepted);
 			res.status(HttpStatus.NO_CONTENT);
 			return;
 		} catch (error) {
