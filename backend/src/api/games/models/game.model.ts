@@ -1,16 +1,26 @@
+import { Injectable, HttpStatus } from '@nestjs/common';
+
 import { Player } from '../dtos/player.dto';
 import { Game } from '../dtos/game.dto';
 import { Socket } from 'socket.io';
+import { PrismaService } from '../../../prisma/prisma.service';
+import { AppGatway } from 'src/app.gateway';
 
 type gameId = number;
 type playerId = number;
 
+@Injectable()
 export class GameModel {
 	private games = new Map<gameId, Game>();
 	private players = new Map<playerId, Player>();
 	
 	private queue = new Array<gameId>();
 	private pongRecords = new Set<playerId>();
+
+	constructor(
+		private prismaService: PrismaService,
+		private appGateway: AppGatway,
+	) {}
 
 	isPlayerInGame(playerId: number): boolean {
 		return this.players.has(playerId);
@@ -30,6 +40,10 @@ export class GameModel {
 		this.queue.push(game.gameId);
 	}
 
+	getGameId(): gameId {
+		return this.games.size + 1;
+	}
+
 	getGame(gameId: number): Game {
 		return this.games.get(gameId);
 	}
@@ -38,7 +52,41 @@ export class GameModel {
 		this.games.set(game.gameId, game);
 	}
 
+	async createPlayer(userId: number) {
+		if (!this.appGateway.isUserOnline(userId)) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This user is not online';
+			throw { code, message };
+		} else if (this.isPlayerInGame(userId)) {
+			const code = HttpStatus.CONFLICT;
+			const message = 'This user is already in game';
+			throw { code, message };
+		}
+
+		const socket = this.appGateway.getUserSocket(userId);
+		const data = await this.prismaService.user.findUnique({
+			where: { id: userId },
+			select: {
+				nickname: true,
+				blockeds: { select: { blockedId: true } }
+			}
+		});
+
+		const blocks = [];
+		for (const blocked of data.blockeds) {
+			blocks.push(blocked.blockedId);
+		}
+
+		return new Player(userId, data.nickname, socket, blocks);
+	}
+
 	getPlayer(playerId: number): Player {
+		if (!this.isPlayerInGame(playerId)) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This user is not in the game';
+			throw { code, message };
+		}
+
 		return this.players.get(playerId);
 	}
 
@@ -66,8 +114,8 @@ export class GameModel {
 		}, 60000);
 	}
 
-	newQueue(player: Player, isLadder: boolean) : number {
-		const gameId = this.games.size + 1;
+	newQueue(player: Player, isLadder: boolean): gameId {
+		const gameId = this.getGameId();
 		const newGame = new Game(gameId, isLadder);
 
 		newGame.join(player, isLadder);
@@ -80,13 +128,49 @@ export class GameModel {
 		return newGame.gameId;
 	}
 
+	newInvite(player: Player, invited: Player): gameId {
+		const gameId = this.getGameId();
+		const newGame = new Game(gameId, false, invited.userId);
+
+		newGame.join(player, false);
+		if (!newGame.canJoin(invited, false)) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'You cannot invite this user';
+			throw { code, message };
+		}
+		player.joinGame(newGame);
+
+		this.setPlayer(player);
+		this.setGame(newGame);
+		this.setGameRoomTimeout(newGame.gameId);
+		return newGame.gameId;
+	}
+
+	removeInvite(game: Game) {
+		const invitedId = game.invitedId;
+		const invitedSocket = this.appGateway.getUserSocket(invitedId);
+
+		invitedSocket.emit('gameInvite', {
+			text: 'canceled'
+		})
+
+		this.removeGame(game);
+	}
+
 	findQueue(player: Player, isLadder: boolean) : Game | undefined {
+		if (this.isPlayerInGame(player.userId)) {
+			const code = HttpStatus.CONFLICT;
+			const message = 'This user is already in queue';
+			throw { code, message };
+		}
+
 		for (const id of this.queue) {
 			const game = this.getGame(id);
 			if (game.canJoin(player, isLadder)) {
 				return game;
 			}
 		};
+
 		return undefined;
 	}
 

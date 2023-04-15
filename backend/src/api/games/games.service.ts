@@ -6,12 +6,9 @@ import { GameModel } from './models/game.model';
 @Injectable()
 export class GamesService {
 	@WebSocketServer() server;
-	public gameModel: GameModel;
 	private pingInterval;
 
-	constructor() {
-		this.gameModel = new GameModel();
-	}
+	constructor(public gameModel: GameModel) {}
 
 	init(server) {
 		this.server = server;
@@ -20,12 +17,8 @@ export class GamesService {
 		}, 5000);
 	}
 
-	addUserToQueue(player: Player, isLadder: boolean) {
-		if (this.gameModel.isPlayerInGame(player.userId)) {
-			const code = HttpStatus.CONFLICT;
-			const message = 'This user is already in queue';
-			throw { code, message };
-		}
+	async addUserToQueue(userId: number, isLadder: boolean) {
+		const player = await this.gameModel.createPlayer(userId);
 		const game = this.gameModel.findQueue(player, isLadder);
 
 		if (game == undefined) {
@@ -37,12 +30,58 @@ export class GamesService {
 		}
 	}
 
-	removeUserFromQueue(playerId: number) {
-		if (this.gameModel.isPlayerInGame(playerId)) {
-			const player = this.gameModel.getPlayer(playerId);
-			if (player.game) {
-				this.gameModel.removeGame(player.game);
+	removeUserFromQueue(userId: number) {
+		const player = this.gameModel.getPlayer(userId);
+		if (player.game) {
+			this.gameModel.removeGame(player.game);
+		}
+	}
+
+	async inviteUserToGame(userId: number, invitedUserId: number) {
+		const user = await this.gameModel.createPlayer(userId);
+		const invited = await this.gameModel.createPlayer(invitedUserId);
+		const gameId = this.gameModel.newInvite(user, invited);
+		
+		invited.socket.emit('gameInvite', {
+			text: "invited",
+			gamdId: gameId,
+			user: {
+				id: user.userId,
+				nickname: user.username
 			}
+		});
+	}
+
+	cancelInvitation(userId: number) {
+		const player = this.gameModel.getPlayer(userId);
+		const game = player.game;
+
+		if (game) {
+			this.gameModel.removeInvite(game);
+		}
+	}
+
+	async answerInvitation(userId: number, gameId: number, isAccepted: boolean) {
+		const invited = await this.gameModel.createPlayer(userId);
+		const game = this.gameModel.getGame(gameId);
+
+		if (!game) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This game does not exist';
+			throw { code, message };
+		} else if (!game.canJoin(invited, false)) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'You cannot join this game';
+			throw { code, message };
+		}
+
+		if (isAccepted) {
+			game.join(invited, false);
+		} else {
+			game.noticeToPlayers('queue', {
+				text: 'rejected'
+			});
+			this.gameModel.removeGame(game);
 		}
 	}
 

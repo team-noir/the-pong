@@ -1,11 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, jest } from '@jest/globals';
-import { GamesService, Player } from './games.service';
-import { SocketServerMock } from 'socket.io-mock-ts';
+import { GamesService } from './games.service';
 import { AppGatway } from '../../app.gateway';
 import { ChannelsModule } from '../channels/channels.module';
 import { AuthModule } from '../auth/auth.module';
 import { GamesModule } from './games.module';
+import { Player } from './dtos/player.dto';
 
 import { io } from 'socket.io-client';
 import { IoAdapter } from '@nestjs/platform-socket.io';

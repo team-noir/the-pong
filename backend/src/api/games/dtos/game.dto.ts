@@ -1,16 +1,18 @@
 import { Player } from "./player.dto";
 
+type userId = number;
+
 export class Game {
 	gameId: number;
 	players: Player[];
 	isLadder: boolean;
-	isInvite: boolean;
+	invitedId: userId;
 	readyTimeout;
 
-	constructor(gameId: number, isLadder?: boolean, isInvite?: boolean) {
+	constructor(gameId: number, isLadder?: boolean, invitedId?: userId) {
 		this.gameId = gameId;
 		this.isLadder = isLadder ? true : false;
-		this.isInvite = isInvite ? true : false;
+		this.invitedId = invitedId ? invitedId : 0;
 		this.players = [];
 	}
 
@@ -37,14 +39,19 @@ export class Game {
 
 	// Check isFull, isLadder, isBlocked
 	canJoin(tarPlayer: Player, isLadder: boolean) : boolean {
-		if (this.isFull() || (this.isLadder != isLadder)) { 
-			return false; 
+		if (this.isFull() 
+			|| (this.isLadder != isLadder)
+			|| (this.invitedId != 0 && this.invitedId != tarPlayer.userId)
+		) { 
+			return false;
 		}
-		this.players.forEach((player) => {
-			if (player.isBlockUser(tarPlayer.userId) || tarPlayer.isBlockUser(player.userId)) {
+		for (const player of this.players) {
+			if (player.isBlockUser(tarPlayer.userId) 
+				|| tarPlayer.isBlockUser(player.userId)
+			) {
 				return false;
 			}
-		});
+		};
 		return true;
 	}
 

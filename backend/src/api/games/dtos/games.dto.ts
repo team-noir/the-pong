@@ -13,3 +13,15 @@ export class AddUserToQueueDto {
 	public isLadder: boolean;
 }
 
+export class InviteUserToGameDto {
+	@ApiProperty()
+	@IsNumber()
+	public userId: number;
+}
+
+export class AnswerInvitationDto {
+	@ApiProperty()
+	@IsBoolean()
+	public isAccepted: boolean;
+}
+
