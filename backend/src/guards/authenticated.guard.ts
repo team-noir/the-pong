@@ -19,14 +19,12 @@ export class AuthenticatedGuard implements CanActivate {
     const now: Date = new Date(Date.now());
 
     // TODO: 임시로 익명 회원의 id는 10000번부터 시작
-    if (user.id >= 10000) {
+    if (user && user.id >= 10000) {
       req.user = user;
       const newJwt = this.authService.signJwt(user.id, user.nickname);
       this.authService.setJwt(res, newJwt);
       return true;
-    }
-
-    if (user == null || now > user.ftRefreshExpiresAt) {
+    } else if (user == null || now > user.ftRefreshExpiresAt) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt) {
