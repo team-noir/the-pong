@@ -8,7 +8,7 @@ export default function ErrorFallback({
   return (
     <>
       <header className="relative mx-auto max-w-xl px-2">
-        <div className="flex h-14 items-center text-lg font-medium text-white items-center justify-center">
+        <div className="flex h-14 items-center text-lg font-medium text-white justify-center">
           <a href="/">The Pong</a>
         </div>
       </header>

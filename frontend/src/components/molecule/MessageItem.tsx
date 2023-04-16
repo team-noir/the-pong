@@ -1,50 +1,36 @@
 import ProfileImage from 'components/atoms/ProfileImage';
 import { MessageType } from 'types';
+import { formatDate, formatTime } from 'utils';
 
 interface Props {
   message: MessageType;
   isShowProfile: boolean;
   isMyMessage: boolean;
+  isShowDate: boolean;
 }
-
-const formatDate = (iso: string) => {
-  const d = new Date(iso);
-  const locale = 'ko-KR';
-  const date = d
-    .toLocaleDateString(locale, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    .replace(/ /g, '');
-  const time = d.toLocaleTimeString(locale, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  return `${date} ${time}`;
-};
 
 export default function MessageItem({
   message,
   isShowProfile,
   isMyMessage,
+  isShowDate,
 }: Props) {
   return (
-    <div
-      className={`flex mb-4 items-end ${`
+    <>
+      {isShowDate && (
+        <span className="self-center text-xs leading-3 mb-4">
+          {`${formatDate(message.createdAt)}`}
+        </span>
+      )}
+      <div
+        className={`flex mb-4 items-end ${`
         ${isMyMessage ? 'self-end flex-row-reverse' : 'self-start flex-row'}
         ${isShowProfile ? 'flex-col' : 'flex-row'}
+        ${message.isLog && 'self-center'}
       `}`}
-    >
-      <li
-        className={`p-2 rounded ${
-          isMyMessage
-            ? 'text-right bg-green text-text-light'
-            : 'bg-gray text-text-dark'
-        }`}
       >
-        {isShowProfile && (
-          <div>
+        {!message.isLog && isShowProfile && (
+          <div className="flex">
             <ProfileImage
               userId={message.senderId}
               alt={`${message.senderNickname}'s profile image`}
@@ -53,13 +39,30 @@ export default function MessageItem({
             <span>{message.senderNickname}</span>
           </div>
         )}
-        <div>
-          <p>{message.text}</p>
-        </div>
-      </li>
-      <span className="mx-2 text-xs leading-3">
-        {formatDate(message.createdAt)}
-      </span>
-    </div>
+        <li
+          className={`flex
+        ${isMyMessage ? 'flex-row-reverse' : 'flex-row'}`}
+        >
+          <p
+            className={`p-2 rounded ${
+              isMyMessage
+                ? 'bg-green text-text-light'
+                : 'bg-gray text-text-dark'
+            }`}
+          >
+            {message.text}
+          </p>
+          {!message.isLog && (
+            <span
+              className={`mx-2 text-xs leading-3 self-end ${
+                isMyMessage && 'text-right'
+              }`}
+            >
+              {`${formatTime(message.createdAt)}`}
+            </span>
+          )}
+        </li>
+      </div>
+    </>
   );
 }

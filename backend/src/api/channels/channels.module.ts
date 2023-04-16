@@ -9,6 +9,6 @@ import { DmController } from './dm.controller';
   imports: [AuthModule],
   exports: [ChannelsService],
   providers: [ChannelsService, PrismaService],
-  controllers: [ChannelsController, DmController]
+  controllers: [ChannelsController, DmController],
 })
 export class ChannelsModule {}

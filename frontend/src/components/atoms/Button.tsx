@@ -12,6 +12,7 @@ interface Props {
   linkStyle?: boolean;
   size?: 'small' | 'medium' | 'large';
   className?: string;
+  disabled?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void;
@@ -28,6 +29,7 @@ export default function Button({
   linkStyle = false,
   size = 'medium',
   className,
+  disabled = false,
   onClick,
   onMouseDown,
   onMouseUp,
@@ -47,6 +49,7 @@ export default function Button({
       )}
       type={type}
       value={value}
+      disabled={disabled}
       onClick={onClick}
       onMouseDown={onMouseDown}
       onMouseUp={onMouseUp}

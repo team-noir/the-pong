@@ -19,7 +19,7 @@ import { AppGatway } from './app.gateway';
     PrismaModule,
     AuthModule,
     ChannelsModule,
-    GamesModule
+    GamesModule,
   ],
   controllers: [AppController],
   providers: [AppGatway],

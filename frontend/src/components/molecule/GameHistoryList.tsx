@@ -2,6 +2,7 @@ import ProfileImage from 'components/atoms/ProfileImage';
 import { GameHistoryType, PlayerType } from 'types';
 import { classNames } from 'utils';
 import { GameHistoryPlayerType } from 'types';
+import { formatDate, formatTime } from 'utils';
 
 interface Props {
   histories: GameHistoryType[];
@@ -68,7 +69,9 @@ function GameHistoryItem({
         </div>
 
         <div className="flex items-center mx-4 my-1 text-xs text-gray-light justify-end">
-          <span>{formatDate(history.createdAt)}</span>
+          <span>{`${formatDate(history.createdAt)} ${formatTime(
+            history.createdAt
+          )}`}</span>
         </div>
       </div>
     </>
@@ -108,24 +111,4 @@ function GameHistoryItemPlayer({
       </span>
     </div>
   );
-}
-
-// Utils
-// TODO: move to utils
-
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  const locale = 'ko-KR';
-  const date = d
-    .toLocaleDateString(locale, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    .replace(/ /g, '');
-  const time = d.toLocaleTimeString(locale, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  return `${date} ${time}`;
 }

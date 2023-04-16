@@ -1,11 +1,11 @@
-import { ChannelModel, Channel } from './channel.model';
-import { UserModel, ChannelUser } from './user.model';
+import { Channel } from './channel.model';
+import { ChannelUser } from './user.model';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { HttpStatus } from '@nestjs/common';
-import { ChannelMessageDto } from '../dtos/channel.dto';
 
 import { PrismaService } from '../../../prisma/prisma.service';
+
+import { NOTICE_STATUS_MESSAGE } from '../../../const';
 
 type messageId = number;
 type userId = number;
@@ -72,7 +72,11 @@ export class MessageModel {
     this.messageMap.set(message.id, message);
   }
 
-  async createMessage(channel: Channel, text: string, sender?: ChannelUser) : Promise<Message> {
+  async createMessage(
+    channel: Channel,
+    text: string,
+    sender?: ChannelUser
+  ): Promise<Message> {
     const created = await this.prismaService.message.create({
       data: {
         senderId: sender ? sender.id : null,
@@ -102,6 +106,26 @@ export class MessageModel {
       senderNickname: sender ? sender.name : null,
       isLog: message.isLog,
       text: message.text,
+      createdAt: message.createdAt,
+    });
+  }
+
+  // NOTE: message와 같은 id, createdAt를 보내기 위해서 message를 인자로 받음
+  sendNotice(
+    channelId: number,
+    code: number,
+    message: Message,
+    users: ChannelUser[]
+  ) {
+    this.server.to(String(channelId)).emit('notice', {
+      id: message.id,
+      channelId: channelId,
+      text: NOTICE_STATUS_MESSAGE[code],
+      code: code,
+      users: users.map((user) => ({
+        id: user.id,
+        nickname: user.name,
+      })),
       createdAt: message.createdAt,
     });
   }
