@@ -80,14 +80,14 @@ export class GameModel {
 		return newGame.gameId;
 	}
 
-	findQueue(player: Player, isLadder: boolean) : Game | undefined {
+	findQueue(player: Player, isLadder: boolean) : Game | null {
 		for (const id of this.queue) {
 			const game = this.getGame(id);
 			if (game.canJoin(player, isLadder)) {
 				return game;
 			}
 		};
-		return undefined;
+		return null;
 	}
 
 	joinQueue(player: Player, game: Game) {
