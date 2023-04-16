@@ -15,7 +15,7 @@ import { AuthenticatedGuard } from '../../guards/authenticated.guard';
 import { GamesService } from './games.service';
 import { AddUserToQueueDto } from './dtos/games.dto';
 import { ChannelsService } from '../channels/channels.service';
-import { Player } from './games.service';
+import { Player } from './dtos/player.dto';
 
 @Controller('games')
 export class GamesController {
@@ -42,5 +42,23 @@ export class GamesController {
 			throw new HttpException(error.message, error.code);
 		}
 	}
+	
+	@Delete('queue')
+	@UseGuards(AuthenticatedGuard)
+	removeUserFromQueue(
+		@Req() req,
+		@Body() body : AddUserToQueueDto,
+		@Res({ passthrough: true }) res
+	) {
+		try {
+			const user = this.channelsService.userModel.getUser(req.user.id);
+			this.gamesService.removeUserFromQueue(user.id);
+			res.status(HttpStatus.NO_CONTENT);
+			return;
+		} catch (error) {
+			throw new HttpException(error.message, error.code);
+		}
+	}
+	
 
 }
