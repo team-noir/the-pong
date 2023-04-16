@@ -65,6 +65,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["express-session", "npm:1.17.3"],\
             ["jest", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:29.3.1"],\
             ["multer", "npm:1.4.5-lts.1"],\
+            ["otplib", "npm:12.0.1"],\
             ["passport", "npm:0.6.0"],\
             ["passport-42", "npm:1.2.6"],\
             ["passport-jwt", "npm:4.0.1"],\
@@ -2010,6 +2011,60 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["chalk", "npm:4.1.2"],\
             ["consola", "npm:2.15.3"],\
             ["node-fetch", "virtual:1811160047d7e0f7e43f371e07920c11204416dd6ae0b8461e04538b2f68e9167aca28b60b34dbd287674a5cdd52bd05be5797bbe2f7de916231958cb58055fb#npm:2.6.9"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@otplib/core", [\
+        ["npm:12.0.1", {\
+          "packageLocation": "./.yarn/cache/@otplib-core-npm-12.0.1-4b9787d379-b3c34bc20b.zip/node_modules/@otplib/core/",\
+          "packageDependencies": [\
+            ["@otplib/core", "npm:12.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@otplib/plugin-crypto", [\
+        ["npm:12.0.1", {\
+          "packageLocation": "./.yarn/cache/@otplib-plugin-crypto-npm-12.0.1-d0dc5d1d98-6867c74ee8.zip/node_modules/@otplib/plugin-crypto/",\
+          "packageDependencies": [\
+            ["@otplib/plugin-crypto", "npm:12.0.1"],\
+            ["@otplib/core", "npm:12.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@otplib/plugin-thirty-two", [\
+        ["npm:12.0.1", {\
+          "packageLocation": "./.yarn/cache/@otplib-plugin-thirty-two-npm-12.0.1-b85109b20e-920099e40d.zip/node_modules/@otplib/plugin-thirty-two/",\
+          "packageDependencies": [\
+            ["@otplib/plugin-thirty-two", "npm:12.0.1"],\
+            ["@otplib/core", "npm:12.0.1"],\
+            ["thirty-two", "npm:1.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@otplib/preset-default", [\
+        ["npm:12.0.1", {\
+          "packageLocation": "./.yarn/cache/@otplib-preset-default-npm-12.0.1-77f04f54c4-8133231384.zip/node_modules/@otplib/preset-default/",\
+          "packageDependencies": [\
+            ["@otplib/preset-default", "npm:12.0.1"],\
+            ["@otplib/core", "npm:12.0.1"],\
+            ["@otplib/plugin-crypto", "npm:12.0.1"],\
+            ["@otplib/plugin-thirty-two", "npm:12.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@otplib/preset-v11", [\
+        ["npm:12.0.1", {\
+          "packageLocation": "./.yarn/cache/@otplib-preset-v11-npm-12.0.1-df44c202c1-367cb09397.zip/node_modules/@otplib/preset-v11/",\
+          "packageDependencies": [\
+            ["@otplib/preset-v11", "npm:12.0.1"],\
+            ["@otplib/core", "npm:12.0.1"],\
+            ["@otplib/plugin-crypto", "npm:12.0.1"],\
+            ["@otplib/plugin-thirty-two", "npm:12.0.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -8110,6 +8165,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["otplib", [\
+        ["npm:12.0.1", {\
+          "packageLocation": "./.yarn/cache/otplib-npm-12.0.1-77263e8084-4a1b91cf1b.zip/node_modules/otplib/",\
+          "packageDependencies": [\
+            ["otplib", "npm:12.0.1"],\
+            ["@otplib/core", "npm:12.0.1"],\
+            ["@otplib/preset-default", "npm:12.0.1"],\
+            ["@otplib/preset-v11", "npm:12.0.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["p-cancelable", [\
         ["npm:2.1.1", {\
           "packageLocation": "./.yarn/cache/p-cancelable-npm-2.1.1-9388305f02-3dba12b4fb.zip/node_modules/p-cancelable/",\
@@ -9519,6 +9586,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["express-session", "npm:1.17.3"],\
             ["jest", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:29.3.1"],\
             ["multer", "npm:1.4.5-lts.1"],\
+            ["otplib", "npm:12.0.1"],\
             ["passport", "npm:0.6.0"],\
             ["passport-42", "npm:1.2.6"],\
             ["passport-jwt", "npm:4.0.1"],\
@@ -9540,6 +9608,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["yarn", "npm:1.22.19"]\
           ],\
           "linkType": "SOFT"\
+        }]\
+      ]],\
+      ["thirty-two", [\
+        ["npm:1.0.2", {\
+          "packageLocation": "./.yarn/cache/thirty-two-npm-1.0.2-9d9270aa34-f6700b31d1.zip/node_modules/thirty-two/",\
+          "packageDependencies": [\
+            ["thirty-two", "npm:1.0.2"]\
+          ],\
+          "linkType": "HARD"\
         }]\
       ]],\
       ["through", [\
