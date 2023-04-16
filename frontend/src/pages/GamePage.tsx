@@ -83,7 +83,7 @@ export default function GamePage() {
   }, []);
 
   useEffect(() => {
-    socket.on('result', (data: GameResultType) => {
+    socket.on('gameResult', (data: GameResultType) => {
       setResult(data);
     });
     socket.on('achievement', (data: AchievementType) => {
@@ -93,7 +93,7 @@ export default function GamePage() {
       });
     });
     return () => {
-      socket.off('result');
+      socket.off('gameResult');
       socket.off('achievement');
     };
   }, [socket]);
