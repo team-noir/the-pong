@@ -88,6 +88,15 @@ export interface MessageType {
   createdAt: string;
 }
 
+export interface NoticeType {
+  id: number;
+  channelId: number;
+  text: string;
+  code: number;
+  users: UserType[];
+  createdAt: string;
+}
+
 /** Game */
 
 export interface PlayerType {

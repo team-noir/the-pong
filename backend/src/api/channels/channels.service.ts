@@ -9,6 +9,8 @@ import { MessageModel, Message } from './models/message.model';
 
 import { PrismaService } from '../../prisma/prisma.service';
 
+import { NOTICE_STATUS, NOTICE_STATUS_MESSAGE } from '../../const';
+
 @Injectable()
 export class ChannelsService {
   @WebSocketServer() server: Server;
@@ -22,7 +24,7 @@ export class ChannelsService {
     this.messageModel = new MessageModel(this.prismaService);
     this.messageModel.server = this.server;
   }
-  
+
   async initModels() {
     await this.userModel.initUser();
     await this.channelModel.initChannel();
@@ -51,7 +53,9 @@ export class ChannelsService {
     const data = [];
 
     channel.users.forEach((userId) => {
-      if (channel.isUserBanned(userId)) { return; }
+      if (channel.isUserBanned(userId)) {
+        return;
+      }
       const user = this.userModel.getUser(userId);
       const userRole = channel.getChannelUserRole(user);
       data.push({
@@ -88,10 +92,7 @@ export class ChannelsService {
     const user: ChannelUser = this.userModel.getUser(userId);
 
     await this.channelModel.joinChannel(user, channel, password);
-    this.noticeToChannel(
-      channel,
-      `${user.name} 님이 채널에 참여하였습니다.`
-    );
+    this.noticeToChannel(channel, NOTICE_STATUS.USER_JOIN, [user]);
   }
 
   async leave(userId: number, channelId: number) {
@@ -108,10 +109,7 @@ export class ChannelsService {
       await this.channelModel.leaveChannel(user, channel);
     }
 
-    this.noticeToChannel(
-      channel,
-      `${user.name} 님이 나가셨습니다.`
-    );
+    this.noticeToChannel(channel, NOTICE_STATUS.USER_LEAVE, [user]);
   }
 
   list(userId: number, query) {
@@ -241,16 +239,10 @@ export class ChannelsService {
 
     if (role == 'admin') {
       channel.admin.add(settedUser.id);
-      this.noticeToChannel(
-        channel,
-        `${settedUser.name} 님이 관리자 권한을 얻었습니다.`
-      );
+      this.noticeToChannel(channel, NOTICE_STATUS.USER_GRANT, [settedUser]);
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
-      this.noticeToChannel(
-        channel,
-        `${settedUser.name} 님의 관리자 권한이 해제되었습니다.`
-      );
+      this.noticeToChannel(channel, NOTICE_STATUS.USER_REVOKE, [settedUser]);
     }
   }
 
@@ -301,20 +293,31 @@ export class ChannelsService {
       };
     }
 
-    invitedUserId.forEach((id) => {
-      const invitedUser = this.userModel.getUser(id);
+    if (invitedUserId.length == 1) {
+      const invitedUser = this.userModel.getUser(invitedUserId[0]);
       this.channelModel.inviteChannel(invitedUser, channel);
 
       // socket massage
-      this.noticeToChannel(
-        channel,
-        `${invitedUser.name} 님을 초대하였습니다.`
-      );
-      
-      if (!invitedUser.socket) { return; }
-      invitedUser.socket.emit('invited', { channelId: channel.id });
+      if (invitedUser.socket) {
+        invitedUser.socket.emit('invited', { channelId: channel.id });
+      }
+      this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, [invitedUser]);
+      return;
+    }
 
+    const users: ChannelUser[] = [];
+
+    invitedUserId.forEach((id) => {
+      const invitedUser = this.userModel.getUser(id);
+      this.channelModel.inviteChannel(invitedUser, channel);
+      users.push(invitedUser);
+
+      // socket massage
+      if (invitedUser.socket) {
+        invitedUser.socket.emit('invited', { channelId: channel.id });
+      }
     });
+    this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, users);
   }
 
   async setUserStatus(
@@ -332,22 +335,13 @@ export class ChannelsService {
 
     if (status == 'kick') {
       await this.channelModel.kick(user, channel, settedUser);
-      this.noticeToChannel(
-        channel,
-        `${user.name}님이 ${settedUser.name} 님을 채널에서 강퇴하였습니다.`
-      );
+      this.noticeToChannel(channel, NOTICE_STATUS.USER_KICK, [user]);
     } else if (status == 'ban') {
       await this.channelModel.ban(user, channel, settedUser);
-      this.noticeToChannel(
-        channel,
-        `${user.name}님이 ${settedUser.name} 님을 채널에서 차단하였습니다.`
-      );
+      this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [user]);
     } else if (status == 'mute') {
       await this.channelModel.mute(user, channel, settedUser, 30);
-      this.noticeToChannel(
-        channel,
-        `${user.name}님이 ${settedUser.name} 님을 채널에서 조용히 시켰습니다.`
-      );
+      this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [user]);
     }
   }
 
@@ -356,7 +350,9 @@ export class ChannelsService {
 
     const data = [];
     this.messageModel.getAllMessages().forEach((message) => {
-      const sender = message.senderId ? this.userModel.getUser(message.senderId) : null;
+      const sender = message.senderId
+        ? this.userModel.getUser(message.senderId)
+        : null;
 
       if (message.channelId == channel.id) {
         const tarMessage = new ChannelMessageDto(
@@ -379,20 +375,31 @@ export class ChannelsService {
   ): Promise<Message> {
     channel.checkUserJoined(user);
     channel.checkUserMuted(user);
+
+    // TODO: unmute 체크 지점을 서버의 타이머로 변경
     this.channelModel.unmute(channel, user);
 
-    const newMessage = await this.messageModel.createMessage(channel, message, user);
+    const newMessage = await this.messageModel.createMessage(
+      channel,
+      message,
+      user
+    );
     this.messageModel.sendMessage(channel, newMessage, user);
     return newMessage;
   }
 
   // 채널에 공지를 보낸다.
   async noticeToChannel(
-    channel: Channel, 
-    message: string
+    channel: Channel,
+    code: number,
+    users: ChannelUser[]
   ): Promise<Message> {
-    const newMessage = await this.messageModel.createMessage(channel, message);
-    this.messageModel.sendMessage(channel, newMessage);
+    const newMessage = await this.messageModel.createMessage(
+      channel,
+      NOTICE_STATUS_MESSAGE[code]
+    );
+    this.messageModel.sendNotice(channel.id, code, newMessage, users);
+
     return newMessage;
   }
 }
