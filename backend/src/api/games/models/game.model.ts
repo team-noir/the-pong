@@ -15,6 +15,7 @@ type playerId = number;
 export class GameModel implements OnModuleInit {
 	private games = new Map<gameId, Game>();
 	private players = new Map<playerId, Player>();	
+	private invites = new Map<playerId, Game>();
 	private queue = new Array<gameId>();
 	private pongRecords = new Set<playerId>();
 
@@ -35,11 +36,12 @@ export class GameModel implements OnModuleInit {
 
 	checkPlayersConnection() {
 		const playerIdList = [...this.players.keys()];
-		playerIdList.forEach((playerId) => {
+		for (const playerId of playerIdList) {
 			if (!this.pongRecords.has(playerId)) {
+				console.log(playerId);
 				this.disconnectPlayer(playerId);
 			}
-		});
+		};
 		this.pongRecords.clear();
 	}
 
@@ -59,12 +61,24 @@ export class GameModel implements OnModuleInit {
 		this.games.set(game.gameId, game);
 	}
 
+	addInvite(game: Game, invitedId: number) {
+		this.invites.set(invitedId, game);
+	}
+
+	getInvite(invitedId: number) {
+		return this.invites.get(invitedId);
+	}
+	
+	isInvited(invitedId: number) {
+		return this.invites.has(invitedId);
+	}
+
 	async createPlayer(userId: number) {
 		if (!this.appGateway.isUserOnline(userId)) {
 			const code = HttpStatus.BAD_REQUEST;
 			const message = 'This user is not online';
 			throw { code, message };
-		} else if (this.isPlayerInGame(userId)) {
+		} else if (this.isPlayerInGame(userId) || this.isInvited(userId)) {
 			const code = HttpStatus.CONFLICT;
 			const message = 'This user is already in game';
 			throw { code, message };
@@ -145,16 +159,18 @@ export class GameModel implements OnModuleInit {
 		const gameId = this.getGameId();
 		const newGame = new Game(gameId, false, invited.userId);
 
-		newGame.join(player, false);
-		if (!newGame.canJoin(invited, false)) {
+		if (player.userId == invited.userId && !newGame.canJoin(invited, false)) {
 			const code = HttpStatus.BAD_REQUEST;
 			const message = 'You cannot invite this user';
 			throw { code, message };
 		}
+
+		newGame.join(player, false);
 		player.joinGame(newGame);
 
 		this.setPlayer(player);
 		this.setGame(newGame);
+		this.addInvite(newGame, invited.userId);
 		this.setGameRoomTimeout(newGame.gameId);
 		return newGame.gameId;
 	}
@@ -163,6 +179,7 @@ export class GameModel implements OnModuleInit {
 		const invitedId = game.invitedId;
 		const invitedSocket = this.appGateway.getUserSocket(invitedId);
 
+		this.invites.delete(invitedId);
 		invitedSocket.emit('gameInvite', {
 			text: 'canceled'
 		})
@@ -170,7 +187,7 @@ export class GameModel implements OnModuleInit {
 		this.removeGame(game);
 	}
 
-	findQueue(player: Player, isLadder: boolean) : Game | undefined {
+	findQueue(player: Player, isLadder: boolean) : Game | null {
 		if (this.isPlayerInGame(player.userId)) {
 			const code = HttpStatus.CONFLICT;
 			const message = 'This user is already in queue';
@@ -184,7 +201,7 @@ export class GameModel implements OnModuleInit {
 			}
 		};
 
-		return undefined;
+		return null;
 	}
 
 	joinQueue(player: Player, game: Game) {
@@ -197,9 +214,10 @@ export class GameModel implements OnModuleInit {
 	}
 
 	removePlayers(game: Game) {
-		game.getPlayers().forEach((player) => {
+		const players = game.getPlayers();
+		for (const player of players) {
 			this.players.delete(player.userId);
-		});
+		};
 		game.removePlayers();
 	}
 
@@ -218,11 +236,11 @@ export class GameModel implements OnModuleInit {
 
 	sendPingToAllPlayers() {
 		if (this.players.size == 0) { return; }
-		const playerIdList = [...this.players.keys()];
 
 		this.checkPlayersConnection();
-
+		
 		// Send ping
+		const playerIdList = [...this.players.keys()];
 		playerIdList.forEach((playerId) => {
 			console.log('ping : ', playerId);
 			const player = this.players.get(playerId);

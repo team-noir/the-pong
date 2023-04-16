@@ -5,9 +5,11 @@ type playerId = number;
 export class Player {
 	userId: number;
 	username: string;
-	socket;
-	game?: Game;
 	blockUser?: Set<playerId>;
+	socket;
+	
+	game?: Game;
+	gameInvited?: Game;
 
 	constructor(userId: number, username: string, socket, blockUser?: playerId[]) {
 		this.userId = userId;

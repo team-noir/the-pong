@@ -225,4 +225,29 @@ export class AppGateway
   ) {
     this.gamesService.gameModel.gameStatus(socket);
   }
+  
+  @SubscribeMessage('gameInvite')
+  async gameInvite(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('invitedId') invitedId: number
+  ) {
+    try {
+      await this.gamesService.inviteUserToGame(socket.data.userId, invitedId);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+  
+  @SubscribeMessage('gameInviteAnswer')
+  async gameInviteAnswer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('gameId') gameId: number,
+    @MessageBody('isAccepted') isAccepted: boolean,
+  ) {
+    try {
+      await this.gamesService.answerInvitation(socket.data.userId, gameId, isAccepted);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

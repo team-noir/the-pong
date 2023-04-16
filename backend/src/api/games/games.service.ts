@@ -21,7 +21,7 @@ export class GamesService {
 		const player = await this.gameModel.createPlayer(userId);
 		const game = this.gameModel.findQueue(player, isLadder);
 
-		if (game == undefined) {
+		if (game == null) {
 			return this.gameModel.newQueue(player, isLadder);
 		} else {
 			this.gameModel.joinQueue(player, game);

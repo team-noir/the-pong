@@ -45,7 +45,9 @@ export class ChannelUser {
   }
 
   resetSocket(socket: Socket) {
-    this.socket.disconnect(true);
+    if (this.socket) {
+      this.socket.disconnect(true);
+    }
     this.socket = socket;
     this.joined.forEach((channelId) => {
       this.socket.join(String(channelId));
