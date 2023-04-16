@@ -54,6 +54,7 @@ export interface AchievementType {
   id: number;
   title: string;
   description: string;
+  createdAt: string;
 }
 
 /** Channel */
@@ -114,6 +115,15 @@ export interface GameType {
   theme: number;
   viewerCount: number;
   isLadder: boolean;
+  createdAt: string;
+}
+
+export interface GameResultType {
+  id: number;
+  winner: PlayerType;
+  loser: PlayerType;
+  winnerScore: number;
+  loserScore: number;
   createdAt: string;
 }
 

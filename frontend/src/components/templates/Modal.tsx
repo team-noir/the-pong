@@ -4,12 +4,14 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { classNames } from 'utils';
 
 interface Props {
+  title?: string;
   children: React.ReactNode;
   onClickClose: () => void;
   fitContent?: boolean;
 }
 
 export default function Modal({
+  title,
   children,
   onClickClose,
   fitContent = false,
@@ -51,12 +53,15 @@ export default function Modal({
                 `modal-panel ${fitContent && 'h-fit w-fit'}`
               )}
             >
-              <XMarkIcon
-                className="absolute top-4 right-4 block h-6 w-6 text-text-light"
-                aria-hidden="true"
-                onClick={onClickClose}
-                ref={closeButtonRef}
-              />
+              <div className="flex justify-between items-center">
+                {title && <h3 className="ml-1 text-sm">{title}</h3>}
+                <XMarkIcon
+                  className="h-6 w-6 text-text-light"
+                  aria-hidden="true"
+                  onClick={onClickClose}
+                  ref={closeButtonRef}
+                />
+              </div>
               {children}
             </Dialog.Panel>
           </Transition.Child>
