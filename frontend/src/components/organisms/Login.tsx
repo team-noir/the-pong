@@ -5,7 +5,7 @@ import logo42 from 'assets/images/logo_42.svg';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function Login() {
-  const isLogin = useUser((state) => state.isLogin);
+  const isLoggedIn = useUser((state) => state.isLoggedIn);
   const queryClient = useQueryClient();
 
   const anonymousLoginMutation = useMutation(anonymousLogin);
@@ -17,7 +17,7 @@ export default function Login() {
   return (
     <>
       <h1>The Pong</h1>
-      <p>isLogin: {isLogin.toString()}</p>
+      <p>isLoggedIn: {isLoggedIn.toString()}</p>
       <Button logoImageUrl={logo42} onClick={handleClick} primary>
         42로 로그인하기
       </Button>

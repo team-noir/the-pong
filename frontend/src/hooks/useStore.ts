@@ -3,7 +3,7 @@ import { devtools } from 'zustand/middleware';
 import { UserType } from 'types';
 
 interface UserState {
-  isLogin: boolean;
+  isLoggedIn: boolean;
   isOnboarded: boolean;
   id: number | null;
   nickname: string;
@@ -11,17 +11,19 @@ interface UserState {
   isTwoFactor: boolean;
   login: (user: UserType) => void;
   logout: () => void;
+  setIsLoggedIn: (isLoggedIn: boolean) => void;
   setNickname: (nickname: string) => void;
   setIsOnboarded: (isOnboarded: boolean) => void;
+  setIsTwoFactor: (isTwoFactor: boolean) => void;
 }
 
 const initialState = {
-  isLogin: false,
+  isLoggedIn: false,
+  isOnboarded: false,
   id: null,
   nickname: '',
   rank: 0,
   isTwoFactor: false,
-  isOnboarded: false,
 };
 
 export const useUser = create<UserState>()(
@@ -29,17 +31,20 @@ export const useUser = create<UserState>()(
     ...initialState,
     login: ({ id, nickname, rank, isTwoFactor }: UserType) =>
       set(() => ({
-        isLogin: true,
+        isLoggedIn: !isTwoFactor,
+        isOnboarded: !!nickname,
         id,
         nickname,
         rank,
         isTwoFactor,
       })),
     logout: () => set(() => initialState),
+    setIsLoggedIn: (isLoggedIn: boolean) => set(() => ({ isLoggedIn })),
     setNickname: (nickname: string) =>
       set(() => ({
         nickname,
       })),
     setIsOnboarded: (isOnboarded: boolean) => set(() => ({ isOnboarded })),
+    setIsTwoFactor: (isTwoFactor: boolean) => set(() => ({ isTwoFactor })),
   }))
 );
