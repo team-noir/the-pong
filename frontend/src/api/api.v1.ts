@@ -136,7 +136,15 @@ export const getMy2fa = async () => {
   return res.data;
 };
 
-export const deleteMy2fa = async () => {
+export const verify2fa = async (otp: string) => {
+  const res = await axiosWithInterceptors.post(`/my/2fa`, { otp });
+  if (res.status !== 202) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const delete2fa = async () => {
   const res = await axiosWithInterceptors.delete(`/my/2fa`);
   if (res.status !== 204) {
     throw new Error(res.statusText);

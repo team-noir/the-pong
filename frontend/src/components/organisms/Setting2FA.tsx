@@ -1,14 +1,38 @@
+import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { get2faCode, delete2fa } from 'api/api.v1';
 import { CheckCircleIcon } from '@heroicons/react/20/solid';
-import Button from 'components/atoms/Button';
 import { useUser } from 'hooks/useStore';
+import Modal from 'components/templates/Modal';
+import Button from 'components/atoms/Button';
 
-interface Props {
-  onClickSet: () => void;
-  onClickUnset: () => void;
-}
+export default function Setting2FA() {
+  const { isTwoFactor, setIsTwoFactor, setIsLoggedIn } = useUser(
+    (state) => state
+  );
+  const [twoFactorCode, setTwoFactorCode] = useState<{
+    qr: string;
+    key: string;
+  } | null>(null);
 
-export default function Setting2FA({ onClickSet, onClickUnset }: Props) {
-  const isTwoFactor = useUser((state) => state.isTwoFactor);
+  const get2faCodeMutation = useMutation({
+    mutationFn: get2faCode,
+    onSuccess: (data) => {
+      setTwoFactorCode(data);
+    },
+  });
+
+  const delete2faMutation = useMutation({
+    mutationFn: delete2fa,
+    onSuccess: () => {
+      setIsTwoFactor(false);
+    },
+  });
+
+  const handleClickNext = () => {
+    setIsLoggedIn(false);
+    setIsTwoFactor(true);
+  };
 
   return (
     <>
@@ -21,7 +45,11 @@ export default function Setting2FA({ onClickSet, onClickUnset }: Props) {
       </p>
       <div>
         {!isTwoFactor ? (
-          <Button onClick={onClickSet} primary fullLength>
+          <Button
+            onClick={() => get2faCodeMutation.mutate()}
+            primary
+            fullLength
+          >
             설정하기
           </Button>
         ) : (
@@ -34,7 +62,7 @@ export default function Setting2FA({ onClickSet, onClickUnset }: Props) {
               <span>보안 활성화됨</span>
             </div>
             <Button
-              onClick={onClickUnset}
+              onClick={() => delete2faMutation.mutate()}
               linkStyle
               fullLength
               className="text-red"
@@ -44,6 +72,25 @@ export default function Setting2FA({ onClickSet, onClickUnset }: Props) {
           </>
         )}
       </div>
+      {twoFactorCode && (
+        <Modal title="2FA 설정" onClickClose={() => setTwoFactorCode(null)}>
+          <div className="flex flex-col items-center">
+            <div>
+              <img src={twoFactorCode.qr} alt="QR 코드" className="w-20" />
+            </div>
+            <div>
+              <h2>설정 키</h2>
+              <p>QR 코드를 사용할 수 없는 경우 설정 키를 입력해 주세요.</p>
+              <span>{twoFactorCode.key}</span>
+            </div>
+            <div>
+              <Button onClick={handleClickNext} primary>
+                다음
+              </Button>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }

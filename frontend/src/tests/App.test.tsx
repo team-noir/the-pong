@@ -20,7 +20,7 @@ describe('Router - Nav에 있는 페이지들 렌더링', () => {
 
     const route = '/';
 
-    const router = createMemoryRouter(routes(true, true), {
+    const router = createMemoryRouter(routes(true, true, false), {
       initialEntries: [route],
     });
 
@@ -63,7 +63,7 @@ describe('Router - Error Page 렌더링', () => {
 
     const badRoute = '/some/bad/route';
 
-    const router = createMemoryRouter(routes(true, true), {
+    const router = createMemoryRouter(routes(true, true, false), {
       initialEntries: [badRoute],
     });
 

@@ -34,10 +34,11 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
-  const isLoggedIn = useUser((state) => state.isLogin);
-  const isOnboarded = useUser((state) => state.isOnboarded);
+  const { isLoggedIn, isOnboarded, isTwoFactor } = useUser((state) => state);
 
-  const router = createBrowserRouter(routes(isLoggedIn, isOnboarded));
+  const router = createBrowserRouter(
+    routes(isLoggedIn, isOnboarded, isTwoFactor)
+  );
 
   return (
     <SocketContext.Provider value={socket}>
@@ -72,7 +73,6 @@ export function App() {
 
 function Init() {
   const login = useUser((state) => state.login);
-  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
 
   useQuery({
     queryKey: ['health-check'],
@@ -84,10 +84,6 @@ function Init() {
     queryFn: whoami,
     onSuccess: (data) => {
       login(data);
-
-      if (data.nickname) {
-        setIsOnboarded(true);
-      }
     },
     refetchInterval: false,
     refetchOnWindowFocus: false,

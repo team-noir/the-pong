@@ -19,33 +19,28 @@ import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
 import GameSettingPage from 'pages/GameSettingPage';
 import WelcomePage from 'pages/WelcomePage';
+import Verify2FAPage from 'pages/Verify2FAPage';
 
-export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
+export const routes = (
+  isLoggedin: boolean,
+  isOnboarded: boolean,
+  isTwoFactor: boolean
+) => [
   {
     path: '/login',
-    element: !isOnboarded ? (
-      !isLoggedin ? (
-        <LoginPage />
-      ) : (
-        <Navigate to="/on-boarding" />
-      )
-    ) : (
-      <Navigate to="/" />
-    ),
+    element: !isLoggedin ? <LoginPage /> : <Navigate to="/" />,
     errorElement: <ErrorPage />,
   },
   {
     path: '/on-boarding',
-    element: isLoggedin ? (
-      !isOnboarded ? (
-        <OnBoardingPage />
-      ) : (
-        <Navigate to="/" />
-      )
-    ) : (
-      <Navigate to="/login" />
-    ),
+    element: !isOnboarded ? <OnBoardingPage /> : <Navigate to="/" />,
     errorElement: <ErrorPage />,
+  },
+  {
+    path: '/2fa',
+    errorElement: <ErrorPage />,
+    element:
+      !isLoggedin && isTwoFactor ? <Verify2FAPage /> : <Navigate to="/" />,
   },
   {
     path: '/setting/*',
@@ -57,7 +52,12 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
       },
       {
         path: '2fa',
-        element: <Setting2FAPage />,
+        element:
+          !isLoggedin && isTwoFactor ? (
+            <Navigate to="/2fa" state={{ redirectTo: '/setting/2fa' }} />
+          ) : (
+            <Setting2FAPage />
+          ),
       },
       {
         path: 'blocks',
@@ -105,6 +105,8 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
       ) : (
         <Navigate to="/on-boarding" />
       )
+    ) : isTwoFactor ? (
+      <Navigate to="/2fa" state={{ redirectTo: '/' }} />
     ) : (
       <Navigate to="/login" />
     ),
