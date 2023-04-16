@@ -7,16 +7,19 @@ const dummyAchievementData: AchievementType[] = [
     id: 0,
     title: '업적 제목0',
     description: '업적 달성 조건에 대한 설명입니다.',
+    createdAt: '2023-04-07T00:00:00.000Z',
   },
   {
     id: 1,
     title: '업적 제목1',
     description: '업적 달성 조건에 대한 설명입니다.',
+    createdAt: '2023-04-07T00:00:00.000Z',
   },
   {
     id: 2,
     title: '업적 제목2',
     description: '업적 달성 조건에 대한 설명입니다.',
+    createdAt: '2023-04-07T00:00:00.000Z',
   },
 ];
 
