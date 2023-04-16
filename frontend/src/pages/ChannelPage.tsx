@@ -20,7 +20,7 @@ export default function ChannelPage() {
   const [isShowInvite, setIsShowInvite] = useState(false);
 
   const getChannelQuery = useQuery({
-    queryKey: ['getChannel', String(channelId)], // NOTE: queryKey 요소는 string이어야 함
+    queryKey: ['getChannel', channelId], // NOTE: queryKey 요소는 string이어야 함
     queryFn: () => getChannel(Number(channelId)),
   });
 
