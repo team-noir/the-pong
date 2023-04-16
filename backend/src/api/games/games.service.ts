@@ -28,7 +28,7 @@ export class GamesService {
 		}
 		const game = this.gameModel.findQueue(player, isLadder);
 
-		if (game == undefined) {
+		if (!game) {
 			return this.gameModel.newQueue(player, isLadder);
 		} else {
 			this.gameModel.joinQueue(player, game);
