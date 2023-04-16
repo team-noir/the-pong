@@ -250,4 +250,15 @@ export class AppGateway
       console.log(error);
     }
   }
+  
+  @SubscribeMessage('cancelInvite')
+  async cancelInvite(
+    @ConnectedSocket() socket: Socket,
+  ) {
+    try {
+      await this.gamesService.cancelInvitation(socket.data.userId);
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

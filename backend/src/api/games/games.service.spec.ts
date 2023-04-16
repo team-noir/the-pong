@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { describe, it, expect, jest } from '@jest/globals';
+import { describe, it, expect, jest, beforeAll, afterAll } from '@jest/globals';
 import { GamesService } from './games.service';
 import { AppGateway } from '../../app.gateway';
 import { ChannelsModule } from '../channels/channels.module';
@@ -8,110 +8,102 @@ import { GamesModule } from './games.module';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { Player } from './dtos/player.dto';
 
-import { io } from 'socket.io-client';
-import { IoAdapter } from '@nestjs/platform-socket.io';
-import { INestApplication } from '@nestjs/common';
+import { SocketServerMock } from 'socket.io-mock-ts';
 import { AppModule } from '../../app.module';
 
-// class FakeServer {
-// 	private events = new Map();
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { io } from 'socket.io-client';
+import { INestApplication } from '@nestjs/common';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
-// 	on(event: string, listener: (data) => void) {
-// 		this.events.set(event, listener);
-// 	}
+it('socket', () => {
+	const socket = new SocketServerMock();
 
-// 	emit(event: string, data) {
-// 		console.log('server: ', event, data);
-
-// 		this.events.get(event)(data);
-// 	}
-// };
-
-// class FakeSocket {
-// 	private server;
-
-// 	constructor(server) {
-// 		this.server = server;
-// 	}
-
-// 	emit(event: string, data) {
-// 		console.log('client: ', event, data);
-
-// 		if (event == 'ping') {
-// 			this.server.emit('pong', data);
-// 		}
-// 	};
-// 	join = jest.fn();
-// 	leave = jest.fn();
-// }
-
-// const fakeServer = new FakeServer();
-// const player1 = new Player(1, new FakeSocket(fakeServer));
-// const player2 = new Player(2, new FakeSocket(fakeServer));
-// const player3 = new Player(3, new FakeSocket(fakeServer), [1]);
+	socket.on('message', (message: string) => {
+	  expect(message).toBe('Hello World!');
+	});
+  
+	socket.clientMock.emit('message', 'Hello World!');
+})
 
 
-it('Test Ping', (done) => {
-	// jest.useFakeTimers();
 
-	let app: INestApplication;
-	let socket;
+const getSocketDsn = (app: INestApplication) => {
+	const { port } = app.getHttpServer().listen().address();
+	return `http://localhost:${port}`;
+};
+
+let app: INestApplication;
+let clientSocket;
+let server;
+let adapter;
+
+afterAll(async () => {
+	console.log('disconnect')
+	await clientSocket.disconnect(true);
+	await clientSocket.close();
+	await app.close();
+	await adapter.close();
+	await server.close();
+});
+
+it('Text socket', (done) => {
+	let module: TestingModule;
 
 	Test.createTestingModule({
 		imports: [AppModule]
-	  })
-		.compile()
-		.then((moduleFixture: TestingModule) => {
-			console.log("asdf")
-			const appModule = moduleFixture.get<AppModule>(AppModule);
-			console.log("asdf")
+	})
+	.compile()
+	.then((moduleFixture: TestingModule) => {
+		module = moduleFixture;
 
-			// app = moduleFixture.createNestApplication();
-			// app.useWebSocketAdapter(new IoAdapter(app.getHttpServer()));
-			// app.init();
-	
-			// socket = io(`http://localhost:${app.getHttpServer().listen().address()}`, {
-			// extraHeaders: { cookie: `Authorization=${process.env.TEST_JWT}` },
-			// });
-			// socket.on('connect', () => {
-			// 	console.log("--------------------");
-			// done();
-			// });
+		app = moduleFixture.createNestApplication();
+		server = app.getHttpServer();
+		adapter = new IoAdapter(server);
+		app.useWebSocketAdapter(adapter);
+		app.init();
+
+		const address = getSocketDsn(app);
+		clientSocket = io(address, {
+			extraHeaders: { cookie: `Authorization=${process.env.TEST_JWT}` }
 		});
+
+		clientSocket.on('connect', () => {
+			done();
+		});
+
+
+
+		// socket.on('connect', (socket) => {
+		// 	serverSocket = socket;
+		// 	done();
+		// });
+	});
+
+	
 	
 
-	// jest.spyOn(service.gameModel, 'sendPingToAllPlayers');
-	// jest.spyOn(player1.socket, 'emit');
+	// const httpServer = createServer();
+	// io = new Server(httpServer);
 
-	// jest.advanceTimersByTime(10000);
-	// expect(service.gameModel.sendPingToAllPlayers).toHaveBeenCalledTimes(2);
-	
-	// const gameId = (service.addUserToQueue(player1, false));
-	// console.log('gameId: ', gameId);
+	// httpServer.listen(() => {
+	// 	const address = httpServer.address();
 
-	// jest.advanceTimersByTime(10000);
-	// expect(player1.socket.emit).toHaveBeenCalledTimes(2);
+	// 	clientSocket = new Client(`http://localhost:${address['port']}`);
+		
+	// 	io.on("connection", (socket) => {
+	// 		serverSocket = socket;
+	// 	});
+
+	// 	clientSocket.on("connect", done);
+	// });
+  
+	// afterAll(() => {
+	//   io.close();
+	//   clientSocket.close();
+	// });
+
+
+
 });
-
-// it ('Test matched', async () => {
-// 	jest.useFakeTimers();
-	
-// 	const module: TestingModule = await Test.createTestingModule({
-// 		providers: [GamesService],
-// 	}).compile();
-// 	const service = module.get<GamesService>(GamesService);
-// 	service.init(fakeServer);
-
-// 	jest.spyOn(service.gameModel, 'sendPingToAllPlayers');
-// 	jest.spyOn(player1.socket, 'emit');
-
-// 	jest.advanceTimersByTime(10000);
-// 	expect(service.gameModel.sendPingToAllPlayers).toHaveBeenCalledTimes(2);
-	
-// 	const gameId = (service.addUserToQueue(player1, false));
-
-// 	jest.advanceTimersByTime(10000);
-// 	expect(player1.socket.emit).toHaveBeenCalledTimes(2);
-
-	
-// });

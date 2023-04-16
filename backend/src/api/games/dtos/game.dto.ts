@@ -91,9 +91,9 @@ export class Game {
 
 	// socket 
 
-	noticeToPlayers(event: string, data) {
-		this.players.forEach((player) => {
-			player.socket.emit(event, data);
-		})
+	async noticeToPlayers(event: string, data) {
+		for (const player of this.players) {
+			await player.socket.emit(event, data);
+		}
 	}
 }

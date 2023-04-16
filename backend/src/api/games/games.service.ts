@@ -57,11 +57,13 @@ export class GamesService {
 		const game = player.game;
 
 		if (game) {
-			this.gameModel.removeInvite(game);
+			this.gameModel.removeInvitation(game);
 		}
 	}
 
 	async answerInvitation(userId: number, gameId: number, isAccepted: boolean) {
+		this.gameModel.deleteInvite(userId);
+
 		const invited = await this.gameModel.createPlayer(userId);
 		const game = this.gameModel.getGame(gameId);
 
@@ -78,7 +80,7 @@ export class GamesService {
 		if (isAccepted) {
 			game.join(invited, false);
 		} else {
-			game.noticeToPlayers('queue', {
+			await game.noticeToPlayers('queue', {
 				text: 'rejected'
 			});
 			this.gameModel.removeGame(game);
