@@ -50,10 +50,10 @@ export class AuthController {
     }
   }
 
-  @Post('login')
-  @ApiOperation({ summary: 'Login' })
-  @ApiNoContentResponse({ description: 'Login. Remove cookie.' })
-  async login(@Res({ passthrough: true }) res) {
+  @Post('login/anonymous')
+  @ApiOperation({ summary: 'Login as an anonymous user' })
+  @ApiNoContentResponse({ description: 'Login as an anonymous user. Remove cookie.' })
+  async loginAnonymous(@Res({ passthrough: true }) res) {
     try {
       return await this.authService.login(res);
     } catch (error) {
