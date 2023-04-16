@@ -9,4 +9,4 @@ export const NOTICE_STATUS = {
   USER_MUTE: 302,
   USER_UNMUTE: 303,
   CHANNEL_REMOVE: 400,
-};
+} as const;

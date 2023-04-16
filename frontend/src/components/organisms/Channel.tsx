@@ -30,29 +30,23 @@ export default function Channel({ channel, myUserId }: Props) {
     placeholder: '메시지를 입력하세요',
     disabled: false,
   });
-  const [messages, setMessages] = useState<MessageType[]>([]);
 
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const queryKey = ['getMessages'];
+  const { data: messages } = useQuery<MessageType[]>({
+    queryKey,
+    queryFn: () => getMessages(channel.id),
+    staleTime: Infinity,
+  });
+
+  const sendMessageMutation = useMutation(sendMessage);
 
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
-
-  const getMessagesQuery = useQuery({
-    queryKey: ['getMessages'],
-    queryFn: () => getMessages(channel.id),
-    staleTime: Infinity,
-  });
-
-  useEffect(() => {
-    if (getMessagesQuery.data) {
-      setMessages([...getMessagesQuery.data]);
-    }
-  }, [getMessagesQuery.data]);
-
-  const sendMessageMutation = useMutation(sendMessage);
 
   useEffect(() => {
     if (!channel.users) return;
@@ -61,7 +55,7 @@ export default function Channel({ channel, myUserId }: Props) {
     if (myUser?.isMuted) {
       setFormData((prevState) => ({
         ...prevState,
-        placeholder: '30초간 조용히 상태가 되었습니다.',
+        placeholder: '30초간 채팅이 금지 되었습니다.',
         disabled: true,
       }));
     }
@@ -77,7 +71,9 @@ export default function Channel({ channel, myUserId }: Props) {
         text: data.text,
         createdAt: data.createdAt,
       };
-      setMessages((prev) => [...prev, newMessage]);
+      queryClient.setQueryData<MessageType[]>(queryKey, (oldData) =>
+        oldData ? [...oldData, newMessage] : oldData
+      );
     });
     socket.on('notice', (data: NoticeType) => {
       const newNotice: MessageType = {
@@ -86,7 +82,9 @@ export default function Channel({ channel, myUserId }: Props) {
         text: data.text,
         createdAt: data.createdAt,
       };
-      setMessages((prev) => [...prev, newNotice]);
+      queryClient.setQueryData<MessageType[]>(queryKey, (oldData) =>
+        oldData ? [...oldData, newNotice] : oldData
+      );
       queryClient.refetchQueries(['getChannel', String(channel.id)]);
 
       data.code === NOTICE_STATUS.CHANNEL_REMOVE &&
@@ -157,7 +155,7 @@ export default function Channel({ channel, myUserId }: Props) {
         className="h-[80vh] overflow-y-auto"
         ref={scrollRef}
       >
-        <MessageList messages={messages} myUserId={myUserId} />
+        {messages && <MessageList messages={messages} myUserId={myUserId} />}
       </div>
       <form onSubmit={handleSubmit} className="inline-flex w-full">
         <div className="w-10/12 flex items-center justify-center pr-2">
