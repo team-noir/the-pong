@@ -90,7 +90,6 @@ function Init() {
       }
     },
     onError: (error: Error) => console.log(error.message),
-    suspense: false,
     useErrorBoundary: false,
   });
 

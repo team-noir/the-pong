@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { SocketContext } from 'contexts/socket';
 
 type ReturnType = [
@@ -12,6 +13,7 @@ export default function useGame(): ReturnType {
   const [isWating, setIsWating] = useState(false);
   const [alertCode, setAlertCode] = useState<string | null>(null);
   const socket = useContext(SocketContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!isWating) return;
@@ -22,7 +24,7 @@ export default function useGame(): ReturnType {
 
     socket.on('queue', (data: { text: string; gameId?: number }) => {
       if (data.gameId) {
-        // TODO: 게임 설정 페이지로 이동
+        navigate(`game/${data.gameId}/setting`);
       } else {
         setAlertCode(data.text);
         setIsWating(false);

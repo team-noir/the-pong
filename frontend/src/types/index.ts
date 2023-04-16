@@ -98,10 +98,13 @@ export interface NoticeType {
   createdAt: string;
 }
 
+/** Game */
+
 export interface PlayerType {
   id: number;
   nickname: string;
   level: number;
+  isOwner?: boolean;
 }
 
 export interface GameHistoryPlayerType extends PlayerType {
@@ -111,11 +114,16 @@ export interface GameHistoryPlayerType extends PlayerType {
 export interface GameType {
   id: number;
   players: PlayerType[];
-  mode: 'normal' | 'hard';
+  mode: string;
   theme: number;
-  viewerCount: number;
+  viewerCount?: number;
   isLadder: boolean;
   createdAt: string;
+}
+
+export interface GameSettingType extends GameType {
+  modes: string[];
+  themes: number[];
 }
 
 export interface GameResultType {

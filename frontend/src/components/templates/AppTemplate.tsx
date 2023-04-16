@@ -49,6 +49,9 @@ export default function AppTemplate({ header, children }: Props) {
           <li>
             <Link to="/profile/3">user3 profile</Link>
           </li>
+          <li>
+            <Link to="/game/1/setting">user3 profile</Link>
+          </li>
         </nav>
       </footer>
     </>
