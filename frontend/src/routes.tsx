@@ -91,7 +91,7 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
         element: <GamePage />,
       },
       {
-        path: 'setting/:gameId',
+        path: ':gameId/setting',
         element: <GameSettingPage />,
       },
     ],
