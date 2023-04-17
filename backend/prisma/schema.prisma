@@ -17,6 +17,7 @@ model User {
   nickname              String?       @unique
   rank                  Int           @default(1)
   isTwoFactor           Boolean       @default(false)
+  twoFactorSecret       String?
   ftId                  String        @unique
   ftUsername            String?
   ftAccessToken         String?       @unique
