@@ -34,10 +34,12 @@ const queryClient = new QueryClient({
 });
 
 export function App() {
-  const { isLoggedIn, isOnboarded, isTwoFactor } = useUser((state) => state);
+  const { isLoggedIn, isOnboarded, isTwoFactor, isVerifiedTwoFactor } = useUser(
+    (state) => state
+  );
 
   const router = createBrowserRouter(
-    routes(isLoggedIn, isOnboarded, isTwoFactor)
+    routes(isLoggedIn, isOnboarded, isTwoFactor, isVerifiedTwoFactor)
   );
 
   return (
