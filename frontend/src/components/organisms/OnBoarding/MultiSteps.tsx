@@ -10,20 +10,16 @@ type ValidatorFunctionOrNull = (() => boolean) | null;
 interface Props {
   formData: FormData;
   stepComponents: React.ReactElement[];
-  resultComponent: React.ReactElement;
   validators: ValidatorFunctionOrNull[];
   messages: string[];
-  isSubmitted: boolean;
   onSubmit: (formData: ProfileFormType) => void;
 }
 
 export default function MultiSteps({
   formData,
   stepComponents,
-  resultComponent,
   validators,
   messages,
-  isSubmitted,
   onSubmit,
 }: Props) {
   const [stepIndex, setStepIndex] = useState<number>(0);
@@ -53,10 +49,6 @@ export default function MultiSteps({
     setStepIndex((prevState) => prevState + 1);
     setIsValid(true);
   };
-
-  if (isSubmitted) {
-    return <>{resultComponent}</>;
-  }
 
   return (
     <>
