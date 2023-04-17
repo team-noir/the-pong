@@ -17,6 +17,7 @@ import ChannelLobbyPage from 'pages/ChannelLobbyPage';
 import ChannelBrowsePage from 'pages/ChannelBrowsePage';
 import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
+import GameSettingPage from 'pages/GameSettingPage';
 
 export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
   {
@@ -88,6 +89,10 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
       {
         path: ':gameId',
         element: <GamePage />,
+      },
+      {
+        path: ':gameId/setting',
+        element: <GameSettingPage />,
       },
     ],
   },

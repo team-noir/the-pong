@@ -14,6 +14,7 @@ import { socket, SocketContext } from 'contexts/socket';
 import LoadingFallback from 'components/organisms/LoadingFalback';
 import ErrorFallbackWithHeader from 'components/organisms/ErrorFallbackWithHeader';
 import { routes } from 'routes';
+import GameInviteModal from 'components/molecule/GameInviteModal';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -57,6 +58,7 @@ export function App() {
             >
               <Suspense fallback={<LoadingFallback />}>
                 <Init />
+                <GameInviteModal />
                 <RouterProvider router={router} />
               </Suspense>
             </ErrorBoundary>
@@ -88,7 +90,6 @@ function Init() {
       }
     },
     onError: (error: Error) => console.log(error.message),
-    suspense: false,
     useErrorBoundary: false,
   });
 

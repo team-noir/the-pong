@@ -18,7 +18,13 @@ export class AuthenticatedGuard implements CanActivate {
     const user: User = await this.authService.getUserFromJwt(req);
     const now: Date = new Date(Date.now());
 
-    if (user == null || now > user.ftRefreshExpiresAt) {
+    // TODO: 임시로 익명 회원의 id는 10000번부터 시작
+    if (user && user.id >= 10000) {
+      req.user = user;
+      const newJwt = this.authService.signJwt(user.id, user.nickname);
+      this.authService.setJwt(res, newJwt);
+      return true;
+    } else if (user == null || now > user.ftRefreshExpiresAt) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt) {
@@ -29,10 +35,8 @@ export class AuthenticatedGuard implements CanActivate {
       }
     }
     req.user = user;
-
     const newJwt = this.authService.signJwt(user.id, user.nickname);
     this.authService.setJwt(res, newJwt);
-
     return true;
   }
 }

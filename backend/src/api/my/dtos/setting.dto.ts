@@ -1,10 +1,17 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString } from 'class-validator';
+import { IsString, IsOptional } from 'class-validator';
 
 export class SettingDto {
   @ApiProperty()
   @IsString()
   public nickname: string;
+}
+
+export class CheckSettingDto {
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  public nickname?: string;
 }
 
 export class FileUploadDto {

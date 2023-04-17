@@ -2,6 +2,7 @@ import ProfileImage from 'components/atoms/ProfileImage';
 import { GameHistoryType, PlayerType } from 'types';
 import { classNames } from 'utils';
 import { GameHistoryPlayerType } from 'types';
+import { formatDate, formatTime } from 'utils';
 
 interface Props {
   histories: GameHistoryType[];
@@ -68,7 +69,9 @@ function GameHistoryItem({
         </div>
 
         <div className="flex items-center mx-4 my-1 text-xs text-gray-light justify-end">
-          <span>{formatDate(history.createdAt)}</span>
+          <span>{`${formatDate(history.createdAt)} ${formatTime(
+            history.createdAt
+          )}`}</span>
         </div>
       </div>
     </>
@@ -85,11 +88,7 @@ function GameHistoryItemPlayer({
   const imageSize = 52;
 
   return (
-    <div
-      className={classNames(
-        'flex-initial p-4 flex flex-col items-center justify-between'
-      )}
-    >
+    <div className="flex-initial p-4 flex flex-col items-center justify-between">
       <div
         className={`flex-1 rounded-full max-w-${imageSize / 4} max-h-${
           imageSize / 4
@@ -103,29 +102,7 @@ function GameHistoryItemPlayer({
       </div>
 
       <span className="mt-1">{player.nickname}</span>
-      <span className="items-center mt-1 px-2 py-1 bg-gray-dark rounded-full text-xs text-text-light">
-        Lv. {player.level}
-      </span>
+      <span className="badge">Lv. {player.level}</span>
     </div>
   );
-}
-
-// Utils
-// TODO: move to utils
-
-function formatDate(iso: string) {
-  const d = new Date(iso);
-  const locale = 'ko-KR';
-  const date = d
-    .toLocaleDateString(locale, {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-    .replace(/ /g, '');
-  const time = d.toLocaleTimeString(locale, {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  return `${date} ${time}`;
 }

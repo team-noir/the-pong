@@ -1,21 +1,19 @@
 import { useState } from 'react';
+import { updateChannelSetting } from 'api/api.v1';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Modal from 'components/templates/Modal';
 import ChannelSettingPassword from 'components/organisms/ChannelSetting/ChannelSettingPassword';
 import ChannelSettingTitle from 'components/organisms/ChannelSetting/ChannelSettingTitle';
-import { ChannelFormType, ChannelType } from 'types';
+import { ChannelType } from 'types';
 
 interface Props {
   channel: ChannelType;
   onClickClose: () => void;
-  changeChannelSetting: (channelForm: ChannelFormType) => void;
 }
 
-export default function ChannelSetting({
-  channel,
-  onClickClose,
-  changeChannelSetting,
-}: Props) {
+export default function ChannelSetting({ channel, onClickClose }: Props) {
+  const queryClient = useQueryClient();
   const [isSettingTitle, setIsSettingTitle] = useState(false);
   const [isSettingPassword, setIsSettingPassword] = useState(false);
 
@@ -24,12 +22,20 @@ export default function ChannelSetting({
     setIsSettingPassword(false);
   };
 
+  const updateChannelSettingMutation = useMutation({
+    mutationFn: updateChannelSetting,
+    onSuccess: async () => {
+      onClickClose();
+      queryClient.refetchQueries(['getChannel', String(channel.id)]);
+    },
+  });
+
   const handleSubmitTitle = (title: string) => {
-    changeChannelSetting({ id: channel.id, title });
+    updateChannelSettingMutation.mutate({ id: channel.id, title });
   };
 
   const handleSubmitPassword = (password: string) => {
-    changeChannelSetting({ id: channel.id, password });
+    updateChannelSettingMutation.mutate({ id: channel.id, password });
   };
 
   return (

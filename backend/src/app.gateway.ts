@@ -76,6 +76,7 @@ export class AppGateway
       );
       return;
     }
+
     return { userId: userId, username: username };
   }
 
@@ -121,8 +122,8 @@ export class AppGateway
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     const userInfo = this.getUserInfoFromSocket(socket);
-    if (!userInfo || !userInfo.userId || !userInfo.username) { 
-      return ;
+    if (!userInfo || !userInfo.userId || !userInfo.username) {
+      return;
     }
 
     const logged = this.channelsService.userModel.getUser(userInfo.userId);
@@ -142,11 +143,7 @@ export class AppGateway
       const channel = this.channelsService.channelModel.get(channelId);
       const user = this.channelsService.userModel.getUser(socket.data.userId);
 
-      await this.channelsService.messageToChannel(
-        user,
-        channel,
-        message
-      );
+      await this.channelsService.messageToChannel(user, channel, message);
     } catch (error) {
       console.log(error);
     }

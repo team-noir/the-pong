@@ -88,14 +88,18 @@ export class ChannelsController {
     @Query('kind') kind: string[],
     @Res({ passthrough: true }) res
   ) {
-    const query = {
-      isEnter: enter != undefined,
-      isPublic: kind && kind.includes('public'),
-      isPriv: kind && kind.includes('private'),
-      isDm: kind && kind.includes('dm'),
-    };
-    res.status(HttpStatus.OK);
-    return this.channelsService.list(req.user.id, query);
+    try {
+      const query = {
+        isEnter: enter != undefined,
+        isPublic: kind && kind.includes('public'),
+        isPriv: kind && kind.includes('private'),
+        isDm: kind && kind.includes('dm'),
+      };
+      res.status(HttpStatus.OK);
+      return this.channelsService.list(req.user.id, query);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
   }
 
   @Get(':channelId')

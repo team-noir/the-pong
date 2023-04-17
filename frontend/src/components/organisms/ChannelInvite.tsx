@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useMutation } from '@tanstack/react-query';
-import { getUsers } from 'api/api.v1';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getUsers, inviteUserToChannel } from 'api/api.v1';
 import { XMarkIcon } from '@heroicons/react/20/solid';
 import Modal from 'components/templates/Modal';
 import UserList from 'components/molecule/UserList';
@@ -9,26 +9,43 @@ import Button from 'components/atoms/Button';
 import { UserType, ChannelUserType } from 'types';
 
 interface Props {
+  channelId: number;
   channelUsers: ChannelUserType[];
   onClickClose: () => void;
-  inviteUsers: (userIds: number[]) => void;
 }
 
 export default function ChannelInvite({
+  channelId,
   channelUsers,
   onClickClose,
-  inviteUsers,
 }: Props) {
+  const queryClient = useQueryClient();
+
   const [nickname, setNickname] = useState('');
   const [users, setUsers] = useState<UserType[]>([]);
 
   const getUsersMutation = useMutation(getUsers);
+
+  const inviteUserToChannelMutation = useMutation({
+    mutationFn: inviteUserToChannel,
+    onSuccess: () => {
+      onClickClose();
+      queryClient.refetchQueries(['getChannel', String(channelId)]);
+    },
+  });
 
   useEffect(() => {
     if (!nickname.trim()) return;
 
     getUsersMutation.mutate(nickname);
   }, [nickname]);
+
+  const handleClickInvite = () => {
+    inviteUserToChannelMutation.mutate({
+      channelId: channelId,
+      userIds: users.map((user) => user.id),
+    });
+  };
 
   const handleSelect = (nickname: string) => {
     if (!getUsersMutation.isSuccess || !getUsersMutation.data) return;
@@ -77,11 +94,7 @@ export default function ChannelInvite({
           inviteList
         />
 
-        <Button
-          onClick={() => inviteUsers(users.map((user) => user.id))}
-          primary
-          fullLength
-        >
+        <Button onClick={handleClickInvite} primary fullLength>
           초대하기
         </Button>
       </section>

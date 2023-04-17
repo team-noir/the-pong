@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateChannelUserRole, updateChannelUserStatus } from 'api/api.v1';
 import ProfileImage from 'components/atoms/ProfileImage';
 import Button from 'components/atoms/Button';
+import GameInviteButton from './GameInviteButton';
 import {
   ChannelUserStatusType,
   ChannelUserType,
@@ -26,6 +27,11 @@ export default function ChannelUserItem({
   const queryClient = useQueryClient();
   const isSelf = myUser?.id === user.id;
   const amIOwner = myUser?.role === USER_ROLES.OWNER;
+  const amIAdmin = myUser?.role === USER_ROLES.ADMIN;
+  const isShowSettingButtons =
+    (amIOwner &&
+      (user.role === USER_ROLES.ADMIN || user.role === USER_ROLES.NORMAL)) ||
+    (amIAdmin && user.role === USER_ROLES.NORMAL);
 
   const updateChannelUserRoleMutation = useMutation({
     mutationFn: updateChannelUserRole,
@@ -88,53 +94,50 @@ export default function ChannelUserItem({
 
         {!isSelf && (
           <div className="inline-flex items-center space-x-2">
-            <Button primary size="small">
-              게임 초대
-            </Button>
-
-            {amIOwner && (
-              <>
-                {user.role === USER_ROLES.ADMIN ? (
-                  <Button onClick={handleClickRole} primary size="small">
-                    관리자 해제
-                  </Button>
-                ) : (
-                  <Button onClick={handleClickRole} primary size="small">
-                    관리자 임명
-                  </Button>
-                )}
-                {user.role !== USER_ROLES.OWNER && (
-                  <>
-                    <Button
-                      value={CHANNEL_USER_STATUS.MUTE}
-                      onClick={handleClickStatus}
-                      secondary
-                      size="small"
-                    >
-                      조용히
-                    </Button>
-                    <Button
-                      value={CHANNEL_USER_STATUS.KICK}
-                      onClick={handleClickStatus}
-                      secondary
-                      size="small"
-                    >
-                      내보내기
-                    </Button>
-                    <Button
-                      value={CHANNEL_USER_STATUS.BAN}
-                      onClick={handleClickStatus}
-                      size="small"
-                      linkStyle
-                      className="text-red"
-                    >
-                      차단하기
-                    </Button>
-                  </>
-                )}
-              </>
-            )}
+            <GameInviteButton />
           </div>
+        )}
+        {amIOwner && (
+          <>
+            {user.role === USER_ROLES.ADMIN ? (
+              <Button onClick={handleClickRole} primary size="small">
+                관리자 해제
+              </Button>
+            ) : (
+              <Button onClick={handleClickRole} primary size="small">
+                관리자 임명
+              </Button>
+            )}
+          </>
+        )}
+        {isShowSettingButtons && (
+          <>
+            <Button
+              value={CHANNEL_USER_STATUS.MUTE}
+              onClick={handleClickStatus}
+              secondary
+              size="small"
+            >
+              조용히
+            </Button>
+            <Button
+              value={CHANNEL_USER_STATUS.KICK}
+              onClick={handleClickStatus}
+              secondary
+              size="small"
+            >
+              내보내기
+            </Button>
+            <Button
+              value={CHANNEL_USER_STATUS.BAN}
+              onClick={handleClickStatus}
+              size="small"
+              linkStyle
+              className="text-red"
+            >
+              차단하기
+            </Button>{' '}
+          </>
         )}
       </div>
     </li>

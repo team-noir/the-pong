@@ -31,6 +31,14 @@ export class MyService {
     return this.userToMyDto(newUser);
   }
 
+  async checkMyProfile(field: string, value: any): Promise<boolean> {
+    const user = await this.prismaService.user.findUnique({
+      where: { [field]: value },
+    });
+    // return true if there is no duplicate data
+    return !user;
+  }
+
   async uploadProfileImage(userId: number, file) {
     await this.prismaService.user.update({
       where: { id: userId },

@@ -54,6 +54,7 @@ export interface AchievementType {
   id: number;
   title: string;
   description: string;
+  createdAt: string;
 }
 
 /** Channel */
@@ -88,10 +89,22 @@ export interface MessageType {
   createdAt: string;
 }
 
+export interface NoticeType {
+  id: number;
+  channelId: number;
+  text: string;
+  code: number;
+  users: UserType[];
+  createdAt: string;
+}
+
+/** Game */
+
 export interface PlayerType {
   id: number;
   nickname: string;
   level: number;
+  isOwner?: boolean;
 }
 
 export interface GameHistoryPlayerType extends PlayerType {
@@ -101,10 +114,24 @@ export interface GameHistoryPlayerType extends PlayerType {
 export interface GameType {
   id: number;
   players: PlayerType[];
-  mode: 'normal' | 'hard';
+  mode: string;
   theme: number;
-  viewerCount: number;
+  viewerCount?: number;
   isLadder: boolean;
+  createdAt: string;
+}
+
+export interface GameSettingType extends GameType {
+  modes: string[];
+  themes: number[];
+}
+
+export interface GameResultType {
+  id: number;
+  winner: PlayerType;
+  loser: PlayerType;
+  winnerScore: number;
+  loserScore: number;
   createdAt: string;
 }
 
