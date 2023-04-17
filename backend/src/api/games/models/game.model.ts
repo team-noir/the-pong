@@ -39,11 +39,18 @@ export class GameModel implements OnModuleInit {
 		const playerIdList = [...this.players.keys()];
 		for (const playerId of playerIdList) {
 			if (!this.pongRecords.has(playerId)) {
-				console.log(playerId);
 				this.disconnectPlayer(playerId);
 			}
 		};
 		this.pongRecords.clear();
+	}
+
+	setReadyTime(time: number) {
+		this.readyTime = time;
+	}
+
+	resetReadyTime() {
+		this.readyTime = 60000;
 	}
 
 	addQueue(game: Game) {
@@ -255,14 +262,12 @@ export class GameModel implements OnModuleInit {
 		// Send ping
 		const playerIdList = [...this.players.keys()];
 		playerIdList.forEach((playerId) => {
-			console.log('ping : ', playerId);
 			const player = this.players.get(playerId);
 			player.socket.emit('ping', { userId: player.userId });
 		});
 	}
 
 	receivePong(userId: number) {
-		console.log('pong : ', userId);
 		if (userId) {
 			this.pongRecords.add(userId);
 		}

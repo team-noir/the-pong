@@ -187,10 +187,10 @@ describe('Test invite', () => {
 	})
 	
 	it('Timeout invitation', (done) => {
-		(gamesService.gameModel as any).readyTime = 3000;
+		gamesService.gameModel.setReadyTime(3000);
 		socket1.on('gameInvite', (data) => {
 			expect(data.text).toBe('canceled');
-			(gamesService.gameModel as any).readyTime = 60000;
+			gamesService.gameModel.setReadyTime(60000);
 			done();
 		});
 
@@ -247,3 +247,131 @@ describe('Test invite', () => {
 
 });
 
+
+describe('Test queue', () => {
+	let gamesService;
+	let app, server;
+	let serverAddr;
+
+	let socket1, socket2, socket3;
+
+	beforeAll(async () => {
+		const module = await Test.createTestingModule({
+			imports: [AppModule]
+		}).compile();
+
+		gamesService = module.get<GamesService>(GamesService);
+		app = module.createNestApplication();
+		server = app.getHttpServer();
+		serverAddr = `http://localhost:${server.listen().address().port}`;
+		app.useWebSocketAdapter(new IoAdapter(server));
+		await app.init();
+		gamesService.clearPingInverval();
+	});
+
+	afterEach(async () => {
+		if (socket1) { 
+			await socket1.off('gameInvite'); 
+			await socket1.off('gameStatus'); 
+			await socket1.off('removeQueue'); 
+			await socket1.off('queue'); 
+		};
+		if (socket2) { 
+			await socket2.off('gameInvite'); 
+			await socket2.off('gameStatus'); 
+			await socket2.off('removeQueue'); 
+			await socket2.off('queue'); 
+		};
+		if (socket3) { 
+			await socket3.off('gameInvite'); 
+			await socket3.off('gameStatus'); 
+			await socket3.off('removeQueue'); 
+			await socket3.off('queue'); 
+		};
+	})
+
+	afterAll(async () => {
+		if (socket1) { await socket1.close(); }
+		if (socket2) { await socket2.close(); }
+		if (socket3) { await socket3.close(); }
+		await server.close();
+		await app.close();
+	});
+
+	it('Join queue', (done) => {
+		socket1 = connectSocket(serverAddr, jwt1);
+
+		socket1.on('gameStatus', (data) => {
+			expect(data.games.length).toBe(1);
+			expect(data.players.length).toBe(1);
+			expect(data.queue.length).toBe(1);
+			done();
+		})
+
+		socket1.on('queue', (data) => {
+			socket1.emit('gameStatus');
+		});
+
+		socket1.emit('queue', { isLadder: false });
+	});
+	
+	it('Leave queue', (done) => {
+		socket1.on('gameStatus', (data) => {
+			expect(data.games.length).toBe(0);
+			expect(data.players.length).toBe(0);
+			expect(data.queue.length).toBe(0);
+			done();
+		});
+
+		socket1.emit('removeQueue');
+		socket1.emit('gameStatus');
+	});
+
+	it('Timeout queue', (done) => {
+		gamesService.gameModel.setReadyTime(3000);
+
+		socket1.on('queue', (data) => {
+			if (data.text == 'timeout') {
+				gamesService.gameModel.resetReadyTime();
+				socket1.emit('gameStatus');
+			}
+		})
+
+		socket1.on('gameStatus', (data) => {
+			expect(data.games.length).toBe(0);
+			expect(data.players.length).toBe(0);
+			expect(data.queue.length).toBe(0);
+			done();
+		})
+
+		socket1.emit('queue', { isLadder: false });
+	});
+
+	it('Matched queue', (done) => {
+		socket2 = connectSocket(serverAddr, jwt2);
+
+		socket2.on('gameStatus', (data) => {
+			expect(data.games.length).toBe(1);
+			expect(data.players.length).toBe(2);
+			expect(data.queue.length).toBe(0);
+		})
+
+		socket2.on('queue', (data) => {
+			if (data.text == 'created') {
+				socket2.emit('gameStatus');
+			}
+			if (data.text == 'matched') {
+				done();
+			}
+		});
+
+		socket1.on('queue', (data) => {
+			if (data.text == 'created') {
+				socket2.emit('queue', { isLadder: false });
+			}
+		});
+
+		socket1.emit('queue', { isLadder: false });
+	});
+
+});

@@ -28,6 +28,7 @@ export class GamesService {
 		if (game == null) {
 			return await this.gameModel.newQueue(player, isLadder);
 		} else {
+			game.join(player, isLadder);
 			this.gameModel.joinQueue(player, game);
 			this.gameModel.removeQueue(game);
 			return game.gameId;

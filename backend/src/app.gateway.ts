@@ -194,8 +194,9 @@ export class AppGateway
     try {
       const userId = socket.data.userId;
       await this.gamesService.addUserToQueue(userId, isLadder);
+      socket.emit('queue', { text: 'created' });
     } catch (error) {
-      throw new HttpException(error.message, error.code);
+      socket.emit('queue', error);
     }
   }
   
@@ -203,9 +204,13 @@ export class AppGateway
   removeQueue(
     @ConnectedSocket() socket: Socket,
   ) {
-    const userId = socket.data.userId;
-    const user = this.channelsService.userModel.getUser(userId);
-    this.gamesService.removeUserFromQueue(user.id);
+    try {
+      const userId = socket.data.userId;
+      this.gamesService.removeUserFromQueue(userId);
+      socket.emit('removeQueue', { text: 'removed' });
+    } catch (error) {
+      socket.emit('removeQueue', error);
+    }
   }
   
   @SubscribeMessage('pong')

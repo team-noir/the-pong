@@ -30,8 +30,8 @@ export class GamesController {
 	) {
 		try {
 			const isLadder = body.isLadder;
-			this.gamesService.addUserToQueue(req.user.id, isLadder);
-			res.status(HttpStatus.NO_CONTENT);
+			await this.gamesService.addUserToQueue(req.user.id, isLadder);
+			res.status(HttpStatus.CREATED);
 			return;
 		} catch (error) {
 			throw new HttpException(error.message, error.code);
