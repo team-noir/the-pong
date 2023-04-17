@@ -1,25 +1,32 @@
 import { useState, useEffect } from 'react';
-import { API_PREFIX } from 'api/api.v1';
+import { useMutation } from '@tanstack/react-query';
+import { API_PREFIX, checkProfile } from 'api/api.v1';
+import { useUser } from 'hooks/useStore';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import FileInputWithImage from 'components/molecule/FileInputWithImage';
 import Button from 'components/atoms/Button';
-import { ProfileFormType } from 'types';
 import { validateNickname } from 'utils/validatorUtils';
-import { useUser } from 'hooks/useStore';
+import { ProfileFormType } from 'types';
 
 interface Props {
   onSubmit: (userFormData: ProfileFormType) => void;
 }
 
 export default function SettingProfile({ onSubmit }: Props) {
+  const { id: myUserId, nickname: myUserNickname } = useUser((state) => state);
   const [userFormData, setUserFormData] = useState<ProfileFormType>({
     nickname: '',
     imageFile: null,
   });
-  const [isValidated, setIsValidated] = useState({
-    nickname: false,
+  const [isValidNickname, setIsValidNickname] = useState(false);
+  const [isAvailableNickname, setIsAvailableNickname] = useState(true);
+
+  const checkProfileMutation = useMutation({
+    mutationFn: checkProfile,
+    onSuccess: (data) => {
+      setIsAvailableNickname(data.nickname);
+    },
   });
-  const { id: myUserId, nickname: myUserNickname } = useUser((state) => state);
 
   useEffect(() => {
     if (!myUserNickname) return;
@@ -29,10 +36,7 @@ export default function SettingProfile({ onSubmit }: Props) {
       ...prevState,
       nickname,
     }));
-    setIsValidated((prevState) => ({
-      ...prevState,
-      nickname: validateNickname(nickname),
-    }));
+    setIsValidNickname(validateNickname(nickname));
   }, [myUserNickname]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -54,8 +58,13 @@ export default function SettingProfile({ onSubmit }: Props) {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isValidated.nickname) return;
+    if (!isValidNickname || !isAvailableNickname) return;
     onSubmit(userFormData);
+  };
+
+  const checkNicknameAvailable = (value: string) => {
+    if (!isValidNickname || value === myUserNickname) return false;
+    checkProfileMutation.mutate({ nickname: value });
   };
 
   return (
@@ -76,15 +85,16 @@ export default function SettingProfile({ onSubmit }: Props) {
         setValue={(value) =>
           setUserFormData((prevState) => ({ ...prevState, nickname: value }))
         }
-        isValid={isValidated.nickname}
-        setIsValid={(value) =>
-          setIsValidated((prevState) => ({
-            ...prevState,
-            nickname: value,
-          }))
-        }
+        isValid={isValidNickname}
+        setIsValid={(value) => setIsValidNickname(value)}
         validate={validateNickname}
-        message="유효하지 않은 닉네임입니다."
+        isAvailable={isAvailableNickname}
+        checkAvailable={checkNicknameAvailable}
+        message={
+          !isAvailableNickname
+            ? '이미 사용중인 닉네임입니다.'
+            : '유효하지 않은 닉네임입니다.'
+        }
       />
       <div className="w-full">
         <Button type="submit" primary fullLength>

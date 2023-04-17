@@ -13,8 +13,8 @@ interface Props {
   isValid: boolean;
   setIsValid: (value: boolean) => void;
   validate: (value: string) => boolean;
-  isDuplicated?: boolean;
-  checkDuplication?: (value: string) => void;
+  isAvailable?: boolean;
+  checkAvailable?: (value: string) => void;
   message: string;
 }
 
@@ -29,8 +29,8 @@ export default function TextInputWithMessage({
   setIsValid,
   validate,
   message,
-  isDuplicated = false,
-  checkDuplication,
+  isAvailable = true,
+  checkAvailable,
 }: Props) {
   const [isTouched, setIsTouched] = useState(false);
 
@@ -43,7 +43,7 @@ export default function TextInputWithMessage({
     setIsTouched(true);
     setValue(value);
     setIsValid(validate(value));
-    checkDuplication && checkDuplication(value);
+    checkAvailable && checkAvailable(value);
   };
 
   const handleBlur = () => {
@@ -68,7 +68,7 @@ export default function TextInputWithMessage({
       />
 
       <Message
-        isShow={(!isValid || isDuplicated) && isTouched}
+        isShow={(!isValid || !isAvailable) && isTouched}
         message={message}
       />
     </div>

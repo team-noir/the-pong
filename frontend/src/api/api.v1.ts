@@ -112,6 +112,14 @@ export const updateMyProfileImage = async (imageFile: File) => {
   return res;
 };
 
+export const checkProfile = async ({ nickname }: { nickname: string }) => {
+  const res = await axios.post(`/my/settings/check`, { nickname });
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 export const getMy2fa = async () => {
   const res = await axiosWithInterceptors.get(`/my/2fa`);
   if (res.status !== 200) {
