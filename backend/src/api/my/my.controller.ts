@@ -30,7 +30,7 @@ import { existsSync, mkdirSync } from 'fs';
 import { readdir, unlink } from 'node:fs/promises';
 import { diskStorage } from 'multer';
 import { AuthenticatedGuard } from '../../guards/authenticated.guard';
-import { SettingDto, FileUploadDto } from './dtos/setting.dto';
+import { SettingDto, CheckSettingDto, FileUploadDto } from './dtos/setting.dto';
 import { MyService } from './my.service';
 import { MyDto, FollowDto, BlockDto } from './dtos/my.dto';
 import { PROFILE_PATH } from '../../const';
@@ -66,6 +66,26 @@ export class MyController {
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  @Post('settings/check')
+  @ApiOperation({ summary: 'Check profile duplication(nickname)' })
+  @ApiOkResponse({
+    description:
+      'Duplicate check results. Return `true` if there is no duplicate data.',
+  })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
+  @UseGuards(AuthenticatedGuard)
+  async checkMyProfile(@Body() body: CheckSettingDto, @Res() res) {
+    const { nickname } = body;
+    const resultNickname = await this.myService.checkMyProfile(
+      'nickname',
+      nickname
+    );
+
+    res.status(HttpStatus.OK).send({
+      nickname: resultNickname,
+    });
   }
 
   @Post('profile-image')
