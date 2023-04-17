@@ -20,14 +20,15 @@ export class GameModel implements OnModuleInit {
 	private pongRecords = new Set<playerId>();
 
 	private appGateway: AppGateway;
+	private readyTime = 60000;
 
 	constructor(
 		private prismaService: PrismaService,
 		private moduleRef: ModuleRef
 	) {}
 
-	onModuleInit() {
-		this.appGateway = this.moduleRef.get(AppGateway, { strict: false });
+	async onModuleInit() {
+		this.appGateway = await this.moduleRef.get(AppGateway, { strict: false });
 	}
 
 	isPlayerInGame(playerId: number): boolean {
@@ -71,6 +72,10 @@ export class GameModel implements OnModuleInit {
 	
 	isInvited(invitedId: number) {
 		return this.invites.has(invitedId);
+	}
+
+	deleteInvite(invitedId: number) {
+		this.invites.delete(invitedId);
 	}
 
 	async createPlayer(userId: number) {
@@ -122,8 +127,8 @@ export class GameModel implements OnModuleInit {
 		this.receivePong(player.userId);
 	}
 
-	gameStatus(socket: Socket) {
-		socket.emit('gameStatus', {
+	async gameStatus(socket: Socket) {
+		await socket.emit('gameStatus', {
 			games: [...this.games.keys()],
 			players: [...this.players.keys()],
 			queue: this.queue,
@@ -131,33 +136,36 @@ export class GameModel implements OnModuleInit {
 		})
 	}
 
-	setGameRoomTimeout(gameId: number) {
+	async setGameRoomTimeout(gameId: number) {
 		const game = this.games.get(gameId);
-		
-		game.readyTimeout = setTimeout(() => {
-			if (!this.queue.includes(gameId)) { return; }
-			game.noticeToPlayers('queue', { text: 'timeout'});
+
+		game.readyTimeout = setTimeout(async () => {
+			if (game.isFull()) { return; }
+			if (game.invitedId) {
+				await game.noticeToPlayers('gameInvite', { text: 'canceled'});
+			} else {
+				await game.noticeToPlayers('queue', { text: 'timeout'});
+			}
 			this.removeGame(game);
-		}, 60000);
+		}, this.readyTime);
 	}
 
-	newQueue(player: Player, isLadder: boolean): gameId {
-		const gameId = this.getGameId();
-		const newGame = new Game(gameId, isLadder);
+	async newQueue(player: Player, isLadder: boolean): Promise<gameId> {
+		const newGame = new Game(this.getGameId(), isLadder);
 
 		newGame.join(player, isLadder);
 		player.joinGame(newGame);
 
 		this.setPlayer(player);
 		this.setGame(newGame);
+		await this.setGameRoomTimeout(newGame.gameId);
+
 		this.addQueue(newGame);
-		this.setGameRoomTimeout(newGame.gameId);
 		return newGame.gameId;
 	}
 
-	newInvite(player: Player, invited: Player): gameId {
-		const gameId = this.getGameId();
-		const newGame = new Game(gameId, false, invited.userId);
+	async newInvite(player: Player, invited: Player): Promise<gameId> {
+		const newGame = new Game(this.getGameId(), false);
 
 		if (player.userId == invited.userId && !newGame.canJoin(invited, false)) {
 			const code = HttpStatus.BAD_REQUEST;
@@ -170,12 +178,16 @@ export class GameModel implements OnModuleInit {
 
 		this.setPlayer(player);
 		this.setGame(newGame);
+		await this.setGameRoomTimeout(newGame.gameId);
+
+		this.addQueue(newGame);
 		this.addInvite(newGame, invited.userId);
-		this.setGameRoomTimeout(newGame.gameId);
+		newGame.invitedId = invited.userId;
+
 		return newGame.gameId;
 	}
 
-	removeInvite(game: Game) {
+	removeInvitation(game: Game) {
 		const invitedId = game.invitedId;
 		const invitedSocket = this.appGateway.getUserSocket(invitedId);
 
@@ -225,6 +237,7 @@ export class GameModel implements OnModuleInit {
 		this.removePlayers(game);
 		this.removeQueue(game);
 		this.games.delete(game.gameId);
+		game.clearGameRoomTimeout();
 	}
 
 	disconnectPlayer(playerId: number) {

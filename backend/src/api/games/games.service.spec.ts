@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { describe, it, expect, jest, beforeAll, afterAll } from '@jest/globals';
+import { describe, it, expect, jest, beforeAll, afterAll, afterEach } from '@jest/globals';
 import { GamesService } from './games.service';
 import { AppGateway } from '../../app.gateway';
 import { ChannelsModule } from '../channels/channels.module';
@@ -7,103 +7,243 @@ import { AuthModule } from '../auth/auth.module';
 import { GamesModule } from './games.module';
 import { PrismaModule } from '../../prisma/prisma.module';
 import { Player } from './dtos/player.dto';
-
-import { SocketServerMock } from 'socket.io-mock-ts';
 import { AppModule } from '../../app.module';
 
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 import { io } from 'socket.io-client';
 import { INestApplication } from '@nestjs/common';
 import { IoAdapter } from '@nestjs/platform-socket.io';
 
-it('socket', () => {
-	const socket = new SocketServerMock();
+const jwt1 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlja25hbWUiOiJjcGFrIiwiaWF0IjoxNjgwMjQzMTQ0LCJleHAiOjE2ODAyNDY3NDR9.L3liN0o6rRVoVvDVtjX1P8ELCQ3eh5P94FnaoJjVg98";
+const jwt2 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwibmlja25hbWUiOiJjcGFrIiwiaWF0IjoxNjgwMjQzMTQ0LCJleHAiOjE2ODAyNDY3NDR9.3R1NiWi5NXqSwCFYSRdmcaXIvGb6UFM9DKQg9qteYE8";
+const jwt3 = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Mywibmlja25hbWUiOiJjcGFrIiwiaWF0IjoxNjgwMjQzMTQ0LCJleHAiOjE2ODAyNDY3NDR9.ZT9J8Oku9BMm7nezrxJzbFv8MYgBjeMO4y0ihSUqnjY";
 
-	socket.on('message', (message: string) => {
-	  expect(message).toBe('Hello World!');
+// it('Test socket', (done) => {
+// 	let module: TestingModule;
+// 	let app: INestApplication;
+// 	let clientSocket;
+// 	let server, serverAddr;
+// 	let adapter;
+	
+// 	Test.createTestingModule({
+// 		imports: [AppModule]
+// 	})
+// 	.compile()
+// 	.then((moduleFixture: TestingModule) => {
+// 		module = moduleFixture;
+
+// 		app = moduleFixture.createNestApplication();
+// 		server = app.getHttpServer();
+// 		serverAddr = `http://localhost:${server.listen().address().port}`;
+// 		adapter = new IoAdapter(server);
+// 		app.useWebSocketAdapter(adapter);
+// 		app.init();
+
+// 		clientSocket = io(serverAddr, {
+// 			extraHeaders: { cookie: `Authorization=${jwt1}` }
+// 		});
+
+// 		clientSocket.on('connect', () => {
+// 			clientSocket.disconnect(true);
+// 			done();
+// 		});
+// 	});
+// });
+
+const connectSocket = (serverAddr: string, jwt) => {
+	const clientSocket = io(serverAddr, {
+		extraHeaders: { cookie: `Authorization=${jwt}` }
 	});
-  
-	socket.clientMock.emit('message', 'Hello World!');
-})
 
+	clientSocket.on('connect', () => { 
+	});
+	return clientSocket;
+}
 
+describe('Test invite', () => {
+	let gamesService;
+	let app, server;
+	let serverAddr;
 
-const getSocketDsn = (app: INestApplication) => {
-	const { port } = app.getHttpServer().listen().address();
-	return `http://localhost:${port}`;
-};
+	let socket1, socket2, socket3;
 
-let app: INestApplication;
-let clientSocket;
-let server;
-let adapter;
+	let invitedGameId;
 
-afterAll(async () => {
-	console.log('disconnect')
-	await clientSocket.disconnect(true);
-	await clientSocket.close();
-	await app.close();
-	await adapter.close();
-	await server.close();
-});
+	beforeAll(async () => {
+		const module = await Test.createTestingModule({
+			imports: [AppModule]
+		}).compile();
 
-it('Text socket', (done) => {
-	let module: TestingModule;
-
-	Test.createTestingModule({
-		imports: [AppModule]
-	})
-	.compile()
-	.then((moduleFixture: TestingModule) => {
-		module = moduleFixture;
-
-		app = moduleFixture.createNestApplication();
+		gamesService = module.get<GamesService>(GamesService);
+		app = module.createNestApplication();
 		server = app.getHttpServer();
-		adapter = new IoAdapter(server);
-		app.useWebSocketAdapter(adapter);
-		app.init();
+		serverAddr = `http://localhost:${server.listen().address().port}`;
+		app.useWebSocketAdapter(new IoAdapter(server));
+		await app.init();
+		gamesService.clearPingInverval();
+	});
 
-		const address = getSocketDsn(app);
-		clientSocket = io(address, {
-			extraHeaders: { cookie: `Authorization=${process.env.TEST_JWT}` }
+	afterEach(async () => {
+		if (socket1) { 
+			await socket1.off('gameInvite'); 
+			await socket1.off('gameStatus'); 
+			await socket1.off('queue'); 
+		};
+		if (socket2) { 
+			await socket2.off('gameInvite'); 
+			await socket2.off('gameStatus'); 
+			await socket2.off('queue'); 
+		};
+		if (socket3) { 
+			await socket3.off('gameInvite'); 
+			await socket3.off('gameStatus'); 
+			await socket3.off('queue'); 
+		};
+	})
+
+	afterAll(async () => {
+		if (socket1) { await socket1.close(); }
+		if (socket2) { await socket2.close(); }
+		if (socket3) { await socket3.close(); }
+		await server.close();
+		await app.close();
+	});
+
+	it('Invite unconnected user', (done) => {
+		socket1 = connectSocket(serverAddr, jwt1);
+		socket1.on('ping', () => {
+			console.log('ping : 1');
+			socket1.emit('pong');
 		});
 
-		clientSocket.on('connect', () => {
+		socket1.on('gameInvite', (data) => {
+			console.log(data);
 			done();
 		});
 
-
-
-		// socket.on('connect', (socket) => {
-		// 	serverSocket = socket;
-		// 	done();
-		// });
+		socket1.emit('gameInvite', { userId: 2 });
 	});
 
-	
-	
+	it('Invite user', (done) => {
+		socket2 = connectSocket(serverAddr, jwt2);
+		socket2.on('ping', () => {
+			console.log('ping : 2');
+			socket2.emit('pong');
+		});
 
-	// const httpServer = createServer();
-	// io = new Server(httpServer);
-
-	// httpServer.listen(() => {
-	// 	const address = httpServer.address();
-
-	// 	clientSocket = new Client(`http://localhost:${address['port']}`);
+		socket1.on('gameInvite', (data) => {
+			console.log(data);
+		});
 		
-	// 	io.on("connection", (socket) => {
-	// 		serverSocket = socket;
-	// 	});
+		socket2.on('connect', () => {
+			socket1.emit('gameInvite', { userId: 2 });
+		})
 
-	// 	clientSocket.on("connect", done);
-	// });
-  
-	// afterAll(() => {
-	//   io.close();
-	//   clientSocket.close();
-	// });
+		socket2.on('gameInvite', (data) => {
+			expect(data.user.id).toBe(1);
+			invitedGameId = data.gameId;
+			done();
+		});
+	});
 
+	it('Reject invitation', (done) => {
+		socket1.on('queue', (data) => {
+			expect(data.text).toBe('rejected');
+			done();
+		});
 
+		socket2.emit('gameInviteAnswer', {
+			gameId: invitedGameId,
+			isAccepted: false,
+		});
+	});
+
+	it('Check game status', (done) => {
+		socket1.on('gameStatus', (data) => {
+			expect(data.games.length).toBe(0);
+			expect(data.players.length).toBe(0);
+			expect(data.queue.length).toBe(0);
+			done();
+		})
+		socket1.emit('gameStatus');
+	});
+
+	it('Cancel invitation', (done) => {
+		socket1.on('gameInvite', (data) => {
+			console.log(data);
+		});
+
+		socket2.on('gameInvite', (data) => {
+			console.log(data);
+
+			if (data.text == 'invited') {
+				expect(data.user.id).toBe(1);
+				socket1.emit('cancelInvite');
+			}
+			if (data.text == 'canceled') {
+				done();
+			}
+		});
+		socket1.emit('gameInvite', { userId: 2 });
+	})
+	
+	it('Timeout invitation', (done) => {
+		(gamesService.gameModel as any).readyTime = 3000;
+		socket1.on('gameInvite', (data) => {
+			expect(data.text).toBe('canceled');
+			(gamesService.gameModel as any).readyTime = 60000;
+			done();
+		});
+
+		socket2.on('gameInvite', (data) => {
+			if (data.text == 'invited') {
+				expect(data.user.id).toBe(1);
+				invitedGameId = data.gameId;
+			}
+		});
+
+		socket1.emit('gameInvite', { userId: 2 });
+	})
+
+	it('Accept invalid invitation', (done) => {
+		socket2.on('gameInvite', (data) => {
+			expect(data.code).toBe(400);
+			done();
+		});
+
+		socket2.emit('gameInviteAnswer', {
+			gameId: invitedGameId,
+			isAccepted: true,
+		});
+	});
+
+	it('Check game status', (done) => {
+		socket1.on('gameStatus', (data) => {
+			expect(data.games.length).toBe(0);
+			expect(data.players.length).toBe(0);
+			expect(data.queue.length).toBe(0);
+			done();
+		})
+		socket1.emit('gameStatus');
+	});
+
+	it('Accept valid invitation', (done) => {		
+		socket2.on('gameInvite', (data) => {
+			invitedGameId = data.gameId;
+			if (data.text == 'invited') {
+				socket2.emit('gameInviteAnswer', {
+					gameId: invitedGameId,
+					isAccepted: true
+				});
+			}
+		});
+
+		socket1.on('queue', (data) => {
+			expect(data.gameId).toBe(invitedGameId);
+			done();
+		});
+
+		socket1.emit('gameInvite', { userId: 2 });
+	});
 
 });
+

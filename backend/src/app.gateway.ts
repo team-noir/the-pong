@@ -220,21 +220,21 @@ export class AppGateway
   }
 
   @SubscribeMessage('gameStatus')
-  gameStatus(
+  async gameStatus(
     @ConnectedSocket() socket: Socket
   ) {
-    this.gamesService.gameModel.gameStatus(socket);
+    await this.gamesService.gameModel.gameStatus(socket);
   }
   
   @SubscribeMessage('gameInvite')
   async gameInvite(
     @ConnectedSocket() socket: Socket,
-    @MessageBody('invitedId') invitedId: number
+    @MessageBody('userId') userId: number
   ) {
     try {
-      await this.gamesService.inviteUserToGame(socket.data.userId, invitedId);
+      await this.gamesService.inviteUserToGame(socket.data.userId, userId);
     } catch (error) {
-      console.log(error);
+      socket.emit('gameInvite', error);
     }
   }
   
@@ -247,7 +247,7 @@ export class AppGateway
     try {
       await this.gamesService.answerInvitation(socket.data.userId, gameId, isAccepted);
     } catch (error) {
-      console.log(error);
+      socket.emit('gameInvite', error);
     }
   }
   
@@ -258,7 +258,7 @@ export class AppGateway
     try {
       await this.gamesService.cancelInvitation(socket.data.userId);
     } catch (error) {
-      console.log(error);
+      socket.emit('gameInvite', error);
     }
   }
 }

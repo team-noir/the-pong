@@ -9,10 +9,9 @@ export class Game {
 	invitedId: userId;
 	readyTimeout;
 
-	constructor(gameId: number, isLadder?: boolean, invitedId?: userId) {
+	constructor(gameId: number, isLadder?: boolean) {
 		this.gameId = gameId;
 		this.isLadder = isLadder ? true : false;
-		this.invitedId = invitedId ? invitedId : 0;
 		this.players = [];
 	}
 
@@ -41,7 +40,7 @@ export class Game {
 	canJoin(tarPlayer: Player, isLadder: boolean) : boolean {
 		if (this.isFull() 
 			|| (this.isLadder != isLadder)
-			|| (this.invitedId != 0 && this.invitedId != tarPlayer.userId)
+			|| (this.invitedId && this.invitedId != tarPlayer.userId)
 		) { 
 			return false;
 		}
@@ -63,14 +62,19 @@ export class Game {
 		this.players = [];
 	}
 
-	join(player: Player, isLadder: boolean) : boolean {
+	clearGameRoomTimeout() {
+		clearTimeout(this.readyTimeout);
+	}
+
+	async join(player: Player, isLadder: boolean): Promise<boolean> {
 		if (!this.canJoin(player, isLadder)) { 
 			return false; 
 		}
 		this.players.push(player);
 		player.socket.join(this.getName());
 		if (this.isFull()) {
-			this.noticeToPlayers('queue', {
+			await this.clearGameRoomTimeout();
+			await this.noticeToPlayers('queue', {
 				text: 'matched',
 				gameId: this.gameId
 			});
@@ -78,7 +82,7 @@ export class Game {
 		return true;
 	}
 
-	leave(tarPlayer: Player) : void {
+	leave(tarPlayer: Player): void {
 		if (this.has(tarPlayer)) {
 			this.players.forEach((player) => {
 				player.socket.leave(this.getName());

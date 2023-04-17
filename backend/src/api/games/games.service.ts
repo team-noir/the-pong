@@ -17,12 +17,16 @@ export class GamesService {
 		}, 5000);
 	}
 
+	clearPingInverval() {
+		clearInterval(this.pingInterval);
+	}
+
 	async addUserToQueue(userId: number, isLadder: boolean) {
 		const player = await this.gameModel.createPlayer(userId);
 		const game = this.gameModel.findQueue(player, isLadder);
 
 		if (game == null) {
-			return this.gameModel.newQueue(player, isLadder);
+			return await this.gameModel.newQueue(player, isLadder);
 		} else {
 			this.gameModel.joinQueue(player, game);
 			this.gameModel.removeQueue(game);
@@ -40,11 +44,11 @@ export class GamesService {
 	async inviteUserToGame(userId: number, invitedUserId: number) {
 		const user = await this.gameModel.createPlayer(userId);
 		const invited = await this.gameModel.createPlayer(invitedUserId);
-		const gameId = this.gameModel.newInvite(user, invited);
+		const gameId = await this.gameModel.newInvite(user, invited);
 		
 		invited.socket.emit('gameInvite', {
 			text: "invited",
-			gamdId: gameId,
+			gameId: gameId,
 			user: {
 				id: user.userId,
 				nickname: user.username
@@ -78,7 +82,7 @@ export class GamesService {
 		}
 
 		if (isAccepted) {
-			game.join(invited, false);
+			await game.join(invited, false);
 		} else {
 			await game.noticeToPlayers('queue', {
 				text: 'rejected'
