@@ -33,7 +33,7 @@ export default function SettingProfile({ onSubmit }: Props) {
       ...prevState,
       nickname: validateNickname(nickname),
     }));
-  }, []);
+  }, [myUserNickname]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
