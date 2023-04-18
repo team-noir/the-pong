@@ -45,11 +45,8 @@ export class Game {
 			return false;
 		}
 		for (const player of this.players) {
-			if (player.isBlockUser(tarPlayer.userId) 
-				|| tarPlayer.isBlockUser(player.userId)
-			) {
-				return false;
-			}
+			if (player.isBlockUser(tarPlayer.userId)) { return false; }
+			if (tarPlayer.isBlockUser(player.userId)) { return false; }
 		};
 		return true;
 	}

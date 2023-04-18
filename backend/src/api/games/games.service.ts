@@ -28,7 +28,7 @@ export class GamesService {
 		if (game == null) {
 			return await this.gameModel.newQueue(player, isLadder);
 		} else {
-			game.join(player, isLadder);
+			await game.join(player, isLadder);
 			this.gameModel.joinQueue(player, game);
 			this.gameModel.removeQueue(game);
 			return game.gameId;
@@ -45,16 +45,19 @@ export class GamesService {
 	async inviteUserToGame(userId: number, invitedUserId: number) {
 		const user = await this.gameModel.createPlayer(userId);
 		const invited = await this.gameModel.createPlayer(invitedUserId);
-		const gameId = await this.gameModel.newInvite(user, invited);
 		
-		invited.socket.emit('gameInvite', {
-			text: "invited",
-			gameId: gameId,
-			user: {
-				id: user.userId,
-				nickname: user.username
-			}
-		});
+		if (this.gameModel.findQueue(user, false) == null) {
+			const gameId = await this.gameModel.newInvite(user, invited);
+			
+			await invited.socket.emit('gameInvite', {
+				text: "invited",
+				gameId: gameId,
+				user: {
+					id: user.userId,
+					nickname: user.username
+				}
+			});
+		}
 	}
 
 	cancelInvitation(userId: number) {
@@ -84,6 +87,8 @@ export class GamesService {
 
 		if (isAccepted) {
 			await game.join(invited, false);
+			this.gameModel.joinQueue(invited, game);
+			this.gameModel.removeQueue(game);
 		} else {
 			await game.noticeToPlayers('queue', {
 				text: 'rejected'

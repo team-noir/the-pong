@@ -116,7 +116,6 @@ describe('Test invite', () => {
 		});
 
 		socket1.on('gameInvite', (data) => {
-			console.log(data);
 			done();
 		});
 
@@ -168,13 +167,7 @@ describe('Test invite', () => {
 	});
 
 	it('Cancel invitation', (done) => {
-		socket1.on('gameInvite', (data) => {
-			console.log(data);
-		});
-
 		socket2.on('gameInvite', (data) => {
-			console.log(data);
-
 			if (data.text == 'invited') {
 				expect(data.user.id).toBe(1);
 				socket1.emit('cancelInvite');
@@ -239,11 +232,52 @@ describe('Test invite', () => {
 
 		socket1.on('queue', (data) => {
 			expect(data.gameId).toBe(invitedGameId);
-			done();
+			socket1.emit('gameStatus');
 		});
+
+		socket1.on('gameStatus', async (data) => {
+			expect(data.games.length).toBe(1);
+			expect(data.players.length).toBe(2);
+			expect(data.queue.length).toBe(0);
+			await socket1.emit('removeQueue');
+			done();
+		})
 
 		socket1.emit('gameInvite', { userId: 2 });
 	});
+
+	it('Game status', (done) => {
+		socket1.on('gameStatus', (data) => {
+			console.log(data);
+			done();
+		});
+		socket1.emit('gameStatus');
+	});
+
+	// it('Blocked invited', async (done) => {
+	// 	console.log('blocked');
+
+	// 	socket2.on('gameInvite', (data) => {
+	// 		console.log('socket2', data);
+	// 		done();
+	// 	});
+		
+	// 	socket1.on('gameInvite', (data) => {
+	// 		console.log('socket1', data);
+	// 		done();
+	// 	});
+
+	// 	await socket1.emit('addBlocked', { userId: 2 });
+	// 	await socket1.emit('gameInvite', { userId: 2 });
+	// });
+
+	// it('Game status', (done) => {
+	// 	socket1.on('gameStatus', (data) => {
+	// 		console.log(data);
+	// 		done();
+	// 	});
+	// 	socket1.emit('gameStatus');
+	// });
 
 });
 
@@ -327,6 +361,18 @@ describe('Test queue', () => {
 		socket1.emit('gameStatus');
 	});
 
+	it('Leave queue', (done) => {
+		socket1.on('gameStatus', (data) => {
+			expect(data.games.length).toBe(0);
+			expect(data.players.length).toBe(0);
+			expect(data.queue.length).toBe(0);
+			done();
+		});
+
+		socket1.emit('removeQueue');
+		socket1.emit('gameStatus');
+	});
+
 	it('Timeout queue', (done) => {
 		gamesService.gameModel.setReadyTime(3000);
 
@@ -361,6 +407,7 @@ describe('Test queue', () => {
 				socket2.emit('gameStatus');
 			}
 			if (data.text == 'matched') {
+				socket1.emit('removeQueue');
 				done();
 			}
 		});
@@ -373,5 +420,79 @@ describe('Test queue', () => {
 
 		socket1.emit('queue', { isLadder: false });
 	});
+
+	it('Game status', (done) => {
+		socket1.on('gameStatus', (data) => {
+			console.log(data);
+			done();
+		});
+		socket1.emit('gameStatus');
+	});
+
+	it('Ladder queue', (done) => {
+		let is = true;
+
+		socket2.on('queue', async (data) => {
+			if (is && data.text == 'created') {
+				is = false;
+				await socket2.emit('removeQueue');
+				await socket2.emit('queue', { isLadder: true });
+			} else if (data.text == 'matched') {
+				await socket2.emit('removeQueue');
+				done();
+			}
+
+		});
+
+		socket1.on('queue', (data) => {
+			if (data.text == 'created') {
+				socket2.emit('queue', { isLadder: false });
+			}
+		});
+
+		socket1.emit('queue', { isLadder: true });
+	});
+
+	it('Game status', (done) => {
+		socket1.on('gameStatus', (data) => {
+			console.log(data);
+			done();
+		});
+		socket1.emit('gameStatus');
+	});
+
+	it('Blocked queue', (done) => {
+		socket2.on('removeQueue', async (data) => {
+			await socket1.emit('removeBlocked', { userId: 2 });
+			done();
+		});
+
+		socket2.on('queue', (data) => {
+			expect(data.text).toBe('created');
+			socket1.emit('gameStatus');
+		});
+
+		socket1.on('gameStatus', async (data) => {
+			console.log(data);
+			expect(data.games.length).toBe(2);
+			expect(data.players.length).toBe(2);
+			expect(data.queue.length).toBe(2);
+			await socket1.emit('removeQueue');
+			await socket2.emit('removeQueue');
+		});
+
+		socket1.on('queue', async (data) => {
+			if (data.text == 'created') {
+				await socket1.emit('addBlocked', { userId: 2 });
+				await socket2.emit('queue', { isLadder: false });
+			}
+		});
+
+		socket1.emit('queue', { isLadder: false });
+	});
+
+	
+
+
 
 });

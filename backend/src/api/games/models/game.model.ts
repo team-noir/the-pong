@@ -174,15 +174,20 @@ export class GameModel implements OnModuleInit {
 	async newInvite(player: Player, invited: Player): Promise<gameId> {
 		const newGame = new Game(this.getGameId(), false);
 
-		if (player.userId == invited.userId && !newGame.canJoin(invited, false)) {
+		if (player.userId == invited.userId) {
 			const code = HttpStatus.BAD_REQUEST;
 			const message = 'You cannot invite this user';
 			throw { code, message };
 		}
 
 		newGame.join(player, false);
+		if (!newGame.canJoin(invited, false)) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'You cannot invite this user';
+			throw { code, message };
+		}
+		
 		player.joinGame(newGame);
-
 		this.setPlayer(player);
 		this.setGame(newGame);
 		await this.setGameRoomTimeout(newGame.gameId);
@@ -263,7 +268,9 @@ export class GameModel implements OnModuleInit {
 		const playerIdList = [...this.players.keys()];
 		playerIdList.forEach((playerId) => {
 			const player = this.players.get(playerId);
-			player.socket.emit('ping', { userId: player.userId });
+			if (player.socket) {
+				player.socket.emit('ping', { userId: player.userId });
+			}
 		});
 	}
 

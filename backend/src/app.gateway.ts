@@ -18,6 +18,7 @@ import { GamesService } from './api/games/games.service';
 
 import { ChannelUser } from './api/channels/models/user.model';
 import { Player } from './api/games/dtos/player.dto';
+import { PrismaService } from './prisma/prisma.service';
 
 type userId = number;
 
@@ -34,7 +35,8 @@ export class AppGateway
     private authService: AuthService,
     private channelsService: ChannelsService,
     @Inject(forwardRef(() => GamesService))
-    public gamesService: GamesService
+    public gamesService: GamesService,
+    private prismaService: PrismaService,
   ) {
     this.userSockets = new Map<userId, Socket>();
   }
@@ -220,13 +222,6 @@ export class AppGateway
     const userId = socket.data.userId;
     this.gamesService.gameModel.receivePong(userId);
   }
-
-  @SubscribeMessage('gameStatus')
-  async gameStatus(
-    @ConnectedSocket() socket: Socket
-  ) {
-    await this.gamesService.gameModel.gameStatus(socket);
-  }
   
   @SubscribeMessage('gameInvite')
   async gameInvite(
@@ -262,5 +257,60 @@ export class AppGateway
     } catch (error) {
       socket.emit('gameInvite', error);
     }
+  }
+
+
+
+  // For test
+
+  @SubscribeMessage('gameStatus')
+  async gameStatus(
+    @ConnectedSocket() socket: Socket
+  ) {
+    await this.gamesService.gameModel.gameStatus(socket);
+  }
+
+  @SubscribeMessage('addBlocked')
+  async addBlocked(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('userId') userId: number,
+  ) {
+    const blocker = socket.data.userId;
+    const blocked = userId;
+
+    await this.prismaService.blockUser.upsert({
+      where: {
+        id: {
+        blockerId: blocker,
+        blockedId: blocked,
+        },
+      },
+      create: {
+        blockerId: blocker,
+        blockedId: blocked,
+      },
+      update: {
+        blockerId: blocker,
+        blockedId: blocked,
+      },
+    });
+  }
+
+  @SubscribeMessage('removeBlocked')
+  async removeBlocked(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('userId') userId: number,
+  ) {
+    const blocker = socket.data.userId;
+    const blocked = userId;
+    
+    await this.prismaService.blockUser.delete({
+      where: {
+        id: {
+          blockerId: blocker,
+          blockedId: blocked,
+        },
+      },
+    });
   }
 }
