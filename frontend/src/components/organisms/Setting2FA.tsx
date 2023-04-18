@@ -4,16 +4,16 @@ import { get2faCode, delete2fa } from 'api/api.v1';
 import { CheckCircleIcon } from '@heroicons/react/20/solid';
 import { useUser } from 'hooks/useStore';
 import Modal from 'components/templates/Modal';
+import Verify2FA from 'components/organisms/Verify2FA';
 import Button from 'components/atoms/Button';
 
 export default function Setting2FA() {
-  const { isTwoFactor, setIsTwoFactor, setIsLoggedIn } = useUser(
-    (state) => state
-  );
+  const { isTwoFactor, setIsTwoFactor } = useUser((state) => state);
   const [twoFactorCode, setTwoFactorCode] = useState<{
-    qr: string;
+    qrCode: string;
     key: string;
   } | null>(null);
+  const [isShowVerify2fa, setIsShowVerify2fa] = useState(false);
 
   const get2faCodeMutation = useMutation({
     mutationFn: get2faCode,
@@ -28,11 +28,6 @@ export default function Setting2FA() {
       setIsTwoFactor(false);
     },
   });
-
-  const handleClickNext = () => {
-    setIsLoggedIn(false);
-    setIsTwoFactor(true);
-  };
 
   return (
     <>
@@ -73,22 +68,39 @@ export default function Setting2FA() {
         )}
       </div>
       {twoFactorCode && (
-        <Modal title="2FA 설정" onClickClose={() => setTwoFactorCode(null)}>
-          <div className="flex flex-col items-center">
-            <div>
-              <img src={twoFactorCode.qr} alt="QR 코드" className="w-20" />
+        <Modal
+          title="2FA 설정"
+          onClickClose={() => setTwoFactorCode(null)}
+          fitContent
+        >
+          {!isShowVerify2fa ? (
+            <div className="flex flex-col items-center">
+              <div>
+                <img
+                  src={twoFactorCode.qrCode}
+                  alt="QR 코드"
+                  className="w-20"
+                />
+              </div>
+              <div>
+                <h2>설정 키</h2>
+                <p>QR 코드를 사용할 수 없는 경우 설정 키를 입력해 주세요.</p>
+                <span>{twoFactorCode.key}</span>
+              </div>
+              <div>
+                <Button onClick={() => setIsShowVerify2fa(true)} primary>
+                  다음
+                </Button>
+              </div>
             </div>
-            <div>
-              <h2>설정 키</h2>
-              <p>QR 코드를 사용할 수 없는 경우 설정 키를 입력해 주세요.</p>
-              <span>{twoFactorCode.key}</span>
-            </div>
-            <div>
-              <Button onClick={handleClickNext} primary>
-                다음
-              </Button>
-            </div>
-          </div>
+          ) : (
+            <Verify2FA
+              onSuccess={() => {
+                setTwoFactorCode(null);
+                setIsShowVerify2fa(false);
+              }}
+            />
+          )}
         </Modal>
       )}
     </>
