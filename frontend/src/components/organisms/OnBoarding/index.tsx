@@ -1,4 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { checkProfile } from 'api/api.v1';
 import MultiSteps from 'components/organisms/OnBoarding/MultiSteps';
 import StepAgreements from 'components/organisms/OnBoarding/StepAgreements';
 import StepNickname from 'components/organisms/OnBoarding/StepNickname';
@@ -28,6 +30,18 @@ export default function OnBoarding({ onSubmit }: Props) {
     nickname: '',
     imageFile: null,
   });
+  const [isAvailableNickname, setIsAvailableNickname] = useState(false);
+
+  const checkProfileMutation = useMutation({
+    mutationFn: checkProfile,
+    onSuccess: (data) => {
+      setIsAvailableNickname(data.nickname);
+    },
+  });
+
+  useEffect(() => {
+    checkProfileMutation.mutate({ nickname: formData.nickname });
+  }, [formData.nickname]);
 
   return (
     <>
@@ -53,7 +67,7 @@ export default function OnBoarding({ onSubmit }: Props) {
               formData.isCheckedTerms,
               formData.isCheckedPrivacy,
             ]),
-          () => validateNickname(formData.nickname),
+          () => validateNickname(formData.nickname) && isAvailableNickname,
           null,
         ]}
         messages={['필수 약관에 동의해 주세요.', '닉네임을 확인해 주세요.', '']}
