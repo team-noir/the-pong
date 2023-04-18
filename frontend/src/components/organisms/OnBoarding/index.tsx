@@ -3,12 +3,10 @@ import MultiSteps from 'components/organisms/OnBoarding/MultiSteps';
 import StepAgreements from 'components/organisms/OnBoarding/StepAgreements';
 import StepNickname from 'components/organisms/OnBoarding/StepNickname';
 import StepProfileImage from 'components/organisms/OnBoarding/StepProfileImage';
-import StepWelcome from 'components/organisms/OnBoarding/StepWelcome';
 import { validateAgreements, validateNickname } from 'utils/validatorUtils';
 import { ProfileFormType } from 'types';
 
 interface Props {
-  isSubmitted: boolean;
   onSubmit: (formData: ProfileFormType) => void;
 }
 
@@ -20,7 +18,7 @@ export interface FormData extends ProfileFormType {
   isCheckedMarketing: boolean;
 }
 
-export default function OnBoarding({ isSubmitted, onSubmit }: Props) {
+export default function OnBoarding({ onSubmit }: Props) {
   const [formData, setFormData] = useState<FormData>({
     isCheckedAll: false,
     isCheckedAge: false,
@@ -48,7 +46,6 @@ export default function OnBoarding({ isSubmitted, onSubmit }: Props) {
           />,
           <StepProfileImage key={2} setFormData={setFormData} />,
         ]}
-        resultComponent={<StepWelcome />}
         validators={[
           () =>
             validateAgreements([
@@ -60,7 +57,6 @@ export default function OnBoarding({ isSubmitted, onSubmit }: Props) {
           null,
         ]}
         messages={['필수 약관에 동의해 주세요.', '닉네임을 확인해 주세요.', '']}
-        isSubmitted={isSubmitted}
         onSubmit={onSubmit}
       />
     </>
