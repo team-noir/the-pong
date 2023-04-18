@@ -44,14 +44,12 @@ export class MyController {
   @ApiOperation({ summary: 'Get my profile' })
   @ApiOkResponse({ description: 'Get my profile', type: MyDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
-  @UseGuards(AuthenticatedGuard)
   async whoami(@Req() req, @Res() res) {
-    try {
-      const user: MyDto = await this.myService.whoami(req);
-      res.status(HttpStatus.OK).send(user);
-    } catch (error) {
-      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    const user: MyDto = await this.myService.whoami(req);
+    if (!user) {
+      throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
+    res.status(HttpStatus.OK).send(user);
   }
 
   @Patch('settings')

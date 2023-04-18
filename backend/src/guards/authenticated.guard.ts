@@ -16,17 +16,35 @@ export class AuthenticatedGuard implements CanActivate {
     const res = context.switchToHttp().getResponse();
 
     const user: User = await this.authService.getUserFromJwt(req);
+    const { isVerifiedTwoFactor } = await this.authService.getJwtPayloadFromReq(
+      req
+    );
     const now: Date = new Date(Date.now());
+
+    if (user === null) {
+      res.status(HttpStatus.UNAUTHORIZED).send();
+      return false;
+    }
 
     // TODO: 임시로 익명 회원의 id는 10000번부터 시작
     if (user.id >= 10000) {
       req.user = user;
-      const newJwt = this.authService.signJwt(user.id, user.nickname);
+      const newJwt = this.authService.signJwt({
+        id: user.id,
+        nickname: user.nickname,
+        isTwoFactor: false,
+        isVerifiedTwoFactor: false,
+      });
       this.authService.setJwt(res, newJwt);
       return true;
     }
 
-    if (user == null || now > user.ftRefreshExpiresAt) {
+    if (user.isTwoFactor && !isVerifiedTwoFactor) {
+      res.status(HttpStatus.UNAUTHORIZED).send();
+      return false;
+    }
+
+    if (now > user.ftRefreshExpiresAt) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt) {
@@ -37,7 +55,12 @@ export class AuthenticatedGuard implements CanActivate {
       }
     }
     req.user = user;
-    const newJwt = this.authService.signJwt(user.id, user.nickname);
+    const newJwt = this.authService.signJwt({
+      id: user.id,
+      nickname: user.nickname,
+      isTwoFactor: user.isTwoFactor,
+      isVerifiedTwoFactor,
+    });
     this.authService.setJwt(res, newJwt);
     return true;
   }
