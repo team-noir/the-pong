@@ -18,6 +18,7 @@ import ChannelBrowsePage from 'pages/ChannelBrowsePage';
 import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
 import GameSettingPage from 'pages/GameSettingPage';
+import WelcomePage from 'pages/WelcomePage';
 
 export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
   {
@@ -137,6 +138,10 @@ export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
       {
         path: 'search',
         element: <SearchResultPage />,
+      },
+      {
+        path: 'welcome',
+        element: <WelcomePage />,
       },
     ],
   },

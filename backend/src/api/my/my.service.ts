@@ -2,33 +2,42 @@ import { Injectable, Req } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { SettingDto } from './dtos/setting.dto';
 import { MyDto } from './dtos/my.dto';
-import { Prisma, User } from '../../../prisma/index';
+import { Prisma, User } from '@prisma';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class MyService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private prismaService: PrismaService,
+    private authService: AuthService
+  ) {}
 
-  userToMyDto(user: User): MyDto {
-    const my: MyDto = {
+  userToMyDto(user: User, isVerifiedTwoFactor: boolean): MyDto {
+    return {
       id: user.id,
       nickname: user.nickname,
       rank: user.rank,
       isTwoFactor: user.isTwoFactor,
+      isVerifiedTwoFactor,
       ftUsername: user.ftUsername,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
-      deletedAt: user.deletedAt,
     };
-    return my;
   }
 
-  async whoami(@Req() req): Promise<MyDto> {
-    return this.userToMyDto(req.user);
+  async whoami(@Req() req): Promise<MyDto | null> {
+    const payload = await this.authService.getJwtPayloadFromReq(req);
+    if (!payload) return null;
+    const user = await this.prismaService.user.findUnique({
+      where: { id: payload.id },
+    });
+    return this.userToMyDto(user, payload.isVerifiedTwoFactor);
   }
 
   async setMyProfile(@Req() req, newData: SettingDto): Promise<MyDto> {
     const newUser: User = await this.setUser(req.user.id, newData);
-    return this.userToMyDto(newUser);
+    const payload = await this.authService.getJwtPayloadFromReq(req);
+    return this.userToMyDto(newUser, payload.isVerifiedTwoFactor);
   }
 
   async checkMyProfile(field: string, value: any): Promise<boolean> {

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsNumber, IsString, IsBoolean } from 'class-validator';
 
 export class JwtPayloadDto {
   @ApiProperty()
@@ -9,4 +9,12 @@ export class JwtPayloadDto {
   @ApiProperty()
   @IsString()
   public nickname: string;
+
+  @ApiProperty()
+  @IsBoolean()
+  public isTwoFactor: boolean;
+
+  @ApiProperty()
+  @IsBoolean()
+  public isVerifiedTwoFactor: boolean;
 }
