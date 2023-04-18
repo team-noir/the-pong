@@ -67,3 +67,8 @@ build-dev-no: ## [dev] Build containers no cache
 .PHONY: up-dev
 up-dev: ## [dev] Create and start containers
 	$(DOCKER_COMPOSE_DEV) up
+
+
+.PHONY: clean-dev
+clean-dev: ## [dev] Stop and remove running containers, networks, images, and volumes
+	$(DOCKER_COMPOSE_DEV) down --rmi all --volumes --remove-orphans

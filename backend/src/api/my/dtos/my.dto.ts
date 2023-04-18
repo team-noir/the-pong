@@ -19,6 +19,11 @@ export class MyDto {
   public isTwoFactor: boolean;
 
   @ApiProperty()
+  @IsBoolean()
+  public isVerifiedTwoFactor: boolean;
+
+  // TODO: remove
+  @ApiProperty()
   @IsString()
   public ftUsername: string;
 
@@ -29,10 +34,6 @@ export class MyDto {
   @ApiProperty()
   @IsDateString()
   public updatedAt: Date;
-
-  @ApiProperty()
-  @IsDateString()
-  public deletedAt: Date;
 }
 
 export class FollowDto {

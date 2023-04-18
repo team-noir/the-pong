@@ -5,6 +5,8 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { User } from '@prisma';
 import { Strategy } from 'passport-42';
 import { Response } from 'express';
+import { authenticator } from 'otplib';
+import { toDataURL } from 'qrcode';
 import { JwtPayloadDto } from './dtos/jwtPayload.dto';
 import { ONESECOND } from '../../const';
 
@@ -17,10 +19,16 @@ export class AuthService {
 
   async auth(@Req() req, @Res() res) {
     this.refreshToken(req.user.ftRefreshToken);
-    const userId = req.user.id;
-    const username = req.user.nickname;
-    const jwt = this.signJwt(userId, username);
+    const jwt = this.signJwt({
+      id: req.user.id,
+      nickname: req.user.nickname,
+      isTwoFactor: req.user.isTwoFactor,
+      isVerifiedTwoFactor: false,
+    });
     await this.setJwt(res, jwt);
+    if (req.user.isTwoFactor) {
+      res.redirect(`${process.env.CLIENT_APP_URL}/2fa`);
+    }
     res.redirect(process.env.CLIENT_APP_URL);
   }
 
@@ -29,38 +37,48 @@ export class AuthService {
   }
 
   generateRandomString(num) {
-    const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     let result = '';
     const charactersLength = characters.length;
     for (let i = 0; i < num; i++) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
     return result;
   }
 
   async login(@Res() res) {
     // TODO: 임시로 익명 회원의 id는 10000번부터 시작
-    let userId = 10000; 
+    let userId = 10000;
     let find;
-    
-    while (find = await this.prismaService.user.findUnique({ where: { id: userId }}))
-    { userId++; }
 
-    let user = await this.prismaService.user.create({
+    while (
+      (find = await this.prismaService.user.findUnique({
+        where: { id: userId },
+      }))
+    ) {
+      userId++;
+    }
+
+    const user = await this.prismaService.user.create({
       data: {
         id: userId,
         ftId: `${userId}`,
         nickname: this.generateRandomString(10),
-      }
+      },
     });
 
-    const jwt = this.signJwt(user.id, user.nickname);
+    const jwt = this.signJwt({
+      id: user.id,
+      nickname: user.nickname,
+      isTwoFactor: false,
+      isVerifiedTwoFactor: false,
+    });
     await this.setJwt(res, jwt);
     res.redirect(process.env.CLIENT_APP_URL);
   }
 
-  signJwt(id: number, nickname: string): string {
-    return this.jwtService.sign({ id, nickname });
+  signJwt(payload: JwtPayloadDto): string {
+    return this.jwtService.sign(payload);
   }
 
   getJwt(@Req() req): string {
@@ -93,6 +111,8 @@ export class AuthService {
     const result = {
       id: payload['id'],
       nickname: payload['nickname'],
+      isTwoFactor: payload['isTwoFactor'],
+      isVerifiedTwoFactor: payload['isVerifiedTwoFactor'],
     };
     return result;
   }
@@ -158,5 +178,61 @@ export class AuthService {
         });
       }
     );
+  }
+
+  /** 2FA */
+
+  async generateTwoFaSecret(userId: number) {
+    const secret = authenticator.generateSecret();
+
+    const otpauthUrl = authenticator.keyuri(String(userId), 'The Pong', secret);
+
+    await this.setTwoFaSecret(userId, secret);
+
+    return {
+      secret,
+      otpauthUrl,
+      qrCode: await toDataURL(otpauthUrl),
+    };
+  }
+
+  async verifyTwoFa(userId: number, twoFaCode: string) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+    return authenticator.verify({
+      token: twoFaCode,
+      secret: user.twoFactorSecret,
+    });
+  }
+
+  async isTwoFaOn(userId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: { id: userId },
+    });
+
+    return user.isTwoFactor;
+  }
+
+  async turnOnTwoFa(userId: number) {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { isTwoFactor: true },
+    });
+  }
+
+  async setTwoFaSecret(userId: number, secret: string) {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { twoFactorSecret: secret },
+    });
+  }
+
+  async turnOffTwoFa(userId: number) {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { isTwoFactor: false, twoFactorSecret: null },
+    });
   }
 }
