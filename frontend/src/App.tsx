@@ -89,7 +89,8 @@ function Init() {
         setIsOnboarded(true);
       }
     },
-    onError: (error: Error) => console.log(error.message),
+    refetchInterval: false,
+    refetchOnWindowFocus: false,
     useErrorBoundary: false,
   });
 
