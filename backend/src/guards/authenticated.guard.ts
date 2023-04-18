@@ -27,7 +27,7 @@ export class AuthenticatedGuard implements CanActivate {
     }
 
     // TODO: 임시로 익명 회원의 id는 10000번부터 시작
-    if (user.id >= 10000) {
+    if (user && user.id >= 10000) {
       req.user = user;
       const newJwt = this.authService.signJwt({
         id: user.id,
