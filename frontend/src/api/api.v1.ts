@@ -35,6 +35,14 @@ export const healthCheck = async () => {
 
 export const API_LOGIN_FT = `${API_PREFIX}/auth/42`;
 
+export const anonymousLogin = async () => {
+  const res = await axiosWithInterceptors.post(`/auth/login/anonymous`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
 export const logout = async () => {
   const res = await axiosWithInterceptors.post(`/auth/logout`);
   if (res.status !== 204) {
