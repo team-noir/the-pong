@@ -1,16 +1,17 @@
 import { Player } from "./player.dto";
 
+type userId = number;
+
 export class Game {
 	gameId: number;
 	players: Player[];
 	isLadder: boolean;
-	isInvite: boolean;
+	invitedId: userId;
 	readyTimeout;
 
-	constructor(gameId: number, isLadder?: boolean, isInvite?: boolean) {
+	constructor(gameId: number, isLadder?: boolean) {
 		this.gameId = gameId;
 		this.isLadder = isLadder ? true : false;
-		this.isInvite = isInvite ? true : false;
 		this.players = [];
 	}
 
@@ -37,35 +38,40 @@ export class Game {
 
 	// Check isFull, isLadder, isBlocked
 	canJoin(tarPlayer: Player, isLadder: boolean) : boolean {
-		if (this.isFull() || (this.isLadder != isLadder)) { 
-			return false; 
+		if (this.isFull() 
+			|| (this.isLadder != isLadder)
+			|| (this.invitedId && this.invitedId != tarPlayer.userId)
+		) { 
+			return false;
 		}
-		this.players.forEach((player) => {
-			if (player.isBlockUser(tarPlayer.userId) || tarPlayer.isBlockUser(player.userId)) {
-				return false;
-			}
-		});
+		for (const player of this.players) {
+			if (player.isBlockUser(tarPlayer.userId)) { return false; }
+			if (tarPlayer.isBlockUser(player.userId)) { return false; }
+		};
 		return true;
 	}
 
 	removePlayers() {
 		for (const player of this.players) {
 			player.leaveGame();
-	
-			// socket message
 			player.socket.emit('message', 'disconnected player');
 		};
 		this.players = [];
 	}
 
-	join(player: Player, isLadder: boolean) : boolean {
+	clearGameRoomTimeout() {
+		clearTimeout(this.readyTimeout);
+	}
+
+	async join(player: Player, isLadder: boolean): Promise<boolean> {
 		if (!this.canJoin(player, isLadder)) { 
 			return false; 
 		}
 		this.players.push(player);
 		player.socket.join(this.getName());
 		if (this.isFull()) {
-			this.noticeToPlayers('queue', {
+			await this.clearGameRoomTimeout();
+			await this.noticeToPlayers('queue', {
 				text: 'matched',
 				gameId: this.gameId
 			});
@@ -73,7 +79,7 @@ export class Game {
 		return true;
 	}
 
-	leave(tarPlayer: Player) : void {
+	leave(tarPlayer: Player): void {
 		if (this.has(tarPlayer)) {
 			this.players.forEach((player) => {
 				player.socket.leave(this.getName());
@@ -86,9 +92,9 @@ export class Game {
 
 	// socket 
 
-	noticeToPlayers(event: string, data) {
-		this.players.forEach((player) => {
-			player.socket.emit(event, data);
-		})
+	async noticeToPlayers(event: string, data) {
+		for (const player of this.players) {
+			await player.socket.emit(event, data);
+		}
 	}
 }

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef, HttpException } from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -10,25 +10,36 @@ import {
   MessageBody,
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
+import { parse } from 'cookie';
+
 import { ChannelsService } from './api/channels/channels.service';
 import { AuthService } from './api/auth/auth.service';
-import { parse } from 'cookie';
-import { ChannelUser } from './api/channels/models/user.model';
 import { GamesService } from './api/games/games.service';
+
+import { ChannelUser } from './api/channels/models/user.model';
 import { Player } from './api/games/dtos/player.dto';
+import { PrismaService } from './prisma/prisma.service';
+
+type userId = number;
 
 @Injectable()
 @WebSocketGateway({
   cors: { credentials: true },
 })
-export class AppGatway
+export class AppGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  private userSockets: Map<userId, Socket>;
+
   constructor(
     private authService: AuthService,
     private channelsService: ChannelsService,
-    public gamesService: GamesService
-  ) {}
+    @Inject(forwardRef(() => GamesService))
+    public gamesService: GamesService,
+    private prismaService: PrismaService,
+  ) {
+    this.userSockets = new Map<userId, Socket>();
+  }
 
   @WebSocketServer() server: Server;
   private logger = new Logger('Gateway');
@@ -71,37 +82,44 @@ export class AppGatway
     return { userId: userId, username: username };
   }
 
+  getUserSocket(userId: number) {
+    return this.userSockets.get(userId);
+  }
+
+  isUserOnline(userId: number) {
+    return this.userSockets.has(userId);
+  }
+
+  setUserOnline(userId: number, socket: Socket) {
+    this.userSockets.set(userId, socket);
+  }
+
+  setUserOffline(userId: number) {
+    this.userSockets.delete(userId);
+  }
+
   async handleConnection(@ConnectedSocket() socket: Socket) {
     const userInfo = this.getUserInfoFromSocket(socket);
-    if (!userInfo || !userInfo.userId || !userInfo.username) {
-      return;
+    if (!userInfo || !userInfo.userId || !userInfo.username) { 
+      this.logger.log(`${socket.id} 소켓 연결 실패 ❌`);
     }
 
-    const userId = userInfo.userId;
-    const username = userInfo.username;
-    if (this.channelsService.userModel.has(userId)) {
-      const logged = this.channelsService.userModel.getUser(userId);
-      if (logged.socket) {
-        logged.socket.disconnect(true);
-      }
-      logged.socket = socket;
-      socket.data = { user: logged };
+    const { userId, username } = userInfo;
+    socket.data = { userId, username }
+
+    if (this.isUserOnline(userId)) {
+      this.channelsService.userModel.resetUserSocket(userId, socket);
       this.logger.log(
         `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`
       );
-      logged.joined.forEach((channelId) => {
-        logged.socket.join(String(channelId));
-      });
-      return;
+    } else {
+      this.channelsService.userModel.addUser(userId, username, socket);
+      this.logger.log(
+        `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
+      );
     }
 
-    const user = new ChannelUser(userId, username, socket);
-    socket.data = { user };
-
-    this.channelsService.userModel.setUser(userId, user);
-    this.logger.log(
-      `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
-    );
+    this.setUserOnline(userId, socket);
   }
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
@@ -112,7 +130,7 @@ export class AppGatway
 
     const logged = this.channelsService.userModel.getUser(userInfo.userId);
     logged.socket = null;
-    this.logger.log(`${socket.handshake.query.username} 소켓 연결 해제 ❌`);
+    this.logger.log(`${socket.id} 소켓 연결 해제 ❌`);
   }
 
   // Message
@@ -125,7 +143,7 @@ export class AppGatway
   ) {
     try {
       const channel = this.channelsService.channelModel.get(channelId);
-      const user = this.channelsService.userModel.getUser(socket.data.user.id);
+      const user = this.channelsService.userModel.getUser(socket.data.userId);
 
       await this.channelsService.messageToChannel(user, channel, message);
     } catch (error) {
@@ -137,7 +155,7 @@ export class AppGatway
 
   @SubscribeMessage('create')
   create(@ConnectedSocket() socket: Socket, @MessageBody() data) {
-    this.channelsService.createChannel(socket.data.user.id, data);
+    this.channelsService.createChannel(socket.data.userId, data);
   }
 
   @SubscribeMessage('join')
@@ -147,7 +165,7 @@ export class AppGatway
     @MessageBody('password') password: string
   ) {
     try {
-      await this.channelsService.join(socket.data.user.id, channelId, password);
+      await this.channelsService.join(socket.data.userId, channelId, password);
     } catch (error) {
       console.log(error);
     }
@@ -158,7 +176,7 @@ export class AppGatway
     @ConnectedSocket() socket: Socket,
     @MessageBody('channelId') channelId: number
   ) {
-    this.channelsService.leave(socket.data.user.id, channelId);
+    this.channelsService.leave(socket.data.userId, channelId);
   }
 
   @SubscribeMessage('invite')
@@ -167,41 +185,132 @@ export class AppGatway
     @MessageBody('channelId') channelId: number,
     @MessageBody('userId') userId: number[]
   ) {
-    this.channelsService.invite(socket.data.user.id, channelId, userId);
+    this.channelsService.invite(socket.data.userId, channelId, userId);
   }
   
   @SubscribeMessage('queue')
-  queue(
+  async queue(
     @ConnectedSocket() socket: Socket,
     @MessageBody('isLadder') isLadder: boolean
   ) {
-    const userId = socket.data.user.id;
-    const user = this.channelsService.userModel.getUser(userId);
-    const player = new Player(user.id, user.socket);
-    this.gamesService.addUserToQueue(player, isLadder);
+    try {
+      const userId = socket.data.userId;
+      await this.gamesService.addUserToQueue(userId, isLadder);
+      socket.emit('queue', { text: 'created' });
+    } catch (error) {
+      socket.emit('queue', error);
+    }
   }
   
   @SubscribeMessage('removeQueue')
   removeQueue(
     @ConnectedSocket() socket: Socket,
   ) {
-    const userId = socket.data.user.id;
-    const user = this.channelsService.userModel.getUser(userId);
-    this.gamesService.removeUserFromQueue(user.id);
+    try {
+      const userId = socket.data.userId;
+      this.gamesService.removeUserFromQueue(userId);
+      socket.emit('removeQueue', { text: 'removed' });
+    } catch (error) {
+      socket.emit('removeQueue', error);
+    }
   }
   
   @SubscribeMessage('pong')
   pong(
     @ConnectedSocket() socket: Socket
   ) {
-    const userId = socket.data.user.id;
+    const userId = socket.data.userId;
     this.gamesService.gameModel.receivePong(userId);
   }
+  
+  @SubscribeMessage('gameInvite')
+  async gameInvite(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('userId') userId: number
+  ) {
+    try {
+      await this.gamesService.inviteUserToGame(socket.data.userId, userId);
+    } catch (error) {
+      socket.emit('gameInvite', error);
+    }
+  }
+  
+  @SubscribeMessage('gameInviteAnswer')
+  async gameInviteAnswer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('gameId') gameId: number,
+    @MessageBody('isAccepted') isAccepted: boolean,
+  ) {
+    try {
+      await this.gamesService.answerInvitation(socket.data.userId, gameId, isAccepted);
+    } catch (error) {
+      socket.emit('gameInvite', error);
+    }
+  }
+  
+  @SubscribeMessage('cancelInvite')
+  async cancelInvite(
+    @ConnectedSocket() socket: Socket,
+  ) {
+    try {
+      await this.gamesService.cancelInvitation(socket.data.userId);
+    } catch (error) {
+      socket.emit('gameInvite', error);
+    }
+  }
+
+
+
+  // For test
 
   @SubscribeMessage('gameStatus')
-  gameStatus(
+  async gameStatus(
     @ConnectedSocket() socket: Socket
   ) {
-    this.gamesService.gameModel.gameStatus(socket);
+    await this.gamesService.gameModel.gameStatus(socket);
+  }
+
+  @SubscribeMessage('addBlocked')
+  async addBlocked(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('userId') userId: number,
+  ) {
+    const blocker = socket.data.userId;
+    const blocked = userId;
+
+    await this.prismaService.blockUser.upsert({
+      where: {
+        id: {
+        blockerId: blocker,
+        blockedId: blocked,
+        },
+      },
+      create: {
+        blockerId: blocker,
+        blockedId: blocked,
+      },
+      update: {
+        blockerId: blocker,
+        blockedId: blocked,
+      },
+    });
+  }
+
+  @SubscribeMessage('removeBlocked')
+  async removeBlocked(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('userId') userId: number,
+  ) {
+    const blocker = socket.data.userId;
+    const blocked = userId;
+    
+    await this.prismaService.blockUser.delete({
+      where: {
+        id: {
+          blockerId: blocker,
+          blockedId: blocked,
+        },
+      },
+    });
   }
 }

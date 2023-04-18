@@ -1,7 +1,7 @@
 import { Injectable, Scope, Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
 import { createReadStream } from 'fs';
 import { readdir } from 'node:fs/promises';
 

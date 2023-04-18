@@ -43,6 +43,16 @@ export class ChannelUser {
   isBlockUser(userId: number) {
     return this.blockUser.has(userId);
   }
+
+  resetSocket(socket: Socket) {
+    if (this.socket) {
+      this.socket.disconnect(true);
+    }
+    this.socket = socket;
+    this.joined.forEach((channelId) => {
+      this.socket.join(String(channelId));
+    });
+  }
 }
 
 export class UserModel {
@@ -102,14 +112,6 @@ export class UserModel {
     return user;
   }
 
-  getUserFromSocket(socket: Socket) {
-    if (!socket || !socket.data || !socket.data.user) {
-      return null;
-    } else {
-      return socket.data.user;
-    }
-  }
-
   getUsernameList() {
     return [...this.channelUserMap.keys()];
   }
@@ -118,5 +120,15 @@ export class UserModel {
 
   setUser(userId: number, user: ChannelUser): void {
     this.channelUserMap.set(userId, user);
+  }
+
+  addUser(userId: number, username: string, socket: Socket) {
+    const newUser = new ChannelUser(userId, username, socket);
+    this.setUser(userId, newUser);
+  }
+
+  resetUserSocket(userId: number, socket: Socket) {
+    const user = this.getUser(userId);
+    user.resetSocket(socket);
   }
 }

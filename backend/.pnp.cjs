@@ -78,6 +78,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["rxjs", "npm:7.8.0"],\
             ["socket.io", "npm:4.6.1"],\
             ["socket.io-client", "npm:4.6.1"],\
+            ["socket.io-mock-ts", "npm:1.0.2"],\
             ["source-map-support", "npm:0.5.21"],\
             ["supertest", "npm:6.3.3"],\
             ["ts-jest", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:29.0.3"],\
@@ -2278,6 +2279,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/keyv", "npm:3.1.4"],\
             ["@types/node", "npm:18.15.2"],\
             ["@types/responselike", "npm:1.0.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@types/component-emitter", [\
+        ["npm:1.2.11", {\
+          "packageLocation": "./.yarn/cache/@types-component-emitter-npm-1.2.11-581f0366a3-0e081c5f7a.zip/node_modules/@types/component-emitter/",\
+          "packageDependencies": [\
+            ["@types/component-emitter", "npm:1.2.11"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -9230,6 +9240,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["socket.io-mock-ts", [\
+        ["npm:1.0.2", {\
+          "packageLocation": "./.yarn/cache/socket.io-mock-ts-npm-1.0.2-3b420fb22b-1e05fb31e4.zip/node_modules/socket.io-mock-ts/",\
+          "packageDependencies": [\
+            ["socket.io-mock-ts", "npm:1.0.2"],\
+            ["@types/component-emitter", "npm:1.2.11"],\
+            ["component-emitter", "npm:1.3.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["socket.io-parser", [\
         ["npm:4.2.2", {\
           "packageLocation": "./.yarn/cache/socket.io-parser-npm-4.2.2-22f4e4a017-ba929645cb.zip/node_modules/socket.io-parser/",\
@@ -9668,6 +9689,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["rxjs", "npm:7.8.0"],\
             ["socket.io", "npm:4.6.1"],\
             ["socket.io-client", "npm:4.6.1"],\
+            ["socket.io-mock-ts", "npm:1.0.2"],\
             ["source-map-support", "npm:0.5.21"],\
             ["supertest", "npm:6.3.3"],\
             ["ts-jest", "virtual:f0188075613bd5ad9f00a7d675a9150ace2ee8136f4530c986eaaca5017f8aaa6c8b844e9e287a8fae4a2861753299773442e1becdbbd260530733ac1f863b3c#npm:29.0.3"],\

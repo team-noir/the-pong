@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './api/users/users.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -7,7 +7,7 @@ import { AuthModule } from './api/auth/auth.module';
 import { AppController } from './app.controller';
 import { ChannelsModule } from './api/channels/channels.module';
 import { GamesModule } from './api/games/games.module';
-import { AppGatway } from './app.gateway';
+import { AppGateway } from './app.gateway';
 
 @Module({
   imports: [
@@ -22,6 +22,7 @@ import { AppGatway } from './app.gateway';
     GamesModule,
   ],
   controllers: [AppController],
-  providers: [AppGatway],
+  providers: [AppGateway],
+  exports: [AppGateway]
 })
 export class AppModule {}
