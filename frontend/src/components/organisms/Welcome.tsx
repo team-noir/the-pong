@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-
-const backgroundImageUrl = `${process.env.PUBLIC_URL}/images/welcome-background.png`;
+import { BACKGROUND_IMAGES } from 'constants/index';
 
 export default function Welcome() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
     const rootDiv = document.getElementById('root');
-    if (rootDiv) rootDiv.style.backgroundImage = `url('${backgroundImageUrl}')`;
+    if (rootDiv)
+      rootDiv.style.backgroundImage = `url('${BACKGROUND_IMAGES.WELCOME}')`;
 
     queryClient.invalidateQueries(['whoami']);
     return () => {
