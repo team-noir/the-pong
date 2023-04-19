@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, useContext } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import {
   QueryClient,
@@ -75,6 +75,8 @@ export function App() {
 
 function Init() {
   const login = useUser((state) => state.login);
+  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
+  const socket = useContext(SocketContext);
 
   useQuery({
     queryKey: ['health-check'],
@@ -85,7 +87,11 @@ function Init() {
     queryKey: ['whoami'],
     queryFn: whoami,
     onSuccess: (data) => {
+      socket.connect();
       login(data);
+      if (data.nickname) {
+        setIsOnboarded(true);
+      }
     },
     refetchInterval: false,
     refetchOnWindowFocus: false,
