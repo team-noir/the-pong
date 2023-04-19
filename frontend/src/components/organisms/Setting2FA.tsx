@@ -9,17 +9,10 @@ import Button from 'components/atoms/Button';
 
 export default function Setting2FA() {
   const { isTwoFactor, setIsTwoFactor } = useUser((state) => state);
-  const [twoFactorCode, setTwoFactorCode] = useState<{
-    qrCode: string;
-    key: string;
-  } | null>(null);
   const [isShowVerify2fa, setIsShowVerify2fa] = useState(false);
 
   const get2faCodeMutation = useMutation({
     mutationFn: get2faCode,
-    onSuccess: (data) => {
-      setTwoFactorCode(data);
-    },
   });
 
   const delete2faMutation = useMutation({
@@ -67,40 +60,47 @@ export default function Setting2FA() {
           </>
         )}
       </div>
-      {twoFactorCode && (
+      {get2faCodeMutation.data && (
         <Modal
           title="2FA 설정"
-          onClickClose={() => setTwoFactorCode(null)}
+          onClickClose={() => get2faCodeMutation.reset()}
           fitContent
         >
-          {!isShowVerify2fa ? (
-            <div className="flex flex-col items-center">
-              <div>
-                <img
-                  src={twoFactorCode.qrCode}
-                  alt="QR 코드"
-                  className="w-20"
-                />
-              </div>
-              <div>
-                <h2>설정 키</h2>
-                <p>QR 코드를 사용할 수 없는 경우 설정 키를 입력해 주세요.</p>
-                <span>{twoFactorCode.key}</span>
-              </div>
-              <div>
-                <Button onClick={() => setIsShowVerify2fa(true)} primary>
+          <div className="w-[26rem] min-h-[28rem] vh-center flex-col mt-6">
+            {!isShowVerify2fa ? (
+              <>
+                <div className="mb-8">
+                  <img
+                    src={get2faCodeMutation.data.qr}
+                    alt="QR 코드"
+                    className="w-52"
+                  />
+                </div>
+                <div className="text-center mb-8">
+                  <p className="mb-2">
+                    QR 코드를 사용할 수 없는 경우 설정 키를 입력해 주세요.
+                  </p>
+                  <span className="inline-block text-lg font-medium font-mono py-2 px-4 border rounded border-gray-light select-all">
+                    {get2faCodeMutation.data.key}
+                  </span>
+                </div>
+                <Button
+                  onClick={() => setIsShowVerify2fa(true)}
+                  primary
+                  fullLength
+                >
                   다음
                 </Button>
-              </div>
-            </div>
-          ) : (
-            <Verify2FA
-              onSuccess={() => {
-                setTwoFactorCode(null);
-                setIsShowVerify2fa(false);
-              }}
-            />
-          )}
+              </>
+            ) : (
+              <Verify2FA
+                onSuccess={() => {
+                  get2faCodeMutation.reset();
+                  setIsShowVerify2fa(false);
+                }}
+              />
+            )}
+          </div>
         </Modal>
       )}
     </>
