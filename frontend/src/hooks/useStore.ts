@@ -45,7 +45,7 @@ export const useUser = create<UserState>()(
         nickname,
         rank,
         isTwoFactor,
-        isVerifiedTwoFactor: false, // TODO: 나중에 false 삭제
+        isVerifiedTwoFactor,
       })),
     logout: () => set(() => initialState),
     setNickname: (nickname: string) =>
