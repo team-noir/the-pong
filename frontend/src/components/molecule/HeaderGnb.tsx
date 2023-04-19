@@ -5,7 +5,6 @@ import { logout as logoutApi } from 'api/api.v1';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useUser } from 'hooks/useStore';
-import SearchBar from 'components/molecule/SearchBar';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { classNames } from 'utils';
 
@@ -13,6 +12,7 @@ const navigation = [
   { name: '게임', href: '/game', current: false },
   { name: '채널', href: '/channel', current: false },
   { name: '팔로잉', href: '/following', current: false },
+  { name: '회원 검색', href: '/search', current: false },
   { name: '설정', href: '/setting', current: false },
 ];
 
@@ -138,8 +138,6 @@ export default function HeaderGnb() {
 
           <Disclosure.Panel>
             <div className="container max-w-xl space-y-1 px-2 pt-2 pb-3">
-              <SearchBar />
-              <hr className="my-6 border-gray-light dark:border-gray" />
               {navigation.map((item) => (
                 <Disclosure.Button
                   key={item.name}
