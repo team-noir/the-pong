@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types';
@@ -7,7 +7,7 @@ import { classNames } from 'utils';
 interface Props {
   user: UserType;
   imageSize: number;
-  buttons?: ReactElement[];
+  buttons?: ReactNode;
   hasStatus: boolean;
   myUserId?: number;
   inviteList?: boolean;
