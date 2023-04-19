@@ -29,11 +29,11 @@ import {
 import { existsSync, mkdirSync } from 'fs';
 import { readdir, unlink } from 'node:fs/promises';
 import { diskStorage } from 'multer';
-import { AuthenticatedGuard } from '../../guards/authenticated.guard';
+import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import { SettingDto, CheckSettingDto, FileUploadDto } from './dtos/setting.dto';
 import { MyService } from './my.service';
 import { MyDto, FollowDto, BlockDto } from './dtos/my.dto';
-import { PROFILE_PATH } from '../../const';
+import { PROFILE_PATH } from '@const';
 
 @ApiTags('my')
 @Controller('my')

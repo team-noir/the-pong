@@ -1,12 +1,12 @@
 import { Injectable, Scope, Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 import { createReadStream } from 'fs';
 import { readdir } from 'node:fs/promises';
 
 import { join } from 'path';
-import { PROFILE_PATH } from '../../const';
+import { PROFILE_PATH } from '@const';
 
 interface RequestWithUser extends Request {
   user: any;

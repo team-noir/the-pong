@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { describe, it, expect, jest, beforeAll, afterAll, afterEach } from '@jest/globals';
 import { GamesService } from './games.service';
-import { AppGateway } from '../../app.gateway';
+import { AppGateway } from '@/app.gateway';
 import { ChannelsModule } from '../channels/channels.module';
 import { AuthModule } from '../auth/auth.module';
 import { GamesModule } from './games.module';
-import { PrismaModule } from '../../prisma/prisma.module';
+import { PrismaModule } from '@/prisma/prisma.module';
 import { Player } from './dtos/player.dto';
-import { AppModule } from '../../app.module';
+import { AppModule } from '@/app.module';
 
 import { io } from 'socket.io-client';
 import { INestApplication } from '@nestjs/common';

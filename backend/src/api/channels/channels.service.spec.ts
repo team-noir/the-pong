@@ -12,7 +12,7 @@ import {
 import { HttpStatus } from '@nestjs/common';
 import { ChannelsModule } from './channels.module';
 import { ChannelUser } from './models/user.model';
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 const fakeSocket = {
   emit: jest.fn(),

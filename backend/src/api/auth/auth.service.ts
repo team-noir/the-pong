@@ -1,12 +1,12 @@
 import { Injectable, Req, Res } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as refresh from 'passport-oauth2-refresh';
-import { PrismaService } from '../../prisma/prisma.service';
-import { User } from '../../../prisma/index';
+import { PrismaService } from '@/prisma/prisma.service';
+import { User } from '@prisma';
 import { Strategy } from 'passport-42';
 import { Response } from 'express';
 import { JwtPayloadDto } from './dtos/jwtPayload.dto';
-import { ONESECOND } from '../../const';
+import { ONESECOND } from '@const';
 
 @Injectable()
 export class AuthService {
