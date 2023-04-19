@@ -135,6 +135,10 @@ export const routes = (
           path: 'search',
           element: <SearchResultPage />,
         },
+        {
+          path: 'welcome',
+          element: <WelcomePage />,
+        },
       ],
     },
   ];
