@@ -62,11 +62,22 @@ export class GameModel implements OnModuleInit {
 	}
 
 	getGame(gameId: number): Game {
+		if (!this.games.has(gameId)) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This game does not exist';
+			throw { code, message };
+		}
+
 		return this.games.get(gameId);
 	}
 
 	setGame(game: Game) {
 		this.games.set(game.gameId, game);
+	}
+
+	setGameSettings(game: Game, mode: number, theme: number) {
+		game.setMode(mode);
+		game.setTheme(theme);
 	}
 
 	addInvite(game: Game, invitedId: number) {
@@ -101,6 +112,7 @@ export class GameModel implements OnModuleInit {
 			where: { id: userId },
 			select: {
 				nickname: true,
+				rank: true,
 				blockeds: { select: { blockedId: true } }
 			}
 		});
@@ -116,7 +128,7 @@ export class GameModel implements OnModuleInit {
 			blocks.push(blocked.blockedId);
 		}
 
-		return new Player(userId, data.nickname, socket, blocks);
+		return new Player(userId, data.nickname, data.rank, socket, blocks);
 	}
 
 	getPlayer(playerId: number): Player {

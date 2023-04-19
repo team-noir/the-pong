@@ -2,6 +2,7 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Player } from './dtos/player.dto';
 import { GameModel } from './models/game.model';
+import { GameSettingInfoDto } from './dtos/games.dto';
 
 @Injectable()
 export class GamesService {
@@ -74,12 +75,8 @@ export class GamesService {
 
 		const invited = await this.gameModel.createPlayer(userId);
 		const game = this.gameModel.getGame(gameId);
-
-		if (!game) {
-			const code = HttpStatus.BAD_REQUEST;
-			const message = 'This game does not exist';
-			throw { code, message };
-		} else if (!game.canJoin(invited, false)) {
+		
+		if (!game.canJoin(invited, false)) {
 			const code = HttpStatus.BAD_REQUEST;
 			const message = 'You cannot join this game';
 			throw { code, message };
@@ -96,5 +93,31 @@ export class GamesService {
 			this.gameModel.removeGame(game);
 		}
 	}
+
+	gameSettingInfo(gameId: number) {
+		const game = this.gameModel.getGame(gameId);
+		return new GameSettingInfoDto(game);
+	}
+
+	async setGameSettings(userId: number, gameId: number, mode: number, theme: number) {
+		const player = this.gameModel.getPlayer(userId);
+		const game = this.gameModel.getGame(gameId);
+		
+		if (game.ownerId != player.userId) {
+			const code = HttpStatus.FORBIDDEN;
+			const message = 'You do not have permission to change game settings.';
+			throw { code, message };
+		} else if (!game.isFull()) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = "Your opponent hasn't entered yet.";
+			throw { code, message };
+		} else if (game.isStarted) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = "The game has already started.";
+			throw { code, message };
+		}
+		this.gameModel.setGameSettings(game, mode, theme);
+	}
+
 
 }

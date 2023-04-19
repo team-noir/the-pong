@@ -1,18 +1,32 @@
 import { Player } from "./player.dto";
+import { HttpStatus } from '@nestjs/common';
+import { GAME_MODES, GAME_THEMES } from "@const";
 
 type userId = number;
+type indexKey = number;
 
 export class Game {
 	gameId: number;
-	players: Player[];
 	isLadder: boolean;
+	isStarted: boolean;
+	mode: indexKey;
+	theme: indexKey;
+	createdAt: Date;
+
+	ownerId: number;
+	players: Player[];
 	invitedId: userId;
+
 	readyTimeout;
 
 	constructor(gameId: number, isLadder?: boolean) {
 		this.gameId = gameId;
 		this.isLadder = isLadder ? true : false;
+		this.isStarted = false;
+		this.mode = 0;
+		this.theme = 0;
 		this.players = [];
+		this.createdAt = new Date();
 	}
 
 	getName() : string {
@@ -36,6 +50,24 @@ export class Game {
 		return false;
 	}
 
+	setMode(mode: indexKey) {
+		if (mode < 0 || mode >= GAME_MODES.size()) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This is an invalid mode.';
+			throw { code, message };
+		}
+		this.mode = mode;
+	}
+	
+	setTheme(theme: indexKey) {
+		if (theme < 0 || theme >= GAME_THEMES.size()) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This is an invalid theme.';
+			throw { code, message };
+		}
+		this.theme = theme;
+	}
+	
 	// Check isFull, isLadder, isBlocked
 	canJoin(tarPlayer: Player, isLadder: boolean) : boolean {
 		if (this.isFull() 
@@ -66,6 +98,9 @@ export class Game {
 	async join(player: Player, isLadder: boolean): Promise<boolean> {
 		if (!this.canJoin(player, isLadder)) { 
 			return false; 
+		}
+		if (this.players.length == 0) {
+			this.ownerId = player.userId;
 		}
 		this.players.push(player);
 		player.socket.join(this.getName());
