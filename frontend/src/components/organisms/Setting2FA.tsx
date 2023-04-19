@@ -42,7 +42,7 @@ export default function Setting2FA() {
           </Button>
         ) : (
           <>
-            <div className="inline-flex items-center justify-center w-full mb-2 py-1 bg-green-300 text-text-dark text-center rounded-sm text-lg font-semibold">
+            <div className="inline-flex vh-center w-full mb-2 py-1 bg-green-300 text-text-dark text-center rounded-sm text-lg font-semibold">
               <CheckCircleIcon
                 className="inline-block w-4 h-4 mr-2"
                 aria-hidden="true"

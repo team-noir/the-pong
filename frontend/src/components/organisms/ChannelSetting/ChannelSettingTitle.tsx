@@ -31,9 +31,7 @@ export default function ChannelSettingTitle({
         aria-hidden="true"
         onClick={onClickBack}
       />
-      <h3 className="section-title">
-        <h2>채널 이름 수정</h2>
-      </h3>
+      <h2 className="section-title">채널 이름 수정</h2>
       <div className="my-16">
         <TextInputWithMessage
           id="title"
