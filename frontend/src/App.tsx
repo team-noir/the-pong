@@ -75,7 +75,6 @@ export function App() {
 
 function Init() {
   const login = useUser((state) => state.login);
-  const setIsOnboarded = useUser((state) => state.setIsOnboarded);
   const socket = useContext(SocketContext);
 
   useQuery({
@@ -89,9 +88,6 @@ function Init() {
     onSuccess: (data) => {
       socket.connect();
       login(data);
-      if (data.nickname) {
-        setIsOnboarded(true);
-      }
     },
     refetchInterval: false,
     refetchOnWindowFocus: false,
