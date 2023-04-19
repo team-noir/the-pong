@@ -24,7 +24,7 @@ export default function useGame(): ReturnType {
 
     socket.on('queue', (data: { text: string; gameId?: number }) => {
       if (data.gameId) {
-        navigate(`game/${data.gameId}/setting`);
+        navigate(`/game/${data.gameId}/setting`);
       } else {
         setAlertCode(data.text);
         setIsWating(false);

@@ -1,4 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
+import { replyGameInvitation } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 import Modal from 'components/templates/Modal';
 import ProfileImage from 'components/atoms/ProfileImage';
@@ -12,13 +14,15 @@ export default function GameInviteModal() {
   const [isCanceled, setIsCanceled] = useState(false);
   const socket = useContext(SocketContext);
 
+  const replyGameInvitationMutation = useMutation(replyGameInvitation);
+
   useEffect(() => {
     socket.on(
       'gameInvite',
       (data: { text: string; user?: UserType; gameId?: number }) => {
         if (data.gameId && data.user) {
           setIsShow(true);
-          setGameId(gameId);
+          setGameId(data.gameId);
           setUser(data.user);
         } else if (data.text === 'canceled') {
           setIsCanceled(true);
@@ -29,13 +33,28 @@ export default function GameInviteModal() {
   }, []);
 
   const handleClickAccept = () => {
-    // TODO: 초대 수락 API 호출 && 게임 페이지로 이동
-    setIsShow(false);
+    if (!gameId) return;
+
+    replyGameInvitationMutation.mutate(
+      { gameId, isAccepted: true },
+      {
+        onSuccess: () => {
+          setIsShow(false);
+          location.href = `/game/${gameId}/setting`;
+        },
+      }
+    );
   };
 
   const handleClickReject = () => {
-    // TODO: 초대 거절 API 호출
-    setIsShow(false);
+    if (!gameId) return;
+
+    replyGameInvitationMutation.mutate(
+      { gameId, isAccepted: false },
+      {
+        onSuccess: () => setIsShow(false),
+      }
+    );
   };
 
   return (
@@ -63,7 +82,7 @@ export default function GameInviteModal() {
         </Modal>
       )}
       {isCanceled && (
-        <Modal onClickClose={() => setIsCanceled(false)}>
+        <Modal onClickClose={() => setIsCanceled(false)} fitContent>
           <p>상대가 초대를 취소하였습니다.</p>
         </Modal>
       )}
