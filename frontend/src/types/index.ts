@@ -7,14 +7,13 @@ export interface UserType {
   nickname?: string;
   rank?: number;
   isTwoFactor?: boolean;
+  isVerifiedTwoFactor?: boolean;
   status?: UserStatus;
   achievements?: [];
   games?: [];
   isFollowedByMyself?: boolean;
   isBlockedByMyself?: boolean;
   createdAt?: string;
-  updatedAt?: string;
-  deletedAt?: string;
 }
 
 export const USER_ROLES = {
