@@ -25,8 +25,10 @@ export default function Verify2FA({ onSuccess }: Props) {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setCode(value);
+    const { value } = e.currentTarget;
+    if (value?.length > 6) return;
+    const onlyNumber = value.replace(/\D/g, '');
+    setCode(onlyNumber);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -35,17 +37,23 @@ export default function Verify2FA({ onSuccess }: Props) {
   };
 
   return (
-    <section>
-      <form onSubmit={handleSubmit}>
-        <h1>Two-Factor Authentication</h1>
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="my-16 text-center">
+        <h2 className="section-title">Two-Factor Authentication</h2>
         <p>2단계 보안 인증 코드를 입력해 주세요.</p>
-        <TextInput id="code" value={code} onChange={handleChange} />
-        <div>
-          <Button type="submit" primary>
-            확인
-          </Button>
+        <div className="my-16 mx-auto">
+          <TextInput
+            id="code"
+            value={code}
+            onChange={handleChange}
+            className="text-3xl text-center w-36 font-mono"
+            placeholder="000000"
+          />
         </div>
-      </form>
-    </section>
+        <Button type="submit" primary fullLength>
+          확인
+        </Button>
+      </div>
+    </form>
   );
 }
