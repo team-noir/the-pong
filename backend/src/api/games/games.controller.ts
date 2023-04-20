@@ -11,7 +11,7 @@ import {
 	HttpException,
 	HttpStatus
 } from '@nestjs/common';
-import { AuthenticatedGuard } from '../../guards/authenticated.guard';
+import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import { GamesService } from './games.service';
 import { AddUserToQueueDto, InviteUserToGameDto, AnswerInvitationDto } from './dtos/games.dto';
 

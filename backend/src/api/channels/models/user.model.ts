@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 import { HttpStatus } from '@nestjs/common';
 import { Channel } from './channel.model';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 type userId = number;
 type channelId = number;

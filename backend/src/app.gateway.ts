@@ -18,7 +18,7 @@ import { GamesService } from './api/games/games.service';
 
 import { ChannelUser } from './api/channels/models/user.model';
 import { Player } from './api/games/dtos/player.dto';
-import { PrismaService } from './prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
 type userId = number;
 

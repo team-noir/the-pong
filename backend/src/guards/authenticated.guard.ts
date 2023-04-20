@@ -5,7 +5,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { AuthService } from '../api/auth/auth.service';
-import { User } from '../../prisma/index';
+import { User } from '@prisma';
 
 @Injectable()
 export class AuthenticatedGuard implements CanActivate {

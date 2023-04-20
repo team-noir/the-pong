@@ -4,8 +4,8 @@ import { ModuleRef } from '@nestjs/core'
 import { Player } from '../dtos/player.dto';
 import { Game } from '../dtos/game.dto';
 import { Socket } from 'socket.io';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { AppGateway } from '../../../app.gateway';
+import { PrismaService } from '@/prisma/prisma.service';
+import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
 
 type gameId = number;

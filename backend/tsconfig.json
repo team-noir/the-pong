@@ -8,8 +8,6 @@
     "allowSyntheticDefaultImports": true,
     "target": "es2017",
     "sourceMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
@@ -18,8 +16,12 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "isolatedModules": true,
+    "baseUrl": "./",
     "paths": {
-      "@prisma": ["./prisma/index"],
-    }
+      "@/*": ["src/*"],
+      "@prisma": ["prisma/index"],
+      "@const": ["src/const"],
+    },
+    "outDir": "./dist"
   }
 }

@@ -3,9 +3,9 @@ import { ChannelUser } from './user.model';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
-import { NOTICE_STATUS_MESSAGE } from '../../../const';
+import { NOTICE_STATUS_MESSAGE } from '@const';
 
 type messageId = number;
 type userId = number;
