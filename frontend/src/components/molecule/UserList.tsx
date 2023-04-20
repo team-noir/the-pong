@@ -1,11 +1,11 @@
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import UserItem from 'components/molecule/UserItem';
 import { UserType } from 'types';
 
 interface Props {
   users: UserType[] | null;
   imageSize: number;
-  buttons?: ReactElement[];
+  buttons?: ReactNode;
   hasStatus?: boolean;
   myUserId?: number;
   inviteList?: boolean;

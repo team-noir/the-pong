@@ -8,7 +8,7 @@ import GamePage from 'pages/GamePage';
 import FollowingPage from 'pages/FollowingPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
-import SearchResultPage from 'pages/SearchResultPage';
+import SearchPage from 'pages/SearchPage';
 import SettingProfilePage from 'pages/SettingProfilePage';
 import Setting2FAPage from 'pages/Setting2FAPage';
 import SettingBlocksPage from 'pages/SettingBlocksPage';
@@ -133,7 +133,7 @@ export const routes = (
         },
         {
           path: 'search',
-          element: <SearchResultPage />,
+          element: <SearchPage />,
         },
         {
           path: 'welcome',

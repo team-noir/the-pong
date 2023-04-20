@@ -1,4 +1,4 @@
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types';
@@ -7,7 +7,7 @@ import { classNames } from 'utils';
 interface Props {
   user: UserType;
   imageSize: number;
-  buttons?: ReactElement[];
+  buttons?: ReactNode;
   hasStatus: boolean;
   myUserId?: number;
   inviteList?: boolean;
@@ -24,7 +24,7 @@ export default function UserItem({
   return (
     <li
       data-user-id={user.id}
-      className="mb-2 px-2 py-2 flex items-center space-x-4"
+      className="px-2 py-4 flex items-center space-x-4"
     >
       <div
         className={classNames(
@@ -62,9 +62,11 @@ export default function UserItem({
             <span className="text-lg font-medium">{user.nickname}</span>
           </Link>
         </div>
-        <div className="inline-flex items-center space-x-2">
-          {user.id !== myUserId && buttons && <>{buttons}</>}
-        </div>
+        {buttons && (
+          <div className="inline-flex items-center space-x-2">
+            {user.id !== myUserId && buttons && <>{buttons}</>}
+          </div>
+        )}
       </div>
     </li>
   );
