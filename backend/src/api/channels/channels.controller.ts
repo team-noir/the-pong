@@ -14,7 +14,7 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { AuthenticatedGuard } from '../../guards/authenticated.guard';
+import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import { ChannelsService } from './channels.service';
 import {
   ApiTags,

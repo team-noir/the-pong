@@ -1,9 +1,9 @@
 import { HttpStatus } from '@nestjs/common';
 
 import { ChannelUser } from './user.model';
-import { PrismaService } from '../../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
-import { ONESECOND } from '../../../const';
+import { ONESECOND } from '@const';
 
 type userId = number;
 type channelId = number;

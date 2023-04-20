@@ -4,8 +4,8 @@ import { ModuleRef } from '@nestjs/core'
 import { Player } from '../dtos/player.dto';
 import { Game } from '../dtos/game.dto';
 import { Socket } from 'socket.io';
-import { PrismaService } from '../../../prisma/prisma.service';
-import { AppGateway } from '../../../app.gateway';
+import { PrismaService } from '@/prisma/prisma.service';
+import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
 
 type gameId = number;
@@ -62,6 +62,12 @@ export class GameModel implements OnModuleInit {
 	}
 
 	getGame(gameId: number): Game {
+		if (!this.games.has(gameId)) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = 'This game does not exist';
+			throw { code, message };
+		}
+
 		return this.games.get(gameId);
 	}
 
@@ -101,6 +107,7 @@ export class GameModel implements OnModuleInit {
 			where: { id: userId },
 			select: {
 				nickname: true,
+				rank: true,
 				blockeds: { select: { blockedId: true } }
 			}
 		});
@@ -116,7 +123,7 @@ export class GameModel implements OnModuleInit {
 			blocks.push(blocked.blockedId);
 		}
 
-		return new Player(userId, data.nickname, socket, blocks);
+		return new Player(userId, data.nickname, data.rank, socket, blocks);
 	}
 
 	getPlayer(playerId: number): Player {

@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { inviteGame } from 'api/api.v1';
+import { cancelInvitingGame, inviteGame } from 'api/api.v1';
 import Button from 'components/atoms/Button';
 import Modal from 'components/templates/Modal';
 import useGame from 'hooks/useGame';
@@ -12,9 +12,8 @@ export default function GameInviteButton() {
     mutationFn: inviteGame,
     onSuccess: () => setIsWating(true),
     onError: (error: AxiosError) => {
-      if (!error.status) return;
-
-      if ([400, 409].includes(error.status)) {
+      if (!error.response?.status) return;
+      if ([400, 409].includes(error.response.status)) {
         setAlertCode('unavailable');
       } else {
         alert('다시 시도해 주세요.');
@@ -22,17 +21,20 @@ export default function GameInviteButton() {
     },
   });
 
+  const cancelInvitingGameMutation = useMutation({
+    mutationFn: cancelInvitingGame,
+    onSuccess: () => setIsWating(false),
+  });
+
   const handleClickInvite = (e: React.MouseEvent<HTMLElement>) => {
     const ancestorElement = e.currentTarget.closest('[data-user-id]');
     if (!(ancestorElement instanceof HTMLElement)) return;
     const userId = ancestorElement.dataset.userId;
-    console.log('userId', userId);
     inviteGameMutation.mutate(Number(userId));
   };
 
   const cancelWaiting = () => {
-    // TODO: 초대 취소 API 요청
-    setIsWating(false);
+    cancelInvitingGameMutation.mutate();
   };
 
   return (

@@ -20,7 +20,7 @@ import {
   ApiNotFoundResponse,
   ApiBadRequestResponse,
 } from '@nestjs/swagger';
-import { AuthenticatedGuard } from '../../guards/authenticated.guard';
+import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import { UsersService } from './users.service';
 import { Response } from 'express';
 import { UserDto } from './dtos/users.dto';

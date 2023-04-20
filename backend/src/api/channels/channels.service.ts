@@ -7,9 +7,9 @@ import { ChannelModel, Channel } from './models/channel.model';
 import { UserModel, ChannelUser } from './models/user.model';
 import { MessageModel, Message } from './models/message.model';
 
-import { PrismaService } from '../../prisma/prisma.service';
+import { PrismaService } from '@/prisma/prisma.service';
 
-import { NOTICE_STATUS, NOTICE_STATUS_MESSAGE } from '../../const';
+import { NOTICE_STATUS, NOTICE_STATUS_MESSAGE } from '@const';
 
 @Injectable()
 export class ChannelsService {

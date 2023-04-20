@@ -1,10 +1,11 @@
-import { Fragment } from 'react';
+import { Fragment, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { logout as logoutApi } from 'api/api.v1';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useUser } from 'hooks/useStore';
+import { SocketContext } from 'contexts/socket';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { classNames } from 'utils';
 
@@ -31,10 +32,12 @@ function Logo() {
 
 export default function HeaderGnb() {
   const { logout, setIsOnboarded, id: myUserId } = useUser((state) => state);
+  const socket = useContext(SocketContext);
 
   const postLogoutMutation = useMutation({
     mutationFn: logoutApi,
     onSuccess: () => {
+      socket.disconnect();
       setIsOnboarded(false);
       logout();
     },
