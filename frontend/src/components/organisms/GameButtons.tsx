@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { waitGame } from 'api/api.v1';
+import { cancelWaitingGame, waitGame } from 'api/api.v1';
 import useGame from 'hooks/useGame';
 import Modal from 'components/templates/Modal';
 import Button from 'components/atoms/Button';
@@ -12,9 +12,13 @@ export default function GameButtons() {
     onSuccess: () => setIsWating(true),
   });
 
+  const cancelWaitingGameMutation = useMutation({
+    mutationFn: cancelWaitingGame,
+    onSuccess: () => setIsWating(false),
+  });
+
   const cancelWaiting = () => {
-    // TODO: 취소 API 요청
-    setIsWating(false);
+    cancelWaitingGameMutation.mutate();
   };
 
   return (

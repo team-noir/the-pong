@@ -355,6 +355,14 @@ export const leaveChannel = async (channelId: number) => {
 
 export const waitGame = async (isLadder: boolean): Promise<AxiosResponse> => {
   const res = await axiosWithInterceptors.post(`/games/queue`, { isLadder });
+  if (res.status !== 201) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const cancelWaitingGame = async (): Promise<AxiosResponse> => {
+  const res = await axiosWithInterceptors.delete(`/games/queue`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
@@ -364,6 +372,30 @@ export const waitGame = async (isLadder: boolean): Promise<AxiosResponse> => {
 export const inviteGame = async (userId: number): Promise<AxiosResponse> => {
   const res = await axiosWithInterceptors.post(`/games/invite`, { userId });
   if (res.status !== 201) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const cancelInvitingGame = async (): Promise<AxiosResponse> => {
+  const res = await axiosWithInterceptors.delete(`/games/invite`);
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const replyGameInvitation = async ({
+  gameId,
+  isAccepted,
+}: {
+  gameId: number;
+  isAccepted: boolean;
+}): Promise<AxiosResponse> => {
+  const res = await axiosWithInterceptors.patch(`/games/${gameId}/invite`, {
+    isAccepted,
+  });
+  if (res.status !== 204) {
     throw new Error(res.statusText);
   }
   return res;
