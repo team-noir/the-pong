@@ -51,7 +51,7 @@ export default function HeaderGnb() {
             <div className="relative flex h-14 items-center justify-between">
               {/* GNB Left */}
               <div className="absolute inset-y-0 left-0 flex items-center">
-                <Disclosure.Button className="inline-flex items-center justify-center rounded p-2 text-gray hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-white">
+                <Disclosure.Button className="inline-flex vh-center rounded p-2 text-gray hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-white">
                   <span className="sr-only">Open global menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -61,7 +61,7 @@ export default function HeaderGnb() {
                 </Disclosure.Button>
               </div>
               {/* GNB Middle */}
-              <div className="flex flex-1 items-center justify-center">
+              <div className="vh-center flex-1">
                 <Logo />
               </div>
               {/* GNB Right */}

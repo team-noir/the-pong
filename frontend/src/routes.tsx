@@ -1,7 +1,6 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import LoginPage from 'pages/LoginPage';
 import OnBoardingPage from 'pages/OnBoardingPage';
-import Root from 'pages/Root';
 import MainPage from 'pages/MainPage';
 import ErrorPage from 'pages/ErrorPage';
 import GameLobbyPage from 'pages/GameLobbyPage';
@@ -18,126 +17,129 @@ import ChannelBrowsePage from 'pages/ChannelBrowsePage';
 import ChannelNewPage from 'pages/ChannelNewPage';
 import ChannelPage from 'pages/ChannelPage';
 import GameSettingPage from 'pages/GameSettingPage';
+import WelcomePage from 'pages/WelcomePage';
+import Verify2FAPage from 'pages/Verify2FAPage';
 
-export const routes = (isLoggedin: boolean, isOnboarded: boolean) => [
-  {
-    path: '/login',
-    element: !isOnboarded ? (
-      !isLoggedin ? (
-        <LoginPage />
-      ) : (
-        <Navigate to="/on-boarding" />
-      )
-    ) : (
-      <Navigate to="/" />
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/on-boarding',
-    element: isLoggedin ? (
-      !isOnboarded ? (
-        <OnBoardingPage />
-      ) : (
-        <Navigate to="/" />
-      )
-    ) : (
-      <Navigate to="/login" />
-    ),
-    errorElement: <ErrorPage />,
-  },
-  {
-    path: '/setting/*',
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: 'profile',
-        element: <SettingProfilePage />,
-      },
-      {
-        path: '2fa',
-        element: <Setting2FAPage />,
-      },
-      {
-        path: 'blocks',
-        element: <SettingBlocksPage />,
-      },
-    ],
-  },
-  {
-    path: '/channel/*',
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: 'browse',
-        element: <ChannelBrowsePage />,
-      },
-      {
-        path: 'new',
-        element: <ChannelNewPage />,
-      },
-      {
-        path: ':channelId',
-        element: <ChannelPage />,
-      },
-    ],
-  },
-  {
-    path: '/game/*',
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        path: ':gameId',
-        element: <GamePage />,
-      },
-      {
-        path: ':gameId/setting',
-        element: <GameSettingPage />,
-      },
-    ],
-  },
-  {
-    path: '/',
-    element: isLoggedin ? (
-      isOnboarded ? (
-        <Root />
-      ) : (
-        <Navigate to="/on-boarding" />
-      )
-    ) : (
-      <Navigate to="/login" />
-    ),
-    errorElement: <ErrorPage />,
-    children: [
-      {
-        index: true,
-        element: <MainPage />,
-      },
+export const routes = (
+  isLoggedin: boolean,
+  isOnboarded: boolean,
+  isTwoFactor: boolean,
+  isVerifiedTwoFactor: boolean
+) => {
+  let mainComponent = <Navigate to="/login" />;
+  if (isLoggedin) {
+    mainComponent = isOnboarded ? <Outlet /> : <Navigate to="/on-boarding" />;
+    if (isTwoFactor && !isVerifiedTwoFactor) {
+      mainComponent = <Navigate to="/2fa" />;
+    }
+  }
 
-      {
-        path: 'game',
-        element: <GameLobbyPage />,
-      },
-      {
-        path: 'channel',
-        element: <ChannelLobbyPage />,
-      },
-      {
-        path: 'following',
-        element: <FollowingPage />,
-      },
-      {
-        path: 'profile/:userId',
-        element: <ProfilePage />,
-      },
-      {
-        path: 'setting',
-        element: <SettingPage />,
-      },
-      {
-        path: 'search',
-        element: <SearchResultPage />,
-      },
-    ],
-  },
-];
+  return [
+    {
+      path: '/login',
+      element: !isLoggedin ? <LoginPage /> : <Navigate to="/" />,
+      errorElement: <ErrorPage />,
+    },
+    {
+      path: '/on-boarding',
+      element: !isOnboarded ? <OnBoardingPage /> : <Navigate to="/" />,
+      errorElement: <ErrorPage />,
+    },
+    {
+      path: '/2fa',
+      errorElement: <ErrorPage />,
+      element:
+        isTwoFactor && !isVerifiedTwoFactor ? (
+          <Verify2FAPage />
+        ) : (
+          <Navigate to="/" />
+        ),
+    },
+    {
+      path: '/',
+      element: mainComponent,
+      errorElement: <ErrorPage />,
+      children: [
+        {
+          index: true,
+          element: <MainPage />,
+        },
+        {
+          path: 'game',
+          children: [
+            {
+              index: true,
+              element: <GameLobbyPage />,
+            },
+            {
+              path: ':gameId',
+              element: <GamePage />,
+            },
+            {
+              path: ':gameId/setting',
+              element: <GameSettingPage />,
+            },
+          ],
+        },
+        {
+          path: 'channel',
+          children: [
+            {
+              index: true,
+              element: <ChannelLobbyPage />,
+            },
+            {
+              path: 'browse',
+              element: <ChannelBrowsePage />,
+            },
+            {
+              path: 'new',
+              element: <ChannelNewPage />,
+            },
+            {
+              path: ':channelId',
+              element: <ChannelPage />,
+            },
+          ],
+        },
+        {
+          path: 'following',
+          element: <FollowingPage />,
+        },
+        {
+          path: 'profile/:userId',
+          element: <ProfilePage />,
+        },
+        {
+          path: 'setting',
+          children: [
+            {
+              index: true,
+              element: <SettingPage />,
+            },
+            {
+              path: 'profile',
+              element: <SettingProfilePage />,
+            },
+            {
+              path: '2fa',
+              element: <Setting2FAPage />,
+            },
+            {
+              path: 'blocks',
+              element: <SettingBlocksPage />,
+            },
+          ],
+        },
+        {
+          path: 'search',
+          element: <SearchResultPage />,
+        },
+        {
+          path: 'welcome',
+          element: <WelcomePage />,
+        },
+      ],
+    },
+  ];
+};

@@ -1,6 +1,8 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getMyFollowings, unfollowUser } from 'api/api.v1';
+import AppTemplate from 'components/templates/AppTemplate';
 import Following from 'components/organisms/Following';
+import HeaderGnb from 'components/molecule/HeaderGnb';
 
 export default function FollowingPage() {
   const getMyFollowingQuery = useQuery({
@@ -24,13 +26,13 @@ export default function FollowingPage() {
   };
 
   return (
-    <>
+    <AppTemplate header={<HeaderGnb />}>
       {getMyFollowingQuery.isSuccess && (
         <Following
           users={getMyFollowingQuery.data}
           onClickUnfollow={handleClickUnfollow}
         />
       )}
-    </>
+    </AppTemplate>
   );
 }

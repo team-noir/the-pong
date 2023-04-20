@@ -33,7 +33,7 @@ function GameItemBackground() {
 
   return (
     <>
-      <div className="absolute flex items-center justify-center w-full h-full z-10 select-none">
+      <div className="absolute vh-center w-full h-full z-10 select-none">
         <span className="text-6xl text-gray-lighter font-thin italic">VS</span>
       </div>
       <div className="absolute flex items-stretch gap-32 w-[160%] h-full -ml-[30%] select-none">

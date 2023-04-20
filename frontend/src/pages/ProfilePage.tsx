@@ -1,9 +1,11 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import * as api from 'api/api.v1';
+import AppTemplate from 'components/templates/AppTemplate';
 import Profile from 'components/organisms/Profile';
 // import Achievements from 'components/organisms/Achievements';
 import GameHistory from 'components/organisms/GameHistory';
+import HeaderGnb from 'components/molecule/HeaderGnb';
 
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };
@@ -69,7 +71,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <>
+    <AppTemplate header={<HeaderGnb />}>
       {getUserQuery.isSuccess && (
         <>
           <section className="section">
@@ -89,6 +91,6 @@ export default function ProfilePage() {
           <GameHistory />
         </>
       )}
-    </>
+    </AppTemplate>
   );
 }

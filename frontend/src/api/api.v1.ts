@@ -31,12 +31,44 @@ export const healthCheck = async () => {
   return res;
 };
 
-/** Login */
+/** Auth */
 
 export const API_LOGIN_FT = `${API_PREFIX}/auth/42`;
 
+export const anonymousLogin = async () => {
+  const res = await axiosWithInterceptors.post(`/auth/login/anonymous`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
 export const logout = async () => {
   const res = await axiosWithInterceptors.post(`/auth/logout`);
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const get2faCode = async () => {
+  const res = await axiosWithInterceptors.get(`/auth/2fa`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
+export const verify2fa = async (code: string) => {
+  const res = await axiosWithInterceptors.post(`/auth/2fa`, { code });
+  if (res.status !== 202) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const delete2fa = async () => {
+  const res = await axiosWithInterceptors.delete(`/auth/2fa`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
@@ -51,19 +83,11 @@ export const whoami = async (): Promise<UserType> => {
     whoamiAxios = axios;
   }
 
-  try {
-    const res = await whoamiAxios.get(`/my/whoami`);
-
-    if (res.status !== 200) {
-      throw new Error(res.statusText);
-    }
-    return res.data;
-  } catch (e) {
-    if (e instanceof AxiosError) {
-      throw new Error(e.response?.data.message || e.message);
-    }
-    throw e;
+  const res = await whoamiAxios.get(`/my/whoami`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
   }
+  return res.data;
 };
 
 export const getUser = async (userId: number): Promise<UserType> => {
@@ -112,20 +136,12 @@ export const updateMyProfileImage = async (imageFile: File) => {
   return res;
 };
 
-export const getMy2fa = async () => {
-  const res = await axiosWithInterceptors.get(`/my/2fa`);
+export const checkProfile = async ({ nickname }: { nickname: string }) => {
+  const res = await axios.post(`/my/settings/check`, { nickname });
   if (res.status !== 200) {
     throw new Error(res.statusText);
   }
   return res.data;
-};
-
-export const deleteMy2fa = async () => {
-  const res = await axiosWithInterceptors.delete(`/my/2fa`);
-  if (res.status !== 204) {
-    throw new Error(res.statusText);
-  }
-  return res;
 };
 
 /** Block */

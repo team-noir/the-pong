@@ -102,6 +102,8 @@ export class AppGateway
     const userInfo = this.getUserInfoFromSocket(socket);
     if (!userInfo || !userInfo.userId || !userInfo.username) { 
       this.logger.log(`${socket.id} 소켓 연결 실패 ❌`);
+      socket.disconnect(true);
+      return;
     }
 
     const { userId, username } = userInfo;

@@ -11,6 +11,7 @@ interface Props {
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   fullLength?: boolean;
   disabled?: boolean;
+  className?: string;
 }
 
 export default function TextInput({
@@ -24,6 +25,7 @@ export default function TextInput({
   onBlur,
   fullLength = false,
   disabled = false,
+  className,
 }: Props) {
   return (
     <input
@@ -37,7 +39,8 @@ export default function TextInput({
       onBlur={onBlur}
       className={classNames(
         'bg-transparent text-white border-0 border-b border-gray py-4 px-2 focus:outline-none focus:ring-gray focus:border-gray focus:rounded',
-        fullLength && 'w-full'
+        fullLength && 'w-full',
+        className ? className : ''
       )}
       disabled={disabled}
     />
