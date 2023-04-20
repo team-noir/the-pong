@@ -15,7 +15,7 @@ export default function ErrorPage() {
   return (
     <>
       <header className="relative mx-auto max-w-xl px-2">
-        <div className="flex h-14 items-center text-lg font-medium text-white items-center justify-center">
+        <div className="vh-center h-14 text-lg font-medium text-white">
           <a href="/">The Pong</a>
         </div>
       </header>

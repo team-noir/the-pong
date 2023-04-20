@@ -24,7 +24,7 @@ export default function HeaderWithBackButton({
       <div className="mx-auto max-w-xl px-2">
         <div className="relative flex h-14 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center">
-            <div className="inline-flex items-center justify-center rounded p-2 text-gray hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-white">
+            <div className="inline-flex vh-center rounded p-2 text-gray hover:text-white focus:outline-none focus:ring-1 focus:ring-inset focus:ring-white">
               <ChevronLeftIcon
                 className="w-6 h-6"
                 role="button"
@@ -32,13 +32,13 @@ export default function HeaderWithBackButton({
               />
             </div>
           </div>
-          <div className="flex-1 flex items-center justify-center">
+          <div className="vh-center flex-1">
             {title && (
               <h1 className="text-xl font-normal text-stone-100">{title}</h1>
             )}
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2">
-            <div className="inline-flex items-center justify-center rounded p-2 text-gray hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+            <div className="inline-flex vh-center rounded p-2 text-gray hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
               {button}
             </div>
           </div>

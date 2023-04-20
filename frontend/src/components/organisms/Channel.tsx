@@ -158,7 +158,7 @@ export default function Channel({ channel, myUserId }: Props) {
         {messages && <MessageList messages={messages} myUserId={myUserId} />}
       </div>
       <form onSubmit={handleSubmit} className="inline-flex w-full">
-        <div className="w-10/12 flex items-center justify-center pr-2">
+        <div className="w-10/12 vh-center pr-2">
           <TextInput
             id="message"
             value={formData.message}
@@ -168,7 +168,7 @@ export default function Channel({ channel, myUserId }: Props) {
             disabled={formData.disabled}
           />
         </div>
-        <div className="w-2/12 flex items-center justify-center pl-2">
+        <div className="w-2/12 vh-center pl-2">
           <Button type="submit" primary fullLength disabled={formData.disabled}>
             보내기
           </Button>
