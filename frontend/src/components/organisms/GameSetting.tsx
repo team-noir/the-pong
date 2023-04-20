@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { startGame, updateGameSetting } from 'api/api.v1';
 import { RadioGroup } from '@headlessui/react';
-import ProfileImage from 'components/atoms/ProfileImage';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import GameMatchtable from 'components/molecule/GameMatchtable';
 import Button from 'components/atoms/Button';
 import { classNames } from 'utils';
 import { GameSettingType } from 'types';
@@ -44,48 +45,55 @@ export default function GameSetting({ gameSetting }: Props) {
   return (
     <section>
       <h2 className="section-title">게임 설정</h2>
-      <h3>모드 선택</h3>
-      <GameOptionList
-        count={gameSetting.modeCount}
-        selectedValue={gameSetting.mode}
-        onChange={handleChangeMode}
-        amIOwner={amIOwner}
-      />
-      <h3>테마 선택</h3>
-      <GameOptionList
-        count={gameSetting.themeCount}
-        selectedValue={gameSetting.theme}
-        onChange={handleChangeTheme}
-        amIOwner={amIOwner}
-      />
-
-      <div className="flex items-center justify-around">
-        <div className="flex flex-col items-center">
-          <ProfileImage
-            userId={myPlayer?.id}
-            alt={`${myPlayer?.nickname}의 프로필 이미지`}
-            size={52}
-          />
-          <span>{myPlayer?.nickname}</span>
-          <span>{myPlayer?.level}</span>
+      {!amIOwner && (
+        <div
+          className="text-text-dark bg-gray border-t-4 border-gray-dark rounded mb-6 px-4 py-3 shadow-md"
+          role="alert"
+        >
+          <div className="flex">
+            <div className="py-1">
+              <InformationCircleIcon
+                className="block h-4 w-4"
+                aria-hidden="true"
+              />
+            </div>
+            <div className="text-sm ml-1">
+              {otherPlayer?.nickname}님이 게임 설정을 완료할 때까지 잠시만
+              기다려 주세요.
+            </div>
+          </div>
         </div>
-        <span>VS</span>
-        <div className="flex flex-col items-center">
-          <ProfileImage
-            userId={otherPlayer?.id}
-            alt={`${otherPlayer?.nickname}의 프로필 이미지`}
-            size={52}
-          />
-          <span>{otherPlayer?.nickname}</span>
-          <span>{otherPlayer?.level}</span>
-        </div>
+      )}
+      <div className="mb-6">
+        {myPlayer && otherPlayer && (
+          <GameMatchtable player1={myPlayer} player2={otherPlayer} />
+        )}
       </div>
-      {!amIOwner ? (
-        <p>
-          {otherPlayer?.nickname}님이 게임 설정을 완료할 때까지 잠시만 기다려
-          주세요.
-        </p>
-      ) : (
+
+      <div className="mb-6">
+        <h3 className="block text-sm font-medium w-full text-text-light mb-2">
+          모드 선택
+        </h3>
+        <GameOptionList
+          count={gameSetting.modeCount}
+          selectedValue={gameSetting.mode}
+          onChange={handleChangeMode}
+          amIOwner={amIOwner}
+        />
+      </div>
+      <div className="mb-6">
+        <h3 className="block text-sm font-medium w-full text-text-light mb-2">
+          테마 선택
+        </h3>
+        <GameOptionList
+          count={gameSetting.themeCount}
+          selectedValue={gameSetting.theme}
+          onChange={handleChangeTheme}
+          amIOwner={amIOwner}
+        />
+      </div>
+
+      {amIOwner && (
         <Button
           primary
           fullLength
@@ -113,7 +121,7 @@ function GameOptionList({
     <RadioGroup
       value={selectedValue}
       onChange={onChange}
-      className="flex gap-x-5"
+      className="inline-flex items-center mb-2 w-full border border-gray-dark rounded"
       disabled={!amIOwner}
     >
       {Array(count)
@@ -123,14 +131,21 @@ function GameOptionList({
             key={index}
             value={index}
             className={classNames(
-              `p-2 rounded focus-visible:outline-none ${
-                amIOwner && 'cursor-pointer'
-              }`
+              'flex-auto border-r border-gray-dark rounded-none',
+              amIOwner && 'cursor-pointer'
             )}
           >
             {/* TODO: index를 문자열로 치환 */}
             {({ checked }) => (
-              <span className={`${checked ? 'text-green' : ''}`}>{index}</span>
+              <span
+                className={classNames(
+                  'block text-center text-lg py-2 px-4 w-full font-semibold select-none focus-visible:outline-none',
+                  amIOwner && 'cursor-pointer',
+                  checked && 'bg-gray-dark'
+                )}
+              >
+                {index}
+              </span>
             )}
           </RadioGroup.Option>
         ))}

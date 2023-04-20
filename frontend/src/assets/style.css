@@ -9,6 +9,7 @@
     @apply container mx-auto max-w-xl min-h-screen;
     @apply bg-gradient-to-b from-gray-darker to-[#433c3f] bg-cover bg-center;
     @apply text-text-light;
+    @apply break-keep;
   }
 }
 

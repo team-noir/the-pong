@@ -9,7 +9,7 @@ interface Props {
 
 export default function GameMatchtable({ player1, player2 }: Props) {
   return (
-    <>
+    <div className="-mx-4 overflow-x-hidden">
       <div className="relative w-full h-full min-h-20 my-1 drop-shadow hover:drop-shadow-lg hover:-translate-y-1 transition-transform duration-500">
         <GameItemBackground />
 
@@ -18,7 +18,7 @@ export default function GameMatchtable({ player1, player2 }: Props) {
           <GameItemPlayer player={player2} isLeft={false} />
         </div>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -28,9 +28,11 @@ function GameItemBackground() {
   return (
     <>
       <div className="absolute vh-center w-full h-full z-10 select-none">
-        <span className="text-6xl text-gray-lighter font-thin italic">VS</span>
+        <span className="text-6xl max-xs:text-xl text-gray-lighter font-thin italic">
+          VS
+        </span>
       </div>
-      <div className="absolute flex items-stretch gap-32 w-[160%] h-full -ml-[30%] select-none">
+      <div className="absolute flex items-stretch gap-32 max-xs:gap-10 w-[160%] h-full -ml-[30%] select-none">
         <div className={bgItemClassNames}></div>
         <div className={bgItemClassNames}></div>
       </div>

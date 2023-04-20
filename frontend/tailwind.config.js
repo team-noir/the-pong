@@ -1,3 +1,4 @@
+const screens = require('tailwindcss/defaultTheme').screens;
 const colors = require('tailwindcss/colors');
 
 // TODO: remove
@@ -11,6 +12,10 @@ delete colors['blueGray'];
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
+    screens: {
+      ...screens,
+      xs: '425px',
+    },
     container: {
       center: true,
     },
