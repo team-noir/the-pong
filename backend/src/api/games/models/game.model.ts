@@ -75,11 +75,6 @@ export class GameModel implements OnModuleInit {
 		this.games.set(game.gameId, game);
 	}
 
-	setGameSettings(game: Game, mode: number, theme: number) {
-		game.setMode(mode);
-		game.setTheme(theme);
-	}
-
 	addInvite(game: Game, invitedId: number) {
 		this.invites.set(invitedId, game);
 	}

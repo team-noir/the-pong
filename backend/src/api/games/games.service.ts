@@ -116,7 +116,36 @@ export class GamesService {
 			const message = "The game has already started.";
 			throw { code, message };
 		}
-		this.gameModel.setGameSettings(game, mode, theme);
+
+		const isModeSetted = game.setMode(mode);
+		const isThemeSetted = game.setTheme(mode);
+
+		await game.noticeToPlayers('gameSetting', {
+			text: 'change',
+			mode: isModeSetted ? game.getMode() : null,
+			theme: isThemeSetted ? game.getTheme() : null,
+		})
+	}
+
+	async startGame(userId: number, gameId: number) {
+		const player = this.gameModel.getPlayer(userId);
+		const game = this.gameModel.getGame(gameId);
+		
+		if (game.ownerId != player.userId) {
+			const code = HttpStatus.FORBIDDEN;
+			const message = 'You do not have permission to change game settings.';
+			throw { code, message };
+		} else if (!game.isFull()) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = "Your opponent hasn't entered yet.";
+			throw { code, message };
+		} else if (game.isStarted) {
+			const code = HttpStatus.BAD_REQUEST;
+			const message = "The game has already started.";
+			throw { code, message };
+		}
+
+		await game.setStart();
 	}
 
 

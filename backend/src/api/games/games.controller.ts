@@ -184,6 +184,24 @@ export class GamesController {
 		}
 	}
 
+	@Patch(':gameId/play')
+	@ApiOperation({ summary: 'Start the game.' })
+	@ApiOkResponse({ description: 'Start the game.' })
+	@ApiBadRequestResponse({ description: 'This is not a valid invitation.' })
+	@UseGuards(AuthenticatedGuard)
+	async startGame(
+		@Req() req,
+		@Param('gameId') gameId: number,
+		@Res({ passthrough: true }) res
+	) {
+		try {
+			const userId = req.user.id;
+			await this.gamesService.startGame(userId, gameId);
+			res.status(HttpStatus.NO_CONTENT);
+		} catch (error) {
+			throw new HttpException(error.message, error.code);
+		}
+	}
 
 	
 

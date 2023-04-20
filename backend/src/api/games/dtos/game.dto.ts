@@ -50,13 +50,23 @@ export class Game {
 		return false;
 	}
 
+	getMode() {
+		return this.mode;
+	}
+
+	getTheme() {
+		return this.theme;
+	}
+
 	setMode(mode: indexKey) {
 		if (mode < 0 || mode >= GAME_MODES.size()) {
 			const code = HttpStatus.BAD_REQUEST;
 			const message = 'This is an invalid mode.';
 			throw { code, message };
 		}
+		if (this.mode == mode) { return false; }
 		this.mode = mode;
+		return true;
 	}
 	
 	setTheme(theme: indexKey) {
@@ -65,7 +75,17 @@ export class Game {
 			const message = 'This is an invalid theme.';
 			throw { code, message };
 		}
+		if (this.theme == theme) { return false; }
 		this.theme = theme;
+		return true;
+	}
+
+	async setStart() {
+		this.isStarted = true;
+
+		await this.noticeToPlayers('gameSetting', {
+			text: 'done'
+		})
 	}
 	
 	// Check isFull, isLadder, isBlocked
