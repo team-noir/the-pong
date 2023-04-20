@@ -1,23 +1,17 @@
 import ProfileImage from 'components/atoms/ProfileImage';
-import { GameHistoryType, PlayerType } from 'types';
-import { classNames } from 'utils';
-import { GameHistoryPlayerType } from 'types';
-import { formatDate, formatTime } from 'utils';
+import { classNames, formatDate, formatTime } from 'utils';
+import { GameHistoryType, GameHistoryPlayerType } from 'types';
 
 interface Props {
   histories: GameHistoryType[];
-  myUserId: number;
+  userId: number;
 }
 
-export default function GameHistoryList({ histories, myUserId }: Props) {
+export default function GameHistoryList({ histories, userId }: Props) {
   return (
     <ul className="flex flex-col -mx-4 overflow-x-hidden">
       {histories.map((history) => (
-        <GameHistoryItem
-          key={history.id}
-          history={history}
-          myUserId={myUserId}
-        />
+        <GameHistoryItem key={history.id} history={history} userId={userId} />
       ))}
     </ul>
   );
@@ -25,12 +19,12 @@ export default function GameHistoryList({ histories, myUserId }: Props) {
 
 function GameHistoryItem({
   history,
-  myUserId,
+  userId,
 }: {
   history: GameHistoryType;
-  myUserId: number;
+  userId: number;
 }) {
-  const isWin = history.winner.id === myUserId;
+  const isWin = history.winner.id === userId;
 
   return (
     <>

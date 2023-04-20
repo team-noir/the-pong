@@ -1,91 +1,140 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import * as api from 'api/api.v1';
+import { useUser } from 'hooks/useStore';
 import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types';
-import { useUser } from 'hooks/useStore';
 
 interface Props {
-  user: UserType;
-  onClickFollow: (userId: number) => void;
-  onClickUnfollow: (userId: number) => void;
-  onClickBlock: (userId: number) => void;
-  onClickUnblock: (userId: number) => void;
-  onClickDm: (userId: number) => void;
+  userId: number;
 }
 
-export default function Profile({
-  user,
-  onClickFollow,
-  onClickUnfollow,
-  onClickBlock,
-  onClickUnblock,
-  onClickDm,
-}: Props) {
+export default function Profile({ userId }: Props) {
   const myUserId = useUser((state) => state.id);
-  const isMyPage = user.id === myUserId;
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  const queryKey = ['profile', userId];
+  const isMyPage = userId === myUserId;
+
+  const { data: user } = useQuery({
+    queryKey,
+    queryFn: () => api.getUser(Number(userId)),
+  });
+
+  const onMutate = async (newUser: UserType | undefined) => {
+    await queryClient.cancelQueries(queryKey);
+    const prevUser = user;
+    queryClient.setQueryData(queryKey, newUser);
+    return { prevUser };
+  };
+  const onError = (
+    _error: Error,
+    _variables: number,
+    context: { prevUser: UserType | undefined } | undefined
+  ) => queryClient.setQueryData(queryKey, context?.prevUser);
+  const onSettled = () => queryClient.invalidateQueries(queryKey);
+
+  const followUserMutation = useMutation({
+    mutationFn: api.followUser,
+    onMutate: () => onMutate(user && { ...user, isFollowedByMyself: true }),
+    onError,
+    onSettled,
+  });
+
+  const unfollowUserMutation = useMutation({
+    mutationFn: api.unfollowUser,
+    onMutate: () => onMutate(user && { ...user, isFollowedByMyself: false }),
+    onError,
+    onSettled,
+  });
+
+  const blockUserMutation = useMutation({
+    mutationFn: api.blockUser,
+    onMutate: () => onMutate(user && { ...user, isBlockedByMyself: true }),
+    onError,
+    onSettled,
+  });
+
+  const unblockUserMutation = useMutation({
+    mutationFn: api.unblockUser,
+    onMutate: () => onMutate(user && { ...user, isBlockedByMyself: false }),
+    onError,
+    onSettled,
+  });
+
+  const getDmChannelMutation = useMutation({
+    mutationFn: api.getDmChannel,
+    onSuccess: (data) => navigate(`/channel/${data.id}`),
+  });
 
   return (
-    <div className="flex flex-col items-center">
-      <ProfileImage userId={user.id} alt="profile image" size={192} />
-      <p data-testid={user.id} className="text-2xl font-semibold mt-4 mb-8">
-        {user.nickname}
-      </p>
-      {isMyPage && (
-        <Link to="/setting" className="button primary small">
-          프로필 수정하기
-        </Link>
-      )}
-      {!isMyPage && (
+    <>
+      {user && (
         <div className="flex flex-col items-center">
-          <div className="inline-flex gap-4 mb-4">
-            {user.isFollowedByMyself ? (
-              <Button
-                onClick={() => onClickUnfollow(user.id)}
-                secondary
-                className="w-36"
-              >
-                언팔로우
-              </Button>
-            ) : (
-              <Button
-                onClick={() => onClickFollow(user.id)}
-                primary
-                className="w-36"
-              >
-                팔로우하기
-              </Button>
-            )}
-            {!user.isBlockedByMyself && (
-              <Button
-                onClick={() => onClickDm(user.id)}
-                primary
-                className="w-36"
-              >
-                메시지 보내기
-              </Button>
-            )}
-          </div>
-          {user.isBlockedByMyself ? (
-            <Button
-              onClick={() => onClickUnblock(user.id)}
-              linkStyle
-              className="text-red"
-              size="small"
-            >
-              차단 해제
-            </Button>
-          ) : (
-            <Button
-              onClick={() => onClickBlock(user.id)}
-              linkStyle
-              className="text-red"
-              size="small"
-            >
-              차단하기
-            </Button>
+          <ProfileImage userId={userId} alt="profile image" size={192} />
+          <p data-testid={userId} className="text-2xl font-semibold mt-4 mb-8">
+            {user.nickname}
+          </p>
+          {isMyPage && (
+            <Link to="/setting" className="button primary small">
+              프로필 수정하기
+            </Link>
+          )}
+          {!isMyPage && (
+            <div className="flex flex-col items-center">
+              <div className="inline-flex gap-4 mb-4">
+                {user.isFollowedByMyself ? (
+                  <Button
+                    onClick={() => unfollowUserMutation.mutate(userId)}
+                    secondary
+                    className="w-36"
+                  >
+                    언팔로우
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => followUserMutation.mutate(userId)}
+                    primary
+                    className="w-36"
+                  >
+                    팔로우하기
+                  </Button>
+                )}
+                {!user.isBlockedByMyself && (
+                  <Button
+                    onClick={() => getDmChannelMutation.mutate(userId)}
+                    primary
+                    className="w-36"
+                  >
+                    메시지 보내기
+                  </Button>
+                )}
+              </div>
+              {user.isBlockedByMyself ? (
+                <Button
+                  onClick={() => unblockUserMutation.mutate(userId)}
+                  linkStyle
+                  className="text-red"
+                  size="small"
+                >
+                  차단 해제
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => blockUserMutation.mutate(userId)}
+                  linkStyle
+                  className="text-red"
+                  size="small"
+                >
+                  차단하기
+                </Button>
+              )}
+            </div>
           )}
         </div>
       )}
-    </div>
+    </>
   );
 }
