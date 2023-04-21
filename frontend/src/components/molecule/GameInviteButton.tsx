@@ -1,15 +1,30 @@
+import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { cancelInvitingGame, inviteGame } from 'api/api.v1';
-import Button from 'components/atoms/Button';
-import Modal from 'components/templates/Modal';
 import useGame from 'hooks/useGame';
+import { SocketContext } from 'contexts/socket';
+import Modal from 'components/templates/Modal';
+import Button from 'components/atoms/Button';
 
 export default function GameInviteButton() {
   const [isWating, setIsWating, alertCode, setAlertCode] = useGame();
+  const socket = useContext(SocketContext);
+  const navigate = useNavigate();
 
   const inviteGameMutation = useMutation({
     mutationFn: inviteGame,
+    onMutate: () => {
+      socket.on('queue', (data: { text: string; gameId?: number }) => {
+        if (data.gameId) {
+          navigate(`/game/${data.gameId}/setting`);
+        } else {
+          setAlertCode(data.text);
+          setIsWating(false);
+        }
+      });
+    },
     onSuccess: () => setIsWating(true),
     onError: (error: AxiosError) => {
       if (!error.response?.status) return;
@@ -18,6 +33,7 @@ export default function GameInviteButton() {
       } else {
         alert('다시 시도해 주세요.');
       }
+      socket.off('queue');
     },
   });
 
@@ -43,7 +59,8 @@ export default function GameInviteButton() {
         게임 초대
       </Button>
       {isWating && (
-        <Modal onClickClose={cancelWaiting} fitContent>
+        /* eslint-disable */
+        <Modal onClickClose={() => {}} fitContent>
           <p>초대 수락을 기다리는 중...</p>
           <Button onClick={cancelWaiting}>취소</Button>
         </Modal>

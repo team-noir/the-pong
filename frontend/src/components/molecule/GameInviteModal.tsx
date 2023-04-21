@@ -60,7 +60,8 @@ export default function GameInviteModal() {
   return (
     <>
       {isShow && (
-        <Modal onClickClose={handleClickReject} fitContent>
+        /* eslint-disable */
+        <Modal onClickClose={() => {}} fitContent>
           <p className="flex items-center">
             <ProfileImage
               userId={user?.id}

@@ -1,15 +1,34 @@
+import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { cancelWaitingGame, waitGame } from 'api/api.v1';
 import useGame from 'hooks/useGame';
+import { SocketContext } from 'contexts/socket';
 import Modal from 'components/templates/Modal';
 import Button from 'components/atoms/Button';
 
 export default function GameButtons() {
-  const [isWating, setIsWating, alert, setAlert] = useGame();
+  const [isWating, setIsWating, alertCode, setAlertCode] = useGame();
+  const socket = useContext(SocketContext);
+  const navigate = useNavigate();
 
   const waitGameMutation = useMutation({
     mutationFn: waitGame,
+    onMutate: () => {
+      socket.on('queue', (data: { text: string; gameId?: number }) => {
+        if (data.gameId) {
+          navigate(`/game/${data.gameId}/setting`);
+        } else {
+          setAlertCode(data.text);
+          setIsWating(false);
+        }
+      });
+    },
     onSuccess: () => setIsWating(true),
+    onError: () => {
+      socket.off('queue');
+      console.log('다시 시도해 주세요.');
+    },
   });
 
   const cancelWaitingGameMutation = useMutation({
@@ -42,13 +61,14 @@ export default function GameButtons() {
         </Button>
       </div>
       {isWating && (
-        <Modal onClickClose={cancelWaiting} fitContent>
+        /* eslint-disable */
+        <Modal onClickClose={() => {}} fitContent>
           <p>게임 상대를 기다리는 중...</p>
           <Button onClick={cancelWaiting}>취소</Button>
         </Modal>
       )}
-      {alert && (
-        <Modal onClickClose={() => setAlert(null)} fitContent>
+      {alertCode && (
+        <Modal onClickClose={() => setAlertCode(null)} fitContent>
           <p>게임 상대를 찾을 수 없습니다.</p>
         </Modal>
       )}
