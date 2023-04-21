@@ -64,7 +64,7 @@ export default function GameSetting({ gameSetting }: Props) {
           </div>
         </div>
       )}
-      <div className="mb-6">
+      <div className="mb-5">
         {myPlayer && otherPlayer && (
           <GameMatchtable player1={myPlayer} player2={otherPlayer} />
         )}
@@ -121,7 +121,7 @@ function GameOptionList({
     <RadioGroup
       value={selectedValue}
       onChange={onChange}
-      className="inline-flex items-center mb-2 w-full border border-gray-dark rounded"
+      className="inline-flex flex-wrap items-center mb-2 w-full border border-gray-dark rounded"
       disabled={!amIOwner}
     >
       {Array(count)
@@ -131,7 +131,7 @@ function GameOptionList({
             key={index}
             value={index}
             className={classNames(
-              'flex-auto border-r border-gray-dark rounded-none',
+              'flex-auto border-r last-of-type:border-none border-gray-dark rounded-none',
               amIOwner && 'cursor-pointer'
             )}
           >
