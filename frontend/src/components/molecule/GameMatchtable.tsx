@@ -73,16 +73,10 @@ function GameItemPlayer({
         )}
       >
         <span>{player.nickname}</span>
-        <GameItemPlayerLevel level={player.level} />
+        <span className="items-center px-2 py-1 bg-gray-dark rounded-full text-xs text-text-light">
+          Lv. {player.level}
+        </span>
       </div>
     </div>
-  );
-}
-
-function GameItemPlayerLevel({ level }: { level: number }) {
-  return (
-    <span className="items-center px-2 py-1 bg-gray-dark rounded-full text-xs text-text-light">
-      Lv. {level}
-    </span>
   );
 }
