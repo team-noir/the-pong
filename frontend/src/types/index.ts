@@ -107,7 +107,7 @@ export interface PlayerType {
 }
 
 export interface GameHistoryPlayerType extends PlayerType {
-  score: number;
+  score?: number;
 }
 
 export interface GameType {

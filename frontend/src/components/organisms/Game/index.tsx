@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer } from 'react-konva';
 import Ball from 'components/organisms/Game/Ball';
 import Paddle from 'components/organisms/Game/Paddle';
-import ProfileImage from 'components/atoms/ProfileImage';
+import GameScoretable from 'components/molecule/GameScoretable';
 import { GameType } from 'types';
 import { useUser } from 'hooks/useStore';
 import Button from 'components/atoms/Button';
@@ -215,22 +215,14 @@ export default function Game({ game }: Props) {
     <section>
       <div>
         <div>
-          <ProfileImage
-            userId={upPlayer?.id}
-            size={40}
-            alt={`${upPlayer?.nickname}'s profile image`}
-          />
-          <span>{upPlayer?.nickname}</span>
-          <div>{score.up}</div>
-        </div>
-        <div>
-          <div>{score.down}</div>
-          <ProfileImage
-            userId={downPlayer?.id}
-            size={40}
-            alt={`${downPlayer?.nickname}'s profile image`}
-          />
-          <span>{downPlayer?.nickname}</span>
+          {upPlayer && downPlayer && (
+            <GameScoretable
+              player1={upPlayer}
+              player2={downPlayer}
+              liveScore1={score.up}
+              liveScore2={score.down}
+            />
+          )}
         </div>
       </div>
       <div style={{ backgroundColor: 'white', width: `${stageSize.width}px` }}>
