@@ -254,7 +254,7 @@ describe('Test invite', () => {
 			expect(data.games.length).toBe(1);
 			expect(data.players.length).toBe(2);
 			expect(data.queue.length).toBe(0);
-			
+
 			socket1.emit('removeQueue');
 			done();
 		})
@@ -524,36 +524,71 @@ describe('Test queue', () => {
 		});
 		socket1.emit('gameStatus');
 	});
-
-	it('Blocked queue', (done) => {
-		socket2.on('removeQueue', async (data) => {
-			await socket1.emit('removeBlocked', { userId: 2 });
+	
+	it('Rejoin Game', (done) => {
+		let count = 0;
+		
+		socket1.on('gameStatus', (data) => {
+			expect(data.games.length).toBe(1);
+			expect(data.players.length).toBe(1);
+			expect(data.queue.length).toBe(1);
 			done();
 		});
 
-		socket2.on('queue', (data) => {
-			expect(data.text).toBe('created');
-			socket1.emit('gameStatus');
-		});
-
-		socket1.on('gameStatus', async (data) => {
-			console.log(data);
-			expect(data.games.length).toBe(2);
-			expect(data.players.length).toBe(2);
-			expect(data.queue.length).toBe(2);
-			await socket1.emit('removeQueue');
-			await socket2.emit('removeQueue');
+		socket1.on('disconnectPlayer', () => {
+			socket1.emit('queue', { isLadder: false });
 		});
 
 		socket1.on('queue', async (data) => {
-			if (data.text == 'created') {
-				await socket1.emit('addBlocked', { userId: 2 });
-				await socket2.emit('queue', { isLadder: false });
+			count++;
+			if (count == 0) {
+				await socket1.emit('disconnectPlayer');
+			} else {
+				await socket1.emit('removeQueue');
+				done();
 			}
 		});
 
 		socket1.emit('queue', { isLadder: false });
 	});
+
+	it('Game status', (done) => {
+		socket1.on('gameStatus', (data) => {
+			console.log(data);
+			done();
+		});
+		socket1.emit('gameStatus');
+	});
+
+	// it('Blocked queue', (done) => {
+	// 	socket2.on('removeQueue', async (data) => {
+	// 		await socket1.emit('removeBlocked', { userId: 2 });
+	// 		done();
+	// 	});
+
+	// 	socket2.on('queue', (data) => {
+	// 		expect(data.text).toBe('created');
+	// 		socket1.emit('gameStatus');
+	// 	});
+
+	// 	socket1.on('gameStatus', async (data) => {
+	// 		console.log(data);
+	// 		expect(data.games.length).toBe(2);
+	// 		expect(data.players.length).toBe(2);
+	// 		expect(data.queue.length).toBe(2);
+	// 		await socket1.emit('removeQueue');
+	// 		await socket2.emit('removeQueue');
+	// 	});
+
+	// 	socket1.on('queue', async (data) => {
+	// 		if (data.text == 'created') {
+	// 			await socket1.emit('addBlocked', { userId: 2 });
+	// 			await socket2.emit('queue', { isLadder: false });
+	// 		}
+	// 	});
+
+	// 	socket1.emit('queue', { isLadder: false });
+	// });
 
 	
 

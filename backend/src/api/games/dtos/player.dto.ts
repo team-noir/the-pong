@@ -1,19 +1,17 @@
 import { Game } from "./game.dto";
 import { Socket } from "socket.io";
 
-type playerId = number;
-
 export class Player {
 	userId: number;
 	username: string;
 	level: number;
 	socket: Socket;
-	blockUser?: Set<playerId>;
+	blockUser?: Set<number>;
 	
 	game?: Game;
 	gameInvited?: Game;
 
-	constructor(userId: number, username: string, level: number, socket: Socket, blockUser?: playerId[]) {
+	constructor(userId: number, username: string, level: number, socket: Socket, blockUser?: number[]) {
 		this.userId = userId;
 		this.username = username;
 		this.level = level;
