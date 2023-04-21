@@ -10,13 +10,13 @@ interface Props {
 export default function GameItem({ game }: Props) {
   return (
     // TODO: Link to game page
-    <Link to={`/game/${game.id}`} className="mb-4 w-full">
+    <Link to={`/game/${game.id}`} className="mb-4 last-of-type:mb-0 w-full">
       <GameMatchtable player1={game.players[0]} player2={game.players[1]} />
 
-      <span className="inline-flex items-center py-1 text-xs text-gray-light float-right">
+      <div className="inline-flex items-center py-1 text-xs text-gray-light float-right">
         <EyeIcon className="block h-4 w-4" aria-hidden="true" />
         <span className="ml-1">{game.viewerCount}</span>
-      </span>
+      </div>
     </Link>
   );
 }
