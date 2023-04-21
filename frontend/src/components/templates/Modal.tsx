@@ -49,9 +49,7 @@ export default function Modal({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <Dialog.Panel
-              className={classNames(
-                `modal-panel ${fitContent && 'h-fit w-fit'}`
-              )}
+              className={classNames(`modal-panel`, fitContent && 'h-fit w-fit')}
             >
               <div className="flex justify-between items-center">
                 {title && <h3 className="ml-1 text-sm">{title}</h3>}
@@ -62,7 +60,9 @@ export default function Modal({
                   ref={closeButtonRef}
                 />
               </div>
-              {children}
+              <div className="flex vh-center min-w-[24em] min-h-[12em]">
+                {children}
+              </div>
             </Dialog.Panel>
           </Transition.Child>
         </div>

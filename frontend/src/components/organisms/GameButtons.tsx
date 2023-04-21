@@ -61,15 +61,18 @@ export default function GameButtons() {
         </Button>
       </div>
       {isWating && (
-        /* eslint-disable */
-        <Modal onClickClose={() => {}} fitContent>
-          <p>게임 상대를 기다리는 중...</p>
-          <Button onClick={cancelWaiting}>취소</Button>
+        <Modal onClickClose={cancelWaiting} fitContent>
+          <div className="text-center">
+            <p>게임 상대를 기다리는 중...</p>
+            <Button onClick={cancelWaiting}>취소</Button>
+          </div>
         </Modal>
       )}
       {alertCode && (
         <Modal onClickClose={() => setAlertCode(null)} fitContent>
-          <p>게임 상대를 찾을 수 없습니다.</p>
+          <div className="text-center">
+            <p>게임 상대를 찾을 수 없습니다.</p>
+          </div>
         </Modal>
       )}
     </>

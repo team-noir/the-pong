@@ -65,10 +65,8 @@ export default function GameSettingPage() {
       </AppTemplate>
       {isOtherUserLeft && (
         <Modal onClickClose={() => navigate('/game')} fitContent>
-          <div className="flex vh-center w-[24em] max-w-full h-[12em] max-h-full">
-            <div className="text-center">
-              <p>상대가 퇴장했습니다.</p>
-            </div>
+          <div className="text-center">
+            <p>상대가 퇴장했습니다.</p>
           </div>
         </Modal>
       )}
