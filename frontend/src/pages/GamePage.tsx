@@ -25,7 +25,7 @@ const dummyGame: GameType = {
       level: 3,
     },
   ],
-  mode: 'normal',
+  mode: 0,
   theme: 1,
   viewerCount: 42,
   isLadder: false,
