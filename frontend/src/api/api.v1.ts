@@ -1,10 +1,12 @@
-import axios, { AxiosResponse, AxiosError } from 'axios';
+import { GameType } from './../types/index';
+import axios, { AxiosResponse } from 'axios';
 import {
   UserType,
   ChannelType,
   ChannelUserRoleType,
   ChannelUserStatusType,
   ChannelFormType,
+  GameSettingType,
 } from 'types';
 
 export const API_PREFIX = `/api/v1`;
@@ -395,6 +397,35 @@ export const replyGameInvitation = async ({
   const res = await axiosWithInterceptors.patch(`/games/${gameId}/invite`, {
     isAccepted,
   });
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const getGameSetting = async (
+  gameId: number
+): Promise<GameSettingType> => {
+  const res = await axiosWithInterceptors.get(`/games/${gameId}/setting`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
+export const updateGameSetting = async ({ id, mode, theme }: GameType) => {
+  const res = await axiosWithInterceptors.patch(`/games/${id}/setting`, {
+    mode,
+    theme,
+  });
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const startGame = async (gameId: number): Promise<AxiosResponse> => {
+  const res = await axiosWithInterceptors.post(`/games/${gameId}/play`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }

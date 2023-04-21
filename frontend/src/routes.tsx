@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import LoginPage from 'pages/LoginPage';
 import OnBoardingPage from 'pages/OnBoardingPage';
 import MainPage from 'pages/MainPage';
@@ -19,6 +19,7 @@ import ChannelPage from 'pages/ChannelPage';
 import GameSettingPage from 'pages/GameSettingPage';
 import WelcomePage from 'pages/WelcomePage';
 import Verify2FAPage from 'pages/Verify2FAPage';
+import Root from 'pages/Root';
 
 export const routes = (
   isLoggedin: boolean,
@@ -28,7 +29,7 @@ export const routes = (
 ) => {
   let mainComponent = <Navigate to="/login" />;
   if (isLoggedin) {
-    mainComponent = isOnboarded ? <Outlet /> : <Navigate to="/on-boarding" />;
+    mainComponent = isOnboarded ? <Root /> : <Navigate to="/on-boarding" />;
     if (isTwoFactor && !isVerifiedTwoFactor) {
       mainComponent = <Navigate to="/2fa" />;
     }

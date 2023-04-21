@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { replyGameInvitation } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
@@ -13,6 +14,7 @@ export default function GameInviteModal() {
   const [gameId, setGameId] = useState<number | null>(null);
   const [isCanceled, setIsCanceled] = useState(false);
   const socket = useContext(SocketContext);
+  const navigate = useNavigate();
 
   const replyGameInvitationMutation = useMutation(replyGameInvitation);
 
@@ -40,7 +42,7 @@ export default function GameInviteModal() {
       {
         onSuccess: () => {
           setIsShow(false);
-          location.href = `/game/${gameId}/setting`;
+          navigate(`/game/${gameId}/setting`);
         },
       }
     );
@@ -60,7 +62,8 @@ export default function GameInviteModal() {
   return (
     <>
       {isShow && (
-        <Modal onClickClose={handleClickReject} fitContent>
+        /* eslint-disable */
+        <Modal onClickClose={() => {}} fitContent>
           <p className="flex items-center">
             <ProfileImage
               userId={user?.id}

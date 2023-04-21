@@ -113,7 +113,7 @@ export interface GameHistoryPlayerType extends PlayerType {
 export interface GameType {
   id: number;
   players: PlayerType[];
-  mode: string;
+  mode: number;
   theme: number;
   viewerCount?: number;
   isLadder: boolean;
@@ -121,8 +121,8 @@ export interface GameType {
 }
 
 export interface GameSettingType extends GameType {
-  modes: string[];
-  themes: number[];
+  modeCount: number;
+  themeCount: number;
 }
 
 export interface GameResultType {

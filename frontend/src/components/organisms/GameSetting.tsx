@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
 import { useUser } from 'hooks/useStore';
+import { useNavigate } from 'react-router-dom';
+import { useMutation } from '@tanstack/react-query';
+import { startGame, updateGameSetting } from 'api/api.v1';
 import { RadioGroup } from '@headlessui/react';
 import ProfileImage from 'components/atoms/ProfileImage';
 import Button from 'components/atoms/Button';
@@ -12,38 +14,48 @@ interface Props {
 
 export default function GameSetting({ gameSetting }: Props) {
   const myUserId = useUser((state) => state.id);
-  const [formData, setFormData] = useState({
-    mode: gameSetting.mode,
-    theme: gameSetting.theme,
-  });
+  const navigate = useNavigate();
 
   const myPlayer = gameSetting.players.find((user) => user.id === myUserId);
   const otherPlayer = gameSetting.players.find((user) => user.id !== myUserId);
   const amIOwner = !!myPlayer?.isOwner;
 
-  useEffect(() => {
-    // TODO: 게임 설정 변경 API 호출
-  }, [formData]);
+  const updateGameSettingMutation = useMutation(updateGameSetting);
+
+  const startGameMutation = useMutation({
+    mutationFn: startGame,
+    onSuccess: () => navigate(`/game/${gameSetting.id}`),
+  });
+
+  const handleChangeMode = (mode: number) => {
+    updateGameSettingMutation.mutate({
+      ...gameSetting,
+      mode,
+    });
+  };
+
+  const handleChangeTheme = (theme: number) => {
+    updateGameSettingMutation.mutate({
+      ...gameSetting,
+      theme,
+    });
+  };
 
   return (
     <section>
       <h2 className="section-title">게임 설정</h2>
       <h3>모드 선택</h3>
       <GameOptionList
-        values={gameSetting.modes}
-        selectedValue={formData.mode}
-        setValue={(value: string) =>
-          setFormData((prevState) => ({ ...prevState, mode: value }))
-        }
+        count={gameSetting.modeCount}
+        selectedValue={gameSetting.mode}
+        onChange={handleChangeMode}
         amIOwner={amIOwner}
       />
       <h3>테마 선택</h3>
       <GameOptionList
-        values={gameSetting.themes}
-        selectedValue={formData.theme}
-        setValue={(value: number) =>
-          setFormData((prevState) => ({ ...prevState, theme: value }))
-        }
+        count={gameSetting.themeCount}
+        selectedValue={gameSetting.theme}
+        onChange={handleChangeTheme}
         amIOwner={amIOwner}
       />
 
@@ -68,53 +80,60 @@ export default function GameSetting({ gameSetting }: Props) {
           <span>{otherPlayer?.level}</span>
         </div>
       </div>
-      {!amIOwner && (
+      {!amIOwner ? (
         <p>
           {otherPlayer?.nickname}님이 게임 설정을 완료할 때까지 잠시만 기다려
           주세요.
         </p>
+      ) : (
+        <Button
+          primary
+          fullLength
+          onClick={() => startGameMutation.mutate(gameSetting.id)}
+        >
+          시작하기
+        </Button>
       )}
-      {/* TODO: 게임 시작 API 호출 */}
-      <Button primary fullLength>
-        시작하기
-      </Button>
     </section>
   );
 }
 
 function GameOptionList({
-  values,
+  count,
   selectedValue,
-  setValue,
+  onChange,
   amIOwner,
 }: {
-  values: string[] | number[];
-  selectedValue: string | number;
-  setValue: ((value: string) => void) | ((value: number) => void);
+  count: number;
+  selectedValue: number;
+  onChange: (value: number) => void;
   amIOwner: boolean;
 }) {
   return (
     <RadioGroup
       value={selectedValue}
-      onChange={setValue}
+      onChange={onChange}
       className="flex gap-x-5"
       disabled={!amIOwner}
     >
-      {values.map((value) => (
-        <RadioGroup.Option
-          key={value}
-          value={value}
-          className={classNames(
-            `p-2 rounded focus-visible:outline-none ${
-              amIOwner && 'cursor-pointer'
-            }`
-          )}
-        >
-          {({ checked }) => (
-            <span className={`${checked ? 'text-green' : ''}`}>{value}</span>
-          )}
-        </RadioGroup.Option>
-      ))}
+      {Array(count)
+        .fill(0)
+        .map((_, index) => (
+          <RadioGroup.Option
+            key={index}
+            value={index}
+            className={classNames(
+              `p-2 rounded focus-visible:outline-none ${
+                amIOwner && 'cursor-pointer'
+              }`
+            )}
+          >
+            {/* TODO: index를 문자열로 치환 */}
+            {({ checked }) => (
+              <span className={`${checked ? 'text-green' : ''}`}>{index}</span>
+            )}
+          </RadioGroup.Option>
+        ))}
     </RadioGroup>
   );
 }
