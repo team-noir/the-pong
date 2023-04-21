@@ -39,4 +39,8 @@ export class Player {
 	leaveGame() {
 		this.game = null;
 	}
+
+	setSocket(socket) {
+		this.socket = socket;
+	}
 }

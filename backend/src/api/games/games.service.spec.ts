@@ -183,7 +183,8 @@ describe('Test invite', () => {
 		gamesService.gameModel.setReadyTime(3000);
 		socket1.on('gameInvite', (data) => {
 			expect(data.text).toBe('canceled');
-			gamesService.gameModel.setReadyTime(60000);
+			gamesService.gameModel.resetReadyTime();
+			socket1.emit('cancelInvite');
 			done();
 		});
 
@@ -196,6 +197,69 @@ describe('Test invite', () => {
 
 		socket1.emit('gameInvite', { userId: 2 });
 	})
+
+	it('Check game status', (done) => {
+		socket1.on('gameStatus', (data) => {
+			console.log(data);
+			expect(data.games.length).toBe(0);
+			expect(data.players.length).toBe(0);
+			expect(data.queue.length).toBe(0);
+			done();
+		})
+		socket1.emit('gameStatus');
+	});
+	
+	it('Timeout invitation', (done) => {
+		gamesService.gameModel.setReadyTime(3000);
+
+		let count = 0;
+
+		socket1.on('queue', (data) => {
+			count++;
+			expect(data.text).toBe('matched');
+			if (count == 2) {
+				gamesService.gameModel.resetReadyTime();
+				done();
+			}
+		})
+
+		socket2.on('queue', (data) => {
+			count++;
+			expect(data.text).toBe('matched');
+			if (count == 2) {
+				gamesService.gameModel.resetReadyTime();
+				done();
+			}
+		})
+
+		socket2.on('gameInvite', (data) => {
+			console.log(data);
+			if (data.text == 'invited') {
+				expect(data.user.id).toBe(1);
+				invitedGameId = data.gameId;
+
+				socket2.emit('gameInviteAnswer', {
+					gameId: invitedGameId,
+					isAccepted: true,
+				});
+			}
+		});
+		
+		socket1.emit('gameInvite', { userId: 2 });
+	})
+
+	it('Check game status', (done) => {
+		socket1.on('gameStatus', (data) => {
+			console.log(data);
+			expect(data.games.length).toBe(1);
+			expect(data.players.length).toBe(2);
+			expect(data.queue.length).toBe(0);
+			
+			socket1.emit('removeQueue');
+			done();
+		})
+		socket1.emit('gameStatus');
+	});
 
 	it('Accept invalid invitation', (done) => {
 		socket2.on('gameInvite', (data) => {

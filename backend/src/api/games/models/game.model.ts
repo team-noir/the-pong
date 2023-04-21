@@ -141,6 +141,13 @@ export class GameModel implements OnModuleInit {
 		this.receivePong(player.userId);
 	}
 
+	resetPlayerSocket(playerId: number, socket) {
+		const player = this.players.get(playerId);
+		if (player) {
+			player.setSocket(socket);
+		}
+	}
+
 	async gameStatus(socket: Socket) {
 		await socket.emit('gameStatus', {
 			games: [...this.games.keys()],
@@ -157,6 +164,7 @@ export class GameModel implements OnModuleInit {
 			if (game.isFull()) { return; }
 			if (game.invitedId) {
 				await game.noticeToPlayers('gameInvite', { text: 'canceled'});
+				this.deleteInvite(game.invitedId);
 			} else {
 				await game.noticeToPlayers('queue', { text: 'timeout'});
 			}
@@ -261,8 +269,11 @@ export class GameModel implements OnModuleInit {
 
 	disconnectPlayer(playerId: number) {
 		const player = this.players.get(playerId);
+		
 		if (player.game) {
 			this.removeGame(player.game);
+		} else if (this.isInvited(playerId)) {
+			this.deleteInvite(playerId);
 		}
 	}
 
