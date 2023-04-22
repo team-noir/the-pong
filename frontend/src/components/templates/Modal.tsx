@@ -7,6 +7,7 @@ interface Props {
   title?: string;
   children: React.ReactNode;
   onClickClose: () => void;
+  isShowClose?: boolean;
   fitContent?: boolean;
 }
 
@@ -14,6 +15,7 @@ export default function Modal({
   title,
   children,
   onClickClose,
+  isShowClose = true,
   fitContent = false,
 }: Props) {
   const closeButtonRef = useRef(null);
@@ -49,18 +51,27 @@ export default function Modal({
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <Dialog.Panel
-              className={classNames(`modal-panel`, fitContent && 'h-fit w-fit')}
+              className={classNames(
+                `modal-panel`,
+                fitContent ? 'h-fit w-fit' : 'mt-20'
+              )}
             >
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-4">
                 {title && <h3 className="ml-1 text-sm">{title}</h3>}
-                <XMarkIcon
-                  className="h-6 w-6 text-text-light"
-                  aria-hidden="true"
-                  onClick={onClickClose}
-                  ref={closeButtonRef}
-                />
+                {isShowClose && (
+                  <XMarkIcon
+                    className="h-6 w-6 text-text-light"
+                    aria-hidden="true"
+                    onClick={onClickClose}
+                    ref={closeButtonRef}
+                  />
+                )}
               </div>
-              <div className="flex vh-center min-w-[24em] min-h-[12em]">
+              <div
+                className={classNames(
+                  fitContent && 'vh-center min-w-[24em] min-h-[12em]'
+                )}
+              >
                 {children}
               </div>
             </Dialog.Panel>

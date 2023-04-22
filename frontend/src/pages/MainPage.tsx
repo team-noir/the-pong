@@ -16,10 +16,8 @@ export default function MainPage() {
       <section className="section">
         <div className="flex justify-start items-baseline">
           <h2 className="section-title">라이브 게임</h2>
-          <span>
-            <Link to="/game" className="inline-block text-sm text-gray-light ">
-              더보기
-            </Link>
+          <span className="inline-block text-sm text-gray-light ml-2">
+            <Link to="/game">더보기</Link>
             <ChevronRightIcon
               className="inline-block h-4 w-4"
               aria-hidden="true"
