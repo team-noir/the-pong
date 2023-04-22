@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import AchievementList from 'components/organisms/Achievements/AchievementList';
-import { UserType, AchievementType } from 'types';
+import { AchievementType } from 'types';
 
 const dummyAchievementData: AchievementType[] = [
   {
@@ -23,7 +23,11 @@ const dummyAchievementData: AchievementType[] = [
   },
 ];
 
-export default function Achievements({ id: userId }: UserType) {
+interface Props {
+  userId: number;
+}
+
+export default function Achievements({ userId }: Props) {
   const [achievements, setAchievements] = useState<AchievementType[] | null>(
     null
   );

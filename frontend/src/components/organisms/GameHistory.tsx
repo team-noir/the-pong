@@ -1,4 +1,3 @@
-import { useUser } from 'hooks/useStore';
 import GameHistoryList from 'components/molecule/GameHistoryList';
 import { GameHistoryType } from 'types';
 
@@ -40,15 +39,18 @@ const dummyData: GameHistoryType[] = [
   },
 ];
 
-export default function GameHistory() {
+interface Props {
+  userId: number;
+}
+
+export default function GameHistory({ userId }: Props) {
   // TODO: get data from api using react-query
   const data = dummyData;
-  const { id: myUserId } = useUser((state) => state);
 
   return (
     <section className="section">
       <h2 className="section-title">게임 히스토리</h2>
-      {myUserId && <GameHistoryList histories={data} myUserId={myUserId} />}
+      <GameHistoryList histories={data} userId={userId} />
     </section>
   );
 }
