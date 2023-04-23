@@ -10,3 +10,7 @@ export const NOTICE_STATUS = {
   USER_UNMUTE: 303,
   CHANNEL_REMOVE: 400,
 } as const;
+
+export const BACKGROUND_IMAGES = {
+  WELCOME: `${process.env.PUBLIC_URL}/images/welcome-background.jpg`,
+};

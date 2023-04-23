@@ -27,15 +27,14 @@ export default function ChannelSettingTitle({
   return (
     <form onSubmit={handleSubmit}>
       <ChevronLeftIcon
-        className="absolute top-4 left-4 block h-6 w-6"
+        className="absolute top-4 left-4 h-6 w-6"
         aria-hidden="true"
         onClick={onClickBack}
       />
       <h2 className="section-title">채널 이름 수정</h2>
-      <div className="my-16">
+      <div className="mb-16">
         <TextInputWithMessage
           id="title"
-          label="채널 이름"
           value={title}
           placeholder="채널 이름을 입력해주세요"
           setValue={(value) => setTitle(value)}

@@ -1,6 +1,6 @@
-import ProfileImage from 'components/atoms/ProfileImage';
+import GameScoretable from 'components/molecule/GameScoretable';
 import { classNames, formatDate, formatTime } from 'utils';
-import { GameHistoryType, GameHistoryPlayerType } from 'types';
+import { GameHistoryType } from 'types';
 
 interface Props {
   histories: GameHistoryType[];
@@ -48,15 +48,11 @@ function GameHistoryItem({
                 <div className="bg-gray h-full flex-1 transform skew-x-[335deg]"></div>
               </div>
 
-              <div className="relative inline-flex items-center gap-2 pl-12">
-                <GameHistoryItemPlayer player={history.winner} isWinner />
-                <span className="text-4xl text-gray-lighter font-light italic">
-                  <span className="text-green">{history.winner.score}</span> :{' '}
-                  <span className={classNames('relative')}>
-                    {history.loser.score}
-                  </span>
-                </span>
-                <GameHistoryItemPlayer player={history.loser} />
+              <div className="pl-12">
+                <GameScoretable
+                  player1={history.winner}
+                  player2={history.loser}
+                />
               </div>
             </div>
           </div>
@@ -69,34 +65,5 @@ function GameHistoryItem({
         </div>
       </div>
     </>
-  );
-}
-
-function GameHistoryItemPlayer({
-  player,
-  isWinner = false,
-}: {
-  player: GameHistoryPlayerType;
-  isWinner?: boolean;
-}) {
-  const imageSize = 52;
-
-  return (
-    <div className="flex-initial p-4 flex flex-col items-center justify-between">
-      <div
-        className={`flex-1 rounded-full max-w-${imageSize / 4} max-h-${
-          imageSize / 4
-        }`}
-      >
-        <ProfileImage
-          userId={player.id}
-          alt={`${player.nickname}의 프로필 사진`}
-          size={imageSize}
-        />
-      </div>
-
-      <span className="mt-1">{player.nickname}</span>
-      <span className="badge">Lv. {player.level}</span>
-    </div>
   );
 }

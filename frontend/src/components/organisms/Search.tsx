@@ -24,13 +24,20 @@ export default function Search() {
   return (
     <section>
       <h1 className="section-title">회원 검색</h1>
-      <form onSubmit={handleSubmit}>
-        <TextInput
-          id="search"
-          placeholder="닉네임을 입력해주세요"
-          onChange={handleChange}
-        />
-        <Button type="submit">검색</Button>
+      <form onSubmit={handleSubmit} className="inline-flex w-full mb-6">
+        <div className="w-10/12 vh-center pr-2">
+          <TextInput
+            id="search"
+            placeholder="닉네임을 입력해주세요"
+            onChange={handleChange}
+            fullLength
+          />
+        </div>
+        <div className="w-2/12 vh-center pl-2">
+          <Button type="submit" primary fullLength>
+            검색
+          </Button>
+        </div>
       </form>
       {getUsersMutation.isSuccess && (
         <>

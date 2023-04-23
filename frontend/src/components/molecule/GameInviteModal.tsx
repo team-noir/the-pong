@@ -86,7 +86,9 @@ export default function GameInviteModal() {
       )}
       {isCanceled && (
         <Modal onClickClose={() => setIsCanceled(false)} fitContent>
-          <p>상대가 초대를 취소하였습니다.</p>
+          <div className="text-center">
+            <p>상대가 초대를 취소하였습니다.</p>
+          </div>
         </Modal>
       )}
     </>

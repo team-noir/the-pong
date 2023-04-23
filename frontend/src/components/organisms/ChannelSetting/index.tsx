@@ -39,11 +39,14 @@ export default function ChannelSetting({ channel, onClickClose }: Props) {
   };
 
   return (
-    <Modal onClickClose={onClickClose}>
+    <Modal
+      onClickClose={onClickClose}
+      isShowClose={!(isSettingTitle || isSettingPassword)}
+    >
       {!isSettingTitle && !isSettingPassword && (
         <section className="section small">
           <h3 className="section-title">채널 설정</h3>
-          <ul className="flex flex-col divide-y divide-gray-dark py-4 -mx-4">
+          <ul className="flex flex-col divide-y divide-gray-dark -mx-4">
             <li
               role="button"
               onClick={() => setIsSettingTitle(true)}
@@ -72,18 +75,22 @@ export default function ChannelSetting({ channel, onClickClose }: Props) {
         </section>
       )}
       {isSettingTitle && (
-        <ChannelSettingTitle
-          channelTitle={channel.title}
-          onClickBack={handleClickBack}
-          onSubmit={handleSubmitTitle}
-        />
+        <div className="mt-10">
+          <ChannelSettingTitle
+            channelTitle={channel.title}
+            onClickBack={handleClickBack}
+            onSubmit={handleSubmitTitle}
+          />
+        </div>
       )}
       {isSettingPassword && (
-        <ChannelSettingPassword
-          isProtected={channel.isProtected}
-          onClickBack={handleClickBack}
-          onSubmit={handleSubmitPassword}
-        />
+        <div className="mt-10">
+          <ChannelSettingPassword
+            isProtected={channel.isProtected}
+            onClickBack={handleClickBack}
+            onSubmit={handleSubmitPassword}
+          />
+        </div>
       )}
     </Modal>
   );

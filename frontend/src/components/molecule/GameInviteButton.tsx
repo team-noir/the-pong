@@ -59,20 +59,23 @@ export default function GameInviteButton() {
         게임 초대
       </Button>
       {isWating && (
-        /* eslint-disable */
-        <Modal onClickClose={() => {}} fitContent>
-          <p>초대 수락을 기다리는 중...</p>
-          <Button onClick={cancelWaiting}>취소</Button>
+        <Modal onClickClose={cancelWaiting} fitContent>
+          <div className="text-center">
+            <p>초대 수락을 기다리는 중...</p>
+            <Button onClick={cancelWaiting}>취소</Button>
+          </div>
         </Modal>
       )}
       {alertCode && (
         <Modal onClickClose={() => setAlertCode(null)} fitContent>
-          <p>
-            {alertCode === 'rejected' && '초대가 거절되었습니다.'}
-            {alertCode === 'timeout' &&
-              '60초 동안 응답이 없어 대기를 종료합니다.'}
-            {alertCode == 'unavailable' && '초대할 수 없는 회원입니다.'}
-          </p>
+          <div className="text-center">
+            <p>
+              {alertCode === 'rejected' && '초대가 거절되었습니다.'}
+              {alertCode === 'timeout' &&
+                '60초 동안 응답이 없어 대기를 종료합니다.'}
+              {alertCode == 'unavailable' && '초대할 수 없는 회원입니다.'}
+            </p>
+          </div>
         </Modal>
       )}
     </>
