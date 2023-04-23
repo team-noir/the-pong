@@ -50,12 +50,11 @@ export default function Channel({ channel, myUserId }: Props) {
 
   useEffect(() => {
     if (!channel.users) return;
-    // 뒤로갔다가 채널로 다시 들어왔을 때, mute 상태인지 확인
     const myUser = channel.users.find((user) => user.id === myUserId);
     if (myUser?.isMuted) {
       setFormData((prevState) => ({
         ...prevState,
-        placeholder: '30초간 채팅이 금지 되었습니다.',
+        placeholder: '30초간 채팅이 금지되었습니다.',
         disabled: true,
       }));
     }
@@ -85,7 +84,7 @@ export default function Channel({ channel, myUserId }: Props) {
       queryClient.setQueryData<MessageType[]>(queryKey, (oldData) =>
         oldData ? [...oldData, newNotice] : oldData
       );
-      queryClient.refetchQueries(['getChannel', String(channel.id)]);
+      queryClient.invalidateQueries(['getChannel', String(channel.id)]);
 
       data.code === NOTICE_STATUS.CHANNEL_REMOVE &&
         setFormData((prevState) => ({
@@ -162,7 +161,7 @@ export default function Channel({ channel, myUserId }: Props) {
           <TextInput
             id="message"
             value={formData.message}
-            placeholder="메시지를 입력해 주세요"
+            placeholder={formData.placeholder}
             onChange={handleChange}
             fullLength
             disabled={formData.disabled}
