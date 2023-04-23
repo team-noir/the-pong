@@ -20,7 +20,6 @@ const queryClient = new QueryClient({
     queries: {
       retry: false,
       refetchOnMount: 'always',
-      refetchInterval: 1000 * 60, // 1분
       staleTime: 1000 * 60, // 1분
       suspense: true,
       useErrorBoundary: true,
