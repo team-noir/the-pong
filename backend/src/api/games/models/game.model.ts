@@ -108,7 +108,7 @@ export class GameModel implements OnModuleInit {
 			select: {
 				nickname: true,
 				rank: true,
-				blockeds: { select: { blockedId: true } }
+				blockers: { select: { blockedId: true } }
 			}
 		});
 
@@ -119,7 +119,8 @@ export class GameModel implements OnModuleInit {
 		}
 
 		const blocks = [];
-		for (const blocked of data.blockeds) {
+		for (const blocked of data.blockers) {
+			console.log(blocked);
 			blocks.push(blocked.blockedId);
 		}
 
@@ -141,6 +142,13 @@ export class GameModel implements OnModuleInit {
 		this.receivePong(player.userId);
 	}
 
+	resetPlayerSocket(playerId: number, socket) {
+		const player = this.players.get(playerId);
+		if (player) {
+			player.setSocket(socket);
+		}
+	}
+
 	async gameStatus(socket: Socket) {
 		await socket.emit('gameStatus', {
 			games: [...this.games.keys()],
@@ -157,6 +165,7 @@ export class GameModel implements OnModuleInit {
 			if (game.isFull()) { return; }
 			if (game.invitedId) {
 				await game.noticeToPlayers('gameInvite', { text: 'canceled'});
+				this.deleteInvite(game.invitedId);
 			} else {
 				await game.noticeToPlayers('queue', { text: 'timeout'});
 			}
@@ -261,9 +270,14 @@ export class GameModel implements OnModuleInit {
 
 	disconnectPlayer(playerId: number) {
 		const player = this.players.get(playerId);
+
 		if (player.game) {
 			this.removeGame(player.game);
 		}
+		if (this.isInvited(playerId)) {
+			this.deleteInvite(playerId);
+		}
+		this.players.delete(player.userId);
 	}
 
 	sendPingToAllPlayers() {

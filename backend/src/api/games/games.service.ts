@@ -118,7 +118,7 @@ export class GamesService {
 		}
 
 		const isModeSetted = game.setMode(mode);
-		const isThemeSetted = game.setTheme(mode);
+		const isThemeSetted = game.setTheme(theme);
 
 		await game.noticeToPlayers('gameSetting', {
 			text: 'change',
