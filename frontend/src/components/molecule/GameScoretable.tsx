@@ -1,10 +1,10 @@
 import ProfileImage from 'components/atoms/ProfileImage';
 import { classNames } from 'utils';
-import { PlayerType, GameHistoryPlayerType } from 'types';
+import { PlayerType } from 'types';
 
 interface Props {
-  player1: GameHistoryPlayerType;
-  player2: GameHistoryPlayerType;
+  player1: PlayerType;
+  player2: PlayerType;
   liveScore1?: number;
   liveScore2?: number;
 }

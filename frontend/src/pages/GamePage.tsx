@@ -18,11 +18,15 @@ const dummyGame: GameType = {
       id: 1,
       nickname: 'Nickname1',
       level: 1,
+      score: 0,
+      isOwner: true,
     },
     {
       id: 101,
       nickname: 'Nickname2',
       level: 3,
+      score: 0,
+      isOwner: false,
     },
   ],
   mode: 0,
@@ -38,14 +42,14 @@ const dummyResult: GameResultType = {
     id: 1,
     nickname: 'Nickname1',
     level: 1,
+    score: 11,
   },
   loser: {
     id: 101,
     nickname: 'Nickname2',
     level: 3,
+    score: 9,
   },
-  winnerScore: 11,
-  loserScore: 9,
   createdAt: '2023-04-07T00:00:00.000Z',
 };
 
@@ -79,10 +83,10 @@ export default function GamePage() {
   );
 
   // TODO: 아래 테스트용 코드 지우기
-  useEffect(() => {
-    setResult(dummyResult);
-    setAchievements(dummyAchievements);
-  }, []);
+  // useEffect(() => {
+  //   setResult(dummyResult);
+  //   setAchievements(dummyAchievements);
+  // }, []);
 
   useEffect(() => {
     socket.on('gameResult', (data: GameResultType) => {
@@ -153,8 +157,8 @@ function GameResultModal({ result }: { result: GameResultType }) {
           <div className="relative inline-flex items-center gap-2 my-12">
             <GameResultModalPlayer player={result.winner} isWinner />
             <span className="pt-8 text-4xl text-gray-lighter font-light italic">
-              <span className="text-green">{result.winnerScore}</span> :{' '}
-              <span className="relative">{result.loserScore}</span>
+              <span className="text-green">{result.winner.score}</span> :{' '}
+              <span className="relative">{result.loser.score}</span>
             </span>
             <GameResultModalPlayer player={result.loser} />
           </div>
