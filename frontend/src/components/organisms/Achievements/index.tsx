@@ -1,46 +1,17 @@
-import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import AchievementList from 'components/organisms/Achievements/AchievementList';
+import { getAchievements } from 'api/api.v1';
 import { AchievementType } from 'types';
-
-const dummyAchievementData: AchievementType[] = [
-  {
-    id: 0,
-    title: '업적 제목0',
-    description: '업적 달성 조건에 대한 설명입니다.',
-    createdAt: '2023-04-07T00:00:00.000Z',
-  },
-  {
-    id: 1,
-    title: '업적 제목1',
-    description: '업적 달성 조건에 대한 설명입니다.',
-    createdAt: '2023-04-07T00:00:00.000Z',
-  },
-  {
-    id: 2,
-    title: '업적 제목2',
-    description: '업적 달성 조건에 대한 설명입니다.',
-    createdAt: '2023-04-07T00:00:00.000Z',
-  },
-];
 
 interface Props {
   userId: number;
 }
 
 export default function Achievements({ userId }: Props) {
-  const [achievements, setAchievements] = useState<AchievementType[] | null>(
-    null
-  );
+  const { data: achievements } = useQuery<AchievementType[]>({
+    queryKey: ['getAchievements', userId],
+    queryFn: () => getAchievements(userId),
+  });
 
-  // TODO: 업적 목록 API에서 가져오기(userId 필요)
-  useEffect(() => {
-    setAchievements(dummyAchievementData);
-  }, []);
-
-  return (
-    <>
-      <h1>Achievements</h1>
-      <AchievementList achievements={achievements} />
-    </>
-  );
+  return <>{achievements && <AchievementList achievements={achievements} />}</>;
 }

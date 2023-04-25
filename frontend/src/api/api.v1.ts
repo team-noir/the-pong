@@ -114,6 +114,14 @@ export const getUsers = async (
   return res.data;
 };
 
+export const getAchievements = async (userId: number) => {
+  const res = await axiosWithInterceptors.get(`/users/${userId}/achievements`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 /** Setting */
 
 export const updateMyProfile = async (nickname: string): Promise<UserType> => {
