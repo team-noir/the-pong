@@ -99,10 +99,10 @@ export interface NoticeType {
 
 export interface PlayerType {
   id: number;
-  nickname: string;
-  level: number;
+  nickname?: string;
+  level?: number;
   isOwner?: boolean;
-  score: number;
+  score?: number;
 }
 
 export interface GameType {
