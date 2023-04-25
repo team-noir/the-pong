@@ -171,9 +171,25 @@ export class UsersService {
   }
 
   async addAchievement(userId: number, achievementId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const achievement = await this.prismaService.achievement.findUnique({
+      where: {
+        id: achievementId,
+      },
+    });
+    if (!achievement) {
+      throw new Error('Achievement not found');
+    }
     return await this.prismaService.achievement_User.upsert({
       where: {
-        unique_id: {
+        unique: {
           userId,
           achievementId,
         },

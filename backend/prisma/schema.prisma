@@ -122,8 +122,8 @@ model Achievement {
 }
 
 model Achievement_User {
-  id              Int       @id @default(autoincrement())
-  @@unique([userId, achievementId], name: "unique_id")
+  id             Int       @id @default(autoincrement())
+  @@unique([userId, achievementId], name: "unique")
 
   userId          Int
   achievementId   Int

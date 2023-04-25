@@ -161,8 +161,7 @@ export class UsersController {
         Number(userId),
         Number(achievementId)
       );
-      const statusCode = achievement ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-      res.status(statusCode).send(achievement);
+      res.status(HttpStatus.OK).send(achievement);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
