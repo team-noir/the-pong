@@ -141,14 +141,17 @@ export class AppGateway
   async rtcOffer(
     @ConnectedSocket() socket: Socket,
     @MessageBody('sdp') sdp,
-    @MessageBody('offerSendUserId') offerSendID,
-    @MessageBody('offerReceiveID') offerReceiveID,
+    @MessageBody('offerSendUserId') offerSendUserId,
+    @MessageBody('offerReceiveUserId') offerReceiveUserId,
   ) {
+    const sendSocket = this.getUserSocket(offerSendUserId);
+    const receiveSocket = this.getUserSocket(offerReceiveUserId);
+
     socket
-    .to(offerReceiveID)
+    .to(receiveSocket.id)
     .emit('rtcGetOffer', {
       sdp: sdp, 
-      offerSendID: offerSendID,
+      offerSendID: sendSocket.id,
     });
   }
 
@@ -156,14 +159,17 @@ export class AppGateway
   async rtcAnswer(
     @ConnectedSocket() socket: Socket,
     @MessageBody('sdp') sdp,
-    @MessageBody('answerSendID') answerSendID,
-    @MessageBody('answerReceiveID') answerReceiveID,
+    @MessageBody('answerSendUserId') answerSendUserId,
+    @MessageBody('answerReceiveUserId') answerReceiveUserId,
   ) {
+    const sendSocket = this.getUserSocket(answerSendUserId);
+    const receiveSocket = this.getUserSocket(answerReceiveUserId);
+
     socket
-    .to(answerReceiveID)
+    .to(receiveSocket.id)
     .emit('rtcGetAnswer', {
       sdp: sdp, 
-      answerSendID: answerSendID,
+      answerSendID: sendSocket.id,
     });
   }
 
@@ -171,14 +177,17 @@ export class AppGateway
   async rtcCandidate(
     @ConnectedSocket() socket: Socket,
     @MessageBody('candidate') candidate,
-    @MessageBody('candidateSendID') candidateSendID,
-    @MessageBody('candidateReceiveID') candidateReceiveID,
+    @MessageBody('candidateSendUserId') candidateSendUserId,
+    @MessageBody('candidateReceiveUserId') candidateReceiveUserId,
   ) {
+    const sendSocket = this.getUserSocket(candidateSendUserId);
+    const receiveSocket = this.getUserSocket(candidateReceiveUserId);
+
     socket
-    .to(candidateReceiveID)
+    .to(receiveSocket.id)
     .emit('rtcGetCandidate', {
       candidate: candidate, 
-      candidateSendID: candidateSendID
+      candidateSendID: sendSocket.id
     });
   }
 
@@ -308,7 +317,7 @@ export class AppGateway
     }
   }
 
-
+  
 
   // For test
 
