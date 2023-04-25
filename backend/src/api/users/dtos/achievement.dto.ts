@@ -8,7 +8,11 @@ export class AchievementDto {
 
   @ApiProperty()
   @IsString()
-  public name: string;
+  public title: string;
+
+  @ApiProperty()
+  @IsString()
+  public condition: string;
 
   @ApiProperty()
   @IsString()

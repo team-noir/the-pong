@@ -153,7 +153,8 @@ export class UsersService {
           id: true,
           achievement: {
             select: {
-              name: true,
+              title: true,
+              condition: true,
               description: true,
             },
           },
@@ -163,7 +164,8 @@ export class UsersService {
       .then((achievements) =>
         achievements.map((achievement) => ({
           id: achievement.id,
-          name: achievement.achievement.name,
+          title: achievement.achievement.title,
+          condition: achievement.achievement.condition,
           description: achievement.achievement.description,
           createdAt: achievement.createdAt,
         }))
