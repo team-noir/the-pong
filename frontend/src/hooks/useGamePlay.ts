@@ -24,6 +24,8 @@ type ReturnType = [
   paddleUp: { x: number; y: number; w: number; h: number },
   paddleDown: { x: number; y: number; w: number; h: number },
   stageSize: number,
+  isPlaying: boolean,
+  count: number | null,
   handleMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => void,
   handleMouseUp: (e: React.MouseEvent<HTMLButtonElement>) => void,
   result: GameResultType | null
@@ -40,12 +42,13 @@ export default function useGamePlay(
   const [paddleUp, setPaddleUp] = useState(initialState.paddleUp);
   const [paddleDown, setPaddleDown] = useState(initialState.paddleDown);
   const [ballDelta, setBallDelta] = useState(initialState.ballDelta);
-  // TODO: gameResult 이벤트를 받으면 true로 변경
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [count, setCount] = useState(3);
   const [stageSize, setStageSize] = useState(0);
   const [result, setResult] = useState<GameResultType | null>(null);
   const socket = useContext(SocketContext);
 
+  const interval = useRef<NodeJS.Timer | null>(null);
   const animationFrame = useRef<number | null>(null);
   const isMyKeyDown = useRef({ left: false, right: false });
   const isOtherKeyDown = useRef({ left: false, right: false });
@@ -53,7 +56,15 @@ export default function useGamePlay(
   useEffect(() => {
     // TODO: 아래 테스트용 코드 지우기
     // setResult(dummyResult);
-
+    socket.on('gameStart', () => {
+      interval.current = setInterval(
+        () => setCount((prevState) => prevState - 1),
+        1000
+      );
+      return () => {
+        interval.current && clearInterval(interval.current!);
+      };
+    });
     socket.on('gameScore', (data: PlayerType) => {
       // TODO: 게임 쿼리 수정
       // setGame((prev) => ({
@@ -81,6 +92,12 @@ export default function useGamePlay(
       document.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
+
+  useEffect(() => {
+    if (count > 0) return;
+    clearInterval(interval.current!);
+    setIsPlaying(true);
+  }, [count]);
 
   useEffect(() => {
     handleScreenResize();
@@ -300,6 +317,8 @@ export default function useGamePlay(
     paddleUp,
     paddleDown,
     stageSize,
+    isPlaying,
+    count,
     handleMouseDown,
     handleMouseUp,
     result,

@@ -1,5 +1,10 @@
 import { useRef } from 'react';
 import { Stage, Layer } from 'react-konva';
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  EyeIcon,
+} from '@heroicons/react/20/solid';
 import { useUser } from 'hooks/useStore';
 import useGamePlay from 'hooks/useGamePlay';
 import Ball from 'components/organisms/Game/Ball';
@@ -28,6 +33,8 @@ export default function Game({ game }: Props) {
     paddleUp,
     paddleDown,
     stageSize,
+    isPlaying,
+    count,
     handleMouseDown,
     handleMouseUp,
     result,
@@ -35,18 +42,16 @@ export default function Game({ game }: Props) {
 
   return (
     <section ref={sectionRef}>
-      <div>
-        <div>
-          <GameScoretable
-            player1={otherPlayer || game.players[0]}
-            player2={myPlayer || game.players[1]}
-            liveScore1={otherPlayer ? otherPlayer.score : game.players[0].score}
-            liveScore2={myPlayer ? myPlayer.score : game.players[1].score}
-          />
-        </div>
+      <div className="text-center">
+        <GameScoretable
+          player1={otherPlayer || game.players[0]}
+          player2={myPlayer || game.players[1]}
+          liveScore1={otherPlayer ? otherPlayer.score : game.players[0].score}
+          liveScore2={myPlayer ? myPlayer.score : game.players[1].score}
+        />
       </div>
       <div
-        className="bg-white"
+        className="relative bg-white"
         style={{ width: `${stageSize}px`, height: `${stageSize}px` }}
       >
         {amIOwner ? (
@@ -84,26 +89,49 @@ export default function Game({ game }: Props) {
             autoPlay
           />
         )}
+        {!isPlaying && (
+          <div className="flex flex-col vh-center  w-full h-full absolute top-0 bg-black/50 gap-y-8">
+            <h1 className="text-6xl">Ready</h1>
+            <p className="text-4xl">{count}</p>
+            <div>
+              <h2 className="text-center text-xl mb-2">조작 안내</h2>
+              <ul className="flex flex-col ">
+                <li>1. 키보드 좌우 버튼</li>
+                <li>
+                  2. 아래 <ChevronLeftIcon className="inline-block w-5" />
+                  <ChevronRightIcon className="inline-block w-5" /> 버튼
+                </li>
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
       {!amIViewer && (
-        <div>
+        <div className="flex justify-center gap-2 mt-2">
           <Button
             value="left"
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
+            className="w-20 h-20"
+            primary
           >
-            &lt;
+            <ChevronLeftIcon />
           </Button>
           <Button
             value="right"
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
+            className="w-20 h-20"
+            primary
           >
-            &gt;
+            <ChevronRightIcon />
           </Button>
         </div>
       )}
-      <div>{game.viewerCount}명 관전중</div>
+      <div className="inline-flex items-center py-1 text-s text-gray-light float-right">
+        <EyeIcon className="block h-4 w-4" aria-hidden="true" />
+        <span className="ml-1">{game.viewerCount}</span>
+      </div>
       {result && <GameResultModal result={result} />}
     </section>
   );
