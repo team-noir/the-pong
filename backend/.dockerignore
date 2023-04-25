@@ -1,5 +1,6 @@
 prisma/*
 !prisma/schema.prisma
+!prisma/yarn.lock
 
 upload
 *.spec.ts
