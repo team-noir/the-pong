@@ -200,5 +200,7 @@ sketch
 # prisma build files
 backend/prisma/*
 !backend/prisma/schema.prisma
+!backend/prisma/seed.ts
 
 backend/uploads
+backend/dist

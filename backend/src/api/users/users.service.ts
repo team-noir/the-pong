@@ -140,4 +140,49 @@ export class UsersService {
       mimetype: `image/${ext}`,
     };
   }
+
+  /** Achievements */
+
+  async getAchievements(userId: number) {
+    return await this.prismaService.achievement_User
+      .findMany({
+        where: {
+          userId,
+        },
+        select: {
+          id: true,
+          achievement: {
+            select: {
+              name: true,
+              description: true,
+            },
+          },
+          createdAt: true,
+        },
+      })
+      .then((achievements) =>
+        achievements.map((achievement) => ({
+          id: achievement.id,
+          name: achievement.achievement.name,
+          description: achievement.achievement.description,
+          createdAt: achievement.createdAt,
+        }))
+      );
+  }
+
+  async addAchievement(userId: number, achievementId: number) {
+    return await this.prismaService.achievement_User.upsert({
+      where: {
+        unique_id: {
+          userId,
+          achievementId,
+        },
+      },
+      update: {},
+      create: {
+        userId,
+        achievementId,
+      },
+    });
+  }
 }

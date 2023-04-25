@@ -1,5 +1,7 @@
 prisma/*
 !prisma/schema.prisma
+!prisma/seed.ts
 
 upload
 *.spec.ts
+dist

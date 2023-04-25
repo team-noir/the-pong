@@ -2,6 +2,7 @@ import {
   Controller,
   Res,
   Get,
+  Post,
   UseGuards,
   Param,
   HttpStatus,
@@ -24,6 +25,7 @@ import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import { UsersService } from './users.service';
 import { Response } from 'express';
 import { UserDto } from './dtos/users.dto';
+import { AchievementDto } from './dtos/achievement.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -74,7 +76,7 @@ export class UsersController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async requestProfile(@Param('userId') userId: number, @Res() res: Response) { 
+  async requestProfile(@Param('userId') userId: number, @Res() res: Response) {
     try {
       const user: UserDto = await this.usersService.getUser(Number(userId));
       const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
@@ -115,6 +117,52 @@ export class UsersController {
         'Cache-Control': 'no-cache, max-age=0',
       });
       return new StreamableFile(result.file);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  /** Achievements */
+
+  @Get(':userId/achievements')
+  @ApiOperation({ summary: 'Get achievements' })
+  @ApiOkResponse({ description: 'Get achievements', type: [AchievementDto] })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
+  @UseGuards(AuthenticatedGuard)
+  async requestAchievements(
+    @Param('userId') userId: number,
+    @Res() res: Response
+  ) {
+    try {
+      const achievements: AchievementDto[] =
+        await this.usersService.getAchievements(Number(userId));
+      const statusCode = achievements ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+      res.status(statusCode).send(achievements);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  // TODO: remove this endpoint
+  @Post(':userId/achievements/:achievementId')
+  @ApiOperation({ summary: 'TEST - Add achievement' })
+  @ApiOkResponse({ description: 'ADD achievement', type: AchievementDto })
+  @ApiNotFoundResponse({ description: 'User not found' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
+  @UseGuards(AuthenticatedGuard)
+  async requestAchievement(
+    @Param('userId') userId: number,
+    @Param('achievementId') achievementId: number,
+    @Res() res: Response
+  ) {
+    try {
+      const achievement: any = await this.usersService.addAchievement(
+        Number(userId),
+        Number(achievementId)
+      );
+      const statusCode = achievement ? HttpStatus.OK : HttpStatus.NOT_FOUND;
+      res.status(statusCode).send(achievement);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
