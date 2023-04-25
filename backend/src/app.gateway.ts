@@ -135,6 +135,53 @@ export class AppGateway
     this.logger.log(`${socket.id} 소켓 연결 해제 ❌`);
   }
 
+  // WebRTC Connection
+
+  @SubscribeMessage('rtcOffer')
+  async rtcOffer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('sdp') sdp,
+    @MessageBody('offerSendUserId') offerSendID,
+    @MessageBody('offerReceiveID') offerReceiveID,
+  ) {
+    socket
+    .to(offerReceiveID)
+    .emit('rtcGetOffer', {
+      sdp: sdp, 
+      offerSendID: offerSendID,
+    });
+  }
+
+  @SubscribeMessage('rtcAnswer')
+  async rtcAnswer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('sdp') sdp,
+    @MessageBody('answerSendID') answerSendID,
+    @MessageBody('answerReceiveID') answerReceiveID,
+  ) {
+    socket
+    .to(answerReceiveID)
+    .emit('rtcGetAnswer', {
+      sdp: sdp, 
+      answerSendID: answerSendID,
+    });
+  }
+
+  @SubscribeMessage('rtcCandidate')
+  async rtcCandidate(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('candidate') candidate,
+    @MessageBody('candidateSendID') candidateSendID,
+    @MessageBody('candidateReceiveID') candidateReceiveID,
+  ) {
+    socket
+    .to(candidateReceiveID)
+    .emit('rtcGetCandidate', {
+      candidate: candidate, 
+      candidateSendID: candidateSendID
+    });
+  }
+
   // Message
 
   @SubscribeMessage('message')
