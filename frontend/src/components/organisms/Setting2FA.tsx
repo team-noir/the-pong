@@ -10,6 +10,7 @@ import Button from 'components/atoms/Button';
 export default function Setting2FA() {
   const { isTwoFactor, setIsTwoFactor } = useUser((state) => state);
   const [isShowVerify2fa, setIsShowVerify2fa] = useState(false);
+  const [isShowInfo, setIsShowInfo] = useState(false);
 
   const get2faCodeMutation = useMutation({
     mutationFn: get2faCode,
@@ -27,9 +28,9 @@ export default function Setting2FA() {
       <h2 className="section-title">Two-Factor Authentication (2FA)</h2>
       <p className="mt-4 mb-8">
         2단계 보안 인증을 설정하고 계정을 더욱 강력하게 보호하세요.{' '}
-        <a href="#" className="link">
+        <Button onClick={() => setIsShowInfo(true)} linkStyle>
           더 알아보기
-        </a>
+        </Button>
       </p>
       <div>
         {!isTwoFactor ? (
@@ -60,6 +61,63 @@ export default function Setting2FA() {
           </>
         )}
       </div>
+      {isShowInfo && (
+        <Modal title="2FA 설정 안내" onClickClose={() => setIsShowInfo(false)}>
+          <div className="leading-7">
+            <h2 className="text-2xl">2FA란?</h2>
+            <hr className="my-2" />
+            <p>
+              2FA는 Two-Factor Authentication의 약자로, 2단계 보안 인증을
+              의미합니다. <br />
+              2FA를 설정하면 로그인 시 인증 코드를 입력해야 하므로 계정을 더욱
+              안전하게 보호할 수 있습니다.
+            </p>
+            <h2 className="text-2xl mt-6 mb-2">2FA 사용 방법</h2>
+            <hr className="my-2" />
+            <ol>
+              <li>
+                <h3 className="text-lg font-bold my-1">
+                  1단계: 모바일 인증 앱 설치
+                </h3>
+                <p>
+                  Google Authenticator:
+                  <a
+                    href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-green hover:underline mx-2"
+                  >
+                    [Android]
+                  </a>
+                  <a
+                    href="https://apps.apple.com/kr/app/google-authenticator/id388497605"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-green hover:underline"
+                  >
+                    [iOS]
+                  </a>
+                </p>
+              </li>
+              <li className="mt-2">
+                <h3 className="text-lg font-bold my-1">
+                  2단계: The Pong에서 2FA 설정
+                </h3>
+                <ol>
+                  <li>
+                    1. 2FA 보안 설정 페이지의 <em>설정하기</em> 버튼 클릭
+                  </li>
+                  <li>2. 인증 앱에서 QR 코드 스캔 혹은 인증 코드 입력</li>
+                  <li>3. 인증 앱이 생성하는 6자리 인증 코드 입력</li>
+                </ol>
+                <p className="mt-2">
+                  이후 로그인할 때는 인증 앱이 생성하는 코드만 입력하면 됩니다.
+                </p>
+              </li>
+            </ol>
+          </div>
+        </Modal>
+      )}
       {get2faCodeMutation.data && (
         <Modal
           title="2FA 설정"
