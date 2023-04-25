@@ -7,6 +7,7 @@ import AppTemplate from 'components/templates/AppTemplate';
 import Modal from 'components/templates/Modal';
 import GameSetting from 'components/organisms/GameSetting';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import { GameSettingType } from 'types';
 
 export default function GameSettingPage() {
   const { gameId } = useParams() as { gameId: string };
@@ -29,14 +30,19 @@ export default function GameSettingPage() {
 
     socket.on(
       'gameSetting',
-      (data: { text: string; mode?: string; theme?: number }) => {
+      (data: { text: string; mode?: number; theme?: number }) => {
         const { text, mode, theme } = data;
         if (text === 'change') {
-          queryClient.setQueryData(['gameSetting', gameId], {
-            ...gameSetting,
-            mode,
-            theme,
-          });
+          queryClient.setQueryData<GameSettingType>(
+            ['gameSetting', gameId],
+            (prevData) =>
+              prevData &&
+              ({
+                ...prevData,
+                mode: mode !== null ? mode : prevData.mode,
+                theme: theme !== null ? theme : prevData.theme,
+              } as GameSettingType)
+          );
         } else if (text === 'done') {
           navigate(`/game/${gameId}`);
         } else if (text === 'leave') {
