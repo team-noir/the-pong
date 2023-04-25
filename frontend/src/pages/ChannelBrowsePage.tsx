@@ -16,6 +16,7 @@ export default function ChannelBrowsePage() {
   const getChannelsQuery = useQuery({
     queryKey: ['getChannels', 'browse'],
     queryFn: () => getChannels({}),
+    refetchInterval: 1000 * 60, // 1분
   });
 
   const joinChannelMutation = useMutation(joinChannel);

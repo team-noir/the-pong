@@ -70,17 +70,18 @@ export default function ChannelDetail({
             />
           )}
         </section>
-        <section className="section small">
-          <Button
-            onClick={onClickLeave}
-            linkStyle
-            size="small"
-            className="text-red"
-            fullLength
-          >
-            {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
-          </Button>
-        </section>
+        {!channel.isDm && (
+          <section className="section small text-center">
+            <Button
+              onClick={onClickLeave}
+              linkStyle
+              size="small"
+              className="text-red"
+            >
+              {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
+            </Button>
+          </section>
+        )}
       </div>
     </Modal>
   );

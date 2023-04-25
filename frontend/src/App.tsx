@@ -1,4 +1,4 @@
-import { Suspense, useContext } from 'react';
+import { Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import {
   QueryClient,
@@ -20,7 +20,6 @@ const queryClient = new QueryClient({
     queries: {
       retry: false,
       refetchOnMount: 'always',
-      refetchInterval: 1000 * 60, // 1분
       staleTime: 1000 * 60, // 1분
       suspense: true,
       useErrorBoundary: true,
@@ -73,7 +72,6 @@ export function App() {
 
 function Init() {
   const login = useUser((state) => state.login);
-  const socket = useContext(SocketContext);
 
   useQuery({
     queryKey: ['health-check'],
@@ -83,10 +81,7 @@ function Init() {
   useQuery({
     queryKey: ['whoami'],
     queryFn: whoami,
-    onSuccess: (data) => {
-      socket.connect();
-      login(data);
-    },
+    onSuccess: (data) => login(data),
     refetchInterval: false,
     refetchOnWindowFocus: false,
     useErrorBoundary: false,

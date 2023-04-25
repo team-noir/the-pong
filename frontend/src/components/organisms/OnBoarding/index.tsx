@@ -40,6 +40,7 @@ export default function OnBoarding({ onSubmit }: Props) {
   });
 
   useEffect(() => {
+    if (!formData.nickname) return;
     checkProfileMutation.mutate({ nickname: formData.nickname });
   }, [formData.nickname]);
 
