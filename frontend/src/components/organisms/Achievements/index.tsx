@@ -8,10 +8,20 @@ interface Props {
 }
 
 export default function Achievements({ userId }: Props) {
-  const { data: achievements } = useQuery<AchievementType[]>({
+  const { data: achievements, isSuccess } = useQuery<AchievementType[]>({
     queryKey: ['getAchievements', userId],
     queryFn: () => getAchievements(userId),
   });
 
-  return <>{achievements && <AchievementList achievements={achievements} />}</>;
+  return (
+    <>
+      {isSuccess && achievements.length > 0 ? (
+        <AchievementList achievements={achievements} />
+      ) : (
+        <p className="block mt-4 text-center text-gray">
+          게임을 플레이하고 업적을 달성해보세요.
+        </p>
+      )}
+    </>
+  );
 }
