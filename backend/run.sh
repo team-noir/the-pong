@@ -1,3 +1,3 @@
-yarn prisma migrate dev --name=thepong --preview-feature
-yarn build
+yarn prisma:migrate
 yarn start
+

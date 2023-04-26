@@ -140,4 +140,67 @@ export class UsersService {
       mimetype: `image/${ext}`,
     };
   }
+
+  /** Achievements */
+
+  async getAchievements(userId: number) {
+    return await this.prismaService.achievement_User
+      .findMany({
+        where: {
+          userId,
+        },
+        select: {
+          id: true,
+          achievement: {
+            select: {
+              title: true,
+              condition: true,
+              description: true,
+            },
+          },
+          createdAt: true,
+        },
+      })
+      .then((achievements) =>
+        achievements.map((achievement) => ({
+          id: achievement.id,
+          title: achievement.achievement.title,
+          condition: achievement.achievement.condition,
+          description: achievement.achievement.description,
+          createdAt: achievement.createdAt,
+        }))
+      );
+  }
+
+  async addAchievement(userId: number, achievementId: number) {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const achievement = await this.prismaService.achievement.findUnique({
+      where: {
+        id: achievementId,
+      },
+    });
+    if (!achievement) {
+      throw new Error('Achievement not found');
+    }
+    return await this.prismaService.achievement_User.upsert({
+      where: {
+        unique: {
+          userId,
+          achievementId,
+        },
+      },
+      update: {},
+      create: {
+        userId,
+        achievementId,
+      },
+    });
+  }
 }
