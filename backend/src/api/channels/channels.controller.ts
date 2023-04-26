@@ -193,7 +193,7 @@ export class ChannelsController {
     }
   }
 
-  @Delete(':channelId')
+  @Delete(':channelId/users')
   @ApiOperation({ summary: 'Leave channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
