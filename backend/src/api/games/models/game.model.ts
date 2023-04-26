@@ -159,8 +159,7 @@ export class GameModel implements OnModuleInit {
     }
 
     const blocks = [];
-    for (const blocked of data.blockers) {
-      console.log(blocked);
+    for (const blocked of data.blockeds) {
       blocks.push(blocked.blockedId);
     }
 
