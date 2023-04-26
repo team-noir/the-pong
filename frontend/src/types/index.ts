@@ -9,11 +9,8 @@ export interface UserType {
   isTwoFactor?: boolean;
   isVerifiedTwoFactor?: boolean;
   status?: UserStatus;
-  achievements?: [];
-  games?: [];
   isFollowedByMyself?: boolean;
   isBlockedByMyself?: boolean;
-  createdAt?: string;
 }
 
 export const USER_ROLES = {
