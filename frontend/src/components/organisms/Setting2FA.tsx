@@ -107,7 +107,7 @@ export default function Setting2FA() {
                   <li>
                     1. 2FA 보안 설정 페이지의 <em>설정하기</em> 버튼 클릭
                   </li>
-                  <li>2. 인증 앱에서 QR 코드 스캔 혹은 인증 코드 입력</li>
+                  <li>2. 인증 앱에서 QR 코드 스캔 혹은 설정 키 입력</li>
                   <li>3. 인증 앱이 생성하는 6자리 인증 코드 입력</li>
                 </ol>
                 <p className="mt-2">
