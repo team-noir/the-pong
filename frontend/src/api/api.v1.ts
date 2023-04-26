@@ -354,7 +354,9 @@ export const updateChannelUserStatus = async ({
 };
 
 export const leaveChannel = async (channelId: number) => {
-  const res = await axiosWithInterceptors.delete(`/channels/${channelId}`);
+  const res = await axiosWithInterceptors.delete(
+    `/channels/${channelId}/users`
+  );
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }
