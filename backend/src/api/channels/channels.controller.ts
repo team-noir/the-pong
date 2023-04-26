@@ -155,7 +155,7 @@ export class ChannelsController {
     }
   }
 
-  @Post(':channelId')
+  @Put(':channelId')
   @ApiOperation({ summary: 'Join channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
