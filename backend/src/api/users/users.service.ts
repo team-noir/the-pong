@@ -80,8 +80,6 @@ export class UsersService {
             id: user.id,
             nickname: user.nickname,
             level: user.level,
-            achievements: [],
-            games: [],
             isFollowedByMyself: await this.checkFollowed(myUserId, user.id),
             isBlockedByMyself: await this.checkBlocked(myUserId, user.id),
           }))
@@ -111,8 +109,6 @@ export class UsersService {
       id: user.id,
       nickname: user.nickname,
       level: user.level,
-      achievements: [],
-      games: [],
       isFollowedByMyself: await this.checkFollowed(myUserId, userId),
       isBlockedByMyself: await this.checkBlocked(myUserId, userId),
     };

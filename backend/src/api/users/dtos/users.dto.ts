@@ -21,11 +21,4 @@ export class UserDto {
   @ApiProperty()
   @IsBoolean()
   public isBlockedByMyself: boolean;
-
-  // TODO: Type of achievements and games
-  @ApiProperty()
-  public achievements: any[];
-
-  @ApiProperty()
-  public games: any[];
 }
