@@ -7,7 +7,7 @@ interface UserState {
   isOnboarded: boolean;
   id: number | null;
   nickname: string;
-  rank: number;
+  level: number;
   isTwoFactor: boolean;
   isVerifiedTwoFactor: boolean;
   login: (user: UserType) => void;
@@ -23,7 +23,7 @@ const initialState = {
   isOnboarded: false,
   id: null,
   nickname: '',
-  rank: 0,
+  level: 1,
   isTwoFactor: false,
   isVerifiedTwoFactor: false,
 };
@@ -34,7 +34,7 @@ export const useUser = create<UserState>()(
     login: ({
       id,
       nickname,
-      rank,
+      level,
       isTwoFactor,
       isVerifiedTwoFactor,
     }: UserType) =>
@@ -43,7 +43,7 @@ export const useUser = create<UserState>()(
         isOnboarded: !!nickname,
         id,
         nickname,
-        rank,
+        level,
         isTwoFactor,
         isVerifiedTwoFactor,
       })),
