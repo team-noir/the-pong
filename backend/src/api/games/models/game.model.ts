@@ -7,6 +7,7 @@ import { Socket } from 'socket.io';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
+import { GAME_MODES, GAME_THEMES } from '@const';
 
 type gameId = number;
 type playerId = number;

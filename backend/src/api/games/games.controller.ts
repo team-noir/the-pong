@@ -225,6 +225,24 @@ export class GamesController {
 	}
 	
 
+	@Get(':gameId')
+	@ApiOperation({ summary: 'Get game information.' })
+	@UseGuards(AuthenticatedGuard)
+	async getGameInfo(
+		@Req() req,
+		@Param('gameId') gameId: number,
+		@Res({ passthrough: true }) res
+	) {
+		try {
+			const userId = req.user.id;
+			const gameInfo = await this.gamesService.getGameInfo(userId, gameId);
+			res.status(HttpStatus.OK);
+			return gameInfo;
+		} catch (error) {
+			throw new HttpException(error.message, error.code);
+		}
+	}
+	
 	
 
 }

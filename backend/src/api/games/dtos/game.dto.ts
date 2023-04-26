@@ -71,6 +71,32 @@ export class Game {
 		});
 		return false;
 	}
+
+	getGameInfo() {
+		return {
+			id: this.gameId,
+			players: this.getPlayersInfo(),
+			mode: GAME_MODES[this.getMode()],
+			theme: GAME_THEMES[this.getTheme()],
+			viewerCount: this.getViewerCount(),
+			isLadder: this.isLadder,
+			createdAt: this.createdAt,
+		}
+	}
+
+	getPlayersInfo() {
+		const playersInfo = [];
+
+		this.players.forEach((player) => {
+			playersInfo.push({
+				id: player.userId,
+				nickname: player.username,
+				level: player.level,
+				isOwner: player.userId == this.ownerId,
+				score: this.score.get(player.userId),
+			});
+		}
+	}
 	
 	hasViewer(tarPlayer: Player) : boolean {
 		this.viewers.forEach((player) => {
@@ -79,6 +105,10 @@ export class Game {
 			}
 		});
 		return false;
+	}
+
+	getViewerCount() : number {
+		return this.viewers.length;
 	}
 
 	getMode() {
