@@ -71,7 +71,7 @@ export class UsersService {
         select: {
           id: true,
           nickname: true,
-          rank: true,
+          level: true,
         },
       })
       .then((users) =>
@@ -79,7 +79,7 @@ export class UsersService {
           users.map(async (user) => ({
             id: user.id,
             nickname: user.nickname,
-            rank: user.rank,
+            level: user.level,
             achievements: [],
             games: [],
             isFollowedByMyself: await this.checkFollowed(myUserId, user.id),
@@ -100,7 +100,7 @@ export class UsersService {
       select: {
         id: true,
         nickname: true,
-        rank: true,
+        level: true,
       },
     });
     if (!user) {
@@ -110,7 +110,7 @@ export class UsersService {
     return {
       id: user.id,
       nickname: user.nickname,
-      rank: user.rank,
+      level: user.level,
       achievements: [],
       games: [],
       isFollowedByMyself: await this.checkFollowed(myUserId, userId),

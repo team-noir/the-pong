@@ -12,7 +12,7 @@ export class UserDto {
 
   @ApiProperty()
   @IsNumber()
-  public rank: number;
+  public level: number;
 
   @ApiProperty()
   @IsBoolean()

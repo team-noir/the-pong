@@ -12,7 +12,7 @@ export class MyDto {
 
   @ApiProperty()
   @IsNumber()
-  public rank: number;
+  public level: number;
 
   @ApiProperty()
   @IsBoolean()
