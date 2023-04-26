@@ -1,24 +1,8 @@
 import { useContext, useEffect, useRef, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import useGameRTC from 'hooks/useGameRTC';
 import { SocketContext } from 'contexts/socket';
-import { GameResultType, PlayerType } from 'types';
-
-const dummyResult: GameResultType = {
-  id: 1,
-  winner: {
-    id: 1,
-    nickname: 'Nickname1',
-    level: 1,
-    score: 11,
-  },
-  loser: {
-    id: 101,
-    nickname: 'Nickname2',
-    level: 3,
-    score: 9,
-  },
-  createdAt: '2023-04-07T00:00:00.000Z',
-};
+import { GameResultType, GameType, PlayerType } from 'types';
 
 type ReturnType = [
   ball: typeof initialState.ball,
@@ -46,6 +30,7 @@ export default function useGamePlay(
   const [count, setCount] = useState(3);
   const [result, setResult] = useState<GameResultType | null>(null);
   const socket = useContext(SocketContext);
+  const queryClient = useQueryClient();
 
   const animationFrame = useRef<number | null>(null);
   const isMyKeyDown = useRef({ left: false, right: false });
@@ -66,18 +51,30 @@ export default function useGamePlay(
       socket.emit('pong');
     });
 
-    socket.on('gameViewer', () => {
-      // TODO: 게임 쿼리 수정
+    socket.on('gameViewer', (data: { viwerCount: number }) => {
+      queryClient.setQueryData<GameType>(
+        ['game', gameId],
+        (prevData) =>
+          prevData && {
+            ...prevData,
+            viewerCount: data.viwerCount,
+          }
+      );
     });
 
-    socket.on('roundOver', (data: PlayerType) => {
-      // TODO: 게임 쿼리 수정
-      // setGame((prev) => ({
-      //   ...prev,
-      //   players: prev.players.map((player) =>
-      //     player.id === data.id ? { ...player, score: data.score } : player
-      //   ),
-      // }));
+    socket.on('roundOver', (data: { winnerId: number; score: number }) => {
+      const { winnerId, score } = data;
+      queryClient.setQueryData<GameType>(
+        ['game', gameId],
+        (prevData) =>
+          prevData &&
+          ({
+            ...prevData,
+            players: prevData.players.map((player) =>
+              player.id === winnerId ? { ...player, score } : player
+            ),
+          } as GameType)
+      );
     });
 
     socket.on('gameOver', (data: GameResultType) => {

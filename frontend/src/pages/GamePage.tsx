@@ -1,37 +1,13 @@
 import { useState, useEffect, useContext } from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { getGame } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 import AppTemplate from 'components/templates/AppTemplate';
 import Game from 'components/organisms/Game';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import AchievementModal from 'components/molecule/AchievementModal';
-import { GameType, AchievementType } from 'types';
-
-// TODO: 나중에 삭제
-const dummyGame: GameType = {
-  id: 1,
-  players: [
-    {
-      id: 1,
-      nickname: 'Nickname1',
-      level: 1,
-      score: 0,
-      isOwner: true,
-    },
-    {
-      id: 101,
-      nickname: 'Nickname2',
-      level: 3,
-      score: 0,
-      isOwner: false,
-    },
-  ],
-  mode: 0,
-  theme: 1,
-  viewerCount: 42,
-  isLadder: false,
-  createdAt: '2023-04-07T00:00:00.000Z',
-};
+import { AchievementType } from 'types';
 
 const dummyAchievements: AchievementType[] = [
   {
@@ -54,8 +30,10 @@ export default function GamePage() {
   const { gameId } = useParams() as { gameId: string };
   const socket = useContext(SocketContext);
 
-  // TODO: 게임 정보 가져오기
-  const [game, setGame] = useState<GameType>(dummyGame);
+  const { data: game } = useQuery({
+    queryKey: ['game', gameId],
+    queryFn: () => getGame(Number(gameId)),
+  });
 
   const [achievements, setAchievements] = useState<AchievementType[] | null>(
     null
@@ -108,7 +86,7 @@ export default function GamePage() {
             }}
           />
         ))}
-      <Game game={game} />
+      {game && <Game game={game} />}
     </AppTemplate>
   );
 }
