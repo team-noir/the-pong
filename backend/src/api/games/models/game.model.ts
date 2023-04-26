@@ -69,6 +69,25 @@ export class GameModel implements OnModuleInit {
 
     return this.games.get(gameId);
   }
+  
+  getGameList() {
+	const gamelist = [];
+
+	for (const game of this.games.values()) {
+		const { gameId, isLadder, players, createdAt } = game;
+
+		gamelist.push({
+			id: gameId,
+			players: players.map((player) => {
+				return {id: player.userId, nickname: player.username, level: player.game}
+			}),
+			viewerCount: game.getViewerCount(),
+			isLadder: isLadder,
+			createdAt: createdAt,
+		});
+	}
+	return gamelist;
+  }
 
   setGame(game: Game) {
     this.games.set(game.gameId, game);
