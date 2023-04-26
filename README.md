@@ -45,5 +45,8 @@ $ docker compose -f docker-compose-dev.yml --env-file .env.development build --n
 $ docker compose -f docker-compose-dev.yml --env-file .env.development up -d
 ```
 
-- frontend: http://localhost:8080
-- backend: http://localhost:8080/api
+- Frontend: http://localhost:8080
+- Backend API: http://localhost:8080/api
+- Backend API Docs(Swagger): http://localhost:8080/api/docs
+- Backend socket.io: http://localhost:8080/socket.io
+- Database GUI(Prisma studio): http://localhost:5555

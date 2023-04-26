@@ -10,6 +10,7 @@
     "prisma:migrate": "yarn pnpify prisma migrate dev --name=thepong --preview-feature --schema prisma/schema.prisma",
     "prisma:seed": "yarn pnpify prisma db seed",
     "prisma:generate": "yarn pnpify prisma generate",
+    "prisma:studio": "yarn pnpify prisma studio --port=5555",
     "prebuild": "yarn prisma:generate && yarn prisma:seed",
     "build": "yarn prebuild && nest build && yarn tsc",
     "start": "yarn build && nest start",
