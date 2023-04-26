@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
+import useGameRTC from 'hooks/useGameRTC';
 import { SocketContext } from 'contexts/socket';
 import { GameResultType, PlayerType } from 'types';
 
@@ -20,9 +21,8 @@ const dummyResult: GameResultType = {
 };
 
 type ReturnType = [
-  ball: { x: number; y: number; r: number },
-  paddleUp: { x: number; y: number; w: number; h: number },
-  paddleDown: { x: number; y: number; w: number; h: number },
+  ball: typeof initialState.ball,
+  paddles: typeof initialState.paddles,
   stageSize: number,
   isPlaying: boolean,
   count: number | null,
@@ -32,40 +32,45 @@ type ReturnType = [
 ];
 
 export default function useGamePlay(
+  gameId: number,
   amIViewer: boolean,
   amIOwner: boolean | undefined,
-  sectionRef: React.RefObject<HTMLElement>,
-  myPlayer?: PlayerType,
-  otherPlayer?: PlayerType
+  containerRef: React.RefObject<HTMLElement>,
+  myPlayer: PlayerType | undefined,
+  otherPlayer: PlayerType | undefined
 ): ReturnType {
   const [ball, setBall] = useState(initialState.ball);
-  const [paddleUp, setPaddleUp] = useState(initialState.paddleUp);
-  const [paddleDown, setPaddleDown] = useState(initialState.paddleDown);
-  const [ballDelta, setBallDelta] = useState(initialState.ballDelta);
+  const [paddles, setPaddles] = useState(initialState.paddles);
+  const [stageSize, setStageSize] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [count, setCount] = useState(3);
-  const [stageSize, setStageSize] = useState(0);
   const [result, setResult] = useState<GameResultType | null>(null);
   const socket = useContext(SocketContext);
 
-  const interval = useRef<NodeJS.Timer | null>(null);
   const animationFrame = useRef<number | null>(null);
   const isMyKeyDown = useRef({ left: false, right: false });
   const isOtherKeyDown = useRef({ left: false, right: false });
 
+  const [dataChannelRef] = useGameRTC(
+    gameId,
+    amIOwner,
+    count,
+    setCount,
+    isPlaying,
+    setIsPlaying,
+    isOtherKeyDown
+  );
+
   useEffect(() => {
-    // TODO: 아래 테스트용 코드 지우기
-    // setResult(dummyResult);
-    socket.on('gameStart', () => {
-      interval.current = setInterval(
-        () => setCount((prevState) => prevState - 1),
-        1000
-      );
-      return () => {
-        interval.current && clearInterval(interval.current!);
-      };
+    socket.on('ping', () => {
+      socket.emit('pong');
     });
-    socket.on('gameScore', (data: PlayerType) => {
+
+    socket.on('gameViewer', () => {
+      // TODO: 게임 쿼리 수정
+    });
+
+    socket.on('roundOver', (data: PlayerType) => {
       // TODO: 게임 쿼리 수정
       // setGame((prev) => ({
       //   ...prev,
@@ -74,36 +79,29 @@ export default function useGamePlay(
       //   ),
       // }));
     });
-    socket.on('gameResult', (data: GameResultType) => {
+
+    socket.on('gameOver', (data: GameResultType) => {
       setResult(data);
     });
 
     if (amIViewer) return;
-    socket.on('ping', () => {
-      socket.emit('pong');
-    });
     document.addEventListener('keydown', handleKeyDown);
     document.addEventListener('keyup', handleKeyUp);
+
     return () => {
       socket.off('ping');
-      socket.off('gameScore');
-      socket.off('gameResult');
+      socket.off('roundOver');
+      socket.off('gameOver');
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
   useEffect(() => {
-    if (count > 0) return;
-    clearInterval(interval.current!);
-    setIsPlaying(true);
-  }, [count]);
-
-  useEffect(() => {
     handleScreenResize();
     window.addEventListener('resize', handleScreenResize);
     return () => window.removeEventListener('resize', handleScreenResize);
-  }, [sectionRef.current]);
+  }, [containerRef.current]);
 
   useEffect(() => {
     if (amIViewer || !amIOwner) return;
@@ -111,9 +109,7 @@ export default function useGamePlay(
       setIsPlaying(false);
     } else {
       setBall(initialState.ball);
-      setPaddleUp(initialState.paddleUp);
-      setPaddleDown(initialState.paddleDown);
-      setBallDelta(initialState.ballDelta);
+      setPaddles(initialState.paddles);
     }
   }, [myPlayer?.score, otherPlayer?.score]);
 
@@ -129,23 +125,20 @@ export default function useGamePlay(
   const drawBall = () => {
     if (ball.y === ball.r || ball.y === ballLimit) {
       const player = ball.y === ball.r ? myPlayer : otherPlayer;
-      socket.emit('gameScore', {
-        player: {
-          id: player?.id,
-          score: player?.score && player.score + 1,
-        },
+      socket.emit('roundOver', {
+        winnerId: player?.id,
       });
       return;
     }
 
-    let dx = ballDelta.x;
-    let dy = ballDelta.y;
+    let dx = ball.dx;
+    let dy = ball.dy;
     let ballX = ball.x + dx;
     let ballY = ball.y + dy;
 
-    const isUp = ballY <= paddleUp.y + paddleSize.h + ball.r;
-    const isDown = ballY >= paddleDown.y - ball.r;
-    const paddle = isDown ? paddleDown : paddleUp;
+    const isUp = ballY <= paddles.up.y + paddleSize.h + ball.r;
+    const isDown = ballY >= paddles.down.y - ball.r;
+    const paddle = isDown ? paddles.down : paddles.up;
     const isBetweenPaddleX =
       ballX >= paddle.x - ball.r && ballX <= paddle.x + paddleSize.w + ball.r;
     if ((isUp || isDown) && isBetweenPaddleX) {
@@ -190,56 +183,62 @@ export default function useGamePlay(
       ...prevState,
       x: ballX,
       y: ballY,
+      dx,
+      dy,
     }));
-    setBallDelta({
-      x: dx,
-      y: dy,
-    });
   };
 
-  const drawPaddleUp = () => {
-    if (isOtherKeyDown.current.left) {
-      const nextX = paddleUp.x - paddleDeltaX;
-      setPaddleUp((prevState) => ({
-        ...prevState,
-        x: nextX < 0 ? 0 : nextX,
-      }));
-    }
-    if (isOtherKeyDown.current.right) {
-      const nextX = paddleUp.x + paddleDeltaX;
-      setPaddleUp((prevState) => ({
-        ...prevState,
-        x: nextX > paddleLimitX ? paddleLimitX : nextX,
-      }));
-    }
-  };
-
-  const drawPaddleDown = () => {
+  const drawPaddles = () => {
     if (isMyKeyDown.current.left) {
-      const nextX = paddleDown.x - paddleDeltaX;
-      setPaddleDown((prevState) => ({
+      const nextX = paddles.down.x - paddleDeltaX;
+      setPaddles((prevState) => ({
         ...prevState,
-        x: nextX < 0 ? 0 : nextX,
+        down: {
+          ...prevState.down,
+          x: nextX < 0 ? 0 : nextX,
+        },
       }));
     }
     if (isMyKeyDown.current.right) {
-      const nextX = paddleDown.x + paddleDeltaX;
-      setPaddleDown((prevState) => ({
+      const nextX = paddles.down.x + paddleDeltaX;
+      setPaddles((prevState) => ({
         ...prevState,
-        x: nextX > paddleLimitX ? paddleLimitX : nextX,
+        down: {
+          ...prevState.down,
+          x: nextX > paddleLimitX ? paddleLimitX : nextX,
+        },
+      }));
+    }
+    if (isOtherKeyDown.current.left) {
+      const nextX = paddles.up.x - paddleDeltaX;
+      setPaddles((prevState) => ({
+        ...prevState,
+        up: {
+          ...prevState.up,
+          x: nextX < 0 ? 0 : nextX,
+        },
+      }));
+    }
+    if (isOtherKeyDown.current.right) {
+      const nextX = paddles.up.x + paddleDeltaX;
+      setPaddles((prevState) => ({
+        ...prevState,
+        up: {
+          ...prevState.up,
+          x: nextX > paddleLimitX ? paddleLimitX : nextX,
+        },
       }));
     }
   };
 
   const draw = () => {
-    drawPaddleUp();
-    drawPaddleDown();
+    drawPaddles();
     drawBall();
   };
 
   const handleScreenResize = () => {
-    if (!sectionRef.current) return;
-    setStageSize(sectionRef.current.clientWidth);
+    if (!containerRef.current) return;
+    setStageSize(containerRef.current.clientWidth);
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
@@ -247,14 +246,14 @@ export default function useGamePlay(
       if (amIOwner) {
         isMyKeyDown.current.left = true;
       } else {
-        // TODO: keydown 이벤트 보내기
+        dataChannelRef.current?.send('DL');
       }
     }
     if (e.key === 'ArrowRight') {
       if (amIOwner) {
         isMyKeyDown.current.right = true;
       } else {
-        // TODO: keydown 이벤트 보내기
+        dataChannelRef.current?.send('DR');
       }
     }
   };
@@ -264,14 +263,14 @@ export default function useGamePlay(
       if (amIOwner) {
         isMyKeyDown.current.left = false;
       } else {
-        // TODO: keydown 이벤트 보내기
+        dataChannelRef.current?.send('UL');
       }
     }
     if (e.key === 'ArrowRight') {
       if (amIOwner) {
         isMyKeyDown.current.right = false;
       } else {
-        // TODO: keydown 이벤트 보내기
+        dataChannelRef.current?.send('UR');
       }
     }
   };
@@ -282,14 +281,14 @@ export default function useGamePlay(
       if (amIOwner) {
         isMyKeyDown.current.left = true;
       } else {
-        // TODO: keydown 이벤트 보내기
+        dataChannelRef.current?.send('DL');
       }
     }
     if (value === 'right') {
       if (amIOwner) {
         isMyKeyDown.current.right = true;
       } else {
-        // TODO: keydown 이벤트 보내기
+        dataChannelRef.current?.send('DR');
       }
     }
   };
@@ -300,22 +299,21 @@ export default function useGamePlay(
       if (amIOwner) {
         isMyKeyDown.current.left = false;
       } else {
-        // TODO: keydown 이벤트 보내기
+        dataChannelRef.current?.send('UL');
       }
     }
     if (value === 'right') {
       if (amIOwner) {
         isMyKeyDown.current.right = false;
       } else {
-        // TODO: keydown 이벤트 보내기
+        dataChannelRef.current?.send('UR');
       }
     }
   };
 
   return [
     ball,
-    paddleUp,
-    paddleDown,
+    paddles,
     stageSize,
     isPlaying,
     count,
@@ -335,20 +333,23 @@ const initialState = {
     x: 0.5,
     y: 0.5,
     r: 0.025,
+    dx: 0.004,
+    dy: 0.005,
   },
-  paddleUp: {
-    x: 0.5 - paddleSize.w / 2,
-    y: 0.1 - paddleSize.h,
-    w: paddleSize.w,
-    h: paddleSize.h,
+  paddles: {
+    up: {
+      x: 0.5 - paddleSize.w / 2,
+      y: 0.1 - paddleSize.h,
+      w: paddleSize.w,
+      h: paddleSize.h,
+    },
+    down: {
+      x: 0.5 - paddleSize.w / 2,
+      y: 0.9,
+      w: paddleSize.w,
+      h: paddleSize.h,
+    },
   },
-  paddleDown: {
-    x: 0.5 - paddleSize.w / 2,
-    y: 0.9,
-    w: paddleSize.w,
-    h: paddleSize.h,
-  },
-  ballDelta: { x: 0.003, y: 0.004 },
 };
 
 const ballLimit = 1 - initialState.ball.r;

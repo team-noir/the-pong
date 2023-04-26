@@ -21,27 +21,34 @@ interface Props {
 
 export default function Game({ game }: Props) {
   const myUserId = useUser((state) => state.id);
-  const sectionRef = useRef<HTMLElement>(null);
+  const containerRef = useRef<HTMLElement>(null);
 
   const amIViewer = !game.players.some((player) => player.id === myUserId);
   const myPlayer = game.players.find((player) => player.id === myUserId);
-  const otherPlayer = game.players.find((player) => player.id !== myUserId);
+  const otherPlayer =
+    myPlayer && game.players.find((player) => player.id !== myUserId);
   const amIOwner = !amIViewer && myPlayer?.isOwner;
 
   const [
     ball,
-    paddleUp,
-    paddleDown,
+    paddles,
     stageSize,
     isPlaying,
     count,
     handleMouseDown,
     handleMouseUp,
     result,
-  ] = useGamePlay(amIViewer, amIOwner, sectionRef, myPlayer, otherPlayer);
+  ] = useGamePlay(
+    game.id,
+    amIViewer,
+    amIOwner,
+    containerRef,
+    myPlayer,
+    otherPlayer
+  );
 
   return (
-    <section ref={sectionRef}>
+    <section ref={containerRef}>
       <div className="text-center">
         <GameScoretable
           player1={otherPlayer || game.players[0]}
@@ -64,17 +71,17 @@ export default function Game({ game }: Props) {
                 color="black"
               />
               <Paddle
-                x={paddleUp.x * stageSize}
-                y={paddleUp.y * stageSize}
-                width={paddleUp.w * stageSize}
-                height={paddleUp.h * stageSize}
+                x={paddles.up.x * stageSize}
+                y={paddles.up.y * stageSize}
+                width={paddles.up.w * stageSize}
+                height={paddles.up.h * stageSize}
                 color="red"
               />
               <Paddle
-                x={paddleDown.x * stageSize}
-                y={paddleDown.y * stageSize}
-                width={paddleDown.w * stageSize}
-                height={paddleDown.h * stageSize}
+                x={paddles.down.x * stageSize}
+                y={paddles.down.y * stageSize}
+                width={paddles.down.w * stageSize}
+                height={paddles.down.h * stageSize}
                 color="green"
               />
             </Layer>
