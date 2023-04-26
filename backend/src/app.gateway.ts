@@ -127,7 +127,7 @@ export class AppGateway
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     const userInfo = this.getUserInfoFromSocket(socket);
     if (!userInfo || !userInfo.userId || !userInfo.username) {
-      return;
+      return;   
     }
 
     const logged = this.channelsService.userModel.getUser(userInfo.userId);
@@ -136,6 +136,24 @@ export class AppGateway
   }
 
   // WebRTC Connection
+
+  @SubscribeMessage('rtcCandidate')
+  async rtcCandidate(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('candidate') candidate,
+    @MessageBody('candidateSendUserId') candidateSendUserId,
+    @MessageBody('candidateReceiveUserId') candidateReceiveUserId,
+  ) {
+    const sendSocket = this.getUserSocket(candidateSendUserId);
+    const receiveSocket = this.getUserSocket(candidateReceiveUserId);
+
+    socket
+    .to(receiveSocket.id)
+    .emit('rtcGetCandidate', {
+      candidate: candidate, 
+      candidateSendID: sendSocket.id
+    });
+  }
 
   @SubscribeMessage('rtcOffer')
   async rtcOffer(
@@ -170,24 +188,6 @@ export class AppGateway
     .emit('rtcGetAnswer', {
       sdp: sdp, 
       answerSendID: sendSocket.id,
-    });
-  }
-
-  @SubscribeMessage('rtcCandidate')
-  async rtcCandidate(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody('candidate') candidate,
-    @MessageBody('candidateSendUserId') candidateSendUserId,
-    @MessageBody('candidateReceiveUserId') candidateReceiveUserId,
-  ) {
-    const sendSocket = this.getUserSocket(candidateSendUserId);
-    const receiveSocket = this.getUserSocket(candidateReceiveUserId);
-
-    socket
-    .to(receiveSocket.id)
-    .emit('rtcGetCandidate', {
-      candidate: candidate, 
-      candidateSendID: sendSocket.id
     });
   }
 
@@ -316,6 +316,34 @@ export class AppGateway
       socket.emit('gameInvite', error);
     }
   }
+
+  @SubscribeMessage('rtcConnected')
+  async rtcConnected(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('gameId') gameId: number,
+  ) {
+    try {
+      const game = this.gamesService.gameModel.getGame(gameId);
+      await game.rtcConnected(socket.data.userId);
+    } catch (error) {
+      socket.emit('gameError', error);
+    }
+  }
+
+  @SubscribeMessage('roundOver')
+  async roundOver(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('gameId') gameId: number,
+    @MessageBody('winnerId') winnerId: number,
+  ) {
+    try {
+      const game = this.gamesService.gameModel.getGame(gameId);
+      await game.roundOver(winnerId);
+    } catch (error) {
+      await socket.emit('gameError', error);
+    }
+  }
+
 
   
 

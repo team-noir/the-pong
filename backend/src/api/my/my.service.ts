@@ -16,7 +16,7 @@ export class MyService {
     return {
       id: user.id,
       nickname: user.nickname,
-      rank: user.rank,
+      level: user.level,
       isTwoFactor: user.isTwoFactor,
       isVerifiedTwoFactor,
       ftUsername: user.ftUsername,

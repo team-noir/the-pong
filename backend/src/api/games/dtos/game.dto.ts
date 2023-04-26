@@ -12,10 +12,14 @@ export class Game {
 	mode: indexKey;
 	theme: indexKey;
 	createdAt: Date;
+	score: Map<userId, number>;
 
 	ownerId: number;
 	players: Player[];
+	viewers: Player[];
 	invitedId: userId;
+
+	countPlayer: number;
 
 	readyTimeout;
 
@@ -25,8 +29,22 @@ export class Game {
 		this.isStarted = false;
 		this.mode = 0;
 		this.theme = 0;
+		this.countPlayer = 0;
 		this.players = [];
+		this.viewers = [];
+		this.score = new Map<userId, number>();
 		this.createdAt = new Date();
+	}
+
+	async readyPlayer(player: Player) {
+		if (!this.hasPlayer(player)) { return }
+
+		this.countPlayer++;
+		if (this.countPlayer == 2) {
+			await this.players[0].socket.emit('rtcInit', { 
+				userId: this.players[1].userId,
+			});
+		}
 	}
 
 	getName() : string {
@@ -37,12 +55,25 @@ export class Game {
 		return this.players;
 	}
 
+	getOwner() : Player {
+		return this.players[0];
+	}
+
 	isFull() : boolean {
 		return (this.players.length > 1);
 	}
 
-	has(tarPlayer: Player) : boolean {
+	hasPlayer(tarPlayer: Player) : boolean {
 		this.players.forEach((player) => {
+			if (player.userId == tarPlayer.userId) {
+				return true;
+			}
+		});
+		return false;
+	}
+	
+	hasViewer(tarPlayer: Player) : boolean {
+		this.viewers.forEach((player) => {
 			if (player.userId == tarPlayer.userId) {
 				return true;
 			}
@@ -82,10 +113,25 @@ export class Game {
 
 	async setStart() {
 		this.isStarted = true;
+		this.score.set(this.players[0].userId, 0);
+		this.score.set(this.players[1].userId, 0);
 
 		await this.noticeToPlayers('gameSetting', {
 			text: 'done'
-		})
+		});
+	}
+
+	async roundOver(winnerId: number) {
+		this.score.set(winnerId, this.score.get(winnerId) + 1);
+
+		await this.noticeToPlayers('roundOver', {
+			winner: this.score.get(winnerId)
+		});
+		await this.noticeToPlayers('roundStart', {});
+	}
+
+	setScore(player: Player, score: number) {
+		this.score.set(player.userId, score);
 	}
 	
 	// Check isFull, isLadder, isBlocked
@@ -109,6 +155,16 @@ export class Game {
 			player.socket.emit('message', 'disconnected player');
 		};
 		this.players = [];
+	}
+
+	removeViewer(viewerId: number) {
+		this.viewers = this.viewers.filter((viewer) => {
+			if (viewer.userId == viewerId) {
+				viewer.socket.leave(this.getName());
+				return true;
+			}
+			return false;
+		});
 	}
 
 	clearGameRoomTimeout() {
@@ -135,7 +191,7 @@ export class Game {
 	}
 
 	leave(tarPlayer: Player): void {
-		if (this.has(tarPlayer)) {
+		if (this.hasPlayer(tarPlayer)) {
 			this.players.forEach((player) => {
 				player.socket.leave(this.getName());
 				
@@ -145,11 +201,42 @@ export class Game {
 		}
 	}
 
-	// socket 
+	getWinnerLoser(loserId?: number): { winner: Player, loser: Player } {
+		let winner, loser;
 
+		if (loser) {
+			if (loserId == this.players[0].userId) {
+				winner = this.players[1];
+			} else {
+				winner = this.players[0];
+			}
+		} else {
+			if (this.score.get(this.players[0].userId) 
+				> this.score.get(this.players[1].userId)
+			) {
+				winner = this.players[0];
+				loser = this.players[1];
+			} else {
+				winner = this.players[1];
+				loser = this.players[0];
+			}
+		}
+		return { winner, loser };
+	}
+
+	// Socket message
 	async noticeToPlayers(event: string, data) {
 		for (const player of this.players) {
 			await player.socket.emit(event, data);
 		}
+	}
+
+	// RTC
+	async rtcConnected(playerId: number) {
+		if (playerId != this.ownerId) { return; }
+		const owner = this.getOwner();
+		await owner.socket.emit('roundStart', {
+			// game data
+		});
 	}
 }

@@ -17,7 +17,9 @@ export class GameModel implements OnModuleInit {
 	private players = new Map<playerId, Player>();	
 	private invites = new Map<playerId, Game>();
 	private queue = new Array<gameId>();
+
 	private pongRecords = new Set<playerId>();
+	private readyRecords = new Set<playerId>();
 
 	private appGateway: AppGateway;
 	private readyTime = 60000;
@@ -33,16 +35,6 @@ export class GameModel implements OnModuleInit {
 
 	isPlayerInGame(playerId: number): boolean {
 		return this.players.has(playerId);
-	}
-
-	checkPlayersConnection() {
-		const playerIdList = [...this.players.keys()];
-		for (const playerId of playerIdList) {
-			if (!this.pongRecords.has(playerId)) {
-				this.disconnectPlayer(playerId);
-			}
-		};
-		this.pongRecords.clear();
 	}
 
 	setReadyTime(time: number) {
@@ -91,6 +83,43 @@ export class GameModel implements OnModuleInit {
 		this.invites.delete(invitedId);
 	}
 
+	async createGameResult(gameId: number, loserId?: number) {
+		const game = this.getGame(gameId);
+		const { winner, loser } = game.getWinnerLoser(loserId);
+		const winnerScore = game.score.get(winner.userId);
+		const loserScore = game.score.get(loser.userId);
+
+		const data = await this.prismaService.gameResult.create({
+			data: {
+				id: game.gameId,
+				isLadder: game.isLadder,
+				winnerId: winner.userId,
+				loserId: loser.userId,
+				winnerScore: winnerScore,
+				loserScore: loserScore,
+			},
+			select: {
+				id: true,
+				isLadder: true,
+				winner: { select: {
+					id: true,
+					nickname: true,
+					level: true,
+				}},
+				loser: { select: {
+					id: true,
+					nickname: true,
+					level: true,
+				}},
+				winnerScore: true,
+				loserScore: true,
+				createdAt: true,
+			}
+		});
+
+		return data;
+	}
+
 	async createPlayer(userId: number) {
 		if (!this.appGateway.isUserOnline(userId)) {
 			const code = HttpStatus.BAD_REQUEST;
@@ -107,7 +136,7 @@ export class GameModel implements OnModuleInit {
 			where: { id: userId },
 			select: {
 				nickname: true,
-				rank: true,
+				level: true,
 				blockeds: { select: { blockedId: true } }
 			}
 		});
@@ -123,7 +152,7 @@ export class GameModel implements OnModuleInit {
 			blocks.push(blocked.blockedId);
 		}
 
-		return new Player(userId, data.nickname, data.rank, socket, blocks);
+		return new Player(userId, data.nickname, data.level, socket, blocks);
 	}
 
 	getPlayer(playerId: number): Player {
@@ -213,9 +242,7 @@ export class GameModel implements OnModuleInit {
 		this.invites.delete(invitedId);
 		invitedSocket.emit('gameInvite', {
 			text: 'canceled'
-		})
-
-		this.removeGame(game);
+		});
 	}
 
 	findQueue(player: Player, isLadder: boolean) : Game | null {
@@ -253,15 +280,17 @@ export class GameModel implements OnModuleInit {
 	}
 
 	removeGame(game: Game) {
-		this.removePlayers(game);
-		this.removeQueue(game);
 		this.games.delete(game.gameId);
+		this.removePlayers(game);
+		this.removeInvitation(game);
+		this.removeQueue(game);
 		game.clearGameRoomTimeout();
 	}
 
 	disconnectPlayer(playerId: number) {
 		const player = this.players.get(playerId);
-		if (player.game) {
+
+		if (player && player.game) {
 			this.removeGame(player.game);
 		}
 	}
@@ -270,8 +299,6 @@ export class GameModel implements OnModuleInit {
 		if (this.players.size == 0) { return; }
 
 		this.checkPlayersConnection();
-		
-		// Send ping
 		const playerIdList = [...this.players.keys()];
 		playerIdList.forEach((playerId) => {
 			const player = this.players.get(playerId);
@@ -283,8 +310,42 @@ export class GameModel implements OnModuleInit {
 
 	receivePong(userId: number) {
 		if (userId) {
+			this.checkPlayersReady(userId);
 			this.pongRecords.add(userId);
 		}
 	}
+
+	checkPlayersConnection() {
+		const playerIdList = [...this.players.keys()];
+		for (const playerId of playerIdList) {
+			if (!this.pongRecords.has(playerId)) {
+				this.disconnectPlayer(playerId);
+			}
+		};
+		this.pongRecords.clear();
+	}
+
+	checkPlayersReady(userId: number) {
+		if (this.readyRecords.has(userId)) {
+			this.readyRecords.delete(userId);
+			const player = this.players.get(userId);
+			if (player) {
+				player.readyGame();
+			}
+		}
+	}
+
+	async gameStart(game: Game) {
+		this.removeQueue(game);
+		this.removeInvitation(game);
+		game.clearGameRoomTimeout();
+		game.setStart();
+
+		const playerIds = [...game.players.keys()];
+		playerIds.forEach((playerId) => {
+			this.readyRecords.add(playerId);
+		});
+	}
+
 
 }

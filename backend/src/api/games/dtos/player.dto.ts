@@ -36,6 +36,12 @@ export class Player {
 		return false;
 	}
 
+	readyGame() {
+		if (this.game) {
+			this.game.readyPlayer(this);
+		}
+	}
+
 	leaveGame() {
 		this.game = null;
 	}

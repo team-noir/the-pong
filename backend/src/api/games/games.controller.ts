@@ -203,6 +203,28 @@ export class GamesController {
 		}
 	}
 
+	@Delete(':gameId/users')
+	@ApiOperation({ summary: 'Leave the game.' })
+	@ApiNoContentResponse({ description: 'Leave the game.' })
+	@ApiBadRequestResponse({ description: 'This user is not in the game.' })
+	@ApiBadRequestResponse({ description: 'This game is not exist.' })
+	@ApiUnauthorizedResponse({ description: 'Unauthorized JWT' })
+	@UseGuards(AuthenticatedGuard)
+	async leaveGame(
+		@Req() req,
+		@Param('gameId') gameId: number,
+		@Res({ passthrough: true }) res
+	) {
+		try {
+			const userId = req.user.id;
+			await this.gamesService.leaveGame(userId, gameId);
+			res.status(HttpStatus.NO_CONTENT);
+		} catch (error) {
+			throw new HttpException(error.message, error.code);
+		}
+	}
+	
+
 	
 
 }

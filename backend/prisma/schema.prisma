@@ -15,7 +15,7 @@ model User {
   id                    Int           @id @default(autoincrement())
   imageUrl              String?
   nickname              String?       @unique
-  rank                  Int           @default(1)
+  level                  Int           @default(1)
   isTwoFactor           Boolean       @default(false)
   twoFactorSecret       String?
   ftId                  String        @unique
@@ -41,10 +41,11 @@ model User {
 
 model GameResult {
   id              Int       @id @default(autoincrement())
-  score           Int
   isLadder        Boolean
   winnerId        Int
   loserId         Int
+  winnerScore     Int
+  loserScore      Int
   createdAt       DateTime  @default(now())
 
   winner          User      @relation("WinLog", fields: [winnerId], references: [id])

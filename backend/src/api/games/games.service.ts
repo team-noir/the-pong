@@ -66,7 +66,7 @@ export class GamesService {
 		const game = player.game;
 
 		if (game) {
-			this.gameModel.removeInvitation(game);
+			this.gameModel.removeGame(game);
 		}
 	}
 
@@ -145,8 +145,19 @@ export class GamesService {
 			throw { code, message };
 		}
 
-		await game.setStart();
+		await this.gameModel.gameStart(game);
 	}
 
+	async leaveGame(userId: number, gameId: number) {
+		const player = this.gameModel.getPlayer(userId);
+		const game = this.gameModel.getGame(gameId);
+
+		if (game.hasPlayer(player)) {
+			await this.gameModel.createGameResult(game.gameId, player.userId);
+			this.gameModel.disconnectPlayer(player.userId);
+		} else if (game.hasViewer(player)) {
+			game.removeViewer(player.userId);
+		}
+	}
 
 }
