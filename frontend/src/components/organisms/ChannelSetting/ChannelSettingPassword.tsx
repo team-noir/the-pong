@@ -44,7 +44,7 @@ export default function ChannelSettingPassword({
       <h3 className="section-title">
         <h2>채널 비밀번호 수정</h2>
       </h3>
-      <div className="my-16">
+      <div className="mb-16">
         <div className="my-4 border border-gray-dark rounded">
           <CheckboxInputWithLabel
             id="password-check"

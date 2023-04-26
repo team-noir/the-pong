@@ -22,7 +22,9 @@ export default function AppTemplateWithoutHeader({ children }: Props) {
           )}
         >
           <Suspense fallback={<LoadingFallback />}>
-            <main className="container mx-auto max-w-xl">{children}</main>
+            <main className="container mx-auto max-w-xl min-h-screen">
+              {children}
+            </main>
           </Suspense>
         </ErrorBoundary>
       )}

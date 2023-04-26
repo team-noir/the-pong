@@ -35,12 +35,14 @@ export default function ChannelUserItem({
 
   const updateChannelUserRoleMutation = useMutation({
     mutationFn: updateChannelUserRole,
-    onSuccess: () => queryClient.invalidateQueries(['getChannel', channelId]),
+    onSuccess: () =>
+      queryClient.invalidateQueries(['getChannel', String(channelId)]),
   });
 
   const updateChannelUserStatusMutation = useMutation({
     mutationFn: updateChannelUserStatus,
-    onSuccess: () => queryClient.invalidateQueries(['getChannel', channelId]),
+    onSuccess: () =>
+      queryClient.invalidateQueries(['getChannel', String(channelId)]),
   });
 
   const handleClickRole = () => {
@@ -95,49 +97,49 @@ export default function ChannelUserItem({
         {!isSelf && (
           <div className="inline-flex items-center space-x-2">
             <GameInviteButton />
-          </div>
-        )}
-        {amIOwner && (
-          <>
-            {user.role === USER_ROLES.ADMIN ? (
-              <Button onClick={handleClickRole} primary size="small">
-                관리자 해제
-              </Button>
-            ) : (
-              <Button onClick={handleClickRole} primary size="small">
-                관리자 임명
-              </Button>
+            {amIOwner && (
+              <>
+                {user.role === USER_ROLES.ADMIN ? (
+                  <Button onClick={handleClickRole} primary size="small">
+                    관리자 해제
+                  </Button>
+                ) : (
+                  <Button onClick={handleClickRole} primary size="small">
+                    관리자 임명
+                  </Button>
+                )}
+              </>
             )}
-          </>
-        )}
-        {isShowSettingButtons && (
-          <>
-            <Button
-              value={CHANNEL_USER_STATUS.MUTE}
-              onClick={handleClickStatus}
-              secondary
-              size="small"
-            >
-              조용히
-            </Button>
-            <Button
-              value={CHANNEL_USER_STATUS.KICK}
-              onClick={handleClickStatus}
-              secondary
-              size="small"
-            >
-              내보내기
-            </Button>
-            <Button
-              value={CHANNEL_USER_STATUS.BAN}
-              onClick={handleClickStatus}
-              size="small"
-              linkStyle
-              className="text-red"
-            >
-              차단하기
-            </Button>{' '}
-          </>
+            {isShowSettingButtons && (
+              <>
+                <Button
+                  value={CHANNEL_USER_STATUS.MUTE}
+                  onClick={handleClickStatus}
+                  secondary
+                  size="small"
+                >
+                  조용히
+                </Button>
+                <Button
+                  value={CHANNEL_USER_STATUS.KICK}
+                  onClick={handleClickStatus}
+                  secondary
+                  size="small"
+                >
+                  내보내기
+                </Button>
+                <Button
+                  value={CHANNEL_USER_STATUS.BAN}
+                  onClick={handleClickStatus}
+                  size="small"
+                  linkStyle
+                  className="text-red"
+                >
+                  차단하기
+                </Button>{' '}
+              </>
+            )}
+          </div>
         )}
       </div>
     </li>

@@ -7,9 +7,11 @@
   "license": "UNLICENSED",
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
+    "prisma:migrate": "yarn pnpify prisma migrate dev --name=thepong --preview-feature --schema prisma/schema.prisma",
+    "prisma:seed": "yarn pnpify prisma db seed",
     "prisma:generate": "yarn pnpify prisma generate",
-    "prebuild": "yarn prisma:generate",
-    "build": "yarn prebuild && yarn tsc",
+    "prebuild": "yarn prisma:generate && yarn prisma:seed",
+    "build": "yarn prebuild && nest build && yarn tsc",
     "start": "yarn build && nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
@@ -107,7 +109,7 @@
     }
   },
   "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "packageManager": "yarn@3.4.1"
 }

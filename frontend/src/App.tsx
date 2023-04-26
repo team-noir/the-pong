@@ -1,4 +1,4 @@
-import { Suspense, useContext } from 'react';
+import { Suspense } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import {
   QueryClient,
@@ -14,14 +14,12 @@ import { socket, SocketContext } from 'contexts/socket';
 import LoadingFallback from 'components/organisms/LoadingFalback';
 import ErrorFallbackWithHeader from 'components/organisms/ErrorFallbackWithHeader';
 import { routes } from 'routes';
-import GameInviteModal from 'components/molecule/GameInviteModal';
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: false,
       refetchOnMount: 'always',
-      refetchInterval: 1000 * 60, // 1분
       staleTime: 1000 * 60, // 1분
       suspense: true,
       useErrorBoundary: true,
@@ -61,7 +59,6 @@ export function App() {
             >
               <Suspense fallback={<LoadingFallback />}>
                 <Init />
-                <GameInviteModal />
                 <RouterProvider router={router} />
               </Suspense>
             </ErrorBoundary>
@@ -75,7 +72,6 @@ export function App() {
 
 function Init() {
   const login = useUser((state) => state.login);
-  const socket = useContext(SocketContext);
 
   useQuery({
     queryKey: ['health-check'],
@@ -85,10 +81,7 @@ function Init() {
   useQuery({
     queryKey: ['whoami'],
     queryFn: whoami,
-    onSuccess: (data) => {
-      socket.connect();
-      login(data);
-    },
+    onSuccess: (data) => login(data),
     refetchInterval: false,
     refetchOnWindowFocus: false,
     useErrorBoundary: false,

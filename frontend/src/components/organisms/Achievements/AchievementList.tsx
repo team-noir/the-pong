@@ -7,7 +7,7 @@ interface Props {
 
 export default function AchievementList({ achievements }: Props) {
   return (
-    <ul>
+    <ul className="flex flex-col">
       {achievements &&
         achievements.map((achievement) => {
           return (

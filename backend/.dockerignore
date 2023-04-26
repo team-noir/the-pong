@@ -1,6 +1,8 @@
 prisma/*
 !prisma/schema.prisma
 !prisma/yarn.lock
+!prisma/seed.ts
 
 upload
 *.spec.ts
+dist

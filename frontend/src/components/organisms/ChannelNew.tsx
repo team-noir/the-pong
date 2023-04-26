@@ -66,7 +66,7 @@ export default function ChannelNew() {
         validate={validateChannelTitle}
         message="2자 이상 25자 이하로 입력해주세요."
       />
-      <div>
+      <div className="mb-6">
         <div className="inline-flex items-center mb-2 w-full border border-gray-dark rounded">
           <Button
             type="button"

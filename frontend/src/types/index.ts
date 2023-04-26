@@ -23,7 +23,7 @@ export const USER_ROLES = {
 } as const;
 
 /* eslint-disable */
-type UserRoleType = typeof USER_ROLES[keyof typeof USER_ROLES];
+type UserRoleType = (typeof USER_ROLES)[keyof typeof USER_ROLES];
 
 export type ChannelUserRoleType = 'admin' | 'normal';
 
@@ -35,7 +35,7 @@ export const CHANNEL_USER_STATUS = {
 
 /* eslint-disable */
 export type ChannelUserStatusType =
-  typeof CHANNEL_USER_STATUS[keyof typeof CHANNEL_USER_STATUS];
+  (typeof CHANNEL_USER_STATUS)[keyof typeof CHANNEL_USER_STATUS];
 
 export interface ChannelUserType extends UserType {
   role: UserRoleType;
@@ -52,6 +52,7 @@ export interface ProfileFormType {
 export interface AchievementType {
   id: number;
   title: string;
+  condition: string;
   description: string;
   createdAt: string;
 }
@@ -107,13 +108,13 @@ export interface PlayerType {
 }
 
 export interface GameHistoryPlayerType extends PlayerType {
-  score: number;
+  score?: number;
 }
 
 export interface GameType {
   id: number;
   players: PlayerType[];
-  mode: string;
+  mode: number;
   theme: number;
   viewerCount?: number;
   isLadder: boolean;
@@ -121,8 +122,8 @@ export interface GameType {
 }
 
 export interface GameSettingType extends GameType {
-  modes: string[];
-  themes: number[];
+  modeCount: number;
+  themeCount: number;
 }
 
 export interface GameResultType {

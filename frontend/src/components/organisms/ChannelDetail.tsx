@@ -49,37 +49,40 @@ export default function ChannelDetail({
 
   return (
     <Modal onClickClose={onClickClose}>
-      {isMyUserRoleOwner && (
-        <section className="section small">
-          <Button onClick={onClickSetting} primary fullLength>
-            채널 설정
-          </Button>
-        </section>
-      )}
-      <section className="section small">
-        <h3 className="section-title">참가자</h3>
-        {myUser && channelUsers && (
-          <ChannelUserList
-            channelId={channel.id}
-            myUser={myUser}
-            users={channelUsers}
-            imageSize={52}
-            isPrivate={channel.isPrivate}
-            onClickInvite={onClickInvite}
-          />
+      <div className="flex flex-col w-full">
+        {isMyUserRoleOwner && (
+          <section className="section small">
+            <Button onClick={onClickSetting} primary fullLength>
+              채널 설정
+            </Button>
+          </section>
         )}
-      </section>
-      <section className="section small">
-        <Button
-          onClick={onClickLeave}
-          linkStyle
-          size="small"
-          className="text-red"
-          fullLength
-        >
-          {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
-        </Button>
-      </section>
+        <section className="section small">
+          <h3 className="section-title">참가자</h3>
+          {myUser && channelUsers && (
+            <ChannelUserList
+              channelId={channel.id}
+              myUser={myUser}
+              users={channelUsers}
+              imageSize={52}
+              isPrivate={channel.isPrivate}
+              onClickInvite={onClickInvite}
+            />
+          )}
+        </section>
+        {!channel.isDm && (
+          <section className="section small text-center">
+            <Button
+              onClick={onClickLeave}
+              linkStyle
+              size="small"
+              className="text-red"
+            >
+              {isMyUserRoleOwner ? '채널 삭제' : '채널 나가기'}
+            </Button>
+          </section>
+        )}
+      </div>
     </Modal>
   );
 }

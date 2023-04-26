@@ -25,7 +25,7 @@ const dummyGame: GameType = {
       level: 3,
     },
   ],
-  mode: 'normal',
+  mode: 0,
   theme: 1,
   viewerCount: 42,
   isLadder: false,
@@ -53,12 +53,14 @@ const dummyAchievements: AchievementType[] = [
   {
     id: 1,
     title: '업적 제목1',
+    condition: '업적1 조건입니다.',
     description: '업적1 설명입니다.',
     createdAt: '2023-04-07T00:00:00.000Z',
   },
   {
     id: 2,
     title: '업적 제목2',
+    condition: '업적2 조건입니다.',
     description: '업적2 설명입니다.',
     createdAt: '2023-04-07T00:00:00.000Z',
   },

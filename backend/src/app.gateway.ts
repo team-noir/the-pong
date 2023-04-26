@@ -111,11 +111,16 @@ export class AppGateway
 
     if (this.isUserOnline(userId)) {
       this.channelsService.userModel.resetUserSocket(userId, socket);
+      this.gamesService.gameModel.resetPlayerSocket(userId, socket);
+      this.userSockets.set(userId, socket);
+
       this.logger.log(
         `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`
       );
     } else {
       this.channelsService.userModel.addUser(userId, username, socket);
+      this.userSockets.set(userId, socket);
+
       this.logger.log(
         `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
       );
@@ -126,11 +131,11 @@ export class AppGateway
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     const userInfo = this.getUserInfoFromSocket(socket);
-    if (!userInfo || !userInfo.userId || !userInfo.username) {
-      return;   
-    }
+    if (!userInfo || !userInfo.userId || !userInfo.username) { return; }
 
     const logged = this.channelsService.userModel.getUser(userInfo.userId);
+    this.userSockets.delete(userInfo.userId);
+    
     logged.socket = null;
     this.logger.log(`${socket.id} 소켓 연결 해제 ❌`);
   }
@@ -333,6 +338,14 @@ export class AppGateway
 
 
   // For test
+
+  @SubscribeMessage('disconnectPlayer')
+  async disconnectPlayer(
+    @ConnectedSocket() socket: Socket
+  ) {
+   this.gamesService.gameModel.disconnectPlayer(socket.data.userId);
+   socket.emit('disconnectPlayer');
+  }
 
   @SubscribeMessage('gameStatus')
   async gameStatus(

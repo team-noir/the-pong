@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getGameSetting } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 import AppTemplate from 'components/templates/AppTemplate';
 import Modal from 'components/templates/Modal';
@@ -7,39 +9,19 @@ import GameSetting from 'components/organisms/GameSetting';
 import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
 import { GameSettingType } from 'types';
 
-// TODO: 나중에 삭제
-const dummyGameSetting: GameSettingType = {
-  id: 1,
-  players: [
-    {
-      id: 1,
-      nickname: 'Nickname1',
-      level: 1,
-      isOwner: true,
-    },
-    {
-      id: 3,
-      nickname: 'Nickname2',
-      level: 3,
-      isOwner: false,
-    },
-  ],
-  modes: ['normal', 'hard'],
-  themes: [1, 2, 3],
-  mode: 'normal',
-  theme: 1,
-  isLadder: false,
-  createdAt: '2023-04-07T00:00:00.000Z',
-};
-
 export default function GameSettingPage() {
   const { gameId } = useParams() as { gameId: string };
-  // TODO: 게임 설정 정보 API 호출
-  const [gameSetting, setGameSetting] =
-    useState<GameSettingType>(dummyGameSetting);
   const [isOtherUserLeft, setIsOtherUserLeft] = useState(false);
   const socket = useContext(SocketContext);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const { data: gameSetting } = useQuery({
+    queryKey: ['gameSetting', gameId],
+    queryFn: () => getGameSetting(Number(gameId)),
+    refetchInterval: false,
+    refetchOnMount: false,
+  });
 
   useEffect(() => {
     socket.on('ping', () => {
@@ -48,12 +30,19 @@ export default function GameSettingPage() {
 
     socket.on(
       'gameSetting',
-      (data: { text: string; mode?: string; theme?: number }) => {
+      (data: { text: string; mode?: number; theme?: number }) => {
         const { text, mode, theme } = data;
         if (text === 'change') {
-          // TODO: 게임 설정 정보 다시 가져오기
-          mode && setGameSetting((prevState) => ({ ...prevState, mode }));
-          theme && setGameSetting((prevState) => ({ ...prevState, theme }));
+          queryClient.setQueryData<GameSettingType>(
+            ['gameSetting', gameId],
+            (prevData) =>
+              prevData &&
+              ({
+                ...prevData,
+                mode: mode !== null ? mode : prevData.mode,
+                theme: theme !== null ? theme : prevData.theme,
+              } as GameSettingType)
+          );
         } else if (text === 'done') {
           navigate(`/game/${gameId}`);
         } else if (text === 'leave') {
@@ -78,11 +67,13 @@ export default function GameSettingPage() {
       <AppTemplate
         header={<HeaderWithBackButton title="The Pong" onClick={handleClick} />}
       >
-        <GameSetting gameSetting={gameSetting} />
+        {gameSetting && <GameSetting gameSetting={gameSetting} />}
       </AppTemplate>
       {isOtherUserLeft && (
         <Modal onClickClose={() => navigate('/game')} fitContent>
-          <p>상대가 퇴장했습니다.</p>
+          <div className="text-center">
+            <p>상대가 퇴장했습니다.</p>
+          </div>
         </Modal>
       )}
     </>

@@ -1,4 +1,4 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
 import LoginPage from 'pages/LoginPage';
 import OnBoardingPage from 'pages/OnBoardingPage';
 import MainPage from 'pages/MainPage';
@@ -8,7 +8,7 @@ import GamePage from 'pages/GamePage';
 import FollowingPage from 'pages/FollowingPage';
 import ProfilePage from 'pages/ProfilePage';
 import SettingPage from 'pages/SettingPage';
-import SearchResultPage from 'pages/SearchResultPage';
+import SearchPage from 'pages/SearchPage';
 import SettingProfilePage from 'pages/SettingProfilePage';
 import Setting2FAPage from 'pages/Setting2FAPage';
 import SettingBlocksPage from 'pages/SettingBlocksPage';
@@ -19,6 +19,7 @@ import ChannelPage from 'pages/ChannelPage';
 import GameSettingPage from 'pages/GameSettingPage';
 import WelcomePage from 'pages/WelcomePage';
 import Verify2FAPage from 'pages/Verify2FAPage';
+import Root from 'pages/Root';
 
 export const routes = (
   isLoggedin: boolean,
@@ -28,7 +29,7 @@ export const routes = (
 ) => {
   let mainComponent = <Navigate to="/login" />;
   if (isLoggedin) {
-    mainComponent = isOnboarded ? <Outlet /> : <Navigate to="/on-boarding" />;
+    mainComponent = isOnboarded ? <Root /> : <Navigate to="/on-boarding" />;
     if (isTwoFactor && !isVerifiedTwoFactor) {
       mainComponent = <Navigate to="/2fa" />;
     }
@@ -133,7 +134,7 @@ export const routes = (
         },
         {
           path: 'search',
-          element: <SearchResultPage />,
+          element: <SearchPage />,
         },
         {
           path: 'welcome',
