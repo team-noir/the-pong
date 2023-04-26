@@ -121,15 +121,6 @@ export class Game {
 		});
 	}
 
-	async roundOver(winnerId: number) {
-		this.score.set(winnerId, this.score.get(winnerId) + 1);
-
-		await this.noticeToPlayers('roundOver', {
-			winner: this.score.get(winnerId)
-		});
-		await this.noticeToPlayers('roundStart', {});
-	}
-
 	setScore(player: Player, score: number) {
 		this.score.set(player.userId, score);
 	}
@@ -204,12 +195,15 @@ export class Game {
 	getWinnerLoser(loserId?: number): { winner: Player, loser: Player } {
 		let winner, loser;
 
-		if (loser) {
-			if (loserId == this.players[0].userId) {
-				winner = this.players[1];
-			} else {
+		if (loserId) {
+			if (loserId != this.players[0].userId) {
 				winner = this.players[0];
+				loser = this.players[1];
+			} else {
+				winner = this.players[1];
+				loser = this.players[0];
 			}
+			this.score.set(loserId, 0);
 		} else {
 			if (this.score.get(this.players[0].userId) 
 				> this.score.get(this.players[1].userId)
@@ -231,12 +225,4 @@ export class Game {
 		}
 	}
 
-	// RTC
-	async rtcConnected(playerId: number) {
-		if (playerId != this.ownerId) { return; }
-		const owner = this.getOwner();
-		await owner.socket.emit('roundStart', {
-			// game data
-		});
-	}
 }

@@ -347,5 +347,19 @@ export class GameModel implements OnModuleInit {
 		});
 	}
 
+	async roundOver(gameId: number, winnerId: number) {
+		const game = this.getGame(gameId);
+		game.score.set(winnerId, game.score.get(winnerId) + 1);
+
+		// Check isGameEnd
+		if (game.score.get(winnerId) == 11) {
+			const data = this.createGameResult(gameId);
+			await game.noticeToPlayers('gameOver', data);
+		} else {
+			await game.noticeToPlayers('roundOver', {
+				winner: game.score.get(winnerId)
+			});
+		}
+	}
 
 }

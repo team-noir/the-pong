@@ -317,19 +317,6 @@ export class AppGateway
     }
   }
 
-  @SubscribeMessage('rtcConnected')
-  async rtcConnected(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody('gameId') gameId: number,
-  ) {
-    try {
-      const game = this.gamesService.gameModel.getGame(gameId);
-      await game.rtcConnected(socket.data.userId);
-    } catch (error) {
-      socket.emit('gameError', error);
-    }
-  }
-
   @SubscribeMessage('roundOver')
   async roundOver(
     @ConnectedSocket() socket: Socket,
@@ -337,15 +324,13 @@ export class AppGateway
     @MessageBody('winnerId') winnerId: number,
   ) {
     try {
-      const game = this.gamesService.gameModel.getGame(gameId);
-      await game.roundOver(winnerId);
+      
+      await this.gamesService.gameModel.roundOver(gameId, winnerId);
     } catch (error) {
       await socket.emit('gameError', error);
     }
   }
 
-
-  
 
   // For test
 
