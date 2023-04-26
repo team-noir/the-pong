@@ -1,5 +1,11 @@
-import { Injectable, HttpStatus, Inject, forwardRef, OnModuleInit } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core'
+import {
+  Injectable,
+  HttpStatus,
+  Inject,
+  forwardRef,
+  OnModuleInit,
+} from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 
 import { Player } from '../dtos/player.dto';
 import { Game } from '../dtos/game.dto';
@@ -14,365 +20,372 @@ type playerId = number;
 
 @Injectable()
 export class GameModel implements OnModuleInit {
-	private games = new Map<gameId, Game>();
-	private players = new Map<playerId, Player>();	
-	private invites = new Map<playerId, Game>();
-	private queue = new Array<gameId>();
+  private games = new Map<gameId, Game>();
+  private players = new Map<playerId, Player>();
+  private invites = new Map<playerId, Game>();
+  private queue = new Array<gameId>();
 
-	private pongRecords = new Set<playerId>();
-	private readyRecords = new Set<playerId>();
+  private pongRecords = new Set<playerId>();
+  private readyRecords = new Set<playerId>();
 
-	private appGateway: AppGateway;
-	private readyTime = 60000;
+  private appGateway: AppGateway;
+  private readyTime = 60000;
 
-	constructor(
-		private prismaService: PrismaService,
-		private moduleRef: ModuleRef
-	) {}
+  constructor(
+    private prismaService: PrismaService,
+    private moduleRef: ModuleRef
+  ) {}
 
-	async onModuleInit() {
-		this.appGateway = await this.moduleRef.get(AppGateway, { strict: false });
-	}
+  async onModuleInit() {
+    this.appGateway = await this.moduleRef.get(AppGateway, { strict: false });
+  }
 
-	isPlayerInGame(playerId: number): boolean {
-		return this.players.has(playerId);
-	}
+  isPlayerInGame(playerId: number): boolean {
+    return this.players.has(playerId);
+  }
 
-	setReadyTime(time: number) {
-		this.readyTime = time;
-	}
+  setReadyTime(time: number) {
+    this.readyTime = time;
+  }
 
-	resetReadyTime() {
-		this.readyTime = 60000;
-	}
+  resetReadyTime() {
+    this.readyTime = 60000;
+  }
 
-	addQueue(game: Game) {
-		this.queue.push(game.gameId);
-	}
+  addQueue(game: Game) {
+    this.queue.push(game.gameId);
+  }
 
-	getGameId(): gameId {
-		return this.games.size + 1;
-	}
+  getGameId(): gameId {
+    return this.games.size + 1;
+  }
 
-	getGame(gameId: number): Game {
-		if (!this.games.has(gameId)) {
-			const code = HttpStatus.BAD_REQUEST;
-			const message = 'This game does not exist';
-			throw { code, message };
-		}
+  getGame(gameId: number): Game {
+    if (!this.games.has(gameId)) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'This game does not exist';
+      throw { code, message };
+    }
 
-		return this.games.get(gameId);
-	}
+    return this.games.get(gameId);
+  }
 
-	setGame(game: Game) {
-		this.games.set(game.gameId, game);
-	}
+  setGame(game: Game) {
+    this.games.set(game.gameId, game);
+  }
 
-	addInvite(game: Game, invitedId: number) {
-		this.invites.set(invitedId, game);
-	}
+  addInvite(game: Game, invitedId: number) {
+    this.invites.set(invitedId, game);
+  }
 
-	getInvite(invitedId: number) {
-		return this.invites.get(invitedId);
-	}
-	
-	isInvited(invitedId: number) {
-		return this.invites.has(invitedId);
-	}
+  getInvite(invitedId: number) {
+    return this.invites.get(invitedId);
+  }
 
-	deleteInvite(invitedId: number) {
-		this.invites.delete(invitedId);
-	}
+  isInvited(invitedId: number) {
+    return this.invites.has(invitedId);
+  }
 
-	async createGameResult(gameId: number, loserId?: number) {
-		const game = this.getGame(gameId);
-		const { winner, loser } = game.getWinnerLoser(loserId);
-		const winnerScore = game.score.get(winner.userId);
-		const loserScore = game.score.get(loser.userId);
+  deleteInvite(invitedId: number) {
+    this.invites.delete(invitedId);
+  }
 
-		const data = await this.prismaService.gameResult.create({
-			data: {
-				id: game.gameId,
-				isLadder: game.isLadder,
-				winnerId: winner.userId,
-				loserId: loser.userId,
-				winnerScore: winnerScore,
-				loserScore: loserScore,
-			},
-			select: {
-				id: true,
-				isLadder: true,
-				winner: { select: {
-					id: true,
-					nickname: true,
-					level: true,
-				}},
-				loser: { select: {
-					id: true,
-					nickname: true,
-					level: true,
-				}},
-				winnerScore: true,
-				loserScore: true,
-				createdAt: true,
-			}
-		});
+  async createGameResult(gameId: number, loserId?: number) {
+    const game = this.getGame(gameId);
+    const { winner, loser } = game.getWinnerLoser(loserId);
+    const winnerScore = game.score.get(winner.userId);
+    const loserScore = game.score.get(loser.userId);
 
-		return data;
-	}
+    const data = await this.prismaService.gameResult.create({
+      data: {
+        id: game.gameId,
+        isLadder: game.isLadder,
+        winnerId: winner.userId,
+        loserId: loser.userId,
+        winnerScore: winnerScore,
+        loserScore: loserScore,
+      },
+      select: {
+        id: true,
+        isLadder: true,
+        winner: {
+          select: {
+            id: true,
+            nickname: true,
+            level: true,
+          },
+        },
+        loser: {
+          select: {
+            id: true,
+            nickname: true,
+            level: true,
+          },
+        },
+        winnerScore: true,
+        loserScore: true,
+        createdAt: true,
+      },
+    });
 
-	async createPlayer(userId: number) {
-		if (!this.appGateway.isUserOnline(userId)) {
-			const code = HttpStatus.BAD_REQUEST;
-			const message = 'This user is not online';
-			throw { code, message };
-		} else if (this.isPlayerInGame(userId) || this.isInvited(userId)) {
-			const code = HttpStatus.CONFLICT;
-			const message = 'This user is already in game';
-			throw { code, message };
-		}
+    return data;
+  }
 
-		const socket = this.appGateway.getUserSocket(userId);
-		const data = await this.prismaService.user.findUnique({
-			where: { id: userId },
-			select: {
-				nickname: true,
-				level: true,
-				blockeds: { select: { blockedId: true } }
-			}
-		});
+  async createPlayer(userId: number) {
+    if (!this.appGateway.isUserOnline(userId)) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'This user is not online';
+      throw { code, message };
+    } else if (this.isPlayerInGame(userId) || this.isInvited(userId)) {
+      const code = HttpStatus.CONFLICT;
+      const message = 'This user is already in game';
+      throw { code, message };
+    }
 
-		if (!data) {
-			const code = HttpStatus.BAD_REQUEST;
-			const message = 'This user is not exist';
-			throw { code, message };
-		}
+    const socket = this.appGateway.getUserSocket(userId);
+    const data = await this.prismaService.user.findUnique({
+      where: { id: userId },
+      select: {
+        nickname: true,
+        level: true,
+        blockeds: { select: { blockedId: true } },
+      },
+    });
 
-		const blocks = [];
-		for (const blocked of data.blockers) {
-			console.log(blocked);
-			blocks.push(blocked.blockedId);
-		}
+    if (!data) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'This user is not exist';
+      throw { code, message };
+    }
 
-		return new Player(userId, data.nickname, data.level, socket, blocks);
-	}
+    const blocks = [];
+    for (const blocked of data.blockers) {
+      console.log(blocked);
+      blocks.push(blocked.blockedId);
+    }
 
-	getPlayer(playerId: number): Player {
-		if (!this.isPlayerInGame(playerId)) {
-			const code = HttpStatus.BAD_REQUEST;
-			const message = 'This user is not in the game';
-			throw { code, message };
-		}
+    return new Player(userId, data.nickname, data.level, socket, blocks);
+  }
 
-		return this.players.get(playerId);
-	}
+  getPlayer(playerId: number): Player {
+    if (!this.isPlayerInGame(playerId)) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'This user is not in the game';
+      throw { code, message };
+    }
 
-	setPlayer(player: Player) {
-		this.players.set(player.userId, player);
-		this.receivePong(player.userId);
-	}
+    return this.players.get(playerId);
+  }
 
-	resetPlayerSocket(playerId: number, socket) {
-		const player = this.players.get(playerId);
-		if (player) {
-			player.setSocket(socket);
-		}
-	}
+  setPlayer(player: Player) {
+    this.players.set(player.userId, player);
+    this.receivePong(player.userId);
+  }
 
-	async gameStatus(socket: Socket) {
-		await socket.emit('gameStatus', {
-			games: [...this.games.keys()],
-			players: [...this.players.keys()],
-			queue: this.queue,
-			pongRecords: [...this.pongRecords.values()]
-		})
-	}
+  resetPlayerSocket(playerId: number, socket) {
+    const player = this.players.get(playerId);
+    if (player) {
+      player.setSocket(socket);
+    }
+  }
 
-	async setGameRoomTimeout(gameId: number) {
-		const game = this.games.get(gameId);
+  async gameStatus(socket: Socket) {
+    await socket.emit('gameStatus', {
+      games: [...this.games.keys()],
+      players: [...this.players.keys()],
+      queue: this.queue,
+      pongRecords: [...this.pongRecords.values()],
+    });
+  }
 
-		game.readyTimeout = setTimeout(async () => {
-			if (game.isFull()) { return; }
-			if (game.invitedId) {
-				await game.noticeToPlayers('gameInvite', { text: 'canceled'});
-				this.deleteInvite(game.invitedId);
-			} else {
-				await game.noticeToPlayers('queue', { text: 'timeout'});
-			}
-			this.removeGame(game);
-		}, this.readyTime);
-	}
+  async setGameRoomTimeout(gameId: number) {
+    const game = this.games.get(gameId);
 
-	async newQueue(player: Player, isLadder: boolean): Promise<gameId> {
-		const newGame = new Game(this.getGameId(), isLadder);
+    game.readyTimeout = setTimeout(async () => {
+      if (game.isFull()) {
+        return;
+      }
+      if (game.invitedId) {
+        await game.noticeToPlayers('gameInvite', { text: 'canceled' });
+        this.deleteInvite(game.invitedId);
+      } else {
+        await game.noticeToPlayers('queue', { text: 'timeout' });
+      }
+      this.removeGame(game);
+    }, this.readyTime);
+  }
 
-		newGame.join(player, isLadder);
-		player.joinGame(newGame);
+  async newQueue(player: Player, isLadder: boolean): Promise<gameId> {
+    const newGame = new Game(this.getGameId(), isLadder);
 
-		this.setPlayer(player);
-		this.setGame(newGame);
-		await this.setGameRoomTimeout(newGame.gameId);
+    newGame.join(player, isLadder);
+    player.joinGame(newGame);
 
-		this.addQueue(newGame);
-		return newGame.gameId;
-	}
+    this.setPlayer(player);
+    this.setGame(newGame);
+    await this.setGameRoomTimeout(newGame.gameId);
 
-	async newInvite(player: Player, invited: Player): Promise<gameId> {
-		const newGame = new Game(this.getGameId(), false);
+    this.addQueue(newGame);
+    return newGame.gameId;
+  }
 
-		if (player.userId == invited.userId) {
-			const code = HttpStatus.BAD_REQUEST;
-			const message = 'You cannot invite this user';
-			throw { code, message };
-		}
+  async newInvite(player: Player, invited: Player): Promise<gameId> {
+    const newGame = new Game(this.getGameId(), false);
 
-		newGame.join(player, false);
-		if (!newGame.canJoin(invited, false)) {
-			const code = HttpStatus.BAD_REQUEST;
-			const message = 'You cannot invite this user';
-			throw { code, message };
-		}
-		
-		player.joinGame(newGame);
-		this.setPlayer(player);
-		this.setGame(newGame);
-		await this.setGameRoomTimeout(newGame.gameId);
+    if (player.userId == invited.userId) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'You cannot invite this user';
+      throw { code, message };
+    }
 
-		this.addQueue(newGame);
-		this.addInvite(newGame, invited.userId);
-		newGame.invitedId = invited.userId;
+    newGame.join(player, false);
+    if (!newGame.canJoin(invited, false)) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'You cannot invite this user';
+      throw { code, message };
+    }
 
-		return newGame.gameId;
-	}
+    player.joinGame(newGame);
+    this.setPlayer(player);
+    this.setGame(newGame);
+    await this.setGameRoomTimeout(newGame.gameId);
 
-	removeInvitation(game: Game) {
-		const invitedId = game.invitedId;
-		const invitedSocket = this.appGateway.getUserSocket(invitedId);
+    this.addQueue(newGame);
+    this.addInvite(newGame, invited.userId);
+    newGame.invitedId = invited.userId;
 
-		this.invites.delete(invitedId);
-		invitedSocket.emit('gameInvite', {
-			text: 'canceled'
-		});
-	}
+    return newGame.gameId;
+  }
 
-	findQueue(player: Player, isLadder: boolean) : Game | null {
-		if (this.isPlayerInGame(player.userId)) {
-			const code = HttpStatus.CONFLICT;
-			const message = 'This user is already in queue';
-			throw { code, message };
-		}
+  removeInvitation(game: Game) {
+    const invitedId = game.invitedId;
+    const invitedSocket = this.appGateway.getUserSocket(invitedId);
 
-		for (const id of this.queue) {
-			const game = this.getGame(id);
-			if (game.canJoin(player, isLadder)) {
-				return game;
-			}
-		};
+    this.invites.delete(invitedId);
+    invitedSocket.emit('gameInvite', {
+      text: 'canceled',
+    });
+  }
 
-		return null;
-	}
+  findQueue(player: Player, isLadder: boolean): Game | null {
+    if (this.isPlayerInGame(player.userId)) {
+      const code = HttpStatus.CONFLICT;
+      const message = 'This user is already in queue';
+      throw { code, message };
+    }
 
-	joinQueue(player: Player, game: Game) {
-		this.setPlayer(player);
-		player.joinGame(game);
-	}
+    for (const id of this.queue) {
+      const game = this.getGame(id);
+      if (game.canJoin(player, isLadder)) {
+        return game;
+      }
+    }
 
-	removeQueue(game: Game) {
-		this.queue = this.queue.filter((id) => id != game.gameId);
-	}
+    return null;
+  }
 
-	removePlayers(game: Game) {
-		const players = game.getPlayers();
-		for (const player of players) {
-			this.players.delete(player.userId);
-		};
-		game.removePlayers();
-	}
+  joinQueue(player: Player, game: Game) {
+    this.setPlayer(player);
+    player.joinGame(game);
+  }
 
-	removeGame(game: Game) {
-		this.games.delete(game.gameId);
-		this.removePlayers(game);
-		this.removeInvitation(game);
-		this.removeQueue(game);
-		game.clearGameRoomTimeout();
-	}
+  removeQueue(game: Game) {
+    this.queue = this.queue.filter((id) => id != game.gameId);
+  }
 
-	disconnectPlayer(playerId: number) {
-		const player = this.players.get(playerId);
+  removePlayers(game: Game) {
+    const players = game.getPlayers();
+    for (const player of players) {
+      this.players.delete(player.userId);
+    }
+    game.removePlayers();
+  }
 
-		if (player && player.game) {
-			this.removeGame(player.game);
-		}
-		if (this.isInvited(playerId)) {
-			this.deleteInvite(playerId);
-		}
-		this.players.delete(player.userId);
-	}
+  removeGame(game: Game) {
+    this.games.delete(game.gameId);
+    this.removePlayers(game);
+    this.removeInvitation(game);
+    this.removeQueue(game);
+    game.clearGameRoomTimeout();
+  }
 
-	sendPingToAllPlayers() {
-		if (this.players.size == 0) { return; }
+  disconnectPlayer(playerId: number) {
+    const player = this.players.get(playerId);
 
-		this.checkPlayersConnection();
-		const playerIdList = [...this.players.keys()];
-		playerIdList.forEach((playerId) => {
-			const player = this.players.get(playerId);
-			if (player.socket) {
-				player.socket.emit('ping', { userId: player.userId });
-			}
-		});
-	}
+    if (player && player.game) {
+      this.removeGame(player.game);
+    }
+    if (this.isInvited(playerId)) {
+      this.deleteInvite(playerId);
+    }
+    this.players.delete(player.userId);
+  }
 
-	receivePong(userId: number) {
-		if (userId) {
-			this.checkPlayersReady(userId);
-			this.pongRecords.add(userId);
-		}
-	}
+  sendPingToAllPlayers() {
+    if (this.players.size == 0) {
+      return;
+    }
 
-	checkPlayersConnection() {
-		const playerIdList = [...this.players.keys()];
-		for (const playerId of playerIdList) {
-			if (!this.pongRecords.has(playerId)) {
-				this.disconnectPlayer(playerId);
-			}
-		};
-		this.pongRecords.clear();
-	}
+    this.checkPlayersConnection();
+    const playerIdList = [...this.players.keys()];
+    playerIdList.forEach((playerId) => {
+      const player = this.players.get(playerId);
+      if (player.socket) {
+        player.socket.emit('ping', { userId: player.userId });
+      }
+    });
+  }
 
-	checkPlayersReady(userId: number) {
-		if (this.readyRecords.has(userId)) {
-			this.readyRecords.delete(userId);
-			const player = this.players.get(userId);
-			if (player) {
-				player.readyGame();
-			}
-		}
-	}
+  receivePong(userId: number) {
+    if (userId) {
+      this.checkPlayersReady(userId);
+      this.pongRecords.add(userId);
+    }
+  }
 
-	async gameStart(game: Game) {
-		this.removeQueue(game);
-		this.removeInvitation(game);
-		game.clearGameRoomTimeout();
-		game.setStart();
+  checkPlayersConnection() {
+    const playerIdList = [...this.players.keys()];
+    for (const playerId of playerIdList) {
+      if (!this.pongRecords.has(playerId)) {
+        this.disconnectPlayer(playerId);
+      }
+    }
+    this.pongRecords.clear();
+  }
 
-		const playerIds = [...game.players.keys()];
-		playerIds.forEach((playerId) => {
-			this.readyRecords.add(playerId);
-		});
-	}
+  checkPlayersReady(userId: number) {
+    if (this.readyRecords.has(userId)) {
+      this.readyRecords.delete(userId);
+      const player = this.players.get(userId);
+      if (player) {
+        player.readyGame();
+      }
+    }
+  }
 
-	async roundOver(gameId: number, winnerId: number) {
-		const game = this.getGame(gameId);
-		game.score.set(winnerId, game.score.get(winnerId) + 1);
+  async gameStart(game: Game) {
+    this.removeQueue(game);
+    this.removeInvitation(game);
+    game.clearGameRoomTimeout();
+    game.setStart();
 
-		if (game.score.get(winnerId) == 11) {
-			const data = this.createGameResult(gameId);
-			await game.noticeToPlayers('gameOver', data);
-		} else {
-			await game.noticeToPlayers('roundOver', {
-				winner: game.score.get(winnerId)
-			});
-		}
-	}
+    const playerIds = [...game.players.keys()];
+    playerIds.forEach((playerId) => {
+      this.readyRecords.add(playerId);
+    });
+  }
 
+  async roundOver(gameId: number, winnerId: number) {
+    const game = this.getGame(gameId);
+    game.score.set(winnerId, game.score.get(winnerId) + 1);
+
+    if (game.score.get(winnerId) == 11) {
+      const data = this.createGameResult(gameId);
+      await game.noticeToPlayers('gameOver', data);
+    } else {
+      await game.noticeToPlayers('roundOver', {
+        winner: game.score.get(winnerId),
+      });
+    }
+  }
 }

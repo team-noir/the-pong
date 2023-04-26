@@ -5,15 +5,12 @@ type UserStatus = 'online' | 'offline' | 'game';
 export interface UserType {
   id: number;
   nickname?: string;
-  rank?: number;
+  level?: number;
   isTwoFactor?: boolean;
   isVerifiedTwoFactor?: boolean;
   status?: UserStatus;
-  achievements?: [];
-  games?: [];
   isFollowedByMyself?: boolean;
   isBlockedByMyself?: boolean;
-  createdAt?: string;
 }
 
 export const USER_ROLES = {

@@ -244,7 +244,7 @@ export const createChannel = async (
 };
 
 export const joinChannel = async (channelForm: ChannelFormType) => {
-  const res = await axiosWithInterceptors.post(`/channels/${channelForm.id}`, {
+  const res = await axiosWithInterceptors.put(`/channels/${channelForm.id}`, {
     password: channelForm.password,
   });
   if (res.status !== 204) {
@@ -354,7 +354,9 @@ export const updateChannelUserStatus = async ({
 };
 
 export const leaveChannel = async (channelId: number) => {
-  const res = await axiosWithInterceptors.delete(`/channels/${channelId}`);
+  const res = await axiosWithInterceptors.delete(
+    `/channels/${channelId}/users`
+  );
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }

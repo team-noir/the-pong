@@ -1,50 +1,56 @@
-import { Game } from "./game.dto";
-import { Socket } from "socket.io";
+import { Game } from './game.dto';
+import { Socket } from 'socket.io';
 
 export class Player {
-	userId: number;
-	username: string;
-	level: number;
-	socket: Socket;
-	blockUser?: Set<number>;
-	
-	game?: Game;
-	gameInvited?: Game;
+  userId: number;
+  username: string;
+  level: number;
+  socket: Socket;
+  blockUser?: Set<number>;
 
-	constructor(userId: number, username: string, level: number, socket: Socket, blockUser?: number[]) {
-		this.userId = userId;
-		this.username = username;
-		this.level = level;
-		this.socket = socket;
-		this.blockUser = new Set(blockUser);
-	}
+  game?: Game;
+  gameInvited?: Game;
 
-	isBlockUser(playerId: number) : boolean {
-		if (!this.blockUser) {
-			return false;
-		}
-		return this.blockUser.has(playerId);
-	}
+  constructor(
+    userId: number,
+    username: string,
+    level: number,
+    socket: Socket,
+    blockUser?: number[]
+  ) {
+    this.userId = userId;
+    this.username = username;
+    this.level = level;
+    this.socket = socket;
+    this.blockUser = new Set(blockUser);
+  }
 
-	joinGame(game: Game): boolean {
-		if (game && !this.game) {
-			this.game = game;
-			return true;
-		}
-		return false;
-	}
+  isBlockUser(playerId: number): boolean {
+    if (!this.blockUser) {
+      return false;
+    }
+    return this.blockUser.has(playerId);
+  }
 
-	readyGame() {
-		if (this.game) {
-			this.game.readyPlayer(this);
-		}
-	}
+  joinGame(game: Game): boolean {
+    if (game && !this.game) {
+      this.game = game;
+      return true;
+    }
+    return false;
+  }
 
-	leaveGame() {
-		this.game = null;
-	}
+  readyGame() {
+    if (this.game) {
+      this.game.readyPlayer(this);
+    }
+  }
 
-	setSocket(socket) {
-		this.socket = socket;
-	}
+  leaveGame() {
+    this.game = null;
+  }
+
+  setSocket(socket) {
+    this.socket = socket;
+  }
 }
