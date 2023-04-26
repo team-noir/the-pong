@@ -1,0 +1,5 @@
+FROM nginx:latest
+
+COPY ./proxy-dev.conf /etc/nginx/conf.d/proxy.conf
+
+CMD ["nginx", "-g", "daemon off;"]
