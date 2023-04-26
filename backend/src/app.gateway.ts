@@ -162,14 +162,13 @@ export class AppGateway
     @MessageBody('offerSendUserId') offerSendUserId,
     @MessageBody('offerReceiveUserId') offerReceiveUserId,
   ) {
-    const sendSocket = this.getUserSocket(offerSendUserId);
     const receiveSocket = this.getUserSocket(offerReceiveUserId);
 
     socket
     .to(receiveSocket.id)
     .emit('rtcGetOffer', {
       sdp: sdp, 
-      offerSendID: sendSocket.id,
+      offerSendUserId: offerSendUserId,
     });
   }
 
@@ -180,14 +179,13 @@ export class AppGateway
     @MessageBody('answerSendUserId') answerSendUserId,
     @MessageBody('answerReceiveUserId') answerReceiveUserId,
   ) {
-    const sendSocket = this.getUserSocket(answerSendUserId);
     const receiveSocket = this.getUserSocket(answerReceiveUserId);
 
     socket
     .to(receiveSocket.id)
     .emit('rtcGetAnswer', {
       sdp: sdp, 
-      answerSendID: sendSocket.id,
+      answerSendUserId: answerSendUserId,
     });
   }
 
@@ -320,12 +318,14 @@ export class AppGateway
   @SubscribeMessage('roundOver')
   async roundOver(
     @ConnectedSocket() socket: Socket,
-    @MessageBody('gameId') gameId: number,
     @MessageBody('winnerId') winnerId: number,
   ) {
     try {
-      
-      await this.gamesService.gameModel.roundOver(gameId, winnerId);
+      const player = await this.gamesService.gameModel.getPlayer(socket.data.userId);
+      const game = player.game;
+      if (game) {
+        await this.gamesService.gameModel.roundOver(game.gameId, winnerId);
+      }
     } catch (error) {
       await socket.emit('gameError', error);
     }
