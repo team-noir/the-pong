@@ -402,7 +402,8 @@ export class GameModel implements OnModuleInit {
       await game.noticeToPlayers('gameOver', data);
     } else {
       await game.noticeToPlayers('roundOver', {
-        winner: game.score.get(winnerId),
+		winnerId: winnerId,
+		winnerScore: game.score.get(winnerId),
       });
     }
   }
