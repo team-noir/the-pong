@@ -244,7 +244,7 @@ export const createChannel = async (
 };
 
 export const joinChannel = async (channelForm: ChannelFormType) => {
-  const res = await axiosWithInterceptors.post(`/channels/${channelForm.id}`, {
+  const res = await axiosWithInterceptors.put(`/channels/${channelForm.id}`, {
     password: channelForm.password,
   });
   if (res.status !== 204) {
