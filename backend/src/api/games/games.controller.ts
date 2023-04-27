@@ -38,6 +38,19 @@ import { GamesService } from './games.service';
 export class GamesController {
   constructor(private gamesService: GamesService) {}
 
+  @Get()
+  @ApiOperation({ summary: 'Get game list.' })
+  @UseGuards(AuthenticatedGuard)
+  getGameList(@Res({ passthrough: true }) res) {
+    try {
+      const gameList = this.gamesService.getGameList();
+      res.status(HttpStatus.OK);
+      return gameList;
+    } catch (error) {
+      throw new HttpException(error.message, error.code);
+    }
+  }
+
   @Post('queue')
   @ApiOperation({ summary: 'Add user to queue.' })
   @ApiCreatedResponse({ description: 'The user has been added to the queue.' })

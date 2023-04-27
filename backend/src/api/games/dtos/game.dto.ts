@@ -17,7 +17,7 @@ export class Game {
   ownerId: number;
   players: Player[];
   viewers: Player[];
-  invitedId: userId;
+  private invitedId: userId;
 
   countPlayer: number;
 
@@ -65,12 +65,26 @@ export class Game {
     return this.players.length > 1;
   }
 
+  /*  Invited user */
+
+  getInvitedId(): number | null {
+    return this.invitedId;
+  }
+
+  setInvitedId(userId: number) {
+    this.invitedId = userId;
+  }
+
+  removeInvitedId() {
+    this.invitedId = null;
+  }
+
   hasPlayer(tarPlayer: Player): boolean {
-    this.players.forEach((player) => {
+    for (const player of this.players) {
       if (player.userId == tarPlayer.userId) {
         return true;
       }
-    });
+    }
     return false;
   }
 
@@ -98,6 +112,7 @@ export class Game {
         score: this.score.get(player.userId),
       });
     });
+    return playersInfo;
   }
 
   hasViewer(tarPlayer: Player): boolean {
@@ -181,10 +196,15 @@ export class Game {
     return true;
   }
 
+  reconnectPlayer(player: Player) {
+    if (this.hasPlayer(player)) {
+      player.socket.join(this.getName());
+    }
+  }
+
   removePlayers() {
     for (const player of this.players) {
       player.leaveGame();
-      player.socket.emit('message', 'disconnected player');
     }
     this.players = [];
   }

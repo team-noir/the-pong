@@ -44,11 +44,11 @@ export class ChannelUser {
     return this.blockUser.has(userId);
   }
 
-  resetSocket(socket: Socket) {
+  resetSocket(newSocket: Socket) {
     if (this.socket) {
       this.socket.disconnect(true);
     }
-    this.socket = socket;
+    this.socket = newSocket;
     this.joined.forEach((channelId) => {
       this.socket.join(String(channelId));
     });
@@ -127,7 +127,7 @@ export class UserModel {
     this.setUser(userId, newUser);
   }
 
-  resetUserSocket(userId: number, socket: Socket) {
+  reconnectUserSocket(userId: number, socket: Socket) {
     const user = this.getUser(userId);
     user.resetSocket(socket);
   }

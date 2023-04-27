@@ -53,4 +53,14 @@ export class Player {
   setSocket(socket) {
     this.socket = socket;
   }
+
+  reconnectSocket(newSocket: Socket) {
+    if (this.socket) {
+      this.socket.disconnect(true);
+    }
+    this.socket = newSocket;
+    if (this.game) {
+      this.game.reconnectPlayer(this);
+    }
+  }
 }

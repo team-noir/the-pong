@@ -22,6 +22,10 @@ export class GamesService {
     clearInterval(this.pingInterval);
   }
 
+  getGameList() {
+    return this.gameModel.getGameList();
+  }
+
   async addUserToQueue(userId: number, isLadder: boolean) {
     const player = await this.gameModel.createPlayer(userId);
     const game = this.gameModel.findQueue(player, isLadder);
