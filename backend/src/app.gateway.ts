@@ -114,24 +114,21 @@ export class AppGateway
 
     const { userId, username } = userInfo;
     socket.data = { userId, username };
+    let log;
 
-    if (this.isUserOnline(userId)) {
-      this.channelsService.userModel.resetUserSocket(userId, socket);
-      this.gamesService.gameModel.resetPlayerSocket(userId, socket);
-      this.userSockets.set(userId, socket);
-
-      this.logger.log(
-        `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`
-      );
-    } else {
-      this.channelsService.userModel.addUser(userId, username, socket);
-      this.userSockets.set(userId, socket);
-
-      this.logger.log(
-        `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`
-      );
+    if (this.channelsService.userModel.has(userId)) {
+      this.channelsService.userModel.reconnectUserSocket(userId, socket);
+      log = `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`;
     }
-
+    if (this.gamesService.gameModel.isPlayerInGame(userId)) {
+      this.gamesService.gameModel.reconnectPlayerSocket(userId, socket);
+      log = `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`;
+    }
+    if (!log) {
+      log = `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`;
+      this.channelsService.userModel.addUser(userId, username, socket);
+    }
+    this.logger.log(log);
     this.setUserOnline(userId, socket);
   }
 
