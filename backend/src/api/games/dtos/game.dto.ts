@@ -205,7 +205,6 @@ export class Game {
   removePlayers() {
     for (const player of this.players) {
       player.leaveGame();
-      player.socket.emit('message', 'disconnected player');
     }
     this.players = [];
   }
