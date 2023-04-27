@@ -9,9 +9,9 @@ import { PrismaModule } from '@/prisma/prisma.module';
 import { AppModule } from '@/app.module';
 
 @Module({
-	imports: [ChannelsModule, AuthModule, PrismaModule],
-	providers: [GamesService, GameModel],
-	controllers: [GamesController],
-	exports: [GamesService, GameModel]
+  imports: [ChannelsModule, AuthModule, PrismaModule],
+  providers: [GamesService, GameModel],
+  controllers: [GamesController],
+  exports: [GamesService, GameModel],
 })
 export class GamesModule {}

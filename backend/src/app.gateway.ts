@@ -1,4 +1,10 @@
-import { Injectable, Logger, Inject, forwardRef, HttpException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  Inject,
+  forwardRef,
+  HttpException,
+} from '@nestjs/common';
 import {
   WebSocketGateway,
   WebSocketServer,
@@ -36,7 +42,7 @@ export class AppGateway
     private channelsService: ChannelsService,
     @Inject(forwardRef(() => GamesService))
     public gamesService: GamesService,
-    private prismaService: PrismaService,
+    private prismaService: PrismaService
   ) {
     this.userSockets = new Map<userId, Socket>();
   }
@@ -100,14 +106,14 @@ export class AppGateway
 
   async handleConnection(@ConnectedSocket() socket: Socket) {
     const userInfo = this.getUserInfoFromSocket(socket);
-    if (!userInfo || !userInfo.userId || !userInfo.username) { 
+    if (!userInfo || !userInfo.userId || !userInfo.username) {
       this.logger.log(`${socket.id} 소켓 연결 실패 ❌`);
       socket.disconnect(true);
       return;
     }
 
     const { userId, username } = userInfo;
-    socket.data = { userId, username }
+    socket.data = { userId, username };
 
     if (this.isUserOnline(userId)) {
       this.channelsService.userModel.resetUserSocket(userId, socket);
@@ -131,13 +137,63 @@ export class AppGateway
 
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     const userInfo = this.getUserInfoFromSocket(socket);
-    if (!userInfo || !userInfo.userId || !userInfo.username) { return; }
+    if (!userInfo || !userInfo.userId || !userInfo.username) {
+      return;
+    }
 
     const logged = this.channelsService.userModel.getUser(userInfo.userId);
     this.userSockets.delete(userInfo.userId);
-    
+
     logged.socket = null;
     this.logger.log(`${socket.id} 소켓 연결 해제 ❌`);
+  }
+
+  // WebRTC Connection
+
+  @SubscribeMessage('rtcCandidate')
+  async rtcCandidate(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('candidate') candidate,
+    @MessageBody('candidateSendUserId') candidateSendUserId,
+    @MessageBody('candidateReceiveUserId') candidateReceiveUserId
+  ) {
+    const sendSocket = this.getUserSocket(candidateSendUserId);
+    const receiveSocket = this.getUserSocket(candidateReceiveUserId);
+
+    socket.to(receiveSocket.id).emit('rtcGetCandidate', {
+      candidate: candidate,
+      candidateSendID: sendSocket.id,
+    });
+  }
+
+  @SubscribeMessage('rtcOffer')
+  async rtcOffer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('sdp') sdp,
+    @MessageBody('offerSendUserId') offerSendUserId,
+    @MessageBody('offerReceiveUserId') offerReceiveUserId
+  ) {
+    const receiveSocket = this.getUserSocket(offerReceiveUserId);
+
+    socket.to(receiveSocket.id).emit('rtcGetOffer', {
+      sdp: sdp,
+      offerSendUserId: offerSendUserId,
+    });
+  }
+
+  @SubscribeMessage('rtcAnswer')
+  async rtcAnswer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('sdp') sdp,
+    @MessageBody('answerSendUserId') answerSendUserId,
+    @MessageBody('answerReceiveUserId') answerReceiveUserId
+  ) {
+    const receiveSocket = this.getUserSocket(answerReceiveUserId);
+
+    socket.to(receiveSocket.id).emit('rtcGetAnswer', {
+      sdp: sdp,
+      answerSendUserId: answerSendUserId,
+    });
   }
 
   // Message
@@ -194,7 +250,7 @@ export class AppGateway
   ) {
     this.channelsService.invite(socket.data.userId, channelId, userId);
   }
-  
+
   @SubscribeMessage('queue')
   async queue(
     @ConnectedSocket() socket: Socket,
@@ -208,11 +264,9 @@ export class AppGateway
       socket.emit('queue', error);
     }
   }
-  
+
   @SubscribeMessage('removeQueue')
-  removeQueue(
-    @ConnectedSocket() socket: Socket,
-  ) {
+  removeQueue(@ConnectedSocket() socket: Socket) {
     try {
       const userId = socket.data.userId;
       this.gamesService.removeUserFromQueue(userId);
@@ -221,15 +275,13 @@ export class AppGateway
       socket.emit('removeQueue', error);
     }
   }
-  
+
   @SubscribeMessage('pong')
-  pong(
-    @ConnectedSocket() socket: Socket
-  ) {
+  pong(@ConnectedSocket() socket: Socket) {
     const userId = socket.data.userId;
     this.gamesService.gameModel.receivePong(userId);
   }
-  
+
   @SubscribeMessage('gameInvite')
   async gameInvite(
     @ConnectedSocket() socket: Socket,
@@ -241,24 +293,26 @@ export class AppGateway
       socket.emit('gameInvite', error);
     }
   }
-  
+
   @SubscribeMessage('gameInviteAnswer')
   async gameInviteAnswer(
     @ConnectedSocket() socket: Socket,
     @MessageBody('gameId') gameId: number,
-    @MessageBody('isAccepted') isAccepted: boolean,
+    @MessageBody('isAccepted') isAccepted: boolean
   ) {
     try {
-      await this.gamesService.answerInvitation(socket.data.userId, gameId, isAccepted);
+      await this.gamesService.answerInvitation(
+        socket.data.userId,
+        gameId,
+        isAccepted
+      );
     } catch (error) {
       socket.emit('gameInvite', error);
     }
   }
-  
+
   @SubscribeMessage('cancelInvite')
-  async cancelInvite(
-    @ConnectedSocket() socket: Socket,
-  ) {
+  async cancelInvite(@ConnectedSocket() socket: Socket) {
     try {
       await this.gamesService.cancelInvitation(socket.data.userId);
     } catch (error) {
@@ -266,29 +320,41 @@ export class AppGateway
     }
   }
 
-
+  @SubscribeMessage('roundOver')
+  async roundOver(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('winnerId') winnerId: number
+  ) {
+    try {
+      const player = await this.gamesService.gameModel.getPlayer(
+        socket.data.userId
+      );
+      const game = player.game;
+      if (game) {
+        await this.gamesService.gameModel.roundOver(game.gameId, winnerId);
+      }
+    } catch (error) {
+      await socket.emit('gameError', error);
+    }
+  }
 
   // For test
 
   @SubscribeMessage('disconnectPlayer')
-  async disconnectPlayer(
-    @ConnectedSocket() socket: Socket
-  ) {
-   this.gamesService.gameModel.disconnectPlayer(socket.data.userId);
-   socket.emit('disconnectPlayer');
+  async disconnectPlayer(@ConnectedSocket() socket: Socket) {
+    this.gamesService.gameModel.disconnectPlayer(socket.data.userId);
+    socket.emit('disconnectPlayer');
   }
 
   @SubscribeMessage('gameStatus')
-  async gameStatus(
-    @ConnectedSocket() socket: Socket
-  ) {
+  async gameStatus(@ConnectedSocket() socket: Socket) {
     await this.gamesService.gameModel.gameStatus(socket);
   }
 
   @SubscribeMessage('addBlocked')
   async addBlocked(
     @ConnectedSocket() socket: Socket,
-    @MessageBody('userId') userId: number,
+    @MessageBody('userId') userId: number
   ) {
     const blocker = socket.data.userId;
     const blocked = userId;
@@ -296,8 +362,8 @@ export class AppGateway
     await this.prismaService.blockUser.upsert({
       where: {
         id: {
-        blockerId: blocker,
-        blockedId: blocked,
+          blockerId: blocker,
+          blockedId: blocked,
         },
       },
       create: {
@@ -314,11 +380,11 @@ export class AppGateway
   @SubscribeMessage('removeBlocked')
   async removeBlocked(
     @ConnectedSocket() socket: Socket,
-    @MessageBody('userId') userId: number,
+    @MessageBody('userId') userId: number
   ) {
     const blocker = socket.data.userId;
     const blocked = userId;
-    
+
     await this.prismaService.blockUser.delete({
       where: {
         id: {

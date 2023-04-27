@@ -69,11 +69,11 @@ export class Channel {
   }
 
   isUserMuted(userId: number): boolean {
-	  return this.muted.has(userId);
+    return this.muted.has(userId);
   }
-  
+
   isUserBanned(userId: number): boolean {
-	  return this.banned.has(userId);
+    return this.banned.has(userId);
   }
 
   // 채널에서 유저의 역할을 가져온다.
@@ -97,15 +97,15 @@ export class Channel {
   }
 
   checkUserMuted(user: ChannelUser) {
-	if (this.isUserMuted(user.id)) {
-		const expiresAt = new Date(this.muted.get(user.id));
+    if (this.isUserMuted(user.id)) {
+      const expiresAt = new Date(this.muted.get(user.id));
 
-		if (expiresAt.getTime() > new Date().getTime()) {
-		  const code = HttpStatus.FORBIDDEN;
-		  const message = 'You are silenced on the channel.';
-		  throw { code, message };
-		}
-	}
+      if (expiresAt.getTime() > new Date().getTime()) {
+        const code = HttpStatus.FORBIDDEN;
+        const message = 'You are silenced on the channel.';
+        throw { code, message };
+      }
+    }
   }
 
   checkPassword(password?: string) {
@@ -313,7 +313,7 @@ export class ChannelModel {
       data: {
         channelId: channel.id,
         userId: user.id,
-      }
+      },
     });
   }
 
@@ -321,14 +321,16 @@ export class ChannelModel {
     channel.leave(user);
     user.leave(channel);
 
-    if (channel.isUserBanned(user.id)) { return; }
+    if (channel.isUserBanned(user.id)) {
+      return;
+    }
     await this.prismaService.channel_User.delete({
       where: {
         id: {
           channelId: channel.id,
           userId: user.id,
         },
-      }
+      },
     });
   }
 
@@ -341,7 +343,7 @@ export class ChannelModel {
       data: {
         channelId: channel.id,
         userId: invitedUser.id,
-      }
+      },
     });
   }
 
