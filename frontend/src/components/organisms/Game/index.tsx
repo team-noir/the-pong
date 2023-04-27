@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 import { Stage, Layer } from 'react-konva';
+import konva from 'konva';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -22,12 +23,14 @@ interface Props {
 export default function Game({ game }: Props) {
   const myUserId = useUser((state) => state.id);
   const containerRef = useRef<HTMLElement>(null);
+  const canvasRef = useRef<konva.Layer>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   const amIViewer = !game.players.some((player) => player.id === myUserId);
   const myPlayer = game.players.find((player) => player.id === myUserId);
   const otherPlayer =
     myPlayer && game.players.find((player) => player.id !== myUserId);
-  const amIOwner = !amIViewer && myPlayer?.isOwner;
+  const amIOwner = myPlayer?.isOwner;
 
   const [
     ball,
@@ -43,6 +46,8 @@ export default function Game({ game }: Props) {
     amIViewer,
     amIOwner,
     containerRef,
+    canvasRef,
+    videoRef,
     myPlayer,
     otherPlayer
   );
@@ -63,7 +68,7 @@ export default function Game({ game }: Props) {
       >
         {amIOwner ? (
           <Stage width={stageSize} height={stageSize}>
-            <Layer>
+            <Layer ref={canvasRef}>
               <Ball
                 x={ball.x * stageSize}
                 y={ball.y * stageSize}
@@ -88,6 +93,7 @@ export default function Game({ game }: Props) {
           </Stage>
         ) : (
           <video
+            ref={videoRef}
             className={classNames(
               'w-full h-full bg-black',
               !amIViewer && !amIOwner && '-scale-y-100'

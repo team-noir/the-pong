@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef } from 'react';
+import konva from 'konva';
 import { SocketContext } from 'contexts/socket';
 
 type ReturnType = [
@@ -8,6 +9,8 @@ type ReturnType = [
 export default function useGameRTC(
   gameId: number,
   amIOwner: boolean | undefined,
+  canvasRef: React.RefObject<konva.Layer>,
+  videoRef: React.RefObject<HTMLVideoElement>,
   count: number,
   setCount: React.Dispatch<React.SetStateAction<number>>,
   isPlaying: boolean,
@@ -67,9 +70,8 @@ export default function useGameRTC(
 
   const addOwnerRTCSocketListeners = () => {
     socket.on('rtcInit', async (userId: number) => {
-      const canvas = document.querySelector('canvas');
-      if (!canvas) return;
-      const stream = canvas.captureStream();
+      if (!canvasRef.current) return;
+      const stream = canvasRef.current.getNativeCanvasElement().captureStream();
       canvasStreamRef.current = stream;
       if (!canvasStreamRef.current) return;
 
@@ -151,13 +153,9 @@ export default function useGameRTC(
   };
 
   const getRemoteStream = (e: RTCTrackEvent) => {
-    const video = document.querySelector('video');
-    if (!video) {
-      return;
-    }
-
-    if (video.srcObject !== e.streams[0]) {
-      video.srcObject = e.streams[0];
+    if (!videoRef.current) return;
+    if (videoRef.current.srcObject !== e.streams[0]) {
+      videoRef.current.srcObject = e.streams[0];
     }
   };
 

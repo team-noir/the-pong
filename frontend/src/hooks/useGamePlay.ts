@@ -1,5 +1,6 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import konva from 'konva';
 import useGameRTC from 'hooks/useGameRTC';
 import { SocketContext } from 'contexts/socket';
 import { GameResultType, GameType, PlayerType } from 'types';
@@ -20,6 +21,8 @@ export default function useGamePlay(
   amIViewer: boolean,
   amIOwner: boolean | undefined,
   containerRef: React.RefObject<HTMLElement>,
+  canvasRef: React.RefObject<konva.Layer>,
+  videoRef: React.RefObject<HTMLVideoElement>,
   myPlayer: PlayerType | undefined,
   otherPlayer: PlayerType | undefined
 ): ReturnType {
@@ -39,6 +42,8 @@ export default function useGamePlay(
   const [dataChannelRef] = useGameRTC(
     gameId,
     amIOwner,
+    canvasRef,
+    videoRef,
     count,
     setCount,
     isPlaying,
