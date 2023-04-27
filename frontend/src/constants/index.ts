@@ -14,3 +14,5 @@ export const NOTICE_STATUS = {
 export const BACKGROUND_IMAGES = {
   WELCOME: `${process.env.PUBLIC_URL}/images/welcome-background.jpg`,
 };
+
+export const SOCKET_URI = process.env.REACT_APP_API_URL || 'http://localhost';
