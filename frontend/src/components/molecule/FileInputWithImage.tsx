@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import Button from 'components/atoms/Button';
+import { DEFAULT_PROFILE_IMAGE } from 'constants/index';
 
 interface Props {
   imageUrl: string;
@@ -14,6 +15,11 @@ export default function FileInputWithImage({
 }: Props) {
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
   const fileInput = useRef<HTMLInputElement>(null);
+
+  const handleImgError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const target = e.target as HTMLImageElement;
+    target.src = DEFAULT_PROFILE_IMAGE;
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -42,6 +48,7 @@ export default function FileInputWithImage({
         src={imagePreviewUrl || imageUrl}
         alt="profile image"
         className="h-32 w-32 rounded-full mb-6 object-cover"
+        onError={handleImgError}
       />
       <div className="flex flex-col items-center gap-2 mb-4">
         <input
