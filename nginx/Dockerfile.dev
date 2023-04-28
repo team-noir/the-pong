@@ -1,4 +1,4 @@
-FROM nginx:stable
+FROM nginx:stable-alpine
 
 COPY ./proxy-dev.conf /etc/nginx/conf.d/proxy.conf
 
