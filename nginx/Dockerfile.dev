@@ -1,4 +1,4 @@
-FROM nginx:latest
+FROM nginx:stable
 
 COPY ./proxy-dev.conf /etc/nginx/conf.d/proxy.conf
 
