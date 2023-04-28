@@ -1,4 +1,4 @@
-import { GameType } from './../types/index';
+import { AchievementType, GameType, MessageType } from './../types/index';
 import axios, { AxiosResponse } from 'axios';
 import {
   UserType,
@@ -53,7 +53,7 @@ export const logout = async () => {
   return res;
 };
 
-export const get2faCode = async () => {
+export const get2faCode = async (): Promise<{ qr: string; key: string }> => {
   const res = await axiosWithInterceptors.get(`/auth/2fa`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -114,7 +114,9 @@ export const getUsers = async (
   return res.data;
 };
 
-export const getAchievements = async (userId: number) => {
+export const getAchievements = async (
+  userId: number
+): Promise<AchievementType[]> => {
   const res = await axiosWithInterceptors.get(`/users/${userId}/achievements`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -146,7 +148,11 @@ export const updateMyProfileImage = async (imageFile: File) => {
   return res;
 };
 
-export const checkProfile = async ({ nickname }: { nickname: string }) => {
+export const checkProfile = async ({
+  nickname,
+}: {
+  nickname: string;
+}): Promise<{ nickname: boolean }> => {
   const res = await axios.post(`/my/settings/check`, { nickname });
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -156,7 +162,7 @@ export const checkProfile = async ({ nickname }: { nickname: string }) => {
 
 /** Block */
 
-export const getMyBlocks = async () => {
+export const getMyBlocks = async (): Promise<UserType[]> => {
   const res = await axiosWithInterceptors.get(`/my/blocks`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -182,7 +188,7 @@ export const blockUser = async (userId: number) => {
 
 /** Follow */
 
-export const getMyFollowings = async () => {
+export const getMyFollowings = async (): Promise<UserType[]> => {
   const res = await axiosWithInterceptors.get(`/my/following`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -214,7 +220,7 @@ export const getChannels = async ({
 }: {
   enter?: string;
   kind?: string[];
-}) => {
+}): Promise<ChannelType[]> => {
   const res = await axiosWithInterceptors.get(`/channels/`, {
     params: { enter, kind },
   });
@@ -225,7 +231,7 @@ export const getChannels = async ({
   return res.data;
 };
 
-export const getChannel = async (channelId: number) => {
+export const getChannel = async (channelId: number): Promise<ChannelType> => {
   const res = await axiosWithInterceptors.get(`/channels/${channelId}`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -253,7 +259,7 @@ export const joinChannel = async (channelForm: ChannelFormType) => {
   return res;
 };
 
-export const getDmChannel = async (userId: number) => {
+export const getDmChannel = async (userId: number): Promise<ChannelType> => {
   const res = await axiosWithInterceptors.get(`/dms/${userId}`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -261,7 +267,9 @@ export const getDmChannel = async (userId: number) => {
   return res.data;
 };
 
-export const getMessages = async (channelId: number) => {
+export const getMessages = async (
+  channelId: number
+): Promise<MessageType[]> => {
   const res = await axiosWithInterceptors.get(`/channels/${channelId}/message`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
@@ -389,7 +397,7 @@ export const waitGame = async (isLadder: boolean): Promise<AxiosResponse> => {
   return res;
 };
 
-export const cancelWaitingGame = async (): Promise<AxiosResponse> => {
+export const cancelWaitingGame = async () => {
   const res = await axiosWithInterceptors.delete(`/games/queue`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
@@ -397,7 +405,7 @@ export const cancelWaitingGame = async (): Promise<AxiosResponse> => {
   return res;
 };
 
-export const inviteGame = async (userId: number): Promise<AxiosResponse> => {
+export const inviteGame = async (userId: number) => {
   const res = await axiosWithInterceptors.post(`/games/invite`, { userId });
   if (res.status !== 201) {
     throw new Error(res.statusText);
@@ -405,7 +413,7 @@ export const inviteGame = async (userId: number): Promise<AxiosResponse> => {
   return res;
 };
 
-export const cancelInvitingGame = async (): Promise<AxiosResponse> => {
+export const cancelInvitingGame = async () => {
   const res = await axiosWithInterceptors.delete(`/games/invite`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
@@ -419,7 +427,7 @@ export const replyGameInvitation = async ({
 }: {
   gameId: number;
   isAccepted: boolean;
-}): Promise<AxiosResponse> => {
+}) => {
   const res = await axiosWithInterceptors.patch(`/games/${gameId}/invite`, {
     isAccepted,
   });
@@ -450,7 +458,7 @@ export const updateGameSetting = async ({ id, mode, theme }: GameType) => {
   return res;
 };
 
-export const startGame = async (gameId: number): Promise<AxiosResponse> => {
+export const startGame = async (gameId: number) => {
   const res = await axiosWithInterceptors.patch(`/games/${gameId}/play`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
