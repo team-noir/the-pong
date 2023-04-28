@@ -12,10 +12,6 @@ export default function Login() {
     onSuccess: () => queryClient.invalidateQueries(['whoami']),
   });
 
-  const handleClick = () => {
-    window.location.href = API_LOGIN_FT;
-  };
-
   return (
     <main className="relative container mx-auto max-w-xl py-24 min-h-screen vh-center">
       <Background imageSrc={BACKGROUND_IMAGES.WELCOME} />
@@ -27,7 +23,7 @@ export default function Login() {
         <div className="flex-col vh-center gap-2 w-full">
           <Button
             logoImageUrl={logo42}
-            onClick={handleClick}
+            onClick={() => (window.location.href = API_LOGIN_FT)}
             primary
             fullLength
           >

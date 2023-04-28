@@ -13,32 +13,6 @@ export interface UserType {
   isBlockedByMyself?: boolean;
 }
 
-export const USER_ROLES = {
-  OWNER: 'owner',
-  ADMIN: 'admin',
-  NORMAL: 'normal',
-} as const;
-
-/* eslint-disable */
-type UserRoleType = (typeof USER_ROLES)[keyof typeof USER_ROLES];
-
-export type ChannelUserRoleType = 'admin' | 'normal';
-
-export const CHANNEL_USER_STATUS = {
-  KICK: 'kick',
-  BAN: 'ban',
-  MUTE: 'mute',
-} as const;
-
-/* eslint-disable */
-export type ChannelUserStatusType =
-  (typeof CHANNEL_USER_STATUS)[keyof typeof CHANNEL_USER_STATUS];
-
-export interface ChannelUserType extends UserType {
-  role: UserRoleType;
-  isMuted: boolean;
-}
-
 export interface ProfileFormType {
   nickname: string;
   imageFile: File | null;
@@ -55,6 +29,30 @@ export interface AchievementType {
 }
 
 /** Channel */
+
+export const USER_ROLES = {
+  OWNER: 'owner',
+  ADMIN: 'admin',
+  NORMAL: 'normal',
+} as const;
+
+type UserRoleType = (typeof USER_ROLES)[keyof typeof USER_ROLES];
+
+export type ChannelUserRoleType = 'admin' | 'normal';
+
+export const CHANNEL_USER_STATUS = {
+  KICK: 'kick',
+  BAN: 'ban',
+  MUTE: 'mute',
+} as const;
+
+export type ChannelUserStatusType =
+  (typeof CHANNEL_USER_STATUS)[keyof typeof CHANNEL_USER_STATUS];
+
+export interface ChannelUserType extends UserType {
+  role: UserRoleType;
+  isMuted: boolean;
+}
 
 export interface ChannelType {
   id: number;

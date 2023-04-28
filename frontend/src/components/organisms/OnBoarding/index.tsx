@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { checkProfile } from 'api/api.v1';
+import {
+  checkProfile,
+  updateMyProfile,
+  updateMyProfileImage,
+} from 'api/api.v1';
+import { useUser } from 'hooks/useStore';
 import MultiSteps from 'components/organisms/OnBoarding/MultiSteps';
 import StepAgreements from 'components/organisms/OnBoarding/StepAgreements';
 import StepNickname from 'components/organisms/OnBoarding/StepNickname';
 import StepProfileImage from 'components/organisms/OnBoarding/StepProfileImage';
 import { validateAgreements, validateNickname } from 'utils/validatorUtils';
 import { ProfileFormType } from 'types';
-
-interface Props {
-  onSubmit: (formData: ProfileFormType) => void;
-}
 
 export interface FormData extends ProfileFormType {
   isCheckedAll: boolean;
@@ -20,7 +22,8 @@ export interface FormData extends ProfileFormType {
   isCheckedMarketing: boolean;
 }
 
-export default function OnBoarding({ onSubmit }: Props) {
+export default function OnBoarding() {
+  const { setIsOnboarded } = useUser((state) => state);
   const [formData, setFormData] = useState<FormData>({
     isCheckedAll: false,
     isCheckedAge: false,
@@ -31,7 +34,10 @@ export default function OnBoarding({ onSubmit }: Props) {
     imageFile: null,
   });
   const [isAvailableNickname, setIsAvailableNickname] = useState(false);
+  const navigate = useNavigate();
 
+  const updateMyProfileMutation = useMutation(updateMyProfile);
+  const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
   const checkProfileMutation = useMutation({
     mutationFn: checkProfile,
     onSuccess: (data) => {
@@ -43,6 +49,24 @@ export default function OnBoarding({ onSubmit }: Props) {
     if (!formData.nickname) return;
     checkProfileMutation.mutate({ nickname: formData.nickname });
   }, [formData.nickname]);
+
+  const handleSubmit = (formData: ProfileFormType) => {
+    updateMyProfileMutation.mutate(formData.nickname, {
+      onSuccess: () => {
+        !formData.imageFile && handleSuccess();
+      },
+    });
+    if (formData.imageFile) {
+      updateMyProfileImageMutation.mutate(formData.imageFile, {
+        onSuccess: handleSuccess,
+      });
+    }
+  };
+
+  const handleSuccess = () => {
+    setIsOnboarded(true);
+    navigate('/welcome');
+  };
 
   return (
     <>
@@ -72,7 +96,7 @@ export default function OnBoarding({ onSubmit }: Props) {
           null,
         ]}
         messages={['필수 약관에 동의해 주세요.', '닉네임을 확인해 주세요.', '']}
-        onSubmit={onSubmit}
+        onSubmit={handleSubmit}
       />
     </>
   );

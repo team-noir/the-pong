@@ -1,47 +1,42 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { getMyBlocks, unblockUser } from 'api/api.v1';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { unblockUser } from 'api/api.v1';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
+import { UserType } from 'types';
 
-export default function SettingBlocks() {
-  const getMyBlocksQuery = useQuery({
-    queryKey: ['getMyBlocks'],
-    queryFn: getMyBlocks,
-  });
+interface Props {
+  users: UserType[];
+}
+
+export default function SettingBlocks({ users }: Props) {
+  const queryClient = useQueryClient();
 
   const unblockUserMutation = useMutation({
     mutationFn: unblockUser,
-    onSuccess: () => getMyBlocksQuery.refetch(),
+    onSuccess: () => queryClient.invalidateQueries(['getMyBlocks']),
   });
 
   const handleClickUnblock = (e: React.MouseEvent<HTMLElement>) => {
     const ancestorElement = e.currentTarget.closest('[data-user-id]');
     if (!(ancestorElement instanceof HTMLElement)) return;
     const userId = ancestorElement.dataset.userId;
-
-    const answer = confirm('차단을 해제하시겠습니까?');
-    if (!answer) return;
     unblockUserMutation.mutate(Number(userId));
   };
 
   return (
-    <>
-      {getMyBlocksQuery.isSuccess && (
-        <UserList
-          users={getMyBlocksQuery.data || null}
-          imageSize={52}
-          buttons={[
-            <Button
-              key="button0"
-              onClick={handleClickUnblock}
-              secondary
-              size="small"
-            >
-              차단 해제
-            </Button>,
-          ]}
-        />
-      )}
-    </>
+    <UserList
+      users={users}
+      imageSize={52}
+      buttons={[
+        <Button
+          key="button0"
+          onClick={handleClickUnblock}
+          secondary
+          size="small"
+        >
+          차단 해제
+        </Button>,
+      ]}
+    />
   );
 }

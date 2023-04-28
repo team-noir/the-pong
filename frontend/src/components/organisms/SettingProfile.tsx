@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { API_PREFIX, checkProfile } from 'api/api.v1';
+import {
+  API_PREFIX,
+  checkProfile,
+  updateMyProfile,
+  updateMyProfileImage,
+} from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import FileInputWithImage from 'components/molecule/FileInputWithImage';
@@ -8,18 +14,19 @@ import Button from 'components/atoms/Button';
 import { validateNickname } from 'utils/validatorUtils';
 import { ProfileFormType } from 'types';
 
-interface Props {
-  onSubmit: (userFormData: ProfileFormType) => void;
-}
-
-export default function SettingProfile({ onSubmit }: Props) {
-  const { id: myUserId, nickname: myUserNickname } = useUser((state) => state);
-  const [userFormData, setUserFormData] = useState<ProfileFormType>({
+export default function SettingProfile() {
+  const {
+    id: myUserId,
+    nickname: myUserNickname,
+    setNickname,
+  } = useUser((state) => state);
+  const [formData, setFormData] = useState<ProfileFormType>({
     nickname: '',
     imageFile: null,
   });
   const [isValidNickname, setIsValidNickname] = useState(false);
   const [isAvailableNickname, setIsAvailableNickname] = useState(true);
+  const navigate = useNavigate();
 
   const checkProfileMutation = useMutation({
     mutationFn: checkProfile,
@@ -27,12 +34,14 @@ export default function SettingProfile({ onSubmit }: Props) {
       setIsAvailableNickname(data.nickname);
     },
   });
+  const updateMyProfileMutation = useMutation(updateMyProfile);
+  const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
 
   useEffect(() => {
     if (!myUserNickname) return;
 
     const nickname = myUserNickname;
-    setUserFormData((prevState) => ({
+    setFormData((prevState) => ({
       ...prevState,
       nickname,
     }));
@@ -43,14 +52,14 @@ export default function SettingProfile({ onSubmit }: Props) {
     const { files } = e.target;
     if (!files) return;
 
-    setUserFormData((prevState) => ({
+    setFormData((prevState) => ({
       ...prevState,
       imageFile: files[0],
     }));
   };
 
   const handleClickFileRemove = () => {
-    setUserFormData((prevState) => ({
+    setFormData((prevState) => ({
       ...prevState,
       imageFile: null,
     }));
@@ -59,7 +68,21 @@ export default function SettingProfile({ onSubmit }: Props) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!isValidNickname || !isAvailableNickname) return;
-    onSubmit(userFormData);
+    updateMyProfileMutation.mutate(formData.nickname, {
+      onSuccess: () => {
+        !formData.imageFile && handleSuccess();
+      },
+    });
+    if (formData.imageFile) {
+      updateMyProfileImageMutation.mutate(formData.imageFile, {
+        onSuccess: handleSuccess,
+      });
+    }
+  };
+
+  const handleSuccess = () => {
+    setNickname(formData.nickname);
+    navigate(`/profile/${myUserId}`);
   };
 
   const checkNicknameAvailable = (value: string) => {
@@ -81,10 +104,10 @@ export default function SettingProfile({ onSubmit }: Props) {
         <TextInputWithMessage
           id="nickname"
           label="닉네임"
-          value={userFormData.nickname}
+          value={formData.nickname}
           placeholder="닉네임을 입력해주세요"
           setValue={(value) =>
-            setUserFormData((prevState) => ({ ...prevState, nickname: value }))
+            setFormData((prevState) => ({ ...prevState, nickname: value }))
           }
           isValid={isValidNickname}
           setIsValid={(value) => setIsValidNickname(value)}
