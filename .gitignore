@@ -200,6 +200,7 @@ sketch
 # prisma build files
 backend/prisma/*
 !backend/prisma/schema.prisma
+!backend/prisma/yarn.lock
 !backend/prisma/seed.ts
 
 backend/uploads

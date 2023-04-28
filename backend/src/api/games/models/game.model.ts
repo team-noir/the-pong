@@ -13,6 +13,7 @@ import { Socket } from 'socket.io';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
+import { GAME_MODES, GAME_THEMES } from '@const';
 
 type gameId = number;
 type playerId = number;
@@ -23,7 +24,9 @@ export class GameModel implements OnModuleInit {
   private players = new Map<playerId, Player>();
   private invites = new Map<playerId, Game>();
   private queue = new Array<gameId>();
+
   private pongRecords = new Set<playerId>();
+  private readyRecords = new Set<playerId>();
 
   private appGateway: AppGateway;
   private readyTime = 60000;
@@ -39,16 +42,6 @@ export class GameModel implements OnModuleInit {
 
   isPlayerInGame(playerId: number): boolean {
     return this.players.has(playerId);
-  }
-
-  checkPlayersConnection() {
-    const playerIdList = [...this.players.keys()];
-    for (const playerId of playerIdList) {
-      if (!this.pongRecords.has(playerId)) {
-        this.disconnectPlayer(playerId);
-      }
-    }
-    this.pongRecords.clear();
   }
 
   setReadyTime(time: number) {
@@ -77,15 +70,39 @@ export class GameModel implements OnModuleInit {
     return this.games.get(gameId);
   }
 
+  getGameList() {
+    const gamelist = [];
+
+    for (const game of this.games.values()) {
+      const { gameId, isLadder, players, createdAt } = game;
+
+      gamelist.push({
+        id: gameId,
+        players: players.map((player) => {
+          return {
+            id: player.userId,
+            nickname: player.username,
+            level: player.game,
+          };
+        }),
+        viewerCount: game.getViewerCount(),
+        isLadder: isLadder,
+        createdAt: createdAt,
+      });
+    }
+    return gamelist;
+  }
+
   setGame(game: Game) {
     this.games.set(game.gameId, game);
   }
 
   addInvite(game: Game, invitedId: number) {
     this.invites.set(invitedId, game);
+    game.setInvitedId(invitedId);
   }
 
-  getInvite(invitedId: number) {
+  getInviteGame(invitedId: number): Game {
     return this.invites.get(invitedId);
   }
 
@@ -94,7 +111,51 @@ export class GameModel implements OnModuleInit {
   }
 
   deleteInvite(invitedId: number) {
+    const game = this.getInviteGame(invitedId);
+
+    game.removeInvitedId();
     this.invites.delete(invitedId);
+  }
+
+  async createGameResult(gameId: number, loserId?: number) {
+    const game = this.getGame(gameId);
+    const { winner, loser } = game.getWinnerLoser(loserId);
+    const winnerScore = game.score.get(winner.userId);
+    const loserScore = game.score.get(loser.userId);
+
+    const data = await this.prismaService.gameResult.create({
+      data: {
+        id: game.gameId,
+        isLadder: game.isLadder,
+        winnerId: winner.userId,
+        loserId: loser.userId,
+        winnerScore: winnerScore,
+        loserScore: loserScore,
+      },
+      select: {
+        id: true,
+        isLadder: true,
+        winner: {
+          select: {
+            id: true,
+            nickname: true,
+            level: true,
+          },
+        },
+        loser: {
+          select: {
+            id: true,
+            nickname: true,
+            level: true,
+          },
+        },
+        winnerScore: true,
+        loserScore: true,
+        createdAt: true,
+      },
+    });
+
+    return data;
   }
 
   async createPlayer(userId: number) {
@@ -114,7 +175,7 @@ export class GameModel implements OnModuleInit {
       select: {
         nickname: true,
         level: true,
-        blockers: { select: { blockedId: true } },
+        blockeds: { select: { blockedId: true } },
       },
     });
 
@@ -125,8 +186,7 @@ export class GameModel implements OnModuleInit {
     }
 
     const blocks = [];
-    for (const blocked of data.blockers) {
-      console.log(blocked);
+    for (const blocked of data.blockeds) {
       blocks.push(blocked.blockedId);
     }
 
@@ -148,10 +208,12 @@ export class GameModel implements OnModuleInit {
     this.receivePong(player.userId);
   }
 
-  resetPlayerSocket(playerId: number, socket) {
+  reconnectPlayerSocket(playerId: number, socket) {
     const player = this.players.get(playerId);
+
     if (player) {
-      player.setSocket(socket);
+      player.reconnectSocket(socket);
+      this.pongRecords.add(playerId);
     }
   }
 
@@ -167,13 +229,21 @@ export class GameModel implements OnModuleInit {
   async setGameRoomTimeout(gameId: number) {
     const game = this.games.get(gameId);
 
+    if (game.readyTimeout) {
+      return;
+    }
     game.readyTimeout = setTimeout(async () => {
       if (game.isFull()) {
         return;
       }
-      if (game.invitedId) {
+      const invitetId = game.getInvitedId();
+      if (invitetId) {
+        const invitedSocket = this.appGateway.getUserSocket(invitetId);
+        if (invitedSocket) {
+          await invitedSocket.emit('gameInvite', { text: 'canceled' });
+        }
         await game.noticeToPlayers('gameInvite', { text: 'canceled' });
-        this.deleteInvite(game.invitedId);
+        this.deleteInvite(invitetId);
       } else {
         await game.noticeToPlayers('queue', { text: 'timeout' });
       }
@@ -218,21 +288,20 @@ export class GameModel implements OnModuleInit {
 
     this.addQueue(newGame);
     this.addInvite(newGame, invited.userId);
-    newGame.invitedId = invited.userId;
+    newGame.setInvitedId(invited.userId);
 
     return newGame.gameId;
   }
 
-  removeInvitation(game: Game) {
-    const invitedId = game.invitedId;
+  removeInvitation(game: Game): Socket | null {
+    const invitedId = game.getInvitedId();
     const invitedSocket = this.appGateway.getUserSocket(invitedId);
 
-    this.invites.delete(invitedId);
-    invitedSocket.emit('gameInvite', {
-      text: 'canceled',
-    });
-
-    this.removeGame(game);
+    if (!invitedId || !invitedSocket) {
+      return null;
+    }
+    this.deleteInvite(invitedId);
+    return invitedSocket;
   }
 
   findQueue(player: Player, isLadder: boolean): Game | null {
@@ -270,21 +339,29 @@ export class GameModel implements OnModuleInit {
   }
 
   removeGame(game: Game) {
-    this.removePlayers(game);
-    this.removeQueue(game);
     this.games.delete(game.gameId);
+    this.removePlayers(game);
+    const invitedSocket = this.removeInvitation(game);
+    if (invitedSocket && !game.isStarted) {
+      invitedSocket.emit('gameInvite', { text: 'canceled' });
+    }
+    this.removeQueue(game);
     game.clearGameRoomTimeout();
   }
 
   disconnectPlayer(playerId: number) {
     const player = this.players.get(playerId);
 
+    if (!player) {
+      return;
+    }
     if (player.game) {
       this.removeGame(player.game);
     }
     if (this.isInvited(playerId)) {
       this.deleteInvite(playerId);
     }
+
     this.players.delete(player.userId);
   }
 
@@ -294,8 +371,6 @@ export class GameModel implements OnModuleInit {
     }
 
     this.checkPlayersConnection();
-
-    // Send ping
     const playerIdList = [...this.players.keys()];
     playerIdList.forEach((playerId) => {
       const player = this.players.get(playerId);
@@ -307,7 +382,56 @@ export class GameModel implements OnModuleInit {
 
   receivePong(userId: number) {
     if (userId) {
+      this.checkPlayersReady(userId);
       this.pongRecords.add(userId);
+    }
+  }
+
+  checkPlayersConnection() {
+    const playerIdList = [...this.players.keys()];
+
+    for (const playerId of playerIdList) {
+      if (!this.pongRecords.has(playerId)) {
+        this.disconnectPlayer(playerId);
+      }
+    }
+    this.pongRecords.clear();
+  }
+
+  checkPlayersReady(userId: number) {
+    if (this.readyRecords.has(userId)) {
+      this.readyRecords.delete(userId);
+      const player = this.players.get(userId);
+      if (player) {
+        player.readyGame();
+      }
+    }
+  }
+
+  async gameStart(game: Game) {
+    this.removeQueue(game);
+    this.removeInvitation(game);
+    game.clearGameRoomTimeout();
+    game.setStart();
+
+    const playerIds = [...game.players.keys()];
+    playerIds.forEach((playerId) => {
+      this.readyRecords.add(playerId);
+    });
+  }
+
+  async roundOver(gameId: number, winnerId: number) {
+    const game = this.getGame(gameId);
+    game.score.set(winnerId, game.score.get(winnerId) + 1);
+
+    if (game.score.get(winnerId) == 11) {
+      const data = this.createGameResult(gameId);
+      await game.noticeToPlayers('gameOver', data);
+    } else {
+      await game.noticeToPlayers('roundOver', {
+        winnerId: winnerId,
+        winnerScore: game.score.get(winnerId),
+      });
     }
   }
 }

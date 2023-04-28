@@ -1,44 +1,66 @@
-import { Game } from "./game.dto";
-import { Socket } from "socket.io";
+import { Game } from './game.dto';
+import { Socket } from 'socket.io';
 
 export class Player {
-	userId: number;
-	username: string;
-	level: number;
-	socket: Socket;
-	blockUser?: Set<number>;
-	
-	game?: Game;
-	gameInvited?: Game;
+  userId: number;
+  username: string;
+  level: number;
+  socket: Socket;
+  blockUser?: Set<number>;
 
-	constructor(userId: number, username: string, level: number, socket: Socket, blockUser?: number[]) {
-		this.userId = userId;
-		this.username = username;
-		this.level = level;
-		this.socket = socket;
-		this.blockUser = new Set(blockUser);
-	}
+  game?: Game;
+  gameInvited?: Game;
 
-	isBlockUser(playerId: number) : boolean {
-		if (!this.blockUser) {
-			return false;
-		}
-		return this.blockUser.has(playerId);
-	}
+  constructor(
+    userId: number,
+    username: string,
+    level: number,
+    socket: Socket,
+    blockUser?: number[]
+  ) {
+    this.userId = userId;
+    this.username = username;
+    this.level = level;
+    this.socket = socket;
+    this.blockUser = new Set(blockUser);
+  }
 
-	joinGame(game: Game): boolean {
-		if (game && !this.game) {
-			this.game = game;
-			return true;
-		}
-		return false;
-	}
+  isBlockUser(playerId: number): boolean {
+    if (!this.blockUser) {
+      return false;
+    }
+    return this.blockUser.has(playerId);
+  }
 
-	leaveGame() {
-		this.game = null;
-	}
+  joinGame(game: Game): boolean {
+    if (game && !this.game) {
+      this.game = game;
+      return true;
+    }
+    return false;
+  }
 
-	setSocket(socket) {
-		this.socket = socket;
-	}
+  readyGame() {
+    if (this.game) {
+      this.game.readyPlayer(this);
+    }
+  }
+
+  leaveGame() {
+    this.game = null;
+  }
+
+  setSocket(socket) {
+    this.socket = socket;
+  }
+
+  reconnectSocket(newSocket: Socket) {
+    if (this.socket) {
+      this.socket.disconnect(true);
+    }
+    this.socket = newSocket;
+    if (this.game) {
+      this.game.reconnectPlayer(this);
+    }
+  }
 }

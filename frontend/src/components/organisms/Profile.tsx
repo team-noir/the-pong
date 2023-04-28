@@ -74,11 +74,17 @@ export default function Profile({ userId }: Props) {
       {user && (
         <div className="flex flex-col items-center">
           <ProfileImage userId={userId} alt="profile image" size={192} />
-          <p data-testid={userId} className="text-2xl font-semibold mt-4 mb-8">
-            {user.nickname}
-          </p>
+          <div className="mb-8 text-center">
+            <p
+              data-testid={userId}
+              className="text-2xl font-semibold mt-4 mb-2"
+            >
+              {user.nickname}
+            </p>
+            <span className="badge">Lv. {user.level}</span>
+          </div>
           {isMyPage && (
-            <Link to="/setting" className="button primary small">
+            <Link to="/setting/profile" className="button primary small">
               프로필 수정하기
             </Link>
           )}
