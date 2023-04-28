@@ -4,7 +4,6 @@ export function classNames(...classes: (string | boolean)[]) {
 
 export function formatDate(iso: string) {
   const d = new Date(iso);
-  const locale = 'ko-KR';
   return `${d.getFullYear()}년 ${d.getMonth() + 1}월 ${d.getDate()}일`;
 }
 

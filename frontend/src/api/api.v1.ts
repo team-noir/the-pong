@@ -1,5 +1,5 @@
 import { AchievementType, GameType, MessageType } from './../types/index';
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 import {
   UserType,
   ChannelType,
