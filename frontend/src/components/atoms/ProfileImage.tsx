@@ -1,4 +1,5 @@
 import { API_PREFIX } from 'api/api.v1';
+import { DEFAULT_PROFILE_IMAGE } from 'constants/index';
 
 interface Props {
   userId: number | undefined;
@@ -14,7 +15,7 @@ export default function ProfileImage({ userId, alt, size }: Props) {
 
   const handleImgError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     const target = e.target as HTMLImageElement;
-    target.src = `${process.env.PUBLIC_URL}/images/default-profile-image.png`;
+    target.src = DEFAULT_PROFILE_IMAGE;
   };
 
   return (
@@ -22,7 +23,7 @@ export default function ProfileImage({ userId, alt, size }: Props) {
       src={
         userId !== undefined
           ? `${API_PREFIX}/users/${userId}/profile-image`
-          : `${process.env.PUBLIC_URL}/images/default-profile-image.png`
+          : DEFAULT_PROFILE_IMAGE
       }
       className="rounded-full object-cover"
       alt={alt}

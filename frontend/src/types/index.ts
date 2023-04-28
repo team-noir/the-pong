@@ -99,12 +99,9 @@ export interface NoticeType {
 
 export interface PlayerType {
   id: number;
-  nickname: string;
-  level: number;
+  nickname?: string;
+  level?: number;
   isOwner?: boolean;
-}
-
-export interface GameHistoryPlayerType extends PlayerType {
   score?: number;
 }
 
@@ -127,25 +124,13 @@ export interface GameResultType {
   id: number;
   winner: PlayerType;
   loser: PlayerType;
-  winnerScore: number;
-  loserScore: number;
   createdAt: string;
 }
 
 export interface GameHistoryType {
   id: number;
   isLadder: boolean;
-  winner: {
-    id: number;
-    nickname: string;
-    level: number;
-    score: number;
-  };
-  loser: {
-    id: number;
-    nickname: string;
-    level: number;
-    score: number;
-  };
+  winner: PlayerType;
+  loser: PlayerType;
   createdAt: string;
 }

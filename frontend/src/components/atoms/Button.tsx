@@ -61,7 +61,7 @@ export default function Button({
           className="fill-current w-4 h-4 mr-2"
         />
       )}
-      <span>{children}</span>
+      {children}
     </button>
   );
 }
