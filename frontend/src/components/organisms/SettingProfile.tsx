@@ -68,39 +68,41 @@ export default function SettingProfile({ onSubmit }: Props) {
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col justify-center items-center"
-    >
-      <FileInputWithImage
-        imageUrl={`${API_PREFIX}/users/${myUserId}/profile-image`}
-        onChange={handleFileChange}
-        onClickRemove={handleClickFileRemove}
-      />
-      <TextInputWithMessage
-        id="nickname"
-        label="닉네임"
-        value={userFormData.nickname}
-        placeholder="닉네임을 입력해주세요"
-        setValue={(value) =>
-          setUserFormData((prevState) => ({ ...prevState, nickname: value }))
-        }
-        isValid={isValidNickname}
-        setIsValid={(value) => setIsValidNickname(value)}
-        validate={validateNickname}
-        isAvailable={isAvailableNickname}
-        checkAvailable={checkNicknameAvailable}
-        message={
-          !isAvailableNickname
-            ? '이미 사용중인 닉네임입니다.'
-            : '유효하지 않은 닉네임입니다.'
-        }
-      />
-      <div className="w-full">
-        <Button type="submit" primary fullLength>
-          저장하기
-        </Button>
-      </div>
-    </form>
+    <div className="container max-w-xl px-0 sm:px-4 lg:px-6">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col justify-center items-center"
+      >
+        <FileInputWithImage
+          imageUrl={`${API_PREFIX}/users/${myUserId}/profile-image`}
+          onChange={handleFileChange}
+          onClickRemove={handleClickFileRemove}
+        />
+        <TextInputWithMessage
+          id="nickname"
+          label="닉네임"
+          value={userFormData.nickname}
+          placeholder="닉네임을 입력해주세요"
+          setValue={(value) =>
+            setUserFormData((prevState) => ({ ...prevState, nickname: value }))
+          }
+          isValid={isValidNickname}
+          setIsValid={(value) => setIsValidNickname(value)}
+          validate={validateNickname}
+          isAvailable={isAvailableNickname}
+          checkAvailable={checkNicknameAvailable}
+          message={
+            !isAvailableNickname
+              ? '이미 사용중인 닉네임입니다.'
+              : '유효하지 않은 닉네임입니다.'
+          }
+        />
+        <div className="w-full">
+          <Button type="submit" primary fullLength>
+            저장하기
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

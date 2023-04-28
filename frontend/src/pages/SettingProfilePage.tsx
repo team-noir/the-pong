@@ -39,9 +39,7 @@ export default function SettingProfilePage() {
 
   return (
     <AppTemplate header={<Header title={'프로필 수정'} hasBackButton />}>
-      <div className="container max-w-xl px-0 sm:px-4 lg:px-6">
-        <SettingProfile onSubmit={handleSubmit} />
-      </div>
+      <SettingProfile onSubmit={handleSubmit} />
     </AppTemplate>
   );
 }

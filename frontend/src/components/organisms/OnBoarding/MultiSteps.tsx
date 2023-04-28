@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { FormData } from 'components/organisms/OnBoarding';
 import Header from 'components/molecule/Header';
 import Button from 'components/atoms/Button';
@@ -9,7 +9,7 @@ type ValidatorFunctionOrNull = (() => boolean) | null;
 
 interface Props {
   formData: FormData;
-  stepComponents: React.ReactElement[];
+  stepComponents: ReactNode[];
   validators: ValidatorFunctionOrNull[];
   messages: string[];
   onSubmit: (formData: ProfileFormType) => void;

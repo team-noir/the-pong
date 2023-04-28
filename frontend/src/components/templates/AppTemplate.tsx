@@ -1,12 +1,11 @@
-import React, { Suspense } from 'react';
-import { Link } from 'react-router-dom';
+import React, { ReactNode, Suspense } from 'react';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import LoadingFallback from 'components/organisms/LoadingFalback';
 import ErrorFallback from 'components/organisms/ErrorFallback';
 
 interface Props {
-  header: React.ReactElement;
+  header: ReactNode;
   children: React.ReactNode;
 }
 
