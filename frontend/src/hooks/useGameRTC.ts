@@ -144,9 +144,14 @@ export default function useGameRTC(
           );
           socket.emit('rtcAnswer', {
             sdp: localSdp,
-            answerSendID: myUserId,
-            answerReceiveID: offerSendUserId,
+            answerSendUserId: myUserId,
+            answerReceiveUserId: offerSendUserId,
           });
+          if (isPlaying) return;
+          interval.current = setInterval(
+            () => setCount((prevState) => prevState - 1),
+            1000
+          );
         } catch (e) {
           console.error(e);
         }
@@ -202,7 +207,7 @@ export default function useGameRTC(
     }
   };
 
-  const createAnswerPeerConnection = (userId: string) => {
+  const createAnswerPeerConnection = (userId: number) => {
     try {
       const peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
