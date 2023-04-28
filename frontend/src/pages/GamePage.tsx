@@ -5,7 +5,7 @@ import { getGame } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
 import AppTemplate from 'components/templates/AppTemplate';
 import Game from 'components/organisms/Game';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Header from 'components/molecule/Header';
 import AchievementModal from 'components/molecule/AchievementModal';
 import { AchievementType } from 'types';
 
@@ -56,11 +56,6 @@ export default function GamePage() {
     };
   }, [socket]);
 
-  const handleClick = () => {
-    // TODO: 게임 나가기 핸들링
-    alert('게임에서 나가시겠습니까?');
-  };
-
   const closeAchievement = (achievementId: number) => {
     setAchievements((prev) => {
       if (prev) {
@@ -73,9 +68,7 @@ export default function GamePage() {
   };
 
   return (
-    <AppTemplate
-      header={<HeaderWithBackButton title="The Pong" onClick={handleClick} />}
-    >
+    <AppTemplate header={<Header title="The Pong" />}>
       {achievements &&
         achievements.map((achievement) => (
           <AchievementModal
