@@ -126,9 +126,7 @@ export default function useGameRTC(
       'rtcGetOffer',
       async (data: { sdp: RTCSessionDescription; offerSendUserId: number }) => {
         const { sdp, offerSendUserId } = data;
-        const peerConnection = createAnswerPeerConnection(
-          String(offerSendUserId)
-        );
+        const peerConnection = createAnswerPeerConnection(offerSendUserId);
         if (!peerConnection) return;
         peerConnectionsRef.current = {
           ...peerConnectionsRef.current,
@@ -203,7 +201,7 @@ export default function useGameRTC(
     }
   };
 
-  const createAnswerPeerConnection = (userId: string) => {
+  const createAnswerPeerConnection = (userId: number) => {
     try {
       const peerConnection = new RTCPeerConnection(peerConnectionConfig);
 
