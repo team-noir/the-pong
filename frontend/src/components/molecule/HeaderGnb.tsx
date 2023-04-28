@@ -19,7 +19,12 @@ const navigation = [
 ];
 
 export default function HeaderGnb() {
-  const { logout, setIsOnboarded, id: myUserId } = useUser((state) => state);
+  const {
+    logout,
+    setIsOnboarded,
+    id: myUserId,
+    nickname: MyUserNickname,
+  } = useUser((state) => state);
   const socket = useContext(SocketContext);
 
   const postLogoutMutation = useMutation({
@@ -64,7 +69,7 @@ export default function HeaderGnb() {
                       {myUserId && (
                         <ProfileImage
                           userId={myUserId}
-                          alt="My profile image"
+                          nickname={`${MyUserNickname}`}
                           size={32}
                         />
                       )}

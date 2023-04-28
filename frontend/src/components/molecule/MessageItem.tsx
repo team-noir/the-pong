@@ -33,7 +33,7 @@ export default function MessageItem({
           <div className="flex">
             <ProfileImage
               userId={message.senderId}
-              alt={`${message.senderNickname}'s profile image`}
+              nickname={`${message.senderNickname}`}
               size={52}
             />
             <span>{message.senderNickname}</span>

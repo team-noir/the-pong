@@ -3,11 +3,11 @@ import { DEFAULT_PROFILE_IMAGE } from 'constants/index';
 
 interface Props {
   userId: number | undefined;
-  alt: string;
+  nickname: string;
   size: number;
 }
 
-export default function ProfileImage({ userId, alt, size }: Props) {
+export default function ProfileImage({ userId, nickname, size }: Props) {
   const style = {
     width: size,
     height: size,
@@ -26,7 +26,7 @@ export default function ProfileImage({ userId, alt, size }: Props) {
           : DEFAULT_PROFILE_IMAGE
       }
       className="rounded-full object-cover"
-      alt={alt}
+      alt={`${nickname}의 프로필 이미지`}
       width={size}
       style={style}
       onError={handleImgError}

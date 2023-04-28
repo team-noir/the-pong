@@ -36,7 +36,7 @@ export default function UserItem({
           <div className="relative">
             <ProfileImage
               userId={user.id}
-              alt={`${user.nickname}'s profile image`}
+              nickname={`${user.nickname}`}
               size={imageSize}
             />
             {hasStatus && user.status === 'online' && (

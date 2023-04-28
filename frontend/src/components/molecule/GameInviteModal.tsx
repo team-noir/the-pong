@@ -67,7 +67,7 @@ export default function GameInviteModal() {
           <p className="flex items-center">
             <ProfileImage
               userId={user?.id}
-              alt={`${user?.nickname}`}
+              nickname={`${user?.nickname}`}
               size={40}
             />
             <span className="ml-2">

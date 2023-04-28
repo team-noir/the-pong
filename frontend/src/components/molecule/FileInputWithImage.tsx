@@ -46,7 +46,7 @@ export default function FileInputWithImage({
     <div className="flex flex-col items-center mb-16">
       <img
         src={imagePreviewUrl || imageUrl}
-        alt="profile image"
+        alt="프로필 이미지"
         className="h-32 w-32 rounded-full mb-6 object-cover"
         onError={handleImgError}
       />

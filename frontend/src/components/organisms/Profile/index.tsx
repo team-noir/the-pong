@@ -70,7 +70,11 @@ export default function Profile({ user }: Props) {
     <>
       <section className="section">
         <div className="flex flex-col items-center">
-          <ProfileImage userId={user.id} alt="profile image" size={192} />
+          <ProfileImage
+            userId={user.id}
+            nickname={`${user.nickname}`}
+            size={192}
+          />
           <div className="mb-8 text-center">
             <p data-testid={user} className="text-2xl font-semibold mt-4 mb-2">
               {user.nickname}
