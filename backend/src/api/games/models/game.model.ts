@@ -134,7 +134,6 @@ export class GameModel implements OnModuleInit {
       },
       select: {
         id: true,
-        isLadder: true,
         winner: {
           select: {
             id: true,
@@ -155,7 +154,22 @@ export class GameModel implements OnModuleInit {
       },
     });
 
-    return data;
+    return {
+      id: data.id,
+      winner: {
+        id: data.winner.id,
+        nickname: data.winner.nickname,
+        level: data.winner.level,
+        score: data.winnerScore,
+      },
+      loser: {
+        id: data.loser.id,
+        nickname: data.loser.nickname,
+        level: data.loser.level,
+        score: data.loserScore,
+      },
+      createdAt: data.createdAt,
+    };
   }
 
   async createPlayer(userId: number) {
@@ -429,7 +443,7 @@ export class GameModel implements OnModuleInit {
     } else {
       await game.noticeToPlayers('roundOver', {
         winnerId: winnerId,
-        winnerScore: game.score.get(winnerId),
+        score: game.score.get(winnerId),
       });
     }
   }
