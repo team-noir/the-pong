@@ -24,19 +24,25 @@ export default function SettingBlocks({ users }: Props) {
   };
 
   return (
-    <UserList
-      users={users}
-      imageSize={52}
-      buttons={[
-        <Button
-          key="button0"
-          onClick={handleClickUnblock}
-          secondary
-          size="small"
-        >
-          차단 해제
-        </Button>,
-      ]}
-    />
+    <>
+      {users.length ? (
+        <UserList
+          users={users}
+          imageSize={52}
+          buttons={[
+            <Button
+              key="button0"
+              onClick={handleClickUnblock}
+              secondary
+              size="small"
+            >
+              차단 해제
+            </Button>,
+          ]}
+        />
+      ) : (
+        <p>차단한 회원이 없습니다.</p>
+      )}
+    </>
   );
 }

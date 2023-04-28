@@ -44,26 +44,30 @@ export default function Following({ users }: Props) {
   return (
     <section className="section">
       <h2 className="section-title">팔로잉</h2>
-      <UserList
-        users={users}
-        imageSize={52}
-        hasStatus={true}
-        buttons={[
-          <GameInviteButton key="button0" />,
-          <Button onClick={handleClickDm} key="button1" primary size="small">
-            메시지 보내기
-          </Button>,
-          <Button
-            key="button2"
-            onClick={handleClickUnfollow}
-            linkStyle
-            className="text-red"
-            size="small"
-          >
-            언팔로우
-          </Button>,
-        ]}
-      />
+      {users.length ? (
+        <UserList
+          users={users}
+          imageSize={52}
+          hasStatus={true}
+          buttons={[
+            <GameInviteButton key="button0" />,
+            <Button onClick={handleClickDm} key="button1" primary size="small">
+              메시지 보내기
+            </Button>,
+            <Button
+              key="button2"
+              onClick={handleClickUnfollow}
+              linkStyle
+              className="text-red"
+              size="small"
+            >
+              언팔로우
+            </Button>,
+          ]}
+        />
+      ) : (
+        <p>팔로우한 회원이 없습니다.</p>
+      )}
     </section>
   );
 }
