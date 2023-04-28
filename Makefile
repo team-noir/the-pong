@@ -49,6 +49,7 @@ show: ## Show containers, images, and logs
 .PHONY: clean
 clean: ## Stop and remove running containers, networks, images, and volumes
 	$(DOCKER_COMPOSE) down --rmi all --volumes --remove-orphans
+	docker image prune
 
 .PHONY: re
 re: clean ## clean & build
@@ -72,3 +73,4 @@ up-dev: ## [dev] Create and start containers
 .PHONY: clean-dev
 clean-dev: ## [dev] Stop and remove running containers, networks, images, and volumes
 	$(DOCKER_COMPOSE_DEV) down --rmi all --volumes --remove-orphans
+	docker image prune
