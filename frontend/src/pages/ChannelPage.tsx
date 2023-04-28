@@ -8,7 +8,7 @@ import Channel from 'components/organisms/Channel';
 import ChannelDetail from 'components/organisms/ChannelDetail';
 import ChannelSetting from 'components/organisms/ChannelSetting';
 import ChannelInvite from 'components/organisms/ChannelInvite';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Header from 'components/molecule/Header';
 import Button from 'components/atoms/Button';
 
 export default function ChannelPage() {
@@ -28,9 +28,11 @@ export default function ChannelPage() {
   return (
     <AppTemplate
       header={
-        <HeaderWithBackButton
-          title={getChannelQuery.data.title || ''}
+        <Header
+          title={getChannelQuery.data.title}
+          noTitle={!getChannelQuery.data.title}
           button={<Button onClick={() => setIsShowDetail(true)}>메뉴</Button>}
+          hasBackButton
         />
       }
     >

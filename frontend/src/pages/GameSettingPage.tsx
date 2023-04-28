@@ -8,6 +8,7 @@ import Modal from 'components/templates/Modal';
 import GameSetting from 'components/organisms/GameSetting';
 import Header from 'components/molecule/Header';
 import { GameSettingType } from 'types';
+import { SERVICE_NAME } from 'constants/index';
 
 export default function GameSettingPage() {
   const { gameId } = useParams() as { gameId: string };
@@ -59,7 +60,7 @@ export default function GameSettingPage() {
 
   return (
     <>
-      <AppTemplate header={<Header />}>
+      <AppTemplate header={<Header title={SERVICE_NAME} />}>
         {gameSetting && <GameSetting gameSetting={gameSetting} />}
       </AppTemplate>
       {isOtherUserLeft && (

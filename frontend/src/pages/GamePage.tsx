@@ -8,6 +8,7 @@ import Game from 'components/organisms/Game';
 import Header from 'components/molecule/Header';
 import AchievementModal from 'components/molecule/AchievementModal';
 import { AchievementType } from 'types';
+import { SERVICE_NAME } from 'constants/index';
 
 const dummyAchievements: AchievementType[] = [
   {
@@ -68,7 +69,7 @@ export default function GamePage() {
   };
 
   return (
-    <AppTemplate header={<Header title="The Pong" />}>
+    <AppTemplate header={<Header title={SERVICE_NAME} />}>
       {achievements &&
         achievements.map((achievement) => (
           <AchievementModal

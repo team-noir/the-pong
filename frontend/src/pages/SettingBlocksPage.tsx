@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { getMyBlocks, unblockUser } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Header from 'components/molecule/Header';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
 
@@ -27,7 +27,7 @@ export default function SettingBlocksPage() {
   };
 
   return (
-    <AppTemplate header={<HeaderWithBackButton title={'차단 관리'} />}>
+    <AppTemplate header={<Header title={'차단 관리'} hasBackButton />}>
       {getMyBlocksQuery.isSuccess && (
         <UserList
           users={getMyBlocksQuery.data || null}

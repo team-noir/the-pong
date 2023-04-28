@@ -1,19 +1,22 @@
 import { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeftIcon } from '@heroicons/react/24/outline';
+import Logo from 'components/atoms/Logo';
 
 interface Props {
   title?: string;
-  button?: ReactNode;
+  noTitle?: boolean;
   hasBackButton?: boolean;
   onClick?: () => void;
+  button?: ReactNode;
 }
 
 export default function Header({
   title,
-  button,
+  noTitle = false,
   hasBackButton = false,
   onClick,
+  button,
 }: Props) {
   const navigate = useNavigate();
 
@@ -37,8 +40,10 @@ export default function Header({
             )}
           </div>
           <div className="vh-center flex-1">
-            {title && (
-              <h1 className="text-xl font-normal text-stone-100">{title}</h1>
+            {!noTitle && (
+              <h1 className="text-xl font-normal text-stone-100">
+                {title ? title : <Logo />}
+              </h1>
             )}
           </div>
           <div className="absolute inset-y-0 right-0 flex items-center pr-2">

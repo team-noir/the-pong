@@ -1,4 +1,5 @@
 import { FallbackProps } from 'react-error-boundary';
+import Header from 'components/molecule/Header';
 import Button from 'components/atoms/Button';
 
 export default function ErrorFallback({
@@ -7,11 +8,7 @@ export default function ErrorFallback({
 }: FallbackProps) {
   return (
     <>
-      <header className="relative mx-auto max-w-xl px-2">
-        <div className="flex h-14 items-center text-lg font-medium text-white justify-center">
-          <a href="/">The Pong</a>
-        </div>
-      </header>
+      <Header />
       <div className="container mx-auto max-w-xl min-h-screen py-24 px-4">
         에러가 발생했습니다.
         <Button onClick={() => resetErrorBoundary()}>다시 시도</Button>

@@ -4,7 +4,7 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { getChannels, joinChannel } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import ChannelBrowse from 'components/organisms/ChannelBrowse';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Header from 'components/molecule/Header';
 import PasswordModal from 'components/molecule/PasswordModal';
 import { ChannelType } from 'types';
 
@@ -50,7 +50,7 @@ export default function ChannelBrowsePage() {
   };
 
   return (
-    <AppTemplate header={<HeaderWithBackButton title={'채널 둘러보기'} />}>
+    <AppTemplate header={<Header title={'채널 둘러보기'} hasBackButton />}>
       {getChannelsQuery.isSuccess && (
         <ChannelBrowse
           channels={getChannelsQuery.data}

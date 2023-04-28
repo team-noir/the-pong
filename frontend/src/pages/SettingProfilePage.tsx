@@ -4,7 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { updateMyProfile, updateMyProfileImage } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import SettingProfile from 'components/organisms/SettingProfile';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Header from 'components/molecule/Header';
 import { ProfileFormType } from 'types';
 import { useUser } from 'hooks/useStore';
 
@@ -38,7 +38,7 @@ export default function SettingProfilePage() {
   };
 
   return (
-    <AppTemplate header={<HeaderWithBackButton title={'프로필 수정'} />}>
+    <AppTemplate header={<Header title={'프로필 수정'} hasBackButton />}>
       <div className="container max-w-xl px-0 sm:px-4 lg:px-6">
         <SettingProfile onSubmit={handleSubmit} />
       </div>

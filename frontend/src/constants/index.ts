@@ -1,3 +1,5 @@
+export const SERVICE_NAME = 'The Pong';
+
 export const NOTICE_STATUS = {
   USER_JOIN: 100,
   USER_LEAVE: 101,
