@@ -29,7 +29,7 @@ export default function ChannelNew() {
     mutationFn: createChannel,
     onSuccess: (data) => {
       const { id } = data;
-      navigate(`/channel/${id}`);
+      navigate(`/channel/${id}`, { replace: true });
     },
   });
 
