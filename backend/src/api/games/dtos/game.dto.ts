@@ -57,8 +57,12 @@ export class Game {
     return this.players;
   }
 
-  getOwner(): Player {
+  getOwnerPlayer(): Player {
     return this.players[0];
+  }
+  
+  getNonOwnerPlayer(): Player {
+    return this.players[1];
   }
 
   isFull(): boolean {
