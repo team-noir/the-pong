@@ -34,23 +34,6 @@ export default function AppTemplate({ header, children }: Props) {
           </ErrorBoundary>
         )}
       </QueryErrorResetBoundary>
-
-      <hr className="my-6 border-gray-200 sm:mx-auto dark:border-gray lg:my-8" />
-      <footer className="container mx-auto max-w-xl p-4 bg-green-200 shadow">
-        <p>Footer</p>
-        <nav>
-          <h5 className="font-mono text-sm font-bold">development nav</h5>
-          <li>
-            <Link to="/login">Login</Link>
-          </li>
-          <li>
-            <Link to="/on-boarding">On Boarding</Link>
-          </li>
-          <li>
-            <Link to="/profile/3">user3 profile</Link>
-          </li>
-        </nav>
-      </footer>
     </>
   );
 }
