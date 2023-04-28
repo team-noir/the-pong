@@ -71,17 +71,18 @@ export default function useGameRTC(
   };
 
   const addOwnerRTCSocketListeners = () => {
-    socket.on('rtcInit', async (userId: number) => {
+    socket.on('rtcInit', async (data: { userId: number }) => {
+      console.log('rtcInit');
       if (!canvasRef.current) return;
       const stream = canvasRef.current.getNativeCanvasElement().captureStream();
       canvasStreamRef.current = stream;
       if (!canvasStreamRef.current) return;
 
-      const peerConnection = createOfferPeerConnection(userId);
+      const peerConnection = createOfferPeerConnection(data.userId);
       if (!peerConnection) return;
       peerConnectionsRef.current = {
         ...peerConnectionsRef.current,
-        [userId]: peerConnection,
+        [data.userId]: peerConnection,
       };
 
       try {
@@ -93,7 +94,7 @@ export default function useGameRTC(
         socket.emit('rtcOffer', {
           sdp: localSdp,
           offerSendUserId: myUserId,
-          offerReceiveUserId: userId,
+          offerReceiveUserId: data.userId,
         });
       } catch (e) {
         console.error(e);
@@ -144,8 +145,8 @@ export default function useGameRTC(
           );
           socket.emit('rtcAnswer', {
             sdp: localSdp,
-            answerSendID: myUserId,
-            answerReceiveID: offerSendUserId,
+            answerSendUserId: myUserId,
+            answerReceiveUserId: offerSendUserId,
           });
         } catch (e) {
           console.error(e);
