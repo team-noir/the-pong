@@ -203,9 +203,9 @@ export class GameModel implements OnModuleInit {
     return this.players.get(playerId);
   }
 
-  setPlayer(player: Player) {
+  async setPlayer(player: Player) {
     this.players.set(player.userId, player);
-    this.receivePong(player.userId);
+    await this.receivePong(player.userId);
   }
 
   reconnectPlayerSocket(playerId: number, socket) {
@@ -380,9 +380,9 @@ export class GameModel implements OnModuleInit {
     });
   }
 
-  receivePong(userId: number) {
+  async receivePong(userId: number) {
     if (userId) {
-      this.checkPlayersReady(userId);
+      await this.checkPlayersReady(userId);
       this.pongRecords.add(userId);
     }
   }
@@ -398,12 +398,12 @@ export class GameModel implements OnModuleInit {
     this.pongRecords.clear();
   }
 
-  checkPlayersReady(userId: number) {
+  async checkPlayersReady(userId: number) {
     if (this.readyRecords.has(userId)) {
       this.readyRecords.delete(userId);
       const player = this.players.get(userId);
       if (player) {
-        player.readyGame();
+        await player.readyGame();
       }
     }
   }
@@ -414,10 +414,9 @@ export class GameModel implements OnModuleInit {
     game.clearGameRoomTimeout();
     game.setStart();
 
-    const playerIds = [...game.players.keys()];
-    playerIds.forEach((playerId) => {
-      this.readyRecords.add(playerId);
-    });
+    for (const player of game.players) {
+      this.readyRecords.add(player.userId);
+    }
   }
 
   async roundOver(gameId: number, winnerId: number) {

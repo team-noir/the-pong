@@ -151,15 +151,14 @@ export class AppGateway
   async rtcCandidate(
     @ConnectedSocket() socket: Socket,
     @MessageBody('candidate') candidate,
-    @MessageBody('candidateSendUserId') candidateSendUserId,
-    @MessageBody('candidateReceiveUserId') candidateReceiveUserId
+    @MessageBody('candidateSendUserId') candidateSendUserId: number,
+    @MessageBody('candidateReceiveUserId') candidateReceiveUserId: number
   ) {
-    const sendSocket = this.getUserSocket(candidateSendUserId);
     const receiveSocket = this.getUserSocket(candidateReceiveUserId);
 
-    socket.to(receiveSocket.id).emit('rtcGetCandidate', {
+    await socket.to(receiveSocket.id).emit('rtcGetCandidate', {
       candidate: candidate,
-      candidateSendID: sendSocket.id,
+      candidateSendUserId: candidateSendUserId,
     });
   }
 
@@ -167,12 +166,12 @@ export class AppGateway
   async rtcOffer(
     @ConnectedSocket() socket: Socket,
     @MessageBody('sdp') sdp,
-    @MessageBody('offerSendUserId') offerSendUserId,
-    @MessageBody('offerReceiveUserId') offerReceiveUserId
+    @MessageBody('offerSendUserId') offerSendUserId: number,
+    @MessageBody('offerReceiveUserId') offerReceiveUserId: number
   ) {
     const receiveSocket = this.getUserSocket(offerReceiveUserId);
 
-    socket.to(receiveSocket.id).emit('rtcGetOffer', {
+    await socket.to(receiveSocket.id).emit('rtcGetOffer', {
       sdp: sdp,
       offerSendUserId: offerSendUserId,
     });
@@ -182,12 +181,12 @@ export class AppGateway
   async rtcAnswer(
     @ConnectedSocket() socket: Socket,
     @MessageBody('sdp') sdp,
-    @MessageBody('answerSendUserId') answerSendUserId,
-    @MessageBody('answerReceiveUserId') answerReceiveUserId
+    @MessageBody('answerSendUserId') answerSendUserId: number,
+    @MessageBody('answerReceiveUserId') answerReceiveUserId: number
   ) {
     const receiveSocket = this.getUserSocket(answerReceiveUserId);
 
-    socket.to(receiveSocket.id).emit('rtcGetAnswer', {
+    await socket.to(receiveSocket.id).emit('rtcGetAnswer', {
       sdp: sdp,
       answerSendUserId: answerSendUserId,
     });
@@ -274,9 +273,9 @@ export class AppGateway
   }
 
   @SubscribeMessage('pong')
-  pong(@ConnectedSocket() socket: Socket) {
+  async pong(@ConnectedSocket() socket: Socket) {
     const userId = socket.data.userId;
-    this.gamesService.gameModel.receivePong(userId);
+    await this.gamesService.gameModel.receivePong(userId);
   }
 
   @SubscribeMessage('gameInvite')
