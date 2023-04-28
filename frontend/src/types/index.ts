@@ -112,6 +112,7 @@ export interface GameType {
   theme: number;
   viewerCount?: number;
   isLadder: boolean;
+  isPlaying?: boolean;
   createdAt: string;
 }
 
