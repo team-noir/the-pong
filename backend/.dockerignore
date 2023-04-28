@@ -6,3 +6,5 @@ prisma/*
 upload
 *.spec.ts
 dist
+
+.env
