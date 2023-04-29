@@ -3,6 +3,7 @@ import { WebSocketServer } from '@nestjs/websockets';
 import { Player } from './dtos/player.dto';
 import { GameModel } from './models/game.model';
 import { GameSettingInfoDto } from './dtos/games.dto';
+import { GAME_STATUS } from '@/const';
 
 @Injectable()
 export class GamesService {
@@ -120,9 +121,9 @@ export class GamesService {
       const code = HttpStatus.BAD_REQUEST;
       const message = "Your opponent hasn't entered yet.";
       throw { code, message };
-    } else if (game.isStarted) {
+    } else if (game.status != GAME_STATUS.READY) {
       const code = HttpStatus.BAD_REQUEST;
-      const message = 'The game has already started.';
+      const message = 'The game is not ready.';
       throw { code, message };
     }
 
@@ -148,7 +149,7 @@ export class GamesService {
       const code = HttpStatus.BAD_REQUEST;
       const message = "Your opponent hasn't entered yet.";
       throw { code, message };
-    } else if (game.isStarted) {
+    } else if (game.status != GAME_STATUS.PLAYING) {
       const code = HttpStatus.BAD_REQUEST;
       const message = 'The game has already started.';
       throw { code, message };

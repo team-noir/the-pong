@@ -192,6 +192,16 @@ export class AppGateway
     });
   }
 
+  @SubscribeMessage('rtcConnected')
+  async rtcConnected(
+    @ConnectedSocket() socket: Socket,
+  ) {
+    const player = this.gamesService.gameModel.getPlayer(socket.data.userId);
+    const game = player.game;
+
+    game.noticeToPlayers('gameStart', {});
+  }
+
   // Message
 
   @SubscribeMessage('message')

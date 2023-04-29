@@ -1,6 +1,6 @@
 import { Player } from './player.dto';
 import { HttpStatus } from '@nestjs/common';
-import { GAME_MODES, GAME_THEMES } from '@const';
+import { GAME_MODES, GAME_THEMES, GAME_STATUS } from '@const';
 
 type userId = number;
 type indexKey = number;
@@ -8,7 +8,7 @@ type indexKey = number;
 export class Game {
   gameId: number;
   isLadder: boolean;
-  isStarted: boolean;
+  status: number;
   mode: indexKey;
   theme: indexKey;
   createdAt: Date;
@@ -26,7 +26,7 @@ export class Game {
   constructor(gameId: number, isLadder?: boolean) {
     this.gameId = gameId;
     this.isLadder = isLadder ? true : false;
-    this.isStarted = false;
+    this.status = GAME_STATUS.WAITING;
     this.mode = 0;
     this.theme = 0;
     this.countPlayer = 0;
@@ -167,7 +167,7 @@ export class Game {
   }
 
   async setStart() {
-    this.isStarted = true;
+    this.status = GAME_STATUS.PLAYING;
     this.score.set(this.players[0].userId, 0);
     this.score.set(this.players[1].userId, 0);
 
@@ -208,6 +208,7 @@ export class Game {
 
   removePlayers() {
     for (const player of this.players) {
+      player.socket.leave(this.getName());
       player.leaveGame();
     }
     this.players = [];
@@ -217,6 +218,7 @@ export class Game {
     this.viewers = this.viewers.filter((viewer) => {
       if (viewer.userId == viewerId) {
         viewer.socket.leave(this.getName());
+        viewer.leaveGame();
         return true;
       }
       return false;
@@ -237,6 +239,7 @@ export class Game {
     this.players.push(player);
     player.socket.join(this.getName());
     if (this.isFull()) {
+      this.status = GAME_STATUS.READY;
       await this.clearGameRoomTimeout();
       await this.noticeToPlayers('queue', {
         text: 'matched',

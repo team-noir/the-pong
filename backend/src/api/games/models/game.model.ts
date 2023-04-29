@@ -13,7 +13,7 @@ import { Socket } from 'socket.io';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
-import { GAME_MODES, GAME_THEMES } from '@const';
+import { GAME_MODES, GAME_STATUS, GAME_THEMES } from '@const';
 
 type gameId = number;
 type playerId = number;
@@ -123,31 +123,22 @@ export class GameModel implements OnModuleInit {
     const winnerScore = game.score.get(winner.userId);
     const loserScore = game.score.get(loser.userId);
 
-    const data = await this.prismaService.gameResult.create({
+    const result = await this.prismaService.gameResult.create({
       data: {
-        id: game.gameId,
         isLadder: game.isLadder,
         winnerId: winner.userId,
         loserId: loser.userId,
         winnerScore: winnerScore,
         loserScore: loserScore,
-      },
+      }
+    });
+
+    const data = await this.prismaService.gameResult.findUnique({
+      where: { id: result.id },
       select: {
         id: true,
-        winner: {
-          select: {
-            id: true,
-            nickname: true,
-            level: true,
-          },
-        },
-        loser: {
-          select: {
-            id: true,
-            nickname: true,
-            level: true,
-          },
-        },
+        winner: { select: { id: true, nickname: true, level: true } },
+        loser: { select: { id: true, nickname: true, level: true } },
         winnerScore: true,
         loserScore: true,
         createdAt: true,
@@ -356,7 +347,7 @@ export class GameModel implements OnModuleInit {
     this.games.delete(game.gameId);
     this.removePlayers(game);
     const invitedSocket = this.removeInvitation(game);
-    if (invitedSocket && !game.isStarted) {
+    if (invitedSocket && game.status == GAME_STATUS.WAITING) {
       invitedSocket.emit('gameInvite', { text: 'canceled' });
     }
     this.removeQueue(game);
@@ -435,10 +426,12 @@ export class GameModel implements OnModuleInit {
 
   async roundOver(gameId: number, winnerId: number) {
     const game = this.getGame(gameId);
-    game.score.set(winnerId, game.score.get(winnerId) + 1);
 
-    if (game.score.get(winnerId) == 11) {
-      const data = this.createGameResult(gameId);
+    if (game.status != GAME_STATUS.PLAYING) { return; }
+    game.score.set(winnerId, game.score.get(winnerId) + 11);
+    if (game.score.get(winnerId) >= 11) {
+      const data = await this.createGameResult(gameId);
+      game.status = GAME_STATUS.FINISHED;
       await game.noticeToPlayers('gameOver', data);
     } else {
       await game.noticeToPlayers('roundOver', {

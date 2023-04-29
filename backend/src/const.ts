@@ -30,6 +30,13 @@ export const NOTICE_STATUS_MESSAGE = {
     '채널장이 채널을 삭제했습니다. 더 이상 대화를 할 수 없습니다.',
 };
 
+export const GAME_STATUS = {
+  WAITING: 0,
+  READY: 1,
+  PLAYING: 2,
+  FINISHED: 3,
+};
+
 export const GAME_MODES = {
   0: 'NORMAL',
   1: 'SPEEDY',
