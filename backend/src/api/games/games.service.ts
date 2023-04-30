@@ -14,8 +14,8 @@ export class GamesService {
 
   init(server) {
     this.server = server;
-    this.pingInterval = setInterval(() => {
-      this.gameModel.sendPingToAllPlayers();
+    this.pingInterval = setInterval(async () => {
+      await this.gameModel.sendPingToAllPlayers();
     }, 5000);
   }
 
@@ -166,7 +166,7 @@ export class GamesService {
     // player가 게임의 플레이어인 경우
     if (game.hasPlayer(player)) {
       await this.gameModel.createGameResult(game.gameId, player.userId);
-      this.gameModel.disconnectPlayer(player.userId);
+      await this.gameModel.disconnectPlayer(player.userId);
     }
 
     // player가 게임의 관전자인 경우
