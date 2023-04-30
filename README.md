@@ -38,6 +38,16 @@ $ vi .env # edit file
 
 ## Development
 
+Install dependencies with [Node.js(^18)](https://nodejs.org/) and [yarn berry](https://yarnpkg.com/getting-started/install)
+
+```bash
+$ node -v
+v18.14.2
+$ yarn set version stable
+$ yarn --version
+3.4.1
+```
+
 ```shell
 $ cp .env.development.example .env.development
 $ vi .env.development # edit file
