@@ -46,8 +46,8 @@ show: ## Show containers, images, and logs
 	@echo "\n<Logs>"
 	@$(DOCKER_COMPOSE) logs
 
-.PHONY: show-logs
-show-logs: ## Show logs
+.PHONY: logs
+logs: ## Show logs
 	$(DOCKER_COMPOSE) logs -f
 
 .PHONY: clean
