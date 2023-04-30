@@ -104,6 +104,7 @@ export class Game {
       theme: GAME_THEMES[this.getTheme()],
       viewerCount: this.getViewerCount(),
       isLadder: this.isLadder,
+      isPlaying: this.status == GAME_STATUS.PLAYING,
       createdAt: this.createdAt,
     };
   }
