@@ -102,6 +102,7 @@ export class GamesService {
 
   gameSettingInfo(gameId: number) {
     const game = this.gameModel.getGame(gameId);
+
     return new GameSettingInfoDto(game);
   }
 
@@ -196,14 +197,7 @@ export class GamesService {
   }
 
   async getGameInfo(userId: number, gameId: number) {
-    const player = this.gameModel.getPlayer(userId);
     const game = this.gameModel.getGame(gameId);
-
-    if (!game.hasPlayer(player)) {
-      const code = HttpStatus.BAD_REQUEST;
-      const message = 'You are not a player of this game.';
-      throw { code, message };
-    }
 
     return game.getGameInfo();
   }
