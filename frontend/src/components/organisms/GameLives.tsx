@@ -1,7 +1,9 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { EyeIcon } from '@heroicons/react/20/solid';
 import GameMatchtable from 'components/molecule/GameMatchtable';
 import { GameType } from 'types';
+import { useMutation } from '@tanstack/react-query';
+import { joinGameLive } from 'api/api.v1';
 
 interface Props {
   games: GameType[];
@@ -30,15 +32,26 @@ function GameList({ games }: { games: GameType[] }) {
 }
 
 function GameItem({ game }: { game: GameType }) {
+  const navigate = useNavigate();
+
+  const joinGameLiveMutation = useMutation({
+    mutationFn: () => joinGameLive(game.id),
+    onSuccess: () => {
+      navigate(`/game/${game.id}`);
+    },
+  });
+
   return (
-    // TODO: Link to game page
-    <Link to={`/game/${game.id}`} className="mb-4 last-of-type:mb-0 w-full">
+    <div
+      className="mb-4 last-of-type:mb-0 w-full cursor-pointer"
+      onClick={() => joinGameLiveMutation.mutate()}
+    >
       <GameMatchtable player1={game.players[0]} player2={game.players[1]} />
 
       <div className="inline-flex items-center py-1 text-xs text-gray-light float-right">
         <EyeIcon className="block h-4 w-4" aria-hidden="true" />
         <span className="ml-1">{game.viewerCount}</span>
       </div>
-    </Link>
+    </div>
   );
 }
