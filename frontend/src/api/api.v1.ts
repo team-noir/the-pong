@@ -457,3 +457,11 @@ export const startGame = async (gameId: number): Promise<AxiosResponse> => {
   }
   return res;
 };
+
+export const joinGameLive = async (gameId: number) => {
+  const res = await axiosWithInterceptors.patch(`/games/${gameId}/users`);
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
