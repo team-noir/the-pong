@@ -89,6 +89,7 @@ export class GamesService {
 
     if (isAccepted) {
       await game.join(invited, false);
+      game.removeInvitedId();
       this.gameModel.joinQueue(invited, game);
       this.gameModel.removeQueue(game);
     } else {
@@ -149,7 +150,7 @@ export class GamesService {
       const code = HttpStatus.BAD_REQUEST;
       const message = "Your opponent hasn't entered yet.";
       throw { code, message };
-    } else if (game.status != GAME_STATUS.PLAYING) {
+    } else if (game.status != GAME_STATUS.READY) {
       const code = HttpStatus.BAD_REQUEST;
       const message = 'The game has already started.';
       throw { code, message };
@@ -162,10 +163,14 @@ export class GamesService {
     const player = this.gameModel.getPlayer(userId);
     const game = this.gameModel.getGame(gameId);
 
+    // player가 게임의 플레이어인 경우
     if (game.hasPlayer(player)) {
       await this.gameModel.createGameResult(game.gameId, player.userId);
       this.gameModel.disconnectPlayer(player.userId);
-    } else if (game.hasViewer(player)) {
+    }
+
+    // player가 게임의 관전자인 경우
+    if (game.hasViewer(player)) {
       game.removeViewer(player.userId);
     }
   }

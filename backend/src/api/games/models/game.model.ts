@@ -298,12 +298,13 @@ export class GameModel implements OnModuleInit {
     return newGame.gameId;
   }
 
-  removeInvitation(game: Game): Socket | null {
+  cancelInvitation(game: Game): Socket | null {
     const invitedId = game.getInvitedId();
     const invitedSocket = this.appGateway.getUserSocket(invitedId);
 
-    if (!invitedId || !invitedSocket) {
-      return null;
+    if (!invitedId || !invitedSocket) { return null; }
+    if (invitedSocket && game.status == GAME_STATUS.WAITING) {
+      invitedSocket.emit('gameInvite', { text: 'canceled' });
     }
     this.deleteInvite(invitedId);
     return invitedSocket;
@@ -337,6 +338,7 @@ export class GameModel implements OnModuleInit {
 
   removePlayers(game: Game) {
     const players = game.getPlayers();
+
     for (const player of players) {
       this.players.delete(player.userId);
     }
@@ -345,21 +347,18 @@ export class GameModel implements OnModuleInit {
 
   removeGame(game: Game) {
     this.games.delete(game.gameId);
-    this.removePlayers(game);
-    const invitedSocket = this.removeInvitation(game);
-    if (invitedSocket && game.status == GAME_STATUS.WAITING) {
-      invitedSocket.emit('gameInvite', { text: 'canceled' });
-    }
+    
+    this.cancelInvitation(game);
+    
     this.removeQueue(game);
+    this.removePlayers(game);
     game.clearGameRoomTimeout();
   }
 
   disconnectPlayer(playerId: number) {
     const player = this.players.get(playerId);
 
-    if (!player) {
-      return;
-    }
+    if (!player) { return; }
     if (player.game) {
       this.removeGame(player.game);
     }
@@ -415,7 +414,7 @@ export class GameModel implements OnModuleInit {
 
   async gameStart(game: Game) {
     this.removeQueue(game);
-    this.removeInvitation(game);
+    this.cancelInvitation(game);
     game.clearGameRoomTimeout();
     game.setStart();
 

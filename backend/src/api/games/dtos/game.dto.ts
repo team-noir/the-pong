@@ -84,8 +84,12 @@ export class Game {
   }
 
   hasPlayer(tarPlayer: Player): boolean {
+    return this.players.includes(tarPlayer);
+  }
+
+  hasPlayerId(userId: number): boolean {
     for (const player of this.players) {
-      if (player.userId == tarPlayer.userId) {
+      if (player.userId == userId) {
         return true;
       }
     }
