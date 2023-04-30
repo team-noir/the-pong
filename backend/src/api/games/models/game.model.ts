@@ -30,6 +30,7 @@ export class GameModel implements OnModuleInit {
 
   private appGateway: AppGateway;
   private readyTime = 60000;
+  private gameId = 1;
 
   constructor(
     private prismaService: PrismaService,
@@ -57,7 +58,7 @@ export class GameModel implements OnModuleInit {
   }
 
   getGameId(): gameId {
-    return this.games.size + 1;
+    return this.gameId++;
   }
 
   getGame(gameId: number): Game {
@@ -347,34 +348,39 @@ export class GameModel implements OnModuleInit {
 
   removeGame(game: Game) {
     this.games.delete(game.gameId);
-    
     this.cancelInvitation(game);
-    
     this.removeQueue(game);
     this.removePlayers(game);
     game.clearGameRoomTimeout();
   }
 
-  disconnectPlayer(playerId: number) {
+  async disconnectPlayer(playerId: number) {
     const player = this.players.get(playerId);
-
     if (!player) { return; }
+    
     if (player.game) {
+      if (player.game.status == GAME_STATUS.READY) {
+        await player.game.noticeToPlayers('gameSetting', { text: 'leave' });
+      } else if (player.game.status == GAME_STATUS.PLAYING) {
+        const data = await this.createGameResult(player.game.gameId, playerId);
+        player.game.status = GAME_STATUS.FINISHED;
+        await player.game.noticeToPlayers('gameOver', data);
+      }
       this.removeGame(player.game);
     }
+    
     if (this.isInvited(playerId)) {
       this.deleteInvite(playerId);
     }
-
     this.players.delete(player.userId);
   }
 
-  sendPingToAllPlayers() {
+  async sendPingToAllPlayers() {
     if (this.players.size == 0) {
       return;
     }
 
-    this.checkPlayersConnection();
+    await this.checkPlayersConnection();
     const playerIdList = [...this.players.keys()];
     playerIdList.forEach((playerId) => {
       const player = this.players.get(playerId);
@@ -391,12 +397,12 @@ export class GameModel implements OnModuleInit {
     }
   }
 
-  checkPlayersConnection() {
+  async checkPlayersConnection() {
     const playerIdList = [...this.players.keys()];
 
     for (const playerId of playerIdList) {
       if (!this.pongRecords.has(playerId)) {
-        this.disconnectPlayer(playerId);
+        await this.disconnectPlayer(playerId);
       }
     }
     this.pongRecords.clear();
@@ -423,11 +429,11 @@ export class GameModel implements OnModuleInit {
     }
   }
 
-  async roundOver(gameId: number, winnerId: number) {
+  async roundOver(gameId: number, winnerId: number) { 
     const game = this.getGame(gameId);
 
     if (game.status != GAME_STATUS.PLAYING) { return; }
-    game.score.set(winnerId, game.score.get(winnerId) + 11);
+    game.score.set(winnerId, game.score.get(winnerId) + 1);
     if (game.score.get(winnerId) >= 11) {
       const data = await this.createGameResult(gameId);
       game.status = GAME_STATUS.FINISHED;
