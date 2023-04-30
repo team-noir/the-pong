@@ -12,16 +12,11 @@ export default function useGameRTC(
   amIOwner: boolean | undefined,
   canvasRef: React.RefObject<konva.Layer>,
   videoRef: React.RefObject<HTMLVideoElement>,
-  count: number,
-  setCount: React.Dispatch<React.SetStateAction<number>>,
-  isPlaying: boolean,
-  setIsPlaying: React.Dispatch<React.SetStateAction<boolean>>,
   isOtherKeyDown: React.MutableRefObject<{ left: boolean; right: boolean }>
 ): ReturnType {
   const myUserId = useUser((state) => state.id);
   const socket = useContext(SocketContext);
 
-  const interval = useRef<NodeJS.Timer | null>(null);
   const peerConnectionsRef = useRef<{
     [userId: number]: RTCPeerConnection;
   } | null>(null);
@@ -38,19 +33,12 @@ export default function useGameRTC(
       socket.off('rtcGetCandidate');
       socket.off('rtcGetOffer');
       socket.off('rtcGetAnswer');
-      interval.current && clearInterval(interval.current);
       if (!peerConnectionsRef.current) return;
       for (const userId in peerConnectionsRef.current) {
         peerConnectionsRef.current[userId].close();
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (count > 0) return;
-    interval.current && clearInterval(interval.current);
-    setIsPlaying(true);
-  }, [count]);
 
   const addRTCSocketListeners = () => {
     socket.on(
@@ -72,6 +60,7 @@ export default function useGameRTC(
 
   const addOwnerRTCSocketListeners = () => {
     socket.on('rtcInit', async (data: { userId: number }) => {
+      // TODO: 테스트 완료 후 삭제
       console.log('rtcInit');
       if (!canvasRef.current) return;
       const stream = canvasRef.current.getNativeCanvasElement().captureStream();
@@ -112,11 +101,6 @@ export default function useGameRTC(
         peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
 
         socket.emit('rtcConnected');
-        if (isPlaying) return;
-        interval.current = setInterval(
-          () => setCount((prevState) => prevState - 1),
-          1000
-        );
       }
     );
   };

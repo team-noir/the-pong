@@ -14,7 +14,7 @@
     "prebuild": "yarn prisma:generate && yarn prisma:seed",
     "build": "yarn prebuild && nest build && yarn tsc",
     "start": "yarn build && nest start",
-    "start:dev": "nest start --watch",
+    "start:dev": "yarn build && nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

@@ -17,7 +17,7 @@ type ReturnType = [
 ];
 
 export default function useGamePlay(
-  gameId: number,
+  game: GameType,
   amIViewer: boolean,
   amIOwner: boolean | undefined,
   containerRef: React.RefObject<HTMLElement>,
@@ -35,30 +35,36 @@ export default function useGamePlay(
   const socket = useContext(SocketContext);
   const queryClient = useQueryClient();
 
+  const interval = useRef<NodeJS.Timer | null>(null);
   const animationFrame = useRef<number | null>(null);
   const isMyKeyDown = useRef({ left: false, right: false });
   const isOtherKeyDown = useRef({ left: false, right: false });
 
   const [dataChannelRef] = useGameRTC(
-    gameId,
+    game.id,
     amIOwner,
     canvasRef,
     videoRef,
-    count,
-    setCount,
-    isPlaying,
-    setIsPlaying,
     isOtherKeyDown
   );
 
   useEffect(() => {
+    setIsPlaying(!!game?.isPlaying);
+
     socket.on('ping', () => {
       socket.emit('pong');
     });
 
+    socket.on('gameStart', () => {
+      interval.current = setInterval(
+        () => setCount((prevState) => prevState - 1),
+        1000
+      );
+    });
+
     socket.on('gameViewer', (data: { viwerCount: number }) => {
       queryClient.setQueryData<GameType>(
-        ['game', gameId],
+        ['game', String(game.id)],
         (prevData) =>
           prevData && {
             ...prevData,
@@ -70,7 +76,7 @@ export default function useGamePlay(
     socket.on('roundOver', (data: { winnerId: number; score: number }) => {
       const { winnerId, score } = data;
       queryClient.setQueryData<GameType>(
-        ['game', gameId],
+        ['game', String(game.id)],
         (prevData) =>
           prevData &&
           ({
@@ -96,8 +102,15 @@ export default function useGamePlay(
       socket.off('gameOver');
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
+      interval.current && clearInterval(interval.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (count > 0) return;
+    interval.current && clearInterval(interval.current);
+    setIsPlaying(true);
+  }, [count]);
 
   useEffect(() => {
     handleScreenResize();

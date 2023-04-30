@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Stage, Layer } from 'react-konva';
+import { Stage, Layer, Rect } from 'react-konva';
 import konva from 'konva';
 import {
   ChevronLeftIcon,
@@ -42,7 +42,7 @@ export default function Game({ game }: Props) {
     handleMouseUp,
     result,
   ] = useGamePlay(
-    game.id,
+    game,
     amIViewer,
     amIOwner,
     containerRef,
@@ -69,6 +69,7 @@ export default function Game({ game }: Props) {
         {amIOwner ? (
           <Stage width={stageSize} height={stageSize}>
             <Layer ref={canvasRef}>
+              <Rect width={stageSize} height={stageSize} fill="white" />
               <Ball
                 x={ball.x * stageSize}
                 y={ball.y * stageSize}
@@ -95,7 +96,7 @@ export default function Game({ game }: Props) {
           <video
             ref={videoRef}
             className={classNames(
-              'w-full h-full bg-black',
+              'w-full h-full bg-white',
               !amIViewer && !amIOwner && '-scale-y-100'
             )}
             muted

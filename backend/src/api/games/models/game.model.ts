@@ -13,7 +13,7 @@ import { Socket } from 'socket.io';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
-import { GAME_MODES, GAME_THEMES } from '@const';
+import { GAME_MODES, GAME_STATUS, GAME_THEMES } from '@const';
 
 type gameId = number;
 type playerId = number;
@@ -123,39 +123,44 @@ export class GameModel implements OnModuleInit {
     const winnerScore = game.score.get(winner.userId);
     const loserScore = game.score.get(loser.userId);
 
-    const data = await this.prismaService.gameResult.create({
+    const result = await this.prismaService.gameResult.create({
       data: {
-        id: game.gameId,
         isLadder: game.isLadder,
         winnerId: winner.userId,
         loserId: loser.userId,
         winnerScore: winnerScore,
         loserScore: loserScore,
-      },
+      }
+    });
+
+    const data = await this.prismaService.gameResult.findUnique({
+      where: { id: result.id },
       select: {
         id: true,
-        isLadder: true,
-        winner: {
-          select: {
-            id: true,
-            nickname: true,
-            level: true,
-          },
-        },
-        loser: {
-          select: {
-            id: true,
-            nickname: true,
-            level: true,
-          },
-        },
+        winner: { select: { id: true, nickname: true, level: true } },
+        loser: { select: { id: true, nickname: true, level: true } },
         winnerScore: true,
         loserScore: true,
         createdAt: true,
       },
     });
 
-    return data;
+    return {
+      id: data.id,
+      winner: {
+        id: data.winner.id,
+        nickname: data.winner.nickname,
+        level: data.winner.level,
+        score: data.winnerScore,
+      },
+      loser: {
+        id: data.loser.id,
+        nickname: data.loser.nickname,
+        level: data.loser.level,
+        score: data.loserScore,
+      },
+      createdAt: data.createdAt,
+    };
   }
 
   async createPlayer(userId: number) {
@@ -293,12 +298,13 @@ export class GameModel implements OnModuleInit {
     return newGame.gameId;
   }
 
-  removeInvitation(game: Game): Socket | null {
+  cancelInvitation(game: Game): Socket | null {
     const invitedId = game.getInvitedId();
     const invitedSocket = this.appGateway.getUserSocket(invitedId);
 
-    if (!invitedId || !invitedSocket) {
-      return null;
+    if (!invitedId || !invitedSocket) { return null; }
+    if (invitedSocket && game.status == GAME_STATUS.WAITING) {
+      invitedSocket.emit('gameInvite', { text: 'canceled' });
     }
     this.deleteInvite(invitedId);
     return invitedSocket;
@@ -332,6 +338,7 @@ export class GameModel implements OnModuleInit {
 
   removePlayers(game: Game) {
     const players = game.getPlayers();
+
     for (const player of players) {
       this.players.delete(player.userId);
     }
@@ -340,21 +347,18 @@ export class GameModel implements OnModuleInit {
 
   removeGame(game: Game) {
     this.games.delete(game.gameId);
-    this.removePlayers(game);
-    const invitedSocket = this.removeInvitation(game);
-    if (invitedSocket && !game.isStarted) {
-      invitedSocket.emit('gameInvite', { text: 'canceled' });
-    }
+    
+    this.cancelInvitation(game);
+    
     this.removeQueue(game);
+    this.removePlayers(game);
     game.clearGameRoomTimeout();
   }
 
   disconnectPlayer(playerId: number) {
     const player = this.players.get(playerId);
 
-    if (!player) {
-      return;
-    }
+    if (!player) { return; }
     if (player.game) {
       this.removeGame(player.game);
     }
@@ -410,7 +414,7 @@ export class GameModel implements OnModuleInit {
 
   async gameStart(game: Game) {
     this.removeQueue(game);
-    this.removeInvitation(game);
+    this.cancelInvitation(game);
     game.clearGameRoomTimeout();
     game.setStart();
 
@@ -421,15 +425,17 @@ export class GameModel implements OnModuleInit {
 
   async roundOver(gameId: number, winnerId: number) {
     const game = this.getGame(gameId);
-    game.score.set(winnerId, game.score.get(winnerId) + 1);
 
-    if (game.score.get(winnerId) == 11) {
-      const data = this.createGameResult(gameId);
+    if (game.status != GAME_STATUS.PLAYING) { return; }
+    game.score.set(winnerId, game.score.get(winnerId) + 11);
+    if (game.score.get(winnerId) >= 11) {
+      const data = await this.createGameResult(gameId);
+      game.status = GAME_STATUS.FINISHED;
       await game.noticeToPlayers('gameOver', data);
     } else {
       await game.noticeToPlayers('roundOver', {
         winnerId: winnerId,
-        winnerScore: game.score.get(winnerId),
+        score: game.score.get(winnerId),
       });
     }
   }
