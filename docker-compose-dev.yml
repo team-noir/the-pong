@@ -66,6 +66,12 @@ services:
       - the-pong-dev-net
     ports:
       - '3000:3000'
+    environment:
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
+      PUBLIC_URL: ${PUBLIC_URL}
+      REACT_APP_AUTHOR: ${REACT_APP_AUTHOR}
+      REACT_APP_TITLE: ${REACT_APP_TITLE}
+      REACT_APP_DESCRIPTION: ${REACT_APP_DESCRIPTION}
     volumes:
       - ./frontend/src:/usr/src/app/src:ro
       - ./frontend/src/tests/__snapshots__:/usr/src/app/src/tests/__snapshots__:rw

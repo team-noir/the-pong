@@ -46,6 +46,10 @@ show: ## Show containers, images, and logs
 	@echo "\n<Logs>"
 	@$(DOCKER_COMPOSE) logs
 
+.PHONY: logs
+logs: ## Show logs
+	$(DOCKER_COMPOSE) logs -f
+
 .PHONY: clean
 clean: ## Stop and remove running containers, networks, images, and volumes
 	$(DOCKER_COMPOSE) down --rmi all --volumes --remove-orphans

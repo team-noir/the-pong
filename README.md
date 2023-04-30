@@ -31,12 +31,23 @@ $ vi .env # edit file
 #### 42 API
 
 1. 42 인트라넷에 로그인 한 다음 [여기](https://profile.intra.42.fr/oauth/applications/new)에서 새로운 앱을 생성합니다.
-2. 폼을 작성합니다. `Redirect URI`를 `http://localhost:8080/api/v1/auth/42/return`로 작성합니다.
+2. 폼을 작성합니다. `Redirect URI`를 `http://localhost/api/v1/auth/42/return`로 작성합니다.
 3. `.env` 혹은 `.env.example` 파일에 각 내용을 복사합니다.
    - `FT_UID`: 생성한 앱의 UID
    - `FT_SECRET`: 생성한 앱의 SECRET
+   - `FT_CB`: `http://localhost/api/v1/auth/42/return`
 
 ## Development
+
+Install dependencies with [Node.js(^18)](https://nodejs.org/) and [yarn berry](https://yarnpkg.com/getting-started/install)
+
+```bash
+$ node -v
+v18.14.2
+$ yarn set version stable
+$ yarn --version
+3.4.1
+```
 
 ```shell
 $ cp .env.development.example .env.development
