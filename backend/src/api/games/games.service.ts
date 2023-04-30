@@ -159,6 +159,26 @@ export class GamesService {
     await this.gameModel.gameStart(game);
   }
 
+  async watchGame(userId: number, gameId: number) {
+    const player = await this.gameModel.createPlayer(userId);
+    const game = this.gameModel.getGame(gameId);
+
+    if (game.hasPlayer(player)) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'You are already in this game.';
+      throw { code, message };
+    } else if (game.status != GAME_STATUS.PLAYING) {
+      const code = HttpStatus.BAD_REQUEST;
+      const message = 'The game has not started yet.';
+      throw { code, message };
+    }
+
+    await game.addViewer(player);
+    await game.noticeToPlayers('gameViewer', {
+      viewerCount: game.getViewerCount(),
+    });
+  }
+
   async leaveGame(userId: number, gameId: number) {
     const player = this.gameModel.getPlayer(userId);
     const game = this.gameModel.getGame(gameId);

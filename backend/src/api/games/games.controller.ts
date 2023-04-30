@@ -201,6 +201,7 @@ export class GamesController {
         body.theme
       );
       res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, error.code);
     }
@@ -220,6 +221,30 @@ export class GamesController {
       const userId = req.user.id;
       await this.gamesService.startGame(userId, gameId);
       res.status(HttpStatus.NO_CONTENT);
+      return;
+    } catch (error) {
+      throw new HttpException(error.message, error.code);
+    }
+  }
+
+  @Patch(':gameId/users')
+  @ApiOperation({ summary: 'Join the live game.' })
+  @ApiNoContentResponse({ description: 'Join the live game.' })
+  @ApiBadRequestResponse({ description: 'This game does not exist.' })
+  @ApiBadRequestResponse({ description: 'This game is not playing.' })
+  @ApiConflictResponse({ description: 'You are already in this game.' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized JWT' })
+  @UseGuards(AuthenticatedGuard)
+  async watchGame(
+    @Req() req,
+    @Param('gameId') gameId: number,
+    @Res({ passthrough: true }) res
+  ) {
+    try {
+      const userId = req.user.id;
+      await this.gamesService.watchGame(userId, gameId);
+      res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, error.code);
     }
@@ -241,6 +266,7 @@ export class GamesController {
       const userId = req.user.id;
       await this.gamesService.leaveGame(userId, gameId);
       res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, error.code);
     }

@@ -25,6 +25,7 @@ import { GamesService } from './api/games/games.service';
 import { ChannelUser } from './api/channels/models/user.model';
 import { Player } from './api/games/dtos/player.dto';
 import { PrismaService } from '@/prisma/prisma.service';
+import { GAME_STATUS } from './const';
 
 type userId = number;
 
@@ -193,13 +194,14 @@ export class AppGateway
   }
 
   @SubscribeMessage('rtcConnected')
-  async rtcConnected(
-    @ConnectedSocket() socket: Socket,
-  ) {
+  async rtcConnected(@ConnectedSocket() socket: Socket) {
     const player = this.gamesService.gameModel.getPlayer(socket.data.userId);
     const game = player.game;
 
-    game.noticeToPlayers('gameStart', {});
+    if (game.status != GAME_STATUS.PLAYING) {
+      game.status = GAME_STATUS.PLAYING;
+      game.noticeToPlayers('gameStart', {});
+    }
   }
 
   // Message
