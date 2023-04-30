@@ -129,13 +129,13 @@ export class GamesService {
       throw { code, message };
     }
 
-    const isModeSetted = game.setMode(mode);
-    const isThemeSetted = game.setTheme(theme);
+    game.setMode(mode);
+    game.setTheme(theme);
 
     await game.noticeToPlayers('gameSetting', {
       text: 'change',
-      mode: isModeSetted ? game.getMode() : null,
-      theme: isThemeSetted ? game.getTheme() : null,
+      mode: game.getMode(),
+      theme: game.getTheme(),
     });
   }
 
