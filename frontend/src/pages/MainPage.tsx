@@ -1,12 +1,19 @@
 import { Link } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { getGames } from 'api/api.v1';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import AppTemplate from 'components/templates/AppTemplate';
 import GameButtons from 'components/organisms/GameButtons';
-import GameLives from 'components/organisms/GameLives';
 import ChannelButtons from 'components/organisms/ChannelButtons';
+import GameLives from 'components/organisms/GameLives';
 import HeaderGnb from 'components/molecule/HeaderGnb';
 
 export default function MainPage() {
+  const { data: games } = useQuery({
+    queryKey: ['games'],
+    queryFn: getGames,
+  });
+
   return (
     <AppTemplate header={<HeaderGnb />}>
       <section className="section">
@@ -24,7 +31,7 @@ export default function MainPage() {
             />
           </span>
         </div>
-        <GameLives limit={2} />
+        {games && <GameLives games={games} />}
       </section>
       <section className="section">
         <h2 className="section-title">채널</h2>

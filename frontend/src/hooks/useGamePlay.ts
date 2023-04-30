@@ -8,7 +8,6 @@ import { GameResultType, GameType, PlayerType } from 'types';
 type ReturnType = [
   ball: typeof initialState.ball,
   paddles: typeof initialState.paddles,
-  stageSize: number,
   isPlaying: boolean,
   count: number | null,
   handleMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => void,
@@ -20,7 +19,6 @@ export default function useGamePlay(
   game: GameType,
   amIViewer: boolean,
   amIOwner: boolean | undefined,
-  containerRef: React.RefObject<HTMLElement>,
   canvasRef: React.RefObject<konva.Layer>,
   videoRef: React.RefObject<HTMLVideoElement>,
   myPlayer: PlayerType | undefined,
@@ -28,7 +26,6 @@ export default function useGamePlay(
 ): ReturnType {
   const [ball, setBall] = useState(initialState.ball);
   const [paddles, setPaddles] = useState(initialState.paddles);
-  const [stageSize, setStageSize] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [count, setCount] = useState(3);
   const [result, setResult] = useState<GameResultType | null>(null);
@@ -90,6 +87,18 @@ export default function useGamePlay(
 
     socket.on('gameOver', (data: GameResultType) => {
       setResult(data);
+      setIsPlaying(false);
+      queryClient.setQueryData<GameType>(
+        ['game', String(game.id)],
+        (prevData) =>
+          prevData &&
+          ({
+            ...prevData,
+            players: prevData.players.map((player) =>
+              player.id === data.winner.id ? data.winner : data.loser
+            ),
+          } as GameType)
+      );
     });
 
     if (amIViewer) return;
@@ -111,12 +120,6 @@ export default function useGamePlay(
     interval.current && clearInterval(interval.current);
     setIsPlaying(true);
   }, [count]);
-
-  useEffect(() => {
-    handleScreenResize();
-    window.addEventListener('resize', handleScreenResize);
-    return () => window.removeEventListener('resize', handleScreenResize);
-  }, [containerRef.current]);
 
   useEffect(() => {
     if (amIViewer || !amIOwner) return;
@@ -251,11 +254,6 @@ export default function useGamePlay(
     drawBall();
   };
 
-  const handleScreenResize = () => {
-    if (!containerRef.current) return;
-    setStageSize(containerRef.current.clientWidth);
-  };
-
   const handleKeyDown = (e: KeyboardEvent) => {
     if (e.key === 'ArrowLeft') {
       if (amIOwner) {
@@ -329,7 +327,6 @@ export default function useGamePlay(
   return [
     ball,
     paddles,
-    stageSize,
     isPlaying,
     count,
     handleMouseDown,
@@ -348,8 +345,8 @@ const initialState = {
     x: 0.5,
     y: 0.5,
     r: 0.025,
-    dx: 0.004,
-    dy: 0.005,
+    dx: 0.003,
+    dy: 0.004,
   },
   paddles: {
     up: {

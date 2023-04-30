@@ -1,88 +1,57 @@
-import GameList from 'components/molecule/GameList';
+import { Link, useNavigate } from 'react-router-dom';
+import { EyeIcon } from '@heroicons/react/20/solid';
+import GameMatchtable from 'components/molecule/GameMatchtable';
 import { GameType } from 'types';
-
-// TODO: remove dummy data
-const dummyGames: GameType[] = [
-  {
-    id: 1,
-    players: [
-      {
-        id: 1,
-        nickname: 'Nickname1',
-        level: 1,
-        score: 1,
-      },
-      {
-        id: 101,
-        nickname: 'Nickname2',
-        level: 3,
-        score: 2,
-      },
-    ],
-    mode: 1,
-    theme: 1,
-    viewerCount: 42,
-    isLadder: false,
-    createdAt: '2023-04-07T00:00:00.000Z',
-  },
-  {
-    id: 2,
-    players: [
-      {
-        id: 200,
-        nickname: 'Nickname1',
-        level: 12,
-        score: 3,
-      },
-      {
-        id: 201,
-        nickname: 'Nickname2',
-        level: 10,
-        score: 2,
-      },
-    ],
-    mode: 2,
-    theme: 1,
-    viewerCount: 123,
-    isLadder: false,
-    createdAt: '2023-04-07T00:00:00.010Z',
-  },
-  {
-    id: 3,
-    players: [
-      {
-        id: 300,
-        nickname: 'Nickname1',
-        level: 1,
-        score: 1,
-      },
-      {
-        id: 301,
-        nickname: 'Nickname2',
-        level: 10,
-        score: 2,
-      },
-    ],
-    mode: 2,
-    theme: 1,
-    viewerCount: 321,
-    isLadder: false,
-    createdAt: '2023-04-07T00:00:00.001Z',
-  },
-];
+import { useMutation } from '@tanstack/react-query';
+import { joinGameLive } from 'api/api.v1';
 
 interface Props {
-  limit?: number;
+  games: GameType[];
 }
 
-export default function GameLives({ limit }: Props) {
-  // TODO: Call API to get live games
-
-  const games = limit ? dummyGames.slice(0, limit) : dummyGames;
-
+export default function GameLives({ games }: Props) {
   return (
     <>
-      <GameList games={games} />
+      {games.length ? (
+        <GameList games={games} />
+      ) : (
+        <p>진행중인 게임이 없습니다.</p>
+      )}
     </>
+  );
+}
+
+function GameList({ games }: { games: GameType[] }) {
+  return (
+    <ul className="flex flex-col ">
+      {games.map((game) => (
+        <GameItem key={game.id} game={game} />
+      ))}
+    </ul>
+  );
+}
+
+function GameItem({ game }: { game: GameType }) {
+  const navigate = useNavigate();
+
+  const joinGameLiveMutation = useMutation({
+    mutationFn: () => joinGameLive(game.id),
+    onSuccess: () => {
+      navigate(`/game/${game.id}`);
+    },
+  });
+
+  return (
+    <div
+      className="mb-4 last-of-type:mb-0 w-full cursor-pointer"
+      onClick={() => joinGameLiveMutation.mutate()}
+    >
+      <GameMatchtable player1={game.players[0]} player2={game.players[1]} />
+
+      <div className="inline-flex items-center py-1 text-xs text-gray-light float-right">
+        <EyeIcon className="block h-4 w-4" aria-hidden="true" />
+        <span className="ml-1">{game.viewerCount}</span>
+      </div>
+    </div>
   );
 }

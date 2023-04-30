@@ -1,38 +1,18 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { getMyFollowings, unfollowUser } from 'api/api.v1';
+import { useQuery } from '@tanstack/react-query';
+import { getMyFollowings } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import Following from 'components/organisms/Following';
 import HeaderGnb from 'components/molecule/HeaderGnb';
 
 export default function FollowingPage() {
-  const getMyFollowingQuery = useQuery({
+  const { data: followings } = useQuery({
     queryKey: ['getMyFollowing'],
     queryFn: getMyFollowings,
   });
 
-  const unfollowUserMutation = useMutation({
-    mutationFn: unfollowUser,
-    onSuccess: () => getMyFollowingQuery.refetch(),
-  });
-
-  const handleClickUnfollow = (e: React.MouseEvent<HTMLElement>) => {
-    const ancestorElement = e.currentTarget.closest('[data-user-id]');
-    if (!(ancestorElement instanceof HTMLElement)) return;
-    const userId = ancestorElement.dataset.userId;
-
-    const answer = confirm('언팔로우하시겠습니까?');
-    if (!answer) return;
-    unfollowUserMutation.mutate(Number(userId));
-  };
-
   return (
     <AppTemplate header={<HeaderGnb />}>
-      {getMyFollowingQuery.isSuccess && (
-        <Following
-          users={getMyFollowingQuery.data}
-          onClickUnfollow={handleClickUnfollow}
-        />
-      )}
+      {followings && <Following users={followings} />}
     </AppTemplate>
   );
 }

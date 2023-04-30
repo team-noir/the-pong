@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Rect } from 'react-konva';
 import konva from 'konva';
 import {
@@ -22,6 +22,8 @@ interface Props {
 
 export default function Game({ game }: Props) {
   const myUserId = useUser((state) => state.id);
+  const [stageSize, setStageSize] = useState(0);
+
   const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<konva.Layer>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -35,7 +37,6 @@ export default function Game({ game }: Props) {
   const [
     ball,
     paddles,
-    stageSize,
     isPlaying,
     count,
     handleMouseDown,
@@ -45,12 +46,22 @@ export default function Game({ game }: Props) {
     game,
     amIViewer,
     amIOwner,
-    containerRef,
     canvasRef,
     videoRef,
     myPlayer,
     otherPlayer
   );
+
+  useEffect(() => {
+    handleScreenResize();
+    window.addEventListener('resize', handleScreenResize);
+    return () => window.removeEventListener('resize', handleScreenResize);
+  }, [containerRef.current]);
+
+  const handleScreenResize = () => {
+    if (!containerRef.current) return;
+    setStageSize(containerRef.current.clientWidth);
+  };
 
   return (
     <section ref={containerRef}>

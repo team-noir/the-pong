@@ -373,6 +373,14 @@ export const getGame = async (gameId: number): Promise<GameType> => {
   return res.data;
 };
 
+export const getGames = async (): Promise<GameType[]> => {
+  const res = await axiosWithInterceptors.get(`/games`);
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 export const waitGame = async (isLadder: boolean): Promise<AxiosResponse> => {
   const res = await axiosWithInterceptors.post(`/games/queue`, { isLadder });
   if (res.status !== 201) {
@@ -444,6 +452,14 @@ export const updateGameSetting = async ({ id, mode, theme }: GameType) => {
 
 export const startGame = async (gameId: number): Promise<AxiosResponse> => {
   const res = await axiosWithInterceptors.patch(`/games/${gameId}/play`);
+  if (res.status !== 204) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
+export const joinGameLive = async (gameId: number) => {
+  const res = await axiosWithInterceptors.patch(`/games/${gameId}/users`);
   if (res.status !== 204) {
     throw new Error(res.statusText);
   }

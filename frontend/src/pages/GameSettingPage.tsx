@@ -6,7 +6,7 @@ import { SocketContext } from 'contexts/socket';
 import AppTemplate from 'components/templates/AppTemplate';
 import Modal from 'components/templates/Modal';
 import GameSetting from 'components/organisms/GameSetting';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Header from 'components/molecule/Header';
 import { GameSettingType } from 'types';
 
 export default function GameSettingPage() {
@@ -57,16 +57,9 @@ export default function GameSettingPage() {
     };
   }, []);
 
-  const handleClick = () => {
-    // TODO: 게임 나가기 핸들링
-    alert('게임에서 나가시겠습니까?');
-  };
-
   return (
     <>
-      <AppTemplate
-        header={<HeaderWithBackButton title="The Pong" onClick={handleClick} />}
-      >
+      <AppTemplate header={<Header />}>
         {gameSetting && <GameSetting gameSetting={gameSetting} />}
       </AppTemplate>
       {isOtherUserLeft && (

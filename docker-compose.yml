@@ -56,6 +56,12 @@ services:
     restart: unless-stopped
     networks:
       - the-pong-net
+    environment:
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
+      PUBLIC_URL: ${PUBLIC_URL}
+      REACT_APP_AUTHOR: ${REACT_APP_AUTHOR}
+      REACT_APP_NAME: ${REACT_APP_NAME}
+      REACT_APP_DESCRIPTION: ${REACT_APP_DESCRIPTION}
     depends_on:
       - backend
 
