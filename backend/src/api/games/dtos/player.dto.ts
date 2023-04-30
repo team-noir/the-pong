@@ -40,9 +40,9 @@ export class Player {
     return false;
   }
 
-  readyGame() {
+  async readyGame() {
     if (this.game) {
-      this.game.readyPlayer(this);
+      await this.game.readyPlayer(this);
     }
   }
 
