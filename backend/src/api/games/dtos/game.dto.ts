@@ -1,6 +1,6 @@
 import { Player } from './player.dto';
 import { HttpStatus } from '@nestjs/common';
-import { GAME_MODES, GAME_THEMES, GAME_STATUS } from '@const';
+import { GAME_STATUS } from '@const';
 
 type userId = number;
 type indexKey = number;
@@ -104,8 +104,8 @@ export class Game {
     return {
       id: this.gameId,
       players: this.getPlayersInfo(),
-      mode: GAME_MODES[this.getMode()],
-      theme: GAME_THEMES[this.getTheme()],
+      mode: this.getMode(),
+      theme: this.getTheme(),
       viewerCount: this.getViewerCount(),
       isLadder: this.isLadder,
       isPlaying: this.status == GAME_STATUS.PLAYING,
@@ -150,11 +150,6 @@ export class Game {
   }
 
   setMode(mode: indexKey) {
-    if (mode < 0 || mode >= GAME_MODES.size()) {
-      const code = HttpStatus.BAD_REQUEST;
-      const message = 'This is an invalid mode.';
-      throw { code, message };
-    }
     if (this.mode == mode) {
       return false;
     }
@@ -163,11 +158,6 @@ export class Game {
   }
 
   setTheme(theme: indexKey) {
-    if (theme < 0 || theme >= GAME_THEMES.size()) {
-      const code = HttpStatus.BAD_REQUEST;
-      const message = 'This is an invalid theme.';
-      throw { code, message };
-    }
     if (this.theme == theme) {
       return false;
     }

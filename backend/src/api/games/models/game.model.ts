@@ -13,7 +13,7 @@ import { Socket } from 'socket.io';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
-import { GAME_MODES, GAME_STATUS, GAME_THEMES } from '@const';
+import { GAME_STATUS } from '@const';
 
 type gameId = number;
 type playerId = number;
