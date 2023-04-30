@@ -312,5 +312,8 @@ export class Game {
     for (const player of this.players) {
       await player.socket.emit(event, data);
     }
+    for (const viewer of this.viewers) {
+      await viewer.socket.emit(event, data);
+    }
   }
 }

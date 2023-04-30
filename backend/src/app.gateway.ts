@@ -200,7 +200,7 @@ export class AppGateway
 
     if (game.status != GAME_STATUS.PLAYING) {
       game.status = GAME_STATUS.PLAYING;
-      game.noticeToPlayers('gameStart', {});
+      await game.noticeToPlayers('gameStart', {});
     }
   }
 
