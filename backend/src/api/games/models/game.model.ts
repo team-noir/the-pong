@@ -75,8 +75,9 @@ export class GameModel implements OnModuleInit {
     const gamelist = [];
 
     for (const game of this.games.values()) {
-      const { gameId, isLadder, players, createdAt } = game;
+      const { gameId, isLadder, players, createdAt, status } = game;
 
+      if (status != GAME_STATUS.PLAYING) { continue; }
       gamelist.push({
         id: gameId,
         players: players.map((player) => {
