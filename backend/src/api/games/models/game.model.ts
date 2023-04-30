@@ -64,7 +64,7 @@ export class GameModel implements OnModuleInit {
   getGame(gameId: number): Game {
     if (!this.games.has(gameId)) {
       const code = HttpStatus.BAD_REQUEST;
-      const message = 'This game does not exist';
+      const message = 'This game does not exist.';
       throw { code, message };
     }
 
@@ -76,17 +76,20 @@ export class GameModel implements OnModuleInit {
 
     for (const game of this.games.values()) {
       const { gameId, isLadder, players, createdAt, status } = game;
+      const list = [];
+
+      for (const player of players) {
+        list.push({
+            id: player.userId,
+            nickname: player.username,
+            level: player.level,
+          });
+      }
 
       if (status != GAME_STATUS.PLAYING) { continue; }
       gamelist.push({
         id: gameId,
-        players: players.map((player) => {
-          return {
-            id: player.userId,
-            nickname: player.username,
-            level: player.game,
-          };
-        }),
+        players: list,
         viewerCount: game.getViewerCount(),
         isLadder: isLadder,
         createdAt: createdAt,
@@ -132,7 +135,7 @@ export class GameModel implements OnModuleInit {
         loserId: loser.userId,
         winnerScore: winnerScore,
         loserScore: loserScore,
-      }
+      },
     });
 
     const data = await this.prismaService.gameResult.findUnique({
@@ -304,7 +307,9 @@ export class GameModel implements OnModuleInit {
     const invitedId = game.getInvitedId();
     const invitedSocket = this.appGateway.getUserSocket(invitedId);
 
-    if (!invitedId || !invitedSocket) { return null; }
+    if (!invitedId || !invitedSocket) {
+      return null;
+    }
     if (invitedSocket && game.status == GAME_STATUS.WAITING) {
       invitedSocket.emit('gameInvite', { text: 'canceled' });
     }
@@ -357,8 +362,10 @@ export class GameModel implements OnModuleInit {
 
   async disconnectPlayer(playerId: number) {
     const player = this.players.get(playerId);
-    if (!player) { return; }
-    
+    if (!player) {
+      return;
+    }
+
     if (player.game) {
       if (player.game.status == GAME_STATUS.READY) {
         await player.game.noticeToPlayers('gameSetting', { text: 'leave' });
@@ -369,7 +376,7 @@ export class GameModel implements OnModuleInit {
       }
       this.removeGame(player.game);
     }
-    
+
     if (this.isInvited(playerId)) {
       this.deleteInvite(playerId);
     }
@@ -430,10 +437,12 @@ export class GameModel implements OnModuleInit {
     }
   }
 
-  async roundOver(gameId: number, winnerId: number) { 
+  async roundOver(gameId: number, winnerId: number) {
     const game = this.getGame(gameId);
 
-    if (game.status != GAME_STATUS.PLAYING) { return; }
+    if (game.status != GAME_STATUS.PLAYING) {
+      return;
+    }
     game.score.set(winnerId, game.score.get(winnerId) + 1);
     if (game.score.get(winnerId) >= 11) {
       const data = await this.createGameResult(gameId);

@@ -60,13 +60,17 @@ export class Game {
   getOwnerPlayer(): Player {
     return this.players[0];
   }
-  
+
   getNonOwnerPlayer(): Player {
     return this.players[1];
   }
 
   isFull(): boolean {
     return this.players.length > 1;
+  }
+
+  isFullViewer(): boolean {
+    return this.viewers.length > 5;
   }
 
   /*  Invited user */
@@ -172,7 +176,6 @@ export class Game {
   }
 
   async setStart() {
-    this.status = GAME_STATUS.PLAYING;
     this.score.set(this.players[0].userId, 0);
     this.score.set(this.players[1].userId, 0);
 
@@ -254,12 +257,24 @@ export class Game {
     return true;
   }
 
+  async addViewer(player: Player): Promise<boolean> {
+    if (this.isFullViewer()) {
+      return false;
+    }
+    this.viewers.push(player);
+    player.socket.join(this.getName());
+
+    await this.players[0].socket.emit('rtcInit', {
+      userId: player.userId,
+    });
+
+    return true;
+  }
+
   leave(tarPlayer: Player): void {
     if (this.hasPlayer(tarPlayer)) {
       this.players.forEach((player) => {
         player.socket.leave(this.getName());
-
-        // socket message
         player.socket.emit('message', '대기열에서 나왔습니다.');
       });
     }
