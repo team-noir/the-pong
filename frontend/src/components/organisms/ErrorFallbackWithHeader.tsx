@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { FallbackProps } from 'react-error-boundary';
 import Button from 'components/atoms/Button';
 
@@ -9,7 +10,7 @@ export default function ErrorFallback({
     <>
       <header className="relative mx-auto max-w-xl px-2">
         <div className="flex h-14 items-center text-lg font-medium text-white justify-center">
-          <a href="/">The Pong</a>
+          <Link to="/">The Pong</Link>
         </div>
       </header>
       <div className="container mx-auto max-w-xl min-h-screen py-24 px-4">
