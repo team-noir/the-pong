@@ -8,7 +8,7 @@ interface Props {
 
 export default function GameHistory({ userId }: Props) {
   const { data: histories } = useQuery({
-    queryKey: ['gameHistory', userId],
+    queryKey: ['gameHistory', String(userId)],
     queryFn: () => getGameHistories(userId),
   });
 
