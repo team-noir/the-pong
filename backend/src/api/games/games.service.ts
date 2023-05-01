@@ -163,7 +163,7 @@ export class GamesService {
   async watchGame(userId: number, gameId: number) {
     const player = await this.gameModel.createPlayer(userId);
     let game;
-    
+
     try {
       game = this.gameModel.getGame(gameId);
     } catch (error) {

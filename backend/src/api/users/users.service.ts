@@ -1,5 +1,5 @@
-import { Injectable, Scope, Inject } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
+import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ModuleRef } from '@nestjs/core';
 
 import { PrismaService } from '@/prisma/prisma.service';
 import { createReadStream } from 'fs';
@@ -8,9 +8,7 @@ import { readdir } from 'node:fs/promises';
 import { join } from 'path';
 import { PROFILE_PATH } from '@const';
 
-interface RequestWithUser extends Request {
-  user: any;
-}
+import { AppGateway } from '@/app.gateway';
 
 interface getUsersQuery {
   q?: string;
@@ -18,12 +16,18 @@ interface getUsersQuery {
   per_page?: number;
 }
 
-@Injectable({ scope: Scope.REQUEST })
-export class UsersService {
+@Injectable()
+export class UsersService implements OnModuleInit {
+  private appGateway: AppGateway;
+
   constructor(
-    @Inject(REQUEST) private readonly request: RequestWithUser,
-    private prismaService: PrismaService
+    private prismaService: PrismaService,
+    private moduleRef: ModuleRef
   ) {}
+
+  async onModuleInit() {
+    this.appGateway = await this.moduleRef.get(AppGateway, { strict: false });
+  }
 
   async checkFollowed(
     followerId: number,
@@ -54,9 +58,7 @@ export class UsersService {
       .then((block) => !!block);
   }
 
-  async getUsers({ q, page, per_page }: getUsersQuery) {
-    const myUserId = this.request.user.id;
-
+  async getUsers(myUserId: number, { q, page, per_page }: getUsersQuery) {
     const where = q && {
       nickname: {
         contains: q,
@@ -89,9 +91,7 @@ export class UsersService {
       );
   }
 
-  async getUser(userId: number) {
-    const myUserId = this.request.user.id;
-
+  async getUser(myUserId: number, userId: number) {
     if (!userId) {
       return null;
     }
@@ -202,5 +202,22 @@ export class UsersService {
         achievementId,
       },
     });
+  }
+
+  getUserStatus(userId: number) {
+    const isOnline = this.appGateway.isUserOnline(userId);
+    const isPlaying = this.appGateway.isUserPlaying(userId);
+    let status = 'offline';
+
+    if (isPlaying) {
+      status = 'game';
+    } else if (isOnline) {
+      status = 'online';
+    }
+
+    return {
+      id: userId,
+      status: status,
+    };
   }
 }
