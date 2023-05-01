@@ -127,6 +127,39 @@ export class GameModel implements OnModuleInit {
   async setGameOver(game: Game, giveupId?: number) {
     const data = await this.createGameResult(game.gameId, giveupId);
 
+    game.status = GAME_STATUS.FINISHED;
+
+    if (game.isLadder) {
+      const winner = data.winner;
+
+      const dbUser = await this.prismaService.user.findUnique({
+        where: {
+          id: winner.id,
+        },
+        select: {
+          level: true,
+          exp: true,
+        },
+      });
+
+      if (dbUser.exp >= dbUser.level) {
+        dbUser.level += 1;
+        dbUser.exp = 0;
+      } else {
+        dbUser.exp += 1;
+      }
+
+      await this.prismaService.user.update({
+        where: {
+          id: winner.id,
+        },
+        data: {
+          level: dbUser.level,
+          exp: dbUser.exp,
+        },
+      });
+    }
+
     await game.noticeToPlayers('gameOver', data);
   }
 
@@ -172,7 +205,7 @@ export class GameModel implements OnModuleInit {
         level: data.loser.level,
         score: data.loserScore,
       },
-      isGiveUp: (giveupId != null),
+      isGiveUp: giveupId != null,
       createdAt: data.createdAt,
     };
   }
@@ -475,10 +508,7 @@ export class GameModel implements OnModuleInit {
   async getGameHistory(userId: number, page: number, perPage: number) {
     const history = await this.prismaService.gameResult.findMany({
       where: {
-        OR: [
-          { loserId: userId },
-          { winnerId: userId },
-        ]
+        OR: [{ loserId: userId }, { winnerId: userId }],
       },
       skip: (page - 1) * perPage,
       take: perPage,
@@ -490,14 +520,14 @@ export class GameModel implements OnModuleInit {
             id: true,
             nickname: true,
             level: true,
-          }
+          },
         },
         loser: {
           select: {
             id: true,
             nickname: true,
             level: true,
-          }
+          },
         },
         winnerScore: true,
         loserScore: true,
@@ -511,9 +541,8 @@ export class GameModel implements OnModuleInit {
         isLadder: h.isLadder,
         winner: { ...h.winner, score: h.winnerScore },
         loser: { ...h.loser, score: h.loserScore },
-        createdAt: h.createdAt
-      }
+        createdAt: h.createdAt,
+      };
     });
   }
 }
-

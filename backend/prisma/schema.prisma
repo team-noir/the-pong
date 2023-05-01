@@ -16,6 +16,7 @@ model User {
   imageUrl              String?
   nickname              String?       @unique
   level                 Int           @default(1)
+  exp                   Int           @default(0)
   isTwoFactor           Boolean       @default(false)
   twoFactorSecret       String?
   ftId                  String        @unique
