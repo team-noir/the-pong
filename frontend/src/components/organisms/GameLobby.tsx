@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query';
 import { getGames } from 'api/api.v1';
 import GameButtons from 'components/organisms/GameButtons';
 import GameLives from 'components/organisms/GameLives';
+import QUERY_KEYS from 'constants/queryKeys';
 
 export default function GameLobby() {
   const { data: games, isSuccess } = useQuery({
-    queryKey: ['games'],
+    queryKey: [QUERY_KEYS.GAMES],
     queryFn: getGames,
   });
 

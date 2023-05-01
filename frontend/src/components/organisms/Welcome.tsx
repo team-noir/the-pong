@@ -3,12 +3,13 @@ import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import Background from 'components/atoms/Background';
 import { BACKGROUND_IMAGES } from 'constants/index';
+import QUERY_KEYS from 'constants/queryKeys';
 
 export default function Welcome() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    queryClient.invalidateQueries(['whoami']);
+    queryClient.invalidateQueries([QUERY_KEYS.WHOAMI]);
   }, []);
 
   return (

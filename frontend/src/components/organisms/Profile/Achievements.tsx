@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
 import { getAchievements } from 'api/api.v1';
 import { AchievementType } from 'types';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   userId: number;
@@ -12,7 +13,7 @@ export default function Achievements({ userId }: Props) {
     AchievementType[],
     AxiosError
   >({
-    queryKey: ['achievements', String(userId)],
+    queryKey: [QUERY_KEYS.ACHIEVEMENTS, String(userId)],
     queryFn: () => getAchievements(userId),
     useErrorBoundary: (error: AxiosError) => {
       if (error && error.response?.status === 404) return false;

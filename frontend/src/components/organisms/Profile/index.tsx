@@ -8,6 +8,7 @@ import Achievements from 'components/organisms/Profile/Achievements';
 import GameHistory from 'components/organisms/Profile/GameHistory';
 import { UserType } from 'types';
 import ROUTES from 'constants/routes';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   user: UserType;
@@ -18,7 +19,7 @@ export default function Profile({ user }: Props) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const queryKey = ['profile', String(user.id)];
+  const queryKey = [QUERY_KEYS.PROFILE, String(user.id)];
   const isMyPage = user.id === myUserId;
 
   const onMutate = async (newUser: UserType | undefined) => {

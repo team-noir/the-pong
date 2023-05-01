@@ -4,12 +4,13 @@ import Button from 'components/atoms/Button';
 import Background from 'components/atoms/Background';
 import { BACKGROUND_IMAGES } from 'constants/index';
 import logo42 from 'assets/images/logo_42.svg';
+import QUERY_KEYS from 'constants/queryKeys';
 
 export default function Login() {
   const queryClient = useQueryClient();
 
   const anonymousLoginMutation = useMutation(anonymousLogin, {
-    onSuccess: () => queryClient.invalidateQueries(['whoami']),
+    onSuccess: () => queryClient.invalidateQueries([QUERY_KEYS.WHOAMI]),
   });
 
   return (
