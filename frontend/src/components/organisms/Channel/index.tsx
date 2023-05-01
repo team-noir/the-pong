@@ -44,7 +44,7 @@ export default function Channel({
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const queryKey = ['getMessages'];
+  const queryKey = ['messages'];
 
   const { data: messages } = useQuery<MessageType[]>({
     queryKey,

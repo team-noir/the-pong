@@ -6,7 +6,7 @@ import HeaderGnb from 'components/molecule/HeaderGnb';
 
 export default function ChannelLobbyPage() {
   const { data: channels, isSuccess } = useQuery({
-    queryKey: ['getChannels'],
+    queryKey: ['channels'],
     queryFn: () =>
       getChannels({ enter: '', kind: ['public', 'private', 'dm'] }),
   });

@@ -6,7 +6,7 @@ import Header from 'components/molecule/Header';
 
 export default function ChannelBrowsePage() {
   const { data: channels, isSuccess } = useQuery({
-    queryKey: ['getChannels', 'browse'],
+    queryKey: ['channels', 'browse'],
     queryFn: () => getChannels({}),
     refetchInterval: 1000 * 60, // 1분
   });

@@ -74,7 +74,7 @@ function Init() {
   const login = useUser((state) => state.login);
 
   useQuery({
-    queryKey: ['health-check'],
+    queryKey: ['health'],
     queryFn: healthCheck,
   });
 

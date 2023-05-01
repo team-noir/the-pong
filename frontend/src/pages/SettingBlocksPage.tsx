@@ -6,7 +6,7 @@ import Header from 'components/molecule/Header';
 
 export default function SettingBlocksPage() {
   const { data: blocks, isSuccess } = useQuery({
-    queryKey: ['getMyBlocks'],
+    queryKey: ['myBlocks'],
     queryFn: getMyBlocks,
   });
 

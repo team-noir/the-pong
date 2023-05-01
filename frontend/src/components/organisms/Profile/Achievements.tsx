@@ -12,7 +12,7 @@ export default function Achievements({ userId }: Props) {
     AchievementType[],
     AxiosError
   >({
-    queryKey: ['getAchievements', userId],
+    queryKey: ['achievements', String(userId)],
     queryFn: () => getAchievements(userId),
     useErrorBoundary: (error: AxiosError) => {
       if (error && error.response?.status === 404) return false;

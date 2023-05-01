@@ -17,7 +17,7 @@ export default function Profile({ user }: Props) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const queryKey = ['profile', user.id];
+  const queryKey = ['profile', String(user.id)];
   const isMyPage = user.id === myUserId;
 
   const onMutate = async (newUser: UserType | undefined) => {

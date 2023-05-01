@@ -6,7 +6,7 @@ import HeaderGnb from 'components/molecule/HeaderGnb';
 
 export default function FollowingPage() {
   const { data: followings, isSuccess } = useQuery({
-    queryKey: ['getMyFollowing'],
+    queryKey: ['myFollowings'],
     queryFn: getMyFollowings,
   });
 
