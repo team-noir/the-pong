@@ -44,7 +44,7 @@ export default function GameSettingPage() {
               } as GameSettingType)
           );
         } else if (text === 'done') {
-          navigate(`/game/${gameId}`);
+          navigate(`/game/${gameId}`, { replace: true });
         } else if (text === 'leave') {
           setIsOtherUserLeft(true);
         }
