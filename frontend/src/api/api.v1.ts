@@ -1,4 +1,9 @@
-import { AchievementType, GameType, MessageType } from './../types/index';
+import {
+  AchievementType,
+  GameHistoryType,
+  GameType,
+  MessageType,
+} from './../types/index';
 import axios, { AxiosResponse } from 'axios';
 import {
   UserType,
@@ -469,4 +474,18 @@ export const joinGameLive = async (gameId: number) => {
     throw new Error(res.statusText);
   }
   return res;
+};
+
+export const getGameHistories = async (
+  userId: number,
+  page = 1,
+  per_page = 30
+): Promise<GameHistoryType[]> => {
+  const res = await axiosWithInterceptors.get(`/games/users/${userId}`, {
+    params: { page, per_page },
+  });
+  if (res.status !== 200) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
 };
