@@ -5,7 +5,7 @@ import useGameRTC from 'hooks/useGameRTC';
 import { SocketContext } from 'contexts/socket';
 import { GameResultType, GameType, PlayerType } from 'types';
 
-type ReturnType = [
+type Return = [
   ball: typeof initialStateDefault.ball,
   paddles: typeof initialStateDefault.paddles,
   isPlaying: boolean,
@@ -23,7 +23,7 @@ export default function useGamePlay(
   videoRef: React.RefObject<HTMLVideoElement>,
   myPlayer: PlayerType | undefined,
   otherPlayer: PlayerType | undefined
-): ReturnType {
+): Return {
   const initialState = initialStates[game.mode];
 
   const [ball, setBall] = useState(initialState.ball);
@@ -34,8 +34,8 @@ export default function useGamePlay(
   const socket = useContext(SocketContext);
   const queryClient = useQueryClient();
 
-  const countInterval = useRef<NodeJS.Timer | null>(null);
-  const drawInterval = useRef<NodeJS.Timer | null>(null);
+  const countInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+  const drawInterval = useRef<ReturnType<typeof setInterval> | null>(null);
   const isMyKeyDown = useRef({ left: false, right: false });
   const isOtherKeyDown = useRef({ left: false, right: false });
 
