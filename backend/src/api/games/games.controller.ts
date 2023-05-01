@@ -7,6 +7,7 @@ import {
   Req,
   Body,
   Param,
+  Query,
   Res,
   UseGuards,
   HttpException,
@@ -15,6 +16,7 @@ import {
 import {
   ApiBody,
   ApiTags,
+  ApiQuery,
   ApiOperation,
   ApiOkResponse,
   ApiCreatedResponse,
@@ -285,6 +287,37 @@ export class GamesController {
       const gameInfo = await this.gamesService.getGameInfo(userId, gameId);
       res.status(HttpStatus.OK);
       return gameInfo;
+    } catch (error) {
+      throw new HttpException(error.message, error.code);
+    }
+  }
+
+  @Get('users/:userId')
+  @ApiOperation({ summary: 'Get game history.' })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'per_page',
+    required: false,
+  })
+  @UseGuards(AuthenticatedGuard)
+  async getGameHistory(
+    @Req() req,
+    @Param('userId') userId: number,
+    @Query('page') page: number,
+    @Query('per_page') perPage: number,
+    @Res({ passthrough: true }) res
+  ) {
+    try {
+      const history = await this.gamesService.gameModel.getGameHistory(
+        userId,
+        page,
+        perPage
+      );
+      res.status(HttpStatus.OK);
+      return history;
     } catch (error) {
       throw new HttpException(error.message, error.code);
     }

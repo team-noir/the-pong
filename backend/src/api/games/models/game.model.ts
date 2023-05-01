@@ -124,6 +124,12 @@ export class GameModel implements OnModuleInit {
     this.invites.delete(invitedId);
   }
 
+  async setGameOver(game: Game, giveupId?: number) {
+    const data = await this.createGameResult(game.gameId, giveupId);
+
+    await game.noticeToPlayers('gameOver', data);
+  }
+
   async createGameResult(gameId: number, giveupId?: number) {
     const game = this.getGame(gameId);
     const { winner, loser } = game.getWinnerLoser(giveupId);
@@ -381,12 +387,7 @@ export class GameModel implements OnModuleInit {
           });
           return;
         } else {
-          const data = await this.createGameResult(
-            player.game.gameId,
-            playerId
-          );
-          player.game.status = GAME_STATUS.FINISHED;
-          await player.game.noticeToPlayers('gameOver', data);
+          this.setGameOver(player.game, playerId);
         }
       }
       this.removeGame(player.game);
@@ -461,9 +462,7 @@ export class GameModel implements OnModuleInit {
 
     const score = game.score.get(winnerId) + 1;
     if (score >= 11) {
-      game.status = GAME_STATUS.FINISHED;
-      const data = await this.createGameResult(gameId);
-      await game.noticeToPlayers('gameOver', data);
+      this.setGameOver(game, null);
     } else {
       game.score.set(winnerId, score);
       await game.noticeToPlayers('roundOver', {
@@ -472,4 +471,49 @@ export class GameModel implements OnModuleInit {
       });
     }
   }
+
+  async getGameHistory(userId: number, page: number, perPage: number) {
+    const history = await this.prismaService.gameResult.findMany({
+      where: {
+        OR: [
+          { loserId: userId },
+          { winnerId: userId },
+        ]
+      },
+      skip: (page - 1) * perPage,
+      take: perPage,
+      select: {
+        id: true,
+        isLadder: true,
+        winner: {
+          select: {
+            id: true,
+            nickname: true,
+            level: true,
+          }
+        },
+        loser: {
+          select: {
+            id: true,
+            nickname: true,
+            level: true,
+          }
+        },
+        winnerScore: true,
+        loserScore: true,
+        createdAt: true,
+      },
+    });
+
+    return history.map((h) => {
+      return {
+        id: h.id,
+        isLadder: h.isLadder,
+        winner: { ...h.winner, score: h.winnerScore },
+        loser: { ...h.loser, score: h.loserScore },
+        createdAt: h.createdAt
+      }
+    });
+  }
 }
+
