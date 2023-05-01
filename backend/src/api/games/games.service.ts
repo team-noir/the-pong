@@ -16,7 +16,7 @@ export class GamesService {
     this.server = server;
     this.pingInterval = setInterval(async () => {
       await this.gameModel.sendPingToAllPlayers();
-    }, 5000);
+    }, 2000);
   }
 
   clearPingInverval() {
@@ -174,6 +174,7 @@ export class GamesService {
       throw { code, message };
     }
 
+    this.gameModel.setPlayer(player);
     await game.addViewer(player);
     await game.noticeToPlayers('gameViewer', {
       viewerCount: game.getViewerCount(),

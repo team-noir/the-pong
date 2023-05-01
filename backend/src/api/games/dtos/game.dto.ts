@@ -17,6 +17,7 @@ export class Game {
   ownerId: number;
   players: Player[];
   viewers: Player[];
+  viewerConnections: Set<userId>;
   private invitedId: userId;
 
   countPlayer: number;
@@ -32,6 +33,7 @@ export class Game {
     this.countPlayer = 0;
     this.players = [];
     this.viewers = [];
+    this.viewerConnections = new Set<userId>();
     this.score = new Map<userId, number>();
     this.createdAt = new Date();
   }
@@ -212,8 +214,8 @@ export class Game {
     this.players = [];
   }
 
-  removeViewer(viewerId: number) {
-    this.viewers = this.viewers.filter((viewer) => {
+  removeViewer(viewerId: number): number {
+    this.viewers = this.viewers.filter(async (viewer) => {
       if (viewer.userId == viewerId) {
         viewer.socket.leave(this.getName());
         viewer.leaveGame();
@@ -221,6 +223,8 @@ export class Game {
       }
       return false;
     });
+    this.viewerConnections.delete(viewerId);
+    return this.getViewerCount();
   }
 
   clearGameRoomTimeout() {
@@ -247,16 +251,28 @@ export class Game {
     return true;
   }
 
-  async addViewer(player: Player): Promise<boolean> {
+  async addViewer(viewer: Player): Promise<boolean> {
     if (this.isFullViewer()) {
       return false;
     }
-    this.viewers.push(player);
-    player.socket.join(this.getName());
+    const viewerId = viewer.userId;
+    this.viewers.push(viewer);
+
+    viewer.game = this;
+    viewer.socket.join(this.getName());
 
     await this.players[0].socket.emit('rtcInit', {
-      userId: player.userId,
+      userId: viewerId,
     });
+
+    this.viewerConnections.add(viewerId);
+    setTimeout(() => {
+      if (this.viewerConnections.has(viewerId)) {
+        this.players[0].socket.emit('rtcInit', {
+          userId: viewerId,
+        });
+      }
+    }, 2000);
 
     return true;
   }
@@ -275,7 +291,7 @@ export class Game {
 
     if (giveupId) {
       this.score.set(giveupId, 0);
-    } 
+    }
 
     if (
       this.score.get(this.players[0].userId) >

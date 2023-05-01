@@ -194,13 +194,19 @@ export class AppGateway
   }
 
   @SubscribeMessage('rtcConnected')
-  async rtcConnected(@ConnectedSocket() socket: Socket) {
+  async rtcConnected(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('userId') userId: number
+  ) {
     const player = this.gamesService.gameModel.getPlayer(socket.data.userId);
     const game = player.game;
 
     if (game.status != GAME_STATUS.PLAYING) {
       game.status = GAME_STATUS.PLAYING;
       await game.noticeToPlayers('gameStart', {});
+    }
+    if (game.status == GAME_STATUS.PLAYING) {
+      game.viewerConnections.delete(userId);
     }
   }
 

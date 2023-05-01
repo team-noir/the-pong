@@ -80,13 +80,15 @@ export class GameModel implements OnModuleInit {
 
       for (const player of players) {
         list.push({
-            id: player.userId,
-            nickname: player.username,
-            level: player.level,
-          });
+          id: player.userId,
+          nickname: player.username,
+          level: player.level,
+        });
       }
 
-      if (status != GAME_STATUS.PLAYING) { continue; }
+      if (status != GAME_STATUS.PLAYING) {
+        continue;
+      }
       gamelist.push({
         id: gameId,
         players: list,
@@ -370,9 +372,21 @@ export class GameModel implements OnModuleInit {
       if (player.game.status == GAME_STATUS.READY) {
         await player.game.noticeToPlayers('gameSetting', { text: 'leave' });
       } else if (player.game.status == GAME_STATUS.PLAYING) {
-        const data = await this.createGameResult(player.game.gameId, playerId);
-        player.game.status = GAME_STATUS.FINISHED;
-        await player.game.noticeToPlayers('gameOver', data);
+        if (player.isViewer()) {
+          const viewerCount = player.game.removeViewer(player.userId);
+          this.players.delete(player.userId);
+          await player.game.noticeToPlayers('gameViewer', {
+            viewerCount: viewerCount,
+          });
+          return;
+        } else {
+          const data = await this.createGameResult(
+            player.game.gameId,
+            playerId
+          );
+          player.game.status = GAME_STATUS.FINISHED;
+          await player.game.noticeToPlayers('gameOver', data);
+        }
       }
       this.removeGame(player.game);
     }
@@ -443,7 +457,7 @@ export class GameModel implements OnModuleInit {
     if (game.status != GAME_STATUS.PLAYING) {
       return;
     }
-    
+
     const score = game.score.get(winnerId) + 1;
     if (score >= 11) {
       game.status = GAME_STATUS.FINISHED;
