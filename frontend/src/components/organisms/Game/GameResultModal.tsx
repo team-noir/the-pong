@@ -3,6 +3,7 @@ import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { classNames } from 'utils';
 import { GameResultType, PlayerType } from 'types';
+import ROUTES from 'constants/routes';
 
 export default function GameResultModal({
   result,
@@ -12,7 +13,7 @@ export default function GameResultModal({
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate('/game');
+    navigate(ROUTES.GAME.INDEX);
   };
 
   return (

@@ -5,6 +5,7 @@ import { verify2fa } from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
 import TextInput from 'components/atoms/TextInput';
 import Button from 'components/atoms/Button';
+import ROUTES from 'constants/routes';
 
 interface Props {
   onSuccess?: () => void;
@@ -20,7 +21,7 @@ export default function Verify2FA({ onSuccess }: Props) {
     onSuccess: () => {
       setIsTwoFactor(true);
       setIsVerifiedTwoFactor(true);
-      onSuccess ? onSuccess() : navigate('/');
+      onSuccess ? onSuccess() : navigate(ROUTES.MAIN);
     },
   });
 

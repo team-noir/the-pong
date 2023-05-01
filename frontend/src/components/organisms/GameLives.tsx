@@ -1,9 +1,10 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { EyeIcon } from '@heroicons/react/20/solid';
 import GameMatchtable from 'components/molecule/GameMatchtable';
 import { GameType } from 'types';
 import { useMutation } from '@tanstack/react-query';
 import { joinGameLive } from 'api/api.v1';
+import ROUTES from 'constants/routes';
 
 interface Props {
   games: GameType[];
@@ -37,7 +38,7 @@ function GameItem({ game }: { game: GameType }) {
   const joinGameLiveMutation = useMutation({
     mutationFn: () => joinGameLive(game.id),
     onSuccess: () => {
-      navigate(`/game/${game.id}`);
+      navigate(ROUTES.GAME.ROOM(game.id));
     },
   });
 

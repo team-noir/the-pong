@@ -5,6 +5,7 @@ import { joinChannel } from 'api/api.v1';
 import ChannelList from 'components/molecule/ChannelList';
 import PasswordModal from 'components/molecule/PasswordModal';
 import { ChannelType } from 'types';
+import ROUTES from 'constants/routes';
 
 interface Props {
   channels: ChannelType[];
@@ -19,7 +20,7 @@ export default function ChannelBrowse({ channels }: Props) {
 
   const handleClickChannel = (channel: ChannelType) => {
     if (channel.isJoined) {
-      navigate(`/channel/${channel.id}`);
+      navigate(ROUTES.CHANNEL.ROOM(channel.id));
       return;
     }
 
@@ -27,7 +28,7 @@ export default function ChannelBrowse({ channels }: Props) {
       joinChannelMutation.mutate(
         { id: channel.id },
         {
-          onSuccess: () => navigate(`/channel/${channel.id}`),
+          onSuccess: () => navigate(ROUTES.CHANNEL.ROOM(channel.id)),
         }
       );
     }
@@ -40,7 +41,7 @@ export default function ChannelBrowse({ channels }: Props) {
     joinChannelMutation.mutate(
       { id: protectedChannelId, password },
       {
-        onSuccess: () => navigate(`/channel/${protectedChannelId}`),
+        onSuccess: () => navigate(ROUTES.CHANNEL.ROOM(protectedChannelId)),
       }
     );
   };

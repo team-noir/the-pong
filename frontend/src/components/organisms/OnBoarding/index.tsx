@@ -13,6 +13,7 @@ import StepNickname from 'components/organisms/OnBoarding/StepNickname';
 import StepProfileImage from 'components/organisms/OnBoarding/StepProfileImage';
 import { validateAgreements, validateNickname } from 'utils/validatorUtils';
 import { ProfileFormType } from 'types';
+import ROUTES from 'constants/routes';
 
 export interface FormData extends ProfileFormType {
   isCheckedAll: boolean;
@@ -65,7 +66,7 @@ export default function OnBoarding() {
 
   const handleSuccess = () => {
     setIsOnboarded(true);
-    navigate('/welcome');
+    navigate(ROUTES.WELCOME);
   };
 
   return (

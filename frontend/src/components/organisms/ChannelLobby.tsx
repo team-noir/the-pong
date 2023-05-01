@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import ChannelButtons from 'components/organisms/ChannelButtons';
 import ChannelList from 'components/molecule/ChannelList';
 import { ChannelType } from 'types';
+import ROUTES from 'constants/routes';
 
 interface Props {
   channels: ChannelType[];
@@ -11,7 +12,7 @@ export default function ChannelLobby({ channels }: Props) {
   const navigate = useNavigate();
 
   const handleClickChannel = (channel: ChannelType) => {
-    navigate(`/channel/${channel.id}`);
+    navigate(ROUTES.CHANNEL.ROOM(channel.id));
   };
 
   return (

@@ -11,6 +11,7 @@ import GameMatchtable from 'components/molecule/GameMatchtable';
 import Button from 'components/atoms/Button';
 import { classNames } from 'utils';
 import { GameSettingType } from 'types';
+import ROUTES from 'constants/routes';
 
 interface Props {
   gameSetting: GameSettingType;
@@ -31,7 +32,7 @@ export default function GameSetting({ gameSetting }: Props) {
 
   const startGameMutation = useMutation({
     mutationFn: startGame,
-    onSuccess: () => navigate(`/game/${gameSetting.id}`),
+    onSuccess: () => navigate(ROUTES.GAME.ROOM(gameSetting.id)),
   });
 
   useEffect(() => {
@@ -55,7 +56,7 @@ export default function GameSetting({ gameSetting }: Props) {
               } as GameSettingType)
           );
         } else if (text === 'done') {
-          navigate(`/game/${gameSetting.id}`);
+          navigate(ROUTES.GAME.ROOM(gameSetting.id));
         } else if (text === 'leave') {
           setIsOtherUserLeft(true);
         }
@@ -146,7 +147,7 @@ export default function GameSetting({ gameSetting }: Props) {
       </section>
 
       {isOtherUserLeft && (
-        <Modal onClickClose={() => navigate('/game')} fitContent>
+        <Modal onClickClose={() => navigate(ROUTES.GAME.INDEX)} fitContent>
           <div className="text-center">
             <p>상대가 퇴장했습니다.</p>
           </div>

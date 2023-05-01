@@ -7,6 +7,7 @@ import useGame from 'hooks/useGame';
 import { SocketContext } from 'contexts/socket';
 import Modal from 'components/templates/Modal';
 import Button from 'components/atoms/Button';
+import ROUTES from 'constants/routes';
 import { UI_TEXT } from 'constants/index';
 
 export default function GameInviteButton() {
@@ -19,7 +20,7 @@ export default function GameInviteButton() {
     onMutate: () => {
       socket.on('queue', (data: { text: string; gameId?: number }) => {
         if (data.gameId) {
-          navigate(`/game/${data.gameId}/setting`);
+          navigate(ROUTES.GAME.ROOM(data.gameId));
         } else {
           setAlertCode(data.text);
           setIsWating(false);

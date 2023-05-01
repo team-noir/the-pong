@@ -6,6 +6,7 @@ import Modal from 'components/templates/Modal';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 import Button from 'components/atoms/Button';
 import { ChannelType, USER_ROLES, ChannelUserType } from 'types';
+import ROUTES from 'constants/routes';
 
 interface Props {
   channel: ChannelType;
@@ -37,7 +38,7 @@ export default function ChannelDetail({
   const leaveChannelMutation = useMutation({
     mutationFn: leaveChannel,
     onSuccess: () => {
-      navigate('/channel');
+      navigate(ROUTES.CHANNEL.INDEX);
     },
   });
 

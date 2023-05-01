@@ -5,6 +5,7 @@ import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
 import GameInviteButton from 'components/molecule/GameInviteButton';
 import { UserType } from 'types';
+import ROUTES from 'constants/routes';
 
 interface Props {
   users: UserType[];
@@ -16,7 +17,7 @@ export default function Following({ users }: Props) {
 
   const getDmChannelMutation = useMutation({
     mutationFn: getDmChannel,
-    onSuccess: (data) => navigate(`/channel/${data.id}`),
+    onSuccess: (data) => navigate(ROUTES.CHANNEL.ROOM(data.id)),
   });
 
   const unfollowUserMutation = useMutation({

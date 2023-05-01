@@ -7,6 +7,7 @@ import ProfileImage from 'components/atoms/ProfileImage';
 import Achievements from 'components/organisms/Profile/Achievements';
 import GameHistory from 'components/organisms/Profile/GameHistory';
 import { UserType } from 'types';
+import ROUTES from 'constants/routes';
 
 interface Props {
   user: UserType;
@@ -63,7 +64,7 @@ export default function Profile({ user }: Props) {
 
   const getDmChannelMutation = useMutation({
     mutationFn: api.getDmChannel,
-    onSuccess: (data) => navigate(`/channel/${data.id}`),
+    onSuccess: (data) => navigate(ROUTES.CHANNEL.ROOM(data.id)),
   });
 
   return (

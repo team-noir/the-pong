@@ -10,6 +10,7 @@ import MessageList from 'components/molecule/MessageList';
 import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
 import { ChannelType, MessageType, NoticeType } from 'types';
+import ROUTES from 'constants/routes';
 import { NOTICE_STATUS } from 'constants/index';
 
 interface Props {
@@ -126,13 +127,13 @@ export default function Channel({
           alert(
             '채널에서 내보내졌습니다. 채널에 다시 참여할 수 있습니다. 채널 페이지로 이동합니다.'
           );
-          navigate('/channel');
+          navigate(ROUTES.CHANNEL.INDEX);
         }
         if (data.code === NOTICE_STATUS.USER_BAN) {
           alert(
             '채널에서 차단되었습니다. 채널에 다시 참여할 수 없습니다. 채널 페이지로 이동합니다.'
           );
-          navigate('/channel');
+          navigate(ROUTES.CHANNEL.INDEX);
         }
       }
     });

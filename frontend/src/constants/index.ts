@@ -25,7 +25,7 @@ export const BACKGROUND_IMAGES = {
   GAME_BACKSTREET: `${process.env.PUBLIC_URL}/images/bg_backstreet.jpg`,
   GAME_PIER: `${process.env.PUBLIC_URL}/images/bg_pier.jpg`,
   GAME_STORAGE: `${process.env.PUBLIC_URL}/images/bg_storage.jpg`,
-};
+} as const;
 
 export const DEFAULT_PROFILE_IMAGE = `${process.env.PUBLIC_URL}/images/default-profile-image.png`;
 
@@ -33,4 +33,4 @@ export const UI_TEXT = {
   ERROR: {
     DEFAULT: '무언가 잘못되었습니다. 다시 시도해주세요.',
   },
-};
+} as const;

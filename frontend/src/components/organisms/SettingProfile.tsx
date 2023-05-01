@@ -13,6 +13,7 @@ import FileInputWithImage from 'components/molecule/FileInputWithImage';
 import Button from 'components/atoms/Button';
 import { validateNickname } from 'utils/validatorUtils';
 import { ProfileFormType } from 'types';
+import ROUTES from 'constants/routes';
 
 export default function SettingProfile() {
   const {
@@ -82,7 +83,7 @@ export default function SettingProfile() {
 
   const handleSuccess = () => {
     setNickname(formData.nickname);
-    navigate(`/profile/${myUserId}`);
+    myUserId && navigate(ROUTES.PROFILE.USER(myUserId));
   };
 
   const checkNicknameAvailable = (value: string) => {
