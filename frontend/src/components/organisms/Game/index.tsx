@@ -15,7 +15,12 @@ import GameScoretable from 'components/molecule/GameScoretable';
 import Button from 'components/atoms/Button';
 import { classNames } from 'utils';
 import { GameType } from 'types';
-import { GAME_THEMES } from 'constants/index';
+import {
+  BALL_COLOR,
+  GAME_THEMES,
+  MY_PADDLE_COLOR,
+  OTHER_PADDLE_COLOR,
+} from 'constants/index';
 
 interface Props {
   game: GameType;
@@ -103,21 +108,21 @@ export default function Game({ game }: Props) {
                 x={ball.x * stageSize}
                 y={ball.y * stageSize}
                 r={ball.r * stageSize}
-                color="white"
+                color={BALL_COLOR}
               />
               <Paddle
                 x={paddles.up.x * stageSize}
                 y={paddles.up.y * stageSize}
                 width={paddles.up.w * stageSize}
                 height={paddles.up.h * stageSize}
-                color="#C3BCBA"
+                color={OTHER_PADDLE_COLOR}
               />
               <Paddle
                 x={paddles.down.x * stageSize}
                 y={paddles.down.y * stageSize}
                 width={paddles.down.w * stageSize}
                 height={paddles.down.h * stageSize}
-                color="#CD392B"
+                color={MY_PADDLE_COLOR}
               />
             </Layer>
           </Stage>
@@ -193,21 +198,21 @@ export default function Game({ game }: Props) {
                 x={ball.x * stageSize}
                 y={ball.y * stageSize}
                 r={ball.r * stageSize}
-                color="white"
+                color={BALL_COLOR}
               />
               <Paddle
                 x={paddles.up.x * stageSize}
                 y={paddles.up.y * stageSize}
                 width={paddles.up.w * stageSize}
                 height={paddles.up.h * stageSize}
-                color="#CD392B"
+                color={MY_PADDLE_COLOR}
               />
               <Paddle
                 x={paddles.down.x * stageSize}
                 y={paddles.down.y * stageSize}
                 width={paddles.down.w * stageSize}
                 height={paddles.down.h * stageSize}
-                color="#C3BCBA"
+                color={OTHER_PADDLE_COLOR}
               />
             </Layer>
           </Stage>

@@ -45,3 +45,7 @@ export const GAME_THEMES: readonly GameThemeType[] = [
     backgroundImage: BACKGROUND_IMAGES.GAME_PIER,
   },
 ] as const;
+
+export const BALL_COLOR = 'white';
+export const MY_PADDLE_COLOR = '#CD392B';
+export const OTHER_PADDLE_COLOR = '#C3BCBA';
