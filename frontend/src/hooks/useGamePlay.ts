@@ -59,13 +59,13 @@ export default function useGamePlay(
       );
     });
 
-    socket.on('gameViewer', (data: { viwerCount: number }) => {
+    socket.on('gameViewer', (data: { viewerCount: number }) => {
       queryClient.setQueryData<GameType>(
         ['game', String(game.id)],
         (prevData) =>
           prevData && {
             ...prevData,
-            viewerCount: data.viwerCount,
+            viewerCount: data.viewerCount,
           }
       );
     });
