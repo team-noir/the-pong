@@ -7,6 +7,7 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useUser } from 'hooks/useStore';
 import { SocketContext } from 'contexts/socket';
 import ProfileImage from 'components/atoms/ProfileImage';
+import Logo from 'components/atoms/Logo';
 import { classNames } from 'utils';
 
 const navigation = [
@@ -17,21 +18,13 @@ const navigation = [
   { name: '설정', href: '/setting', current: false },
 ];
 
-function Logo() {
-  return (
-    <div className="flex flex-shrink-0 items-center text-lg font-medium text-white">
-      <Link to="/">
-        <div className="block h-8 w-auto lg:hidden">The Pong</div>
-      </Link>
-      <Link to="/">
-        <div className="hidden h-8 w-auto lg:block">The Pong</div>
-      </Link>
-    </div>
-  );
-}
-
 export default function HeaderGnb() {
-  const { logout, setIsOnboarded, id: myUserId } = useUser((state) => state);
+  const {
+    logout,
+    setIsOnboarded,
+    id: myUserId,
+    nickname: MyUserNickname,
+  } = useUser((state) => state);
   const socket = useContext(SocketContext);
 
   const postLogoutMutation = useMutation({
@@ -76,7 +69,7 @@ export default function HeaderGnb() {
                       {myUserId && (
                         <ProfileImage
                           userId={myUserId}
-                          alt="My profile image"
+                          nickname={`${MyUserNickname}`}
                           size={32}
                         />
                       )}

@@ -1,12 +1,16 @@
-import { useUser } from 'hooks/useStore';
+import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { startGame, updateGameSetting } from 'api/api.v1';
 import { RadioGroup } from '@headlessui/react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
+import { useUser } from 'hooks/useStore';
+import { SocketContext } from 'contexts/socket';
+import Modal from 'components/templates/Modal';
 import GameMatchtable from 'components/molecule/GameMatchtable';
 import Button from 'components/atoms/Button';
 import { classNames } from 'utils';
+import ROUTES from 'constants/routes';
 import { GameType } from 'types';
 import { GAME_MODES, GAME_THEMES } from 'constants/index';
 
@@ -16,7 +20,10 @@ interface Props {
 
 export default function GameSetting({ gameSetting }: Props) {
   const myUserId = useUser((state) => state.id);
+  const [isOtherUserLeft, setIsOtherUserLeft] = useState(false);
+  const socket = useContext(SocketContext);
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const myPlayer = gameSetting.players.find((user) => user.id === myUserId);
   const otherPlayer = gameSetting.players.find((user) => user.id !== myUserId);
@@ -26,8 +33,43 @@ export default function GameSetting({ gameSetting }: Props) {
 
   const startGameMutation = useMutation({
     mutationFn: startGame,
-    onSuccess: () => navigate(`/game/${gameSetting.id}`),
+    onSuccess: () =>
+      navigate(ROUTES.GAME.ROOM(gameSetting.id), { replace: true }),
   });
+
+  useEffect(() => {
+    socket.on('ping', () => {
+      socket.emit('pong');
+    });
+
+    socket.on(
+      'gameSetting',
+      (data: { text: string; mode?: number; theme?: number }) => {
+        const { text, mode, theme } = data;
+        if (text === 'change') {
+          queryClient.setQueryData<GameType>(
+            ['gameSetting', String(gameSetting.id)],
+            (prevData) =>
+              prevData &&
+              ({
+                ...prevData,
+                mode: mode !== null ? mode : prevData.mode,
+                theme: theme !== null ? theme : prevData.theme,
+              } as GameType)
+          );
+        } else if (text === 'done') {
+          navigate(ROUTES.GAME.ROOM(gameSetting.id));
+        } else if (text === 'leave') {
+          setIsOtherUserLeft(true);
+        }
+      }
+    );
+
+    return () => {
+      socket.off('ping');
+      socket.off('gameSetting');
+    };
+  }, []);
 
   const handleChangeMode = (mode: number) => {
     updateGameSettingMutation.mutate({
@@ -44,66 +86,76 @@ export default function GameSetting({ gameSetting }: Props) {
   };
 
   return (
-    <section>
-      <h2 className="section-title">게임 설정</h2>
-      {!amIOwner && (
-        <div
-          className="text-text-dark bg-gray border-t-4 border-gray-dark rounded mb-6 px-4 py-3 shadow-md"
-          role="alert"
-        >
-          <div className="flex">
-            <div className="py-1">
-              <InformationCircleIcon
-                className="block h-4 w-4"
-                aria-hidden="true"
-              />
-            </div>
-            <div className="text-sm ml-1">
-              {otherPlayer?.nickname}님이 게임 설정을 완료할 때까지 잠시만
-              기다려 주세요.
+    <>
+      <section>
+        <h2 className="section-title">게임 설정</h2>
+        {!amIOwner && (
+          <div
+            className="text-text-dark bg-gray border-t-4 border-gray-dark rounded mb-6 px-4 py-3 shadow-md"
+            role="alert"
+          >
+            <div className="flex">
+              <div className="py-1">
+                <InformationCircleIcon
+                  className="block h-4 w-4"
+                  aria-hidden="true"
+                />
+              </div>
+              <div className="text-sm ml-1">
+                {otherPlayer?.nickname}님이 게임 설정을 완료할 때까지 잠시만
+                기다려 주세요.
+              </div>
             </div>
           </div>
-        </div>
-      )}
-      <div className="mb-5">
-        {myPlayer && otherPlayer && (
-          <GameMatchtable player1={myPlayer} player2={otherPlayer} />
         )}
-      </div>
+        <div className="mb-5">
+          {myPlayer && otherPlayer && (
+            <GameMatchtable player1={myPlayer} player2={otherPlayer} />
+          )}
+        </div>
 
-      <div className="mb-6">
-        <h3 className="block text-sm font-medium w-full text-text-light mb-2">
-          모드 선택
-        </h3>
-        <GameOptionList
-          type="mode"
-          selectedValue={gameSetting.mode}
-          onChange={handleChangeMode}
-          amIOwner={amIOwner}
-        />
-      </div>
-      <div className="mb-6">
-        <h3 className="block text-sm font-medium w-full text-text-light mb-2">
-          테마 선택
-        </h3>
-        <GameOptionList
-          type="theme"
-          selectedValue={gameSetting.theme}
-          onChange={handleChangeTheme}
-          amIOwner={amIOwner}
-        />
-      </div>
+        <div className="mb-6">
+          <h3 className="block text-sm font-medium w-full text-text-light mb-2">
+            모드 선택
+          </h3>
+          <GameOptionList
+            type="mode"
+            selectedValue={gameSetting.mode}
+            onChange={handleChangeMode}
+            amIOwner={amIOwner}
+          />
+        </div>
+        <div className="mb-6">
+          <h3 className="block text-sm font-medium w-full text-text-light mb-2">
+            테마 선택
+          </h3>
+          <GameOptionList
+            type="theme"
+            selectedValue={gameSetting.theme}
+            onChange={handleChangeTheme}
+            amIOwner={amIOwner}
+          />
+        </div>
 
-      {amIOwner && (
-        <Button
-          primary
-          fullLength
-          onClick={() => startGameMutation.mutate(gameSetting.id)}
-        >
-          시작하기
-        </Button>
+        {amIOwner && (
+          <Button
+            primary
+            fullLength
+            onClick={() => startGameMutation.mutate(gameSetting.id)}
+          >
+            시작하기
+          </Button>
+        )}
+      </section>
+
+      {isOtherUserLeft && (
+        <Modal onClickClose={() => navigate(ROUTES.GAME.INDEX)} fitContent>
+          <div className="text-center">
+            <p>상대가 퇴장했습니다.</p>
+          </div>
+        </Modal>
       )}
-    </section>
+    </>
   );
 }
 

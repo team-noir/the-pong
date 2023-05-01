@@ -11,6 +11,7 @@ import {
 } from 'utils/validatorUtils';
 import { ChannelFormType } from 'types';
 import { classNames } from 'utils';
+import ROUTES from 'constants/routes';
 
 export default function ChannelNew() {
   const [formData, setformData] = useState<ChannelFormType>({
@@ -29,7 +30,7 @@ export default function ChannelNew() {
     mutationFn: createChannel,
     onSuccess: (data) => {
       const { id } = data;
-      navigate(`/channel/${id}`);
+      navigate(ROUTES.CHANNEL.ROOM(id), { replace: true });
     },
   });
 

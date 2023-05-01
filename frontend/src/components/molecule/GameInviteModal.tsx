@@ -7,6 +7,7 @@ import Modal from 'components/templates/Modal';
 import ProfileImage from 'components/atoms/ProfileImage';
 import Button from 'components/atoms/Button';
 import { UserType } from 'types';
+import ROUTES from 'constants/routes';
 
 export default function GameInviteModal() {
   const [isShow, setIsShow] = useState(false);
@@ -42,7 +43,7 @@ export default function GameInviteModal() {
       {
         onSuccess: () => {
           setIsShow(false);
-          navigate(`/game/${gameId}/setting`);
+          navigate(ROUTES.GAME.SETTING(gameId));
         },
       }
     );
@@ -67,7 +68,7 @@ export default function GameInviteModal() {
           <p className="flex items-center">
             <ProfileImage
               userId={user?.id}
-              alt={`${user?.nickname}`}
+              nickname={`${user?.nickname}`}
               size={40}
             />
             <span className="ml-2">

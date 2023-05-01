@@ -20,6 +20,7 @@ import GameSettingPage from 'pages/GameSettingPage';
 import WelcomePage from 'pages/WelcomePage';
 import Verify2FAPage from 'pages/Verify2FAPage';
 import Root from 'pages/Root';
+import ROUTES from 'constants/routes';
 
 export const routes = (
   isLoggedin: boolean,
@@ -27,37 +28,45 @@ export const routes = (
   isTwoFactor: boolean,
   isVerifiedTwoFactor: boolean
 ) => {
-  let mainComponent = <Navigate to="/login" />;
+  let mainComponent = <Navigate to={ROUTES.LOGIN} />;
   if (isLoggedin) {
-    mainComponent = isOnboarded ? <Root /> : <Navigate to="/on-boarding" />;
+    mainComponent = isOnboarded ? (
+      <Root />
+    ) : (
+      <Navigate to={ROUTES.ONBOARDING} />
+    );
     if (isTwoFactor && !isVerifiedTwoFactor) {
-      mainComponent = <Navigate to="/2fa" />;
+      mainComponent = <Navigate to={ROUTES.TWO_FACTOR_AUTH} />;
     }
   }
 
   return [
     {
-      path: '/login',
-      element: !isLoggedin ? <LoginPage /> : <Navigate to="/" />,
+      path: ROUTES.LOGIN,
+      element: !isLoggedin ? <LoginPage /> : <Navigate to={ROUTES.MAIN} />,
       errorElement: <ErrorPage />,
     },
     {
-      path: '/on-boarding',
-      element: !isOnboarded ? <OnBoardingPage /> : <Navigate to="/" />,
+      path: ROUTES.ONBOARDING,
+      element: !isOnboarded ? (
+        <OnBoardingPage />
+      ) : (
+        <Navigate to={ROUTES.MAIN} />
+      ),
       errorElement: <ErrorPage />,
     },
     {
-      path: '/2fa',
+      path: ROUTES.TWO_FACTOR_AUTH,
       errorElement: <ErrorPage />,
       element:
         isTwoFactor && !isVerifiedTwoFactor ? (
           <Verify2FAPage />
         ) : (
-          <Navigate to="/" />
+          <Navigate to={ROUTES.MAIN} />
         ),
     },
     {
-      path: '/',
+      path: ROUTES.MAIN,
       element: mainComponent,
       errorElement: <ErrorPage />,
       children: [
@@ -66,78 +75,78 @@ export const routes = (
           element: <MainPage />,
         },
         {
-          path: 'game',
+          path: ROUTES.GAME.INDEX,
           children: [
             {
               index: true,
               element: <GameLobbyPage />,
             },
             {
-              path: ':gameId',
+              path: ROUTES.GAME.CHILDREN.GAME,
               element: <GamePage />,
             },
             {
-              path: ':gameId/setting',
+              path: ROUTES.GAME.CHILDREN.SETTING,
               element: <GameSettingPage />,
             },
           ],
         },
         {
-          path: 'channel',
+          path: ROUTES.CHANNEL.INDEX,
           children: [
             {
               index: true,
               element: <ChannelLobbyPage />,
             },
             {
-              path: 'browse',
+              path: ROUTES.CHANNEL.CHILDREN.BROWSE,
               element: <ChannelBrowsePage />,
             },
             {
-              path: 'new',
+              path: ROUTES.CHANNEL.CHILDREN.NEW,
               element: <ChannelNewPage />,
             },
             {
-              path: ':channelId',
+              path: ROUTES.CHANNEL.CHILDREN.CHANNEL,
               element: <ChannelPage />,
             },
           ],
         },
         {
-          path: 'following',
+          path: ROUTES.FOLLOWING,
           element: <FollowingPage />,
         },
         {
-          path: 'profile/:userId',
+          path: `${ROUTES.PROFILE.INDEX}/${ROUTES.PROFILE.CHILDREN.USER}`,
           element: <ProfilePage />,
         },
         {
-          path: 'setting',
+          path: ROUTES.SETTING.INDEX,
           children: [
             {
               index: true,
               element: <SettingPage />,
             },
             {
-              path: 'profile',
+              path: ROUTES.SETTING.CHILDREN.PROFILE,
               element: <SettingProfilePage />,
             },
             {
-              path: '2fa',
+              path: ROUTES.SETTING.CHILDREN.TWO_FACTOR_AUTH,
               element: <Setting2FAPage />,
             },
             {
-              path: 'blocks',
+              path: ROUTES.SETTING.CHILDREN.BLOCKS,
               element: <SettingBlocksPage />,
             },
           ],
         },
         {
-          path: 'search',
+          path: ROUTES.SEARCH,
           element: <SearchPage />,
         },
         {
-          path: 'welcome',
+          path: ROUTES.WELCOME,
           element: <WelcomePage />,
         },
       ],

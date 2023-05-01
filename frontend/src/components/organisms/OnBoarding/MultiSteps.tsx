@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { ReactNode, useState } from 'react';
 import { FormData } from 'components/organisms/OnBoarding';
-import HeaderWithBackButton from 'components/molecule/HeaderWithBackButton';
+import Header from 'components/molecule/Header';
 import Button from 'components/atoms/Button';
 import Message from 'components/atoms/Message';
 import { ProfileFormType } from 'types';
@@ -9,7 +9,7 @@ type ValidatorFunctionOrNull = (() => boolean) | null;
 
 interface Props {
   formData: FormData;
-  stepComponents: React.ReactElement[];
+  stepComponents: ReactNode[];
   validators: ValidatorFunctionOrNull[];
   messages: string[];
   onSubmit: (formData: ProfileFormType) => void;
@@ -52,7 +52,9 @@ export default function MultiSteps({
 
   return (
     <>
-      {!isFirstStep && <HeaderWithBackButton onClick={handleClickPrevStep} />}
+      {!isFirstStep && (
+        <Header noTitle hasBackButton onClick={handleClickPrevStep} />
+      )}
       <form
         onSubmit={handleClickNextStep}
         className="container mx-auto max-w-xl min-h-screen py-24 px-4"

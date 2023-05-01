@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Image } from 'react-konva';
 import konva from 'konva';
 import {
@@ -8,13 +8,15 @@ import {
 } from '@heroicons/react/20/solid';
 import { useUser } from 'hooks/useStore';
 import useGamePlay from 'hooks/useGamePlay';
+import { SocketContext } from 'contexts/socket';
 import Ball from 'components/organisms/Game/Ball';
 import Paddle from 'components/organisms/Game/Paddle';
 import GameResultModal from 'components/organisms/Game/GameResultModal';
 import GameScoretable from 'components/molecule/GameScoretable';
+import AchievementModal from 'components/molecule/AchievementModal';
 import Button from 'components/atoms/Button';
 import { classNames } from 'utils';
-import { GameType } from 'types';
+import { AchievementType, GameType } from 'types';
 import {
   BALL_COLOR,
   GAME_THEMES,
@@ -29,8 +31,12 @@ interface Props {
 export default function Game({ game }: Props) {
   const myUserId = useUser((state) => state.id);
   const [stageSize, setStageSize] = useState(0);
+  const [achievements, setAchievements] = useState<AchievementType[] | null>(
+    null
+  );
   const [backgroundImage, setBackgroundImage] =
     useState<HTMLImageElement | null>(null);
+  const socket = useContext(SocketContext);
 
   const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<konva.Layer>(null);
@@ -80,6 +86,29 @@ export default function Game({ game }: Props) {
     setStageSize(containerRef.current.clientWidth);
   };
 
+  useEffect(() => {
+    socket.on('achievement', (data: AchievementType) => {
+      setAchievements((prev) => {
+        if (prev) return [...prev, data];
+        return [data];
+      });
+    });
+    return () => {
+      socket.off('achievement');
+    };
+  }, [socket]);
+
+  const closeAchievement = (achievementId: number) => {
+    setAchievements((prev) => {
+      if (prev) {
+        return prev.filter(
+          (prevAchievement) => prevAchievement.id !== achievementId
+        );
+      }
+      return null;
+    });
+  };
+
   return (
     <section ref={containerRef}>
       <div className="text-center">
@@ -90,6 +119,7 @@ export default function Game({ game }: Props) {
           liveScore2={myPlayer ? myPlayer.score : game.players[1].score}
         />
       </div>
+
       <div
         className="relative bg-black"
         style={{ width: `${stageSize}px`, height: `${stageSize}px` }}
@@ -137,6 +167,7 @@ export default function Game({ game }: Props) {
             autoPlay
           />
         )}
+
         {!isPlaying && (
           <div className="flex flex-col vh-center  w-full h-full absolute top-0 bg-black/50 gap-y-8">
             <h1 className="text-6xl">Ready</h1>
@@ -154,6 +185,7 @@ export default function Game({ game }: Props) {
           </div>
         )}
       </div>
+
       {!amIViewer && (
         <div className="flex justify-center gap-2 mt-2">
           <Button
@@ -218,11 +250,24 @@ export default function Game({ game }: Props) {
           </Stage>
         </div>
       )}
+
       <div className="inline-flex items-center py-1 text-s text-gray-light float-right">
         <EyeIcon className="block h-4 w-4" aria-hidden="true" />
         <span className="ml-1">{game.viewerCount}</span>
       </div>
+
       {result && <GameResultModal result={result} />}
+
+      {achievements &&
+        achievements.map((achievement) => (
+          <AchievementModal
+            key={achievement.id}
+            achievement={achievement}
+            onClickClose={() => {
+              closeAchievement(achievement.id);
+            }}
+          />
+        ))}
     </section>
   );
 }

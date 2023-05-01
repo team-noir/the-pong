@@ -72,7 +72,7 @@ export default function ChannelUserItem({
         <Link to={`/profile/${user.id}`}>
           <ProfileImage
             userId={user.id}
-            alt={`${user.nickname}'s profile image`}
+            nickname={`${user.nickname}`}
             size={imageSize}
           />
         </Link>

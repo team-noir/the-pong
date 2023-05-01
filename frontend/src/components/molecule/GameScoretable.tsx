@@ -41,7 +41,7 @@ function GameHistoryItemPlayer({ player }: { player: PlayerType }) {
       >
         <ProfileImage
           userId={player.id}
-          alt={`${player.nickname}의 프로필 사진`}
+          nickname={`${player.nickname}`}
           size={imageSize}
         />
       </div>

@@ -7,6 +7,8 @@ import useGame from 'hooks/useGame';
 import { SocketContext } from 'contexts/socket';
 import Modal from 'components/templates/Modal';
 import Button from 'components/atoms/Button';
+import ROUTES from 'constants/routes';
+import { UI_TEXT } from 'constants/index';
 
 export default function GameInviteButton() {
   const [isWating, setIsWating, alertCode, setAlertCode] = useGame();
@@ -18,7 +20,7 @@ export default function GameInviteButton() {
     onMutate: () => {
       socket.on('queue', (data: { text: string; gameId?: number }) => {
         if (data.gameId) {
-          navigate(`/game/${data.gameId}/setting`);
+          navigate(ROUTES.GAME.ROOM(data.gameId));
         } else {
           setAlertCode(data.text);
           setIsWating(false);
@@ -31,7 +33,7 @@ export default function GameInviteButton() {
       if ([400, 409].includes(error.response.status)) {
         setAlertCode('unavailable');
       } else {
-        alert('다시 시도해 주세요.');
+        alert(UI_TEXT.ERROR.DEFAULT);
       }
       socket.off('queue');
     },

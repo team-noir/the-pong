@@ -5,6 +5,7 @@ import { joinGameLive } from 'api/api.v1';
 import { EyeIcon } from '@heroicons/react/20/solid';
 import GameMatchtable from 'components/molecule/GameMatchtable';
 import { GameType } from 'types';
+import ROUTES from 'constants/routes';
 
 interface Props {
   games: GameType[];
@@ -39,7 +40,7 @@ function GameItem({ game }: { game: GameType }) {
   const joinGameLiveMutation = useMutation({
     mutationFn: () => joinGameLive(game.id),
     onSuccess: () => {
-      navigate(`/game/${game.id}`);
+      navigate(ROUTES.GAME.ROOM(game.id));
     },
     onError: (error: AxiosError) => {
       if (error && error.response?.status === 404) {

@@ -5,14 +5,14 @@ import Following from 'components/organisms/Following';
 import HeaderGnb from 'components/molecule/HeaderGnb';
 
 export default function FollowingPage() {
-  const { data: followings } = useQuery({
-    queryKey: ['getMyFollowing'],
+  const { data: followings, isSuccess } = useQuery({
+    queryKey: ['myFollowings'],
     queryFn: getMyFollowings,
   });
 
   return (
     <AppTemplate header={<HeaderGnb />}>
-      {followings && <Following users={followings} />}
+      {isSuccess && <Following users={followings} />}
     </AppTemplate>
   );
 }

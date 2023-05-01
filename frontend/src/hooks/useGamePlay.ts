@@ -374,7 +374,7 @@ const initialStateDefault = {
   },
 };
 
-const speedRate = 1.5;
+const speedRate = 2;
 
 const initialStateSpeedy = {
   ...initialStateDefault,

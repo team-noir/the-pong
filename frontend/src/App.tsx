@@ -14,6 +14,7 @@ import { socket, SocketContext } from 'contexts/socket';
 import LoadingFallback from 'components/organisms/LoadingFalback';
 import ErrorFallbackWithHeader from 'components/organisms/ErrorFallbackWithHeader';
 import { routes } from 'routes';
+import { UI_TEXT } from 'constants/index';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,7 +27,7 @@ const queryClient = new QueryClient({
     },
     mutations: {
       retry: false,
-      onError: () => alert('다시 시도해 주세요.'),
+      onError: () => alert(UI_TEXT.ERROR.DEFAULT),
     },
   },
 });
@@ -74,7 +75,7 @@ function Init() {
   const login = useUser((state) => state.login);
 
   useQuery({
-    queryKey: ['health-check'],
+    queryKey: ['health'],
     queryFn: healthCheck,
   });
 

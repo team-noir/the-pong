@@ -1,5 +1,5 @@
-import { Link } from 'react-router-dom';
 import { FallbackProps } from 'react-error-boundary';
+import Header from 'components/molecule/Header';
 import Button from 'components/atoms/Button';
 
 export default function ErrorFallback({
@@ -8,11 +8,7 @@ export default function ErrorFallback({
 }: FallbackProps) {
   return (
     <>
-      <header className="relative mx-auto max-w-xl px-2">
-        <div className="flex h-14 items-center text-lg font-medium text-white justify-center">
-          <Link to="/">The Pong</Link>
-        </div>
-      </header>
+      <Header />
       <div className="container mx-auto max-w-xl min-h-screen py-24 px-4">
         <div className="vh-center flex-col text-center mb-4">
           <h2>에러가 발생했습니다.</h2>

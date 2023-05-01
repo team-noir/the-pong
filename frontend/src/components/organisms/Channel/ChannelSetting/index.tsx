@@ -3,8 +3,8 @@ import { updateChannelSetting } from 'api/api.v1';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Modal from 'components/templates/Modal';
-import ChannelSettingPassword from 'components/organisms/ChannelSetting/ChannelSettingPassword';
-import ChannelSettingTitle from 'components/organisms/ChannelSetting/ChannelSettingTitle';
+import ChannelSettingPassword from 'components/organisms/Channel/ChannelSetting/ChannelSettingPassword';
+import ChannelSettingTitle from 'components/organisms/Channel/ChannelSetting/ChannelSettingTitle';
 import { ChannelType } from 'types';
 
 interface Props {

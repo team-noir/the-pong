@@ -1,27 +1,25 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import * as api from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
 import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';
+import Achievements from 'components/organisms/Profile/Achievements';
+import GameHistory from 'components/organisms/Profile/GameHistory';
 import { UserType } from 'types';
+import ROUTES from 'constants/routes';
 
 interface Props {
-  userId: number;
+  user: UserType;
 }
 
-export default function Profile({ userId }: Props) {
+export default function Profile({ user }: Props) {
   const myUserId = useUser((state) => state.id);
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const queryKey = ['profile', userId];
-  const isMyPage = userId === myUserId;
-
-  const { data: user } = useQuery({
-    queryKey,
-    queryFn: () => api.getUser(Number(userId)),
-  });
+  const queryKey = ['profile', String(user.id)];
+  const isMyPage = user.id === myUserId;
 
   const onMutate = async (newUser: UserType | undefined) => {
     await queryClient.cancelQueries(queryKey);
@@ -66,19 +64,20 @@ export default function Profile({ userId }: Props) {
 
   const getDmChannelMutation = useMutation({
     mutationFn: api.getDmChannel,
-    onSuccess: (data) => navigate(`/channel/${data.id}`),
+    onSuccess: (data) => navigate(ROUTES.CHANNEL.ROOM(data.id)),
   });
 
   return (
     <>
-      {user && (
+      <section className="section">
         <div className="flex flex-col items-center">
-          <ProfileImage userId={userId} alt="profile image" size={192} />
+          <ProfileImage
+            userId={user.id}
+            nickname={`${user.nickname}`}
+            size={192}
+          />
           <div className="mb-8 text-center">
-            <p
-              data-testid={userId}
-              className="text-2xl font-semibold mt-4 mb-2"
-            >
+            <p data-testid={user} className="text-2xl font-semibold mt-4 mb-2">
               {user.nickname}
             </p>
             <span className="badge">Lv. {user.level}</span>
@@ -93,7 +92,7 @@ export default function Profile({ userId }: Props) {
               <div className="inline-flex gap-4 mb-4">
                 {user.isFollowedByMyself ? (
                   <Button
-                    onClick={() => unfollowUserMutation.mutate(userId)}
+                    onClick={() => unfollowUserMutation.mutate(user.id)}
                     secondary
                     className="w-36"
                   >
@@ -101,7 +100,7 @@ export default function Profile({ userId }: Props) {
                   </Button>
                 ) : (
                   <Button
-                    onClick={() => followUserMutation.mutate(userId)}
+                    onClick={() => followUserMutation.mutate(user.id)}
                     primary
                     className="w-36"
                   >
@@ -110,7 +109,7 @@ export default function Profile({ userId }: Props) {
                 )}
                 {!user.isBlockedByMyself && (
                   <Button
-                    onClick={() => getDmChannelMutation.mutate(userId)}
+                    onClick={() => getDmChannelMutation.mutate(user.id)}
                     primary
                     className="w-36"
                   >
@@ -120,7 +119,7 @@ export default function Profile({ userId }: Props) {
               </div>
               {user.isBlockedByMyself ? (
                 <Button
-                  onClick={() => unblockUserMutation.mutate(userId)}
+                  onClick={() => unblockUserMutation.mutate(user.id)}
                   linkStyle
                   className="text-red"
                   size="small"
@@ -129,7 +128,7 @@ export default function Profile({ userId }: Props) {
                 </Button>
               ) : (
                 <Button
-                  onClick={() => blockUserMutation.mutate(userId)}
+                  onClick={() => blockUserMutation.mutate(user.id)}
                   linkStyle
                   className="text-red"
                   size="small"
@@ -140,7 +139,9 @@ export default function Profile({ userId }: Props) {
             </div>
           )}
         </div>
-      )}
+      </section>
+      <Achievements userId={user.id} />
+      <GameHistory userId={user.id} />
     </>
   );
 }

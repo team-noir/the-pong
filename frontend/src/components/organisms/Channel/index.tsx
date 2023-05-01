@@ -3,15 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMessages, sendMessage } from 'api/api.v1';
 import { SocketContext } from 'contexts/socket';
+import ChannelDetail from 'components/organisms/Channel/ChannelDetail';
+import ChannelSetting from 'components/organisms/Channel/ChannelSetting';
+import ChannelInvite from 'components/organisms/Channel/ChannelInvite';
+import MessageList from 'components/molecule/MessageList';
 import Button from 'components/atoms/Button';
 import TextInput from 'components/atoms/TextInput';
-import MessageList from 'components/molecule/MessageList';
 import { ChannelType, MessageType, NoticeType } from 'types';
+import ROUTES from 'constants/routes';
 import { NOTICE_STATUS } from 'constants/index';
 
 interface Props {
   channel: ChannelType;
   myUserId: number;
+  isShowDetail: boolean;
+  onClickCloseDetail: () => void;
 }
 
 interface FormData {
@@ -20,20 +26,27 @@ interface FormData {
   disabled: boolean;
 }
 
-export default function Channel({ channel, myUserId }: Props) {
-  const queryClient = useQueryClient();
-  const socket = useContext(SocketContext);
-  const navigate = useNavigate();
-
+export default function Channel({
+  channel,
+  myUserId,
+  isShowDetail,
+  onClickCloseDetail,
+}: Props) {
   const [formData, setFormData] = useState<FormData>({
     message: '',
     placeholder: '메시지를 입력하세요',
     disabled: false,
   });
+  const [isShowSetting, setIsShowSetting] = useState(false);
+  const [isShowInvite, setIsShowInvite] = useState(false);
+  const socket = useContext(SocketContext);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const queryKey = ['getMessages'];
+  const queryKey = ['messages'];
+
   const { data: messages } = useQuery<MessageType[]>({
     queryKey,
     queryFn: () => getMessages(channel.id),
@@ -114,13 +127,13 @@ export default function Channel({ channel, myUserId }: Props) {
           alert(
             '채널에서 내보내졌습니다. 채널에 다시 참여할 수 있습니다. 채널 페이지로 이동합니다.'
           );
-          navigate('/channel');
+          navigate(ROUTES.CHANNEL.INDEX);
         }
         if (data.code === NOTICE_STATUS.USER_BAN) {
           alert(
             '채널에서 차단되었습니다. 채널에 다시 참여할 수 없습니다. 채널 페이지로 이동합니다.'
           );
-          navigate('/channel');
+          navigate(ROUTES.CHANNEL.INDEX);
         }
       }
     });
@@ -173,6 +186,29 @@ export default function Channel({ channel, myUserId }: Props) {
           </Button>
         </div>
       </form>
+
+      {isShowDetail && myUserId && (
+        <ChannelDetail
+          channel={channel}
+          myUserId={myUserId}
+          onClickClose={onClickCloseDetail}
+          onClickSetting={() => setIsShowSetting(true)}
+          onClickInvite={() => setIsShowInvite(true)}
+        />
+      )}
+      {isShowSetting && (
+        <ChannelSetting
+          channel={channel}
+          onClickClose={() => setIsShowSetting(false)}
+        />
+      )}
+      {isShowInvite && channel.users && (
+        <ChannelInvite
+          channelId={channel.id}
+          channelUsers={channel.users}
+          onClickClose={() => setIsShowInvite(false)}
+        />
+      )}
     </>
   );
 }

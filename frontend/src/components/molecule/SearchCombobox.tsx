@@ -58,7 +58,7 @@ export default function SearchCombobox({
                   >
                     <ProfileImage
                       userId={user.id}
-                      alt={`${user.nickname}'s profile image`}
+                      nickname={`${user.nickname}`}
                       size={40}
                     />
                     <div
