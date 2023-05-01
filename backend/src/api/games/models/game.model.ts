@@ -166,6 +166,7 @@ export class GameModel implements OnModuleInit {
         level: data.loser.level,
         score: data.loserScore,
       },
+      isGiveUp: (giveupId != null),
       createdAt: data.createdAt,
     };
   }
