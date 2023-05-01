@@ -13,6 +13,9 @@ export const NOTICE_STATUS = {
 
 export const BACKGROUND_IMAGES = {
   WELCOME: `${process.env.PUBLIC_URL}/images/welcome-background.jpg`,
+  GAME_BACKSTREET: `${process.env.PUBLIC_URL}/images/bg_backstreet.jpg`,
+  GAME_PIER: `${process.env.PUBLIC_URL}/images/bg_pier.jpg`,
+  GAME_STORAGE: `${process.env.PUBLIC_URL}/images/bg_storage.jpg`,
 };
 
 export const DEFAULT_PROFILE_IMAGE = `${process.env.PUBLIC_URL}/images/default-profile-image.png`;
