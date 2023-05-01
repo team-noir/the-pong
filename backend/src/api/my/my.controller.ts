@@ -20,6 +20,7 @@ import {
   ApiOperation,
   ApiTags,
   ApiOkResponse,
+  ApiCreatedResponse,
   ApiUnauthorizedResponse,
   ApiConsumes,
   ApiBadRequestResponse,
@@ -89,7 +90,7 @@ export class MyController {
   @Post('profile-image')
   @ApiOperation({ summary: 'Upload profile image' })
   @ApiConsumes('multipart/form-data')
-  @ApiNoContentResponse({ description: 'Successfully uploaded profile image' })
+  @ApiCreatedResponse({ description: 'Successfully created profile image' })
   @ApiBadRequestResponse({ description: 'Bad request\n- [TODO]Invalid file' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @ApiBody({ description: 'Profile image binary file', type: FileUploadDto })
@@ -123,7 +124,7 @@ export class MyController {
   async uploadProfileImage(@Req() req, @Res() res, @UploadedFile() file) {
     try {
       // TODO: file validation(format, size, etc...)
-      const statusCode = file ? HttpStatus.NO_CONTENT : HttpStatus.BAD_REQUEST;
+      const statusCode = file ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
       await this.myService.uploadProfileImage(req.user.id, file);
       res.status(statusCode).send();
     } catch (error) {

@@ -16,6 +16,7 @@ import {
   ApiOperation,
   ApiTags,
   ApiOkResponse,
+  ApiCreatedResponse,
   ApiUnauthorizedResponse,
   ApiQuery,
   ApiNotFoundResponse,
@@ -147,7 +148,7 @@ export class UsersController {
   // TODO: remove this endpoint
   @Post(':userId/achievements/:achievementId')
   @ApiOperation({ summary: 'TEST - Add achievement' })
-  @ApiOkResponse({ description: 'ADD achievement', type: AchievementDto })
+  @ApiCreatedResponse({ description: 'ADD achievement', type: AchievementDto })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
@@ -161,7 +162,7 @@ export class UsersController {
         Number(userId),
         Number(achievementId)
       );
-      res.status(HttpStatus.OK).send(achievement);
+      res.status(HttpStatus.CREATED).send(achievement);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

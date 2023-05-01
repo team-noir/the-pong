@@ -21,6 +21,7 @@ import {
   ApiOperation,
   ApiQuery,
   ApiOkResponse,
+  ApiCreatedResponse,
   ApiBadRequestResponse,
   ApiUnauthorizedResponse,
   ApiForbiddenResponse,
@@ -46,7 +47,8 @@ export class ChannelsController {
 
   @Post()
   @ApiOperation({ summary: 'Create channel' })
-  @ApiOkResponse({
+  @ApiCreatedResponse({
+    description: 'The channel has been successfully created.',
     type: ChannelIdDto,
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
@@ -62,7 +64,7 @@ export class ChannelsController {
         req.user.id,
         body
       );
-      res.status(HttpStatus.OK);
+      res.status(HttpStatus.CREATED);
       return result;
     } catch (error) {
       throw new HttpException(error.message, error.code);
@@ -238,6 +240,10 @@ export class ChannelsController {
 
   @Post(':channelId/message')
   @ApiOperation({ summary: 'Send message to channel' })
+  @ApiCreatedResponse({
+    description: 'The message has been successfully sent.',
+    type: ChannelMessageDto,
+  })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async sendChannelMessage(
@@ -249,8 +255,12 @@ export class ChannelsController {
     try {
       const channel = this.channelsService.channelModel.get(channelId);
       const user = this.channelsService.userModel.getUser(req.user.id);
-      await this.channelsService.messageToChannel(user, channel, body.text);
-      res.status(HttpStatus.NO_CONTENT);
+      const message = await this.channelsService.messageToChannel(
+        user,
+        channel,
+        body.text
+      );
+      res.status(HttpStatus.CREATED).send(message);
       return;
     } catch (error) {
       throw new HttpException(error.message, error.code);
