@@ -120,6 +120,7 @@ export interface GameResultType {
   id: number;
   winner: PlayerType;
   loser: PlayerType;
+  isGiveUp: boolean;
   createdAt: string;
 }
 
