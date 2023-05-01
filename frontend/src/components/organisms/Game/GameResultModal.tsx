@@ -1,5 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-import Button from 'components/atoms/Button';
+import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { classNames } from 'utils';
 import { GameResultType, PlayerType } from 'types';
@@ -10,12 +9,6 @@ export default function GameResultModal({
 }: {
   result: GameResultType;
 }) {
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate(ROUTES.GAME.INDEX);
-  };
-
   return (
     <div className="modal-wrapper z-[9]">
       <div className="modal-backdrop"></div>
@@ -30,9 +23,9 @@ export default function GameResultModal({
             </span>
             <GameResultModalPlayer player={result.loser} />
           </div>
-          <Button onClick={handleClick} primary>
+          <Link to={ROUTES.GAME.INDEX} className="button primary">
             게임 로비로 돌아가기
-          </Button>
+          </Link>
         </div>
       </div>
     </div>
