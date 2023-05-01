@@ -36,9 +36,6 @@ export default function Following({ users }: Props) {
     const ancestorElement = e.currentTarget.closest('[data-user-id]');
     if (!(ancestorElement instanceof HTMLElement)) return;
     const userId = ancestorElement.dataset.userId;
-
-    const answer = confirm('언팔로우하시겠습니까?');
-    if (!answer) return;
     unfollowUserMutation.mutate(Number(userId));
   };
 

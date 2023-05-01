@@ -9,8 +9,7 @@ const ROUTES = {
       SETTING: ':gameId/setting',
     },
     ROOM: (id: number) => `${ROUTES.GAME.INDEX}/${id}`,
-    SETTING: (id: number) =>
-      `${ROUTES.GAME.INDEX}/${id}/${ROUTES.GAME.CHILDREN.SETTING}`,
+    SETTING: (id: number) => `${ROUTES.GAME.INDEX}/${id}/setting`,
   },
   CHANNEL: {
     INDEX: '/channel',

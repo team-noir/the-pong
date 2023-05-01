@@ -10,11 +10,12 @@ import Modal from 'components/templates/Modal';
 import GameMatchtable from 'components/molecule/GameMatchtable';
 import Button from 'components/atoms/Button';
 import { classNames } from 'utils';
-import { GameSettingType } from 'types';
 import ROUTES from 'constants/routes';
+import { GameType } from 'types';
+import { GAME_MODES, GAME_THEMES } from 'constants/index';
 
 interface Props {
-  gameSetting: GameSettingType;
+  gameSetting: GameType;
 }
 
 export default function GameSetting({ gameSetting }: Props) {
@@ -32,7 +33,8 @@ export default function GameSetting({ gameSetting }: Props) {
 
   const startGameMutation = useMutation({
     mutationFn: startGame,
-    onSuccess: () => navigate(ROUTES.GAME.ROOM(gameSetting.id)),
+    onSuccess: () =>
+      navigate(ROUTES.GAME.ROOM(gameSetting.id), { replace: true }),
   });
 
   useEffect(() => {
@@ -45,15 +47,15 @@ export default function GameSetting({ gameSetting }: Props) {
       (data: { text: string; mode?: number; theme?: number }) => {
         const { text, mode, theme } = data;
         if (text === 'change') {
-          queryClient.setQueryData<GameSettingType>(
-            ['gameSetting', gameSetting.id],
+          queryClient.setQueryData<GameType>(
+            ['gameSetting', String(gameSetting.id)],
             (prevData) =>
               prevData &&
               ({
                 ...prevData,
                 mode: mode !== null ? mode : prevData.mode,
                 theme: theme !== null ? theme : prevData.theme,
-              } as GameSettingType)
+              } as GameType)
           );
         } else if (text === 'done') {
           navigate(ROUTES.GAME.ROOM(gameSetting.id));
@@ -117,7 +119,7 @@ export default function GameSetting({ gameSetting }: Props) {
             모드 선택
           </h3>
           <GameOptionList
-            count={gameSetting.modeCount}
+            type="mode"
             selectedValue={gameSetting.mode}
             onChange={handleChangeMode}
             amIOwner={amIOwner}
@@ -128,7 +130,7 @@ export default function GameSetting({ gameSetting }: Props) {
             테마 선택
           </h3>
           <GameOptionList
-            count={gameSetting.themeCount}
+            type="theme"
             selectedValue={gameSetting.theme}
             onChange={handleChangeTheme}
             amIOwner={amIOwner}
@@ -158,16 +160,18 @@ export default function GameSetting({ gameSetting }: Props) {
 }
 
 function GameOptionList({
-  count,
+  type,
   selectedValue,
   onChange,
   amIOwner,
 }: {
-  count: number;
+  type: string;
   selectedValue: number;
   onChange: (value: number) => void;
   amIOwner: boolean;
 }) {
+  const options = type === 'mode' ? GAME_MODES : GAME_THEMES;
+
   return (
     <RadioGroup
       value={selectedValue}
@@ -175,31 +179,28 @@ function GameOptionList({
       className="inline-flex flex-wrap items-center mb-2 w-full border border-gray-dark rounded"
       disabled={!amIOwner}
     >
-      {Array(count)
-        .fill(0)
-        .map((_, index) => (
-          <RadioGroup.Option
-            key={index}
-            value={index}
-            className={classNames(
-              'flex-auto border-r last-of-type:border-none border-gray-dark rounded-none',
-              amIOwner && 'cursor-pointer'
-            )}
-          >
-            {/* TODO: index를 문자열로 치환 */}
-            {({ checked }) => (
-              <span
-                className={classNames(
-                  'block text-center text-lg py-2 px-4 w-full font-semibold select-none focus-visible:outline-none',
-                  amIOwner && 'cursor-pointer',
-                  checked && 'bg-gray-dark'
-                )}
-              >
-                {index}
-              </span>
-            )}
-          </RadioGroup.Option>
-        ))}
+      {options.map((option, index) => (
+        <RadioGroup.Option
+          key={index}
+          value={index}
+          className={classNames(
+            'flex-auto border-r last-of-type:border-none border-gray-dark rounded-none',
+            amIOwner && 'cursor-pointer'
+          )}
+        >
+          {({ checked }) => (
+            <span
+              className={classNames(
+                'block text-center text-lg py-2 px-4 w-full font-semibold select-none focus-visible:outline-none',
+                amIOwner && 'cursor-pointer',
+                checked && 'bg-gray-dark'
+              )}
+            >
+              {option.name}
+            </span>
+          )}
+        </RadioGroup.Option>
+      ))}
     </RadioGroup>
   );
 }

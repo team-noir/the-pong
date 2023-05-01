@@ -92,15 +92,20 @@ export default function useGameRTC(
 
     socket.on(
       'rtcGetAnswer',
-      (data: { sdp: RTCSessionDescription; answerSendUserId: number }) => {
+      async (data: {
+        sdp: RTCSessionDescription;
+        answerSendUserId: number;
+      }) => {
         const { sdp, answerSendUserId } = data;
         if (!peerConnectionsRef.current) return;
         const peerConnection: RTCPeerConnection =
           peerConnectionsRef.current[answerSendUserId];
         if (!peerConnection) return;
-        peerConnection.setRemoteDescription(new RTCSessionDescription(sdp));
+        await peerConnection.setRemoteDescription(
+          new RTCSessionDescription(sdp)
+        );
 
-        socket.emit('rtcConnected');
+        socket.emit('rtcConnected', { userId: answerSendUserId });
       }
     );
   };

@@ -32,6 +32,13 @@ export class Player {
     return this.blockUser.has(playerId);
   }
 
+  isViewer(): boolean {
+    if (!this.game) {
+      return false;
+    }
+    return this.game.hasViewer(this);
+  }
+
   joinGame(game: Game): boolean {
     if (game && !this.game) {
       this.game = game;

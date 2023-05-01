@@ -9,5 +9,15 @@ interface Props {
 }
 
 export default function Paddle({ x, y, width, height, color }: Props) {
-  return <Rect x={x} y={y} width={width} height={height} fill={color} />;
+  return (
+    <Rect
+      x={x}
+      y={y}
+      width={width}
+      height={height}
+      fill={color}
+      shadowColor="rgba(61, 54, 54, 0.25)"
+      shadowBlur={21}
+    />
+  );
 }

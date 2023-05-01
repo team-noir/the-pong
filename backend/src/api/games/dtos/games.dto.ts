@@ -8,7 +8,6 @@ import {
 } from 'class-validator';
 import { Player } from './player.dto';
 import { Game } from './game.dto';
-import { GAME_MODES, GAME_THEMES } from '@const';
 
 export class AddUserToQueueDto {
   @ApiProperty()
@@ -59,13 +58,13 @@ export class GameSettingInfoDto {
   public id: number;
 
   @ApiProperty({
-    example: GAME_MODES.size(),
+    example: 5,
   })
   @IsNumber()
   public modeCount: number;
 
   @ApiProperty({
-    example: GAME_THEMES.size(),
+    example: 4,
   })
   @IsNumber()
   public themeCount: number;
@@ -93,8 +92,6 @@ export class GameSettingInfoDto {
 
   constructor(game: Game) {
     this.id = game.gameId;
-    this.modeCount = GAME_MODES.size();
-    this.themeCount = GAME_THEMES.size();
     this.mode = game.mode;
     this.theme = game.theme;
     this.isLadder = game.isLadder;

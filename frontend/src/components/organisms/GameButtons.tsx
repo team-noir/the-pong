@@ -29,7 +29,7 @@ export default function GameButtons() {
     onSuccess: () => setIsWating(true),
     onError: () => {
       socket.off('queue');
-      console.log(UI_TEXT.ERROR.DEFAULT);
+      alert(UI_TEXT.ERROR.DEFAULT);
     },
   });
 

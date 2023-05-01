@@ -1,3 +1,5 @@
+import { GameOptionType, GameThemeType } from 'types';
+
 export const SERVICE_NAME = 'The Pong';
 
 /** Socket */
@@ -34,3 +36,28 @@ export const UI_TEXT = {
     DEFAULT: '무언가 잘못되었습니다. 다시 시도해주세요.',
   },
 } as const;
+
+export const GAME_MODES: readonly GameOptionType[] = [
+  { name: '보통' },
+  { name: '빠른 공' },
+  { name: '짧은 패들' },
+] as const;
+
+export const GAME_THEMES: readonly GameThemeType[] = [
+  {
+    name: '창고',
+    backgroundImage: BACKGROUND_IMAGES.GAME_STORAGE,
+  },
+  {
+    name: '뒷골목',
+    backgroundImage: BACKGROUND_IMAGES.GAME_BACKSTREET,
+  },
+  {
+    name: '부두',
+    backgroundImage: BACKGROUND_IMAGES.GAME_PIER,
+  },
+] as const;
+
+export const BALL_COLOR = 'white';
+export const MY_PADDLE_COLOR = '#CD392B';
+export const OTHER_PADDLE_COLOR = '#C3BCBA';

@@ -15,6 +15,9 @@ export default function GameResultModal({
       <div className="modal-panel-wrapper">
         <div className="modal-panel h-fit w-fit mt-6 px-24 py-8 flex flex-col vh-center">
           <h2 className="text-2xl">게임 결과</h2>
+          {result.isGiveUp && (
+            <p className="mt-2 -mb-6">{result.loser.nickname}의 기권</p>
+          )}
           <div className="relative inline-flex items-center gap-2 my-12">
             <GameResultModalPlayer player={result.winner} isWinner />
             <span className="pt-8 text-4xl text-gray-lighter font-light italic">

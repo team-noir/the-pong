@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
+import { joinGameLive } from 'api/api.v1';
 import { EyeIcon } from '@heroicons/react/20/solid';
 import GameMatchtable from 'components/molecule/GameMatchtable';
 import { GameType } from 'types';
-import { useMutation } from '@tanstack/react-query';
-import { joinGameLive } from 'api/api.v1';
 import ROUTES from 'constants/routes';
 
 interface Props {
@@ -34,11 +35,20 @@ function GameList({ games }: { games: GameType[] }) {
 
 function GameItem({ game }: { game: GameType }) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const joinGameLiveMutation = useMutation({
     mutationFn: () => joinGameLive(game.id),
     onSuccess: () => {
       navigate(ROUTES.GAME.ROOM(game.id));
+    },
+    onError: (error: AxiosError) => {
+      if (error && error.response?.status === 404) {
+        queryClient.invalidateQueries(['games']);
+        alert('이미 종료된 게임입니다.');
+      } else {
+        alert('다시 시도해 주세요.');
+      }
     },
   });
 
