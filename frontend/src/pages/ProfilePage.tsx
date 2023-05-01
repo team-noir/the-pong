@@ -4,12 +4,13 @@ import { getUser } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import Profile from 'components/organisms/Profile';
 import HeaderGnb from 'components/molecule/HeaderGnb';
+import QUERY_KEYS from 'constants/queryKeys';
 
 export default function ProfilePage() {
   const { userId } = useParams() as { userId: string };
 
   const { data: user } = useQuery({
-    queryKey: ['profile', userId],
+    queryKey: [QUERY_KEYS.PROFILE, userId],
     queryFn: () => getUser(Number(userId)),
   });
 

@@ -12,6 +12,7 @@ import TextInput from 'components/atoms/TextInput';
 import { ChannelType, MessageType, NoticeType } from 'types';
 import ROUTES from 'constants/routes';
 import { NOTICE_STATUS } from 'constants/index';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   channel: ChannelType;
@@ -45,10 +46,10 @@ export default function Channel({
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const queryKey = ['messages'];
+  const messageQueryKey = [QUERY_KEYS.MESSAGES, String(channel.id)];
 
   const { data: messages } = useQuery<MessageType[]>({
-    queryKey,
+    queryKey: messageQueryKey,
     queryFn: () => getMessages(channel.id),
     staleTime: Infinity,
   });
@@ -83,7 +84,7 @@ export default function Channel({
         text: data.text,
         createdAt: data.createdAt,
       };
-      queryClient.setQueryData<MessageType[]>(queryKey, (oldData) =>
+      queryClient.setQueryData<MessageType[]>(messageQueryKey, (oldData) =>
         oldData ? [...oldData, newMessage] : oldData
       );
     });
@@ -94,10 +95,10 @@ export default function Channel({
         text: data.text,
         createdAt: data.createdAt,
       };
-      queryClient.setQueryData<MessageType[]>(queryKey, (oldData) =>
+      queryClient.setQueryData<MessageType[]>(messageQueryKey, (oldData) =>
         oldData ? [...oldData, newNotice] : oldData
       );
-      queryClient.invalidateQueries(['getChannel', String(channel.id)]);
+      queryClient.invalidateQueries([QUERY_KEYS.CHANNEL, String(channel.id)]);
 
       data.code === NOTICE_STATUS.CHANNEL_REMOVE &&
         setFormData((prevState) => ({

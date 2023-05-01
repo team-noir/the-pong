@@ -15,6 +15,7 @@ import LoadingFallback from 'components/organisms/LoadingFalback';
 import ErrorFallbackWithHeader from 'components/organisms/ErrorFallbackWithHeader';
 import { routes } from 'routes';
 import { UI_TEXT } from 'constants/index';
+import QUERY_KEYS from 'constants/queryKeys';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -75,12 +76,12 @@ function Init() {
   const login = useUser((state) => state.login);
 
   useQuery({
-    queryKey: ['health'],
+    queryKey: [QUERY_KEYS.HEALTH],
     queryFn: healthCheck,
   });
 
   useQuery({
-    queryKey: ['whoami'],
+    queryKey: [QUERY_KEYS.WHOAMI],
     queryFn: whoami,
     onSuccess: (data) => login(data),
     refetchInterval: false,

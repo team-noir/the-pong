@@ -6,6 +6,7 @@ import Button from 'components/atoms/Button';
 import GameInviteButton from 'components/molecule/GameInviteButton';
 import { UserType } from 'types';
 import ROUTES from 'constants/routes';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   users: UserType[];
@@ -22,7 +23,7 @@ export default function Following({ users }: Props) {
 
   const unfollowUserMutation = useMutation({
     mutationFn: unfollowUser,
-    onSuccess: () => queryClient.invalidateQueries(['getMyFollowing']),
+    onSuccess: () => queryClient.invalidateQueries([QUERY_KEYS.FOLLOWINGS]),
   });
 
   const handleClickDm = (e: React.MouseEvent<HTMLElement>) => {

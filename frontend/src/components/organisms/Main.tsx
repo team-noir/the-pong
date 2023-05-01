@@ -5,10 +5,11 @@ import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import GameButtons from 'components/organisms/GameButtons';
 import GameLives from 'components/organisms/GameLives';
 import ChannelButtons from 'components/organisms/ChannelButtons';
+import QUERY_KEYS from 'constants/queryKeys';
 
 export default function Main() {
   const { data: games, isSuccess } = useQuery({
-    queryKey: ['games'],
+    queryKey: [QUERY_KEYS.GAMES],
     // TODO: getGames with limit(after server-side pagination)
     queryFn: getGames,
   });

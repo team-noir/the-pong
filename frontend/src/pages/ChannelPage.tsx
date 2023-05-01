@@ -7,6 +7,7 @@ import { useUser } from 'hooks/useStore';
 import AppTemplate from 'components/templates/AppTemplate';
 import Channel from 'components/organisms/Channel';
 import Header from 'components/molecule/Header';
+import QUERY_KEYS from 'constants/queryKeys';
 
 export default function ChannelPage() {
   const myUserId = useUser((state) => state.id);
@@ -14,7 +15,7 @@ export default function ChannelPage() {
   const [isShowDetail, setIsShowDetail] = useState(false);
 
   const { data: channel } = useQuery({
-    queryKey: ['channel', channelId],
+    queryKey: [QUERY_KEYS.CHANNEL, channelId],
     queryFn: () => getChannel(Number(channelId)),
     refetchInterval: 1000 * 60, // 1분
   });

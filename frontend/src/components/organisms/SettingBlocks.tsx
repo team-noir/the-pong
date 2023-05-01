@@ -3,6 +3,7 @@ import { unblockUser } from 'api/api.v1';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
 import { UserType } from 'types';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   users: UserType[];
@@ -13,7 +14,7 @@ export default function SettingBlocks({ users }: Props) {
 
   const unblockUserMutation = useMutation({
     mutationFn: unblockUser,
-    onSuccess: () => queryClient.invalidateQueries(['getMyBlocks']),
+    onSuccess: () => queryClient.invalidateQueries([QUERY_KEYS.BLOCKS]),
   });
 
   const handleClickUnblock = (e: React.MouseEvent<HTMLElement>) => {

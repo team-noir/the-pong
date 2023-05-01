@@ -3,10 +3,11 @@ import { getMyBlocks } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import SettingBlocks from 'components/organisms/SettingBlocks';
 import Header from 'components/molecule/Header';
+import QUERY_KEYS from 'constants/queryKeys';
 
 export default function SettingBlocksPage() {
   const { data: blocks, isSuccess } = useQuery({
-    queryKey: ['myBlocks'],
+    queryKey: [QUERY_KEYS.BLOCKS],
     queryFn: getMyBlocks,
   });
 

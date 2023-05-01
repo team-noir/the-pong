@@ -6,6 +6,7 @@ import { EyeIcon } from '@heroicons/react/20/solid';
 import GameMatchtable from 'components/molecule/GameMatchtable';
 import { GameType } from 'types';
 import ROUTES from 'constants/routes';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   games: GameType[];
@@ -44,7 +45,7 @@ function GameItem({ game }: { game: GameType }) {
     },
     onError: (error: AxiosError) => {
       if (error && error.response?.status === 404) {
-        queryClient.invalidateQueries(['games']);
+        queryClient.invalidateQueries([QUERY_KEYS.GAMES]);
         alert('이미 종료된 게임입니다.');
       } else {
         alert('다시 시도해 주세요.');

@@ -10,6 +10,7 @@ import {
   CHANNEL_USER_STATUS,
   USER_ROLES,
 } from 'types';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   channelId: number;
@@ -25,6 +26,8 @@ export default function ChannelUserItem({
   myUser,
 }: Props) {
   const queryClient = useQueryClient();
+  const queryKey = [QUERY_KEYS.CHANNEL, String(channelId)];
+
   const isSelf = myUser?.id === user.id;
   const amIOwner = myUser?.role === USER_ROLES.OWNER;
   const amIAdmin = myUser?.role === USER_ROLES.ADMIN;
@@ -35,14 +38,12 @@ export default function ChannelUserItem({
 
   const updateChannelUserRoleMutation = useMutation({
     mutationFn: updateChannelUserRole,
-    onSuccess: () =>
-      queryClient.invalidateQueries(['getChannel', String(channelId)]),
+    onSuccess: () => queryClient.invalidateQueries(queryKey),
   });
 
   const updateChannelUserStatusMutation = useMutation({
     mutationFn: updateChannelUserStatus,
-    onSuccess: () =>
-      queryClient.invalidateQueries(['getChannel', String(channelId)]),
+    onSuccess: () => queryClient.invalidateQueries(queryKey),
   });
 
   const handleClickRole = () => {

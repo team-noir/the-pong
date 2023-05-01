@@ -3,10 +3,11 @@ import { getChannels } from 'api/api.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import ChannelLobby from 'components/organisms/ChannelLobby';
 import HeaderGnb from 'components/molecule/HeaderGnb';
+import QUERY_KEYS from 'constants/queryKeys';
 
 export default function ChannelLobbyPage() {
   const { data: channels, isSuccess } = useQuery({
-    queryKey: ['channels'],
+    queryKey: [QUERY_KEYS.CHANNELS],
     queryFn: () =>
       getChannels({ enter: '', kind: ['public', 'private', 'dm'] }),
   });
