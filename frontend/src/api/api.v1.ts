@@ -144,7 +144,7 @@ export const updateMyProfileImage = async (imageFile: File) => {
       'Content-Type': 'multipart/form-data',
     },
   });
-  if (res.status !== 204) {
+  if (res.status !== 201) {
     throw new Error(res.statusText);
   }
   return res;
@@ -227,7 +227,7 @@ export const getChannels = async ({
     params: { enter, kind },
   });
 
-  if (res.status !== 200) {
+  if (res.status !== 201) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -292,7 +292,7 @@ export const sendMessage = async ({
       text: message,
     }
   );
-  if (res.status != 204) {
+  if (res.status != 201) {
     throw new Error(res.statusText);
   }
   return res;
