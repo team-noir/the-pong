@@ -7,7 +7,7 @@ import AppTemplate from 'components/templates/AppTemplate';
 import Modal from 'components/templates/Modal';
 import GameSetting from 'components/organisms/GameSetting';
 import Header from 'components/molecule/Header';
-import { GameSettingType } from 'types';
+import { GameType } from 'types';
 
 export default function GameSettingPage() {
   const { gameId } = useParams() as { gameId: string };
@@ -33,7 +33,7 @@ export default function GameSettingPage() {
       (data: { text: string; mode?: number; theme?: number }) => {
         const { text, mode, theme } = data;
         if (text === 'change') {
-          queryClient.setQueryData<GameSettingType>(
+          queryClient.setQueryData<GameType>(
             ['gameSetting', gameId],
             (prevData) =>
               prevData &&
@@ -41,7 +41,7 @@ export default function GameSettingPage() {
                 ...prevData,
                 mode: mode !== null ? mode : prevData.mode,
                 theme: theme !== null ? theme : prevData.theme,
-              } as GameSettingType)
+              } as GameType)
           );
         } else if (text === 'done') {
           navigate(`/game/${gameId}`, { replace: true });
