@@ -109,6 +109,8 @@ export default function useGamePlay(
 
     return () => {
       socket.off('ping');
+      socket.off('gameStart');
+      socket.off('gameViewer');
       socket.off('roundOver');
       socket.off('gameOver');
       document.removeEventListener('keydown', handleKeyDown);
