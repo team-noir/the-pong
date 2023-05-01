@@ -270,29 +270,22 @@ export class Game {
     }
   }
 
-  getWinnerLoser(loserId?: number): { winner: Player; loser: Player } {
+  getWinnerLoser(giveupId?: number): { winner: Player; loser: Player } {
     let winner, loser;
 
-    if (loserId) {
-      if (loserId != this.players[0].userId) {
-        winner = this.players[0];
-        loser = this.players[1];
-      } else {
-        winner = this.players[1];
-        loser = this.players[0];
-      }
-      this.score.set(loserId, 0);
+    if (giveupId) {
+      this.score.set(giveupId, 0);
+    } 
+
+    if (
+      this.score.get(this.players[0].userId) >
+      this.score.get(this.players[1].userId)
+    ) {
+      winner = this.players[0];
+      loser = this.players[1];
     } else {
-      if (
-        this.score.get(this.players[0].userId) >
-        this.score.get(this.players[1].userId)
-      ) {
-        winner = this.players[0];
-        loser = this.players[1];
-      } else {
-        winner = this.players[1];
-        loser = this.players[0];
-      }
+      winner = this.players[1];
+      loser = this.players[0];
     }
     return { winner, loser };
   }
