@@ -374,12 +374,14 @@ const initialStateDefault = {
   },
 };
 
+const speedRate = 1.5;
+
 const initialStateSpeedy = {
   ...initialStateDefault,
   ball: {
     ...initialStateDefault.ball,
-    dx: 0.006,
-    dy: 0.008,
+    dx: initialStateDefault.ball.dx * speedRate,
+    dy: initialStateDefault.ball.dy * speedRate,
   },
 };
 
