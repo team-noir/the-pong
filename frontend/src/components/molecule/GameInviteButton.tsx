@@ -62,7 +62,7 @@ export default function GameInviteButton() {
       </Button>
       {isWating && (
         /* eslint-disable */
-        <Modal onClickClose={() => {}} fitContent>
+        <Modal onClickClose={() => {}} isShowClose={false} fitContent>
           <div className="text-center">
             <p>초대 수락을 기다리는 중...</p>
             <Button onClick={cancelWaiting}>취소</Button>
