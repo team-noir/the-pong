@@ -36,22 +36,3 @@ export const GAME_STATUS = {
   PLAYING: 2,
   FINISHED: 3,
 };
-
-export const GAME_MODES = {
-  0: 'NORMAL',
-  1: 'SPEEDY',
-  2: 'FUNNY',
-  size: () => {
-    return Object.keys(this).length;
-  },
-};
-
-export const GAME_THEMES = {
-  0: 'DEFAULT',
-  1: 'DARK',
-  2: 'BLOOD',
-  3: 'GOLD',
-  size: () => {
-    return Object.keys(this).length;
-  },
-};

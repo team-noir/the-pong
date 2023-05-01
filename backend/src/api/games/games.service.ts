@@ -16,7 +16,7 @@ export class GamesService {
     this.server = server;
     this.pingInterval = setInterval(async () => {
       await this.gameModel.sendPingToAllPlayers();
-    }, 5000);
+    }, 2000);
   }
 
   clearPingInverval() {
@@ -129,13 +129,13 @@ export class GamesService {
       throw { code, message };
     }
 
-    const isModeSetted = game.setMode(mode);
-    const isThemeSetted = game.setTheme(theme);
+    game.setMode(mode);
+    game.setTheme(theme);
 
     await game.noticeToPlayers('gameSetting', {
       text: 'change',
-      mode: isModeSetted ? game.getMode() : null,
-      theme: isThemeSetted ? game.getTheme() : null,
+      mode: game.getMode(),
+      theme: game.getTheme(),
     });
   }
 
@@ -162,7 +162,15 @@ export class GamesService {
 
   async watchGame(userId: number, gameId: number) {
     const player = await this.gameModel.createPlayer(userId);
-    const game = this.gameModel.getGame(gameId);
+    let game;
+    
+    try {
+      game = this.gameModel.getGame(gameId);
+    } catch (error) {
+      const code = HttpStatus.NOT_FOUND;
+      const message = error.message;
+      throw { code, message };
+    }
 
     if (game.hasPlayer(player)) {
       const code = HttpStatus.BAD_REQUEST;
@@ -174,6 +182,7 @@ export class GamesService {
       throw { code, message };
     }
 
+    this.gameModel.setPlayer(player);
     await game.addViewer(player);
     await game.noticeToPlayers('gameViewer', {
       viewerCount: game.getViewerCount(),

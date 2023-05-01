@@ -1,6 +1,6 @@
 import { Player } from './player.dto';
 import { HttpStatus } from '@nestjs/common';
-import { GAME_MODES, GAME_THEMES, GAME_STATUS } from '@const';
+import { GAME_STATUS } from '@const';
 
 type userId = number;
 type indexKey = number;
@@ -17,6 +17,7 @@ export class Game {
   ownerId: number;
   players: Player[];
   viewers: Player[];
+  viewerConnections: Set<userId>;
   private invitedId: userId;
 
   countPlayer: number;
@@ -32,6 +33,7 @@ export class Game {
     this.countPlayer = 0;
     this.players = [];
     this.viewers = [];
+    this.viewerConnections = new Set<userId>();
     this.score = new Map<userId, number>();
     this.createdAt = new Date();
   }
@@ -104,8 +106,8 @@ export class Game {
     return {
       id: this.gameId,
       players: this.getPlayersInfo(),
-      mode: GAME_MODES[this.getMode()],
-      theme: GAME_THEMES[this.getTheme()],
+      mode: this.getMode(),
+      theme: this.getTheme(),
       viewerCount: this.getViewerCount(),
       isLadder: this.isLadder,
       isPlaying: this.status == GAME_STATUS.PLAYING,
@@ -150,11 +152,6 @@ export class Game {
   }
 
   setMode(mode: indexKey) {
-    if (mode < 0 || mode >= GAME_MODES.size()) {
-      const code = HttpStatus.BAD_REQUEST;
-      const message = 'This is an invalid mode.';
-      throw { code, message };
-    }
     if (this.mode == mode) {
       return false;
     }
@@ -163,11 +160,6 @@ export class Game {
   }
 
   setTheme(theme: indexKey) {
-    if (theme < 0 || theme >= GAME_THEMES.size()) {
-      const code = HttpStatus.BAD_REQUEST;
-      const message = 'This is an invalid theme.';
-      throw { code, message };
-    }
     if (this.theme == theme) {
       return false;
     }
@@ -222,8 +214,8 @@ export class Game {
     this.players = [];
   }
 
-  removeViewer(viewerId: number) {
-    this.viewers = this.viewers.filter((viewer) => {
+  removeViewer(viewerId: number): number {
+    this.viewers = this.viewers.filter(async (viewer) => {
       if (viewer.userId == viewerId) {
         viewer.socket.leave(this.getName());
         viewer.leaveGame();
@@ -231,6 +223,8 @@ export class Game {
       }
       return false;
     });
+    this.viewerConnections.delete(viewerId);
+    return this.getViewerCount();
   }
 
   clearGameRoomTimeout() {
@@ -257,16 +251,28 @@ export class Game {
     return true;
   }
 
-  async addViewer(player: Player): Promise<boolean> {
+  async addViewer(viewer: Player): Promise<boolean> {
     if (this.isFullViewer()) {
       return false;
     }
-    this.viewers.push(player);
-    player.socket.join(this.getName());
+    const viewerId = viewer.userId;
+    this.viewers.push(viewer);
+
+    viewer.game = this;
+    viewer.socket.join(this.getName());
 
     await this.players[0].socket.emit('rtcInit', {
-      userId: player.userId,
+      userId: viewerId,
     });
+
+    this.viewerConnections.add(viewerId);
+    setTimeout(() => {
+      if (this.viewerConnections.has(viewerId)) {
+        this.players[0].socket.emit('rtcInit', {
+          userId: viewerId,
+        });
+      }
+    }, 2000);
 
     return true;
   }
@@ -280,29 +286,22 @@ export class Game {
     }
   }
 
-  getWinnerLoser(loserId?: number): { winner: Player; loser: Player } {
+  getWinnerLoser(giveupId?: number): { winner: Player; loser: Player } {
     let winner, loser;
 
-    if (loserId) {
-      if (loserId != this.players[0].userId) {
-        winner = this.players[0];
-        loser = this.players[1];
-      } else {
-        winner = this.players[1];
-        loser = this.players[0];
-      }
-      this.score.set(loserId, 0);
+    if (giveupId) {
+      this.score.set(giveupId, 0);
+    }
+
+    if (
+      this.score.get(this.players[0].userId) >
+      this.score.get(this.players[1].userId)
+    ) {
+      winner = this.players[0];
+      loser = this.players[1];
     } else {
-      if (
-        this.score.get(this.players[0].userId) >
-        this.score.get(this.players[1].userId)
-      ) {
-        winner = this.players[0];
-        loser = this.players[1];
-      } else {
-        winner = this.players[1];
-        loser = this.players[0];
-      }
+      winner = this.players[1];
+      loser = this.players[0];
     }
     return { winner, loser };
   }
@@ -311,6 +310,9 @@ export class Game {
   async noticeToPlayers(event: string, data) {
     for (const player of this.players) {
       await player.socket.emit(event, data);
+    }
+    for (const viewer of this.viewers) {
+      await viewer.socket.emit(event, data);
     }
   }
 }

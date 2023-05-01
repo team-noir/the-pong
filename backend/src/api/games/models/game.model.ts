@@ -13,7 +13,7 @@ import { Socket } from 'socket.io';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
-import { GAME_MODES, GAME_STATUS, GAME_THEMES } from '@const';
+import { GAME_STATUS } from '@const';
 
 type gameId = number;
 type playerId = number;
@@ -80,13 +80,15 @@ export class GameModel implements OnModuleInit {
 
       for (const player of players) {
         list.push({
-            id: player.userId,
-            nickname: player.username,
-            level: player.level,
-          });
+          id: player.userId,
+          nickname: player.username,
+          level: player.level,
+        });
       }
 
-      if (status != GAME_STATUS.PLAYING) { continue; }
+      if (status != GAME_STATUS.PLAYING) {
+        continue;
+      }
       gamelist.push({
         id: gameId,
         players: list,
@@ -122,9 +124,9 @@ export class GameModel implements OnModuleInit {
     this.invites.delete(invitedId);
   }
 
-  async createGameResult(gameId: number, loserId?: number) {
+  async createGameResult(gameId: number, giveupId?: number) {
     const game = this.getGame(gameId);
-    const { winner, loser } = game.getWinnerLoser(loserId);
+    const { winner, loser } = game.getWinnerLoser(giveupId);
     const winnerScore = game.score.get(winner.userId);
     const loserScore = game.score.get(loser.userId);
 
@@ -164,6 +166,7 @@ export class GameModel implements OnModuleInit {
         level: data.loser.level,
         score: data.loserScore,
       },
+      isGiveUp: (giveupId != null),
       createdAt: data.createdAt,
     };
   }
@@ -370,9 +373,21 @@ export class GameModel implements OnModuleInit {
       if (player.game.status == GAME_STATUS.READY) {
         await player.game.noticeToPlayers('gameSetting', { text: 'leave' });
       } else if (player.game.status == GAME_STATUS.PLAYING) {
-        const data = await this.createGameResult(player.game.gameId, playerId);
-        player.game.status = GAME_STATUS.FINISHED;
-        await player.game.noticeToPlayers('gameOver', data);
+        if (player.isViewer()) {
+          const viewerCount = player.game.removeViewer(player.userId);
+          this.players.delete(player.userId);
+          await player.game.noticeToPlayers('gameViewer', {
+            viewerCount: viewerCount,
+          });
+          return;
+        } else {
+          const data = await this.createGameResult(
+            player.game.gameId,
+            playerId
+          );
+          player.game.status = GAME_STATUS.FINISHED;
+          await player.game.noticeToPlayers('gameOver', data);
+        }
       }
       this.removeGame(player.game);
     }
@@ -443,12 +458,14 @@ export class GameModel implements OnModuleInit {
     if (game.status != GAME_STATUS.PLAYING) {
       return;
     }
-    game.score.set(winnerId, game.score.get(winnerId) + 1);
-    if (game.score.get(winnerId) >= 11) {
-      const data = await this.createGameResult(gameId);
+
+    const score = game.score.get(winnerId) + 1;
+    if (score >= 11) {
       game.status = GAME_STATUS.FINISHED;
+      const data = await this.createGameResult(gameId);
       await game.noticeToPlayers('gameOver', data);
     } else {
+      game.score.set(winnerId, score);
       await game.noticeToPlayers('roundOver', {
         winnerId: winnerId,
         score: game.score.get(winnerId),
