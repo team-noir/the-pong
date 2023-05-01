@@ -7,7 +7,6 @@ import { useUser } from 'hooks/useStore';
 import AppTemplate from 'components/templates/AppTemplate';
 import Channel from 'components/organisms/Channel';
 import Header from 'components/molecule/Header';
-import Button from 'components/atoms/Button';
 
 export default function ChannelPage() {
   const myUserId = useUser((state) => state.id);
@@ -27,9 +26,9 @@ export default function ChannelPage() {
           title={channel?.title}
           noTitle={!channel?.title}
           button={
-            <Button onClick={() => setIsShowDetail(true)}>
+            <div role="button" onClick={() => setIsShowDetail(true)}>
               <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
-            </Button>
+            </div>
           }
           hasBackButton
         />
