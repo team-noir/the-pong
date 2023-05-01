@@ -117,7 +117,7 @@ export const routes = (
           element: <FollowingPage />,
         },
         {
-          path: `${ROUTES.PROFILE}/${ROUTES.PROFILE.CHILDREN.USER}`,
+          path: `${ROUTES.PROFILE.INDEX}/${ROUTES.PROFILE.CHILDREN.USER}`,
           element: <ProfilePage />,
         },
         {
