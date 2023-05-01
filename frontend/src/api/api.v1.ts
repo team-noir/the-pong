@@ -1,14 +1,15 @@
+import { StatusCodes } from 'http-status-codes';
 import axios, { AxiosResponse } from 'axios';
 import {
-  AchievementType,
-  GameHistoryType,
-  GameType,
-  MessageType,
   UserType,
+  AchievementType,
+  GameType,
+  GameHistoryType,
   ChannelType,
   ChannelUserRoleType,
   ChannelUserStatusType,
   ChannelFormType,
+  MessageType,
 } from 'types';
 
 export const API_PREFIX = `/api/v1`;
@@ -23,7 +24,7 @@ axiosWithInterceptors.defaults.withCredentials = true;
 axiosWithInterceptors.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response.status === 401) {
+    if (error.response.status === StatusCodes.UNAUTHORIZED) {
       window.location.href = '/login';
     }
     return Promise.reject(error);
@@ -41,7 +42,7 @@ export const API_LOGIN_FT = `${API_PREFIX}/auth/42`;
 
 export const anonymousLogin = async () => {
   const res = await axiosWithInterceptors.post(`/auth/login/anonymous`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res;
@@ -49,7 +50,7 @@ export const anonymousLogin = async () => {
 
 export const logout = async () => {
   const res = await axiosWithInterceptors.post(`/auth/logout`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -57,7 +58,7 @@ export const logout = async () => {
 
 export const get2faCode = async (): Promise<{ qr: string; key: string }> => {
   const res = await axiosWithInterceptors.get(`/auth/2fa`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -65,7 +66,7 @@ export const get2faCode = async (): Promise<{ qr: string; key: string }> => {
 
 export const verify2fa = async (code: string) => {
   const res = await axiosWithInterceptors.post(`/auth/2fa`, { code });
-  if (res.status !== 202) {
+  if (res.status !== StatusCodes.ACCEPTED) {
     throw new Error(res.statusText);
   }
   return res;
@@ -73,7 +74,7 @@ export const verify2fa = async (code: string) => {
 
 export const delete2fa = async () => {
   const res = await axiosWithInterceptors.delete(`/auth/2fa`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -88,7 +89,7 @@ export const whoami = async (): Promise<UserType> => {
   }
 
   const res = await whoamiAxios.get(`/my/whoami`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -96,7 +97,7 @@ export const whoami = async (): Promise<UserType> => {
 
 export const getUser = async (userId: number): Promise<UserType> => {
   const res = await axiosWithInterceptors.get(`/users/${userId}`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -110,7 +111,7 @@ export const getUsers = async (
   const res = await axios.get(`/users`, {
     params: { q, page, per_page },
   });
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -120,7 +121,7 @@ export const getAchievements = async (
   userId: number
 ): Promise<AchievementType[]> => {
   const res = await axiosWithInterceptors.get(`/users/${userId}/achievements`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -130,7 +131,7 @@ export const getAchievements = async (
 
 export const updateMyProfile = async (nickname: string): Promise<UserType> => {
   const res = await axiosWithInterceptors.patch(`/my/settings`, { nickname });
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -144,7 +145,7 @@ export const updateMyProfileImage = async (imageFile: File) => {
       'Content-Type': 'multipart/form-data',
     },
   });
-  if (res.status !== 201) {
+  if (res.status !== StatusCodes.CREATED) {
     throw new Error(res.statusText);
   }
   return res;
@@ -156,7 +157,7 @@ export const checkProfile = async ({
   nickname: string;
 }): Promise<{ nickname: boolean }> => {
   const res = await axios.post(`/my/settings/check`, { nickname });
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -166,7 +167,7 @@ export const checkProfile = async ({
 
 export const getMyBlocks = async (): Promise<UserType[]> => {
   const res = await axiosWithInterceptors.get(`/my/blocks`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -174,7 +175,7 @@ export const getMyBlocks = async (): Promise<UserType[]> => {
 
 export const unblockUser = async (userId: number) => {
   const res = await axiosWithInterceptors.delete(`/my/blocks/${userId}`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -182,7 +183,7 @@ export const unblockUser = async (userId: number) => {
 
 export const blockUser = async (userId: number) => {
   const res = await axiosWithInterceptors.put(`/my/blocks/${userId}`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -192,7 +193,7 @@ export const blockUser = async (userId: number) => {
 
 export const getMyFollowings = async (): Promise<UserType[]> => {
   const res = await axiosWithInterceptors.get(`/my/following`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -200,7 +201,7 @@ export const getMyFollowings = async (): Promise<UserType[]> => {
 
 export const unfollowUser = async (userId: number) => {
   const res = await axiosWithInterceptors.delete(`/my/following/${userId}`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -208,7 +209,7 @@ export const unfollowUser = async (userId: number) => {
 
 export const followUser = async (userId: number) => {
   const res = await axiosWithInterceptors.put(`/my/following/${userId}`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -227,7 +228,7 @@ export const getChannels = async ({
     params: { enter, kind },
   });
 
-  if (res.status !== 201) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -235,7 +236,7 @@ export const getChannels = async ({
 
 export const getChannel = async (channelId: number): Promise<ChannelType> => {
   const res = await axiosWithInterceptors.get(`/channels/${channelId}`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -245,7 +246,7 @@ export const createChannel = async (
   channelForm: ChannelFormType
 ): Promise<ChannelType> => {
   const res = await axios.post(`/channels`, channelForm);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.CREATED) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -255,7 +256,7 @@ export const joinChannel = async (channelForm: ChannelFormType) => {
   const res = await axiosWithInterceptors.put(`/channels/${channelForm.id}`, {
     password: channelForm.password,
   });
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -263,7 +264,7 @@ export const joinChannel = async (channelForm: ChannelFormType) => {
 
 export const getDmChannel = async (userId: number): Promise<ChannelType> => {
   const res = await axiosWithInterceptors.get(`/dms/${userId}`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -273,7 +274,7 @@ export const getMessages = async (
   channelId: number
 ): Promise<MessageType[]> => {
   const res = await axiosWithInterceptors.get(`/channels/${channelId}/message`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -292,7 +293,7 @@ export const sendMessage = async ({
       text: message,
     }
   );
-  if (res.status != 201) {
+  if (res.status !== StatusCodes.CREATED) {
     throw new Error(res.statusText);
   }
   return res;
@@ -303,7 +304,7 @@ export const updateChannelSetting = async (channelForm: ChannelFormType) => {
     title: channelForm.title,
     password: channelForm.password,
   });
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -319,7 +320,7 @@ export const inviteUserToChannel = async ({
   const res = await axiosWithInterceptors.put(`/channels/${channelId}/users`, {
     userIds,
   });
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -338,7 +339,7 @@ export const updateChannelUserRole = async ({
     `/channels/${channelId}/users/${userId}/role`,
     { role }
   );
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -357,7 +358,7 @@ export const updateChannelUserStatus = async ({
     `/channels/${channelId}/users/${userId}/status`,
     { status }
   );
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -367,7 +368,7 @@ export const leaveChannel = async (channelId: number) => {
   const res = await axiosWithInterceptors.delete(
     `/channels/${channelId}/users`
   );
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -377,7 +378,7 @@ export const leaveChannel = async (channelId: number) => {
 
 export const getGame = async (gameId: number): Promise<GameType> => {
   const res = await axiosWithInterceptors.get(`/games/${gameId}`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -385,7 +386,7 @@ export const getGame = async (gameId: number): Promise<GameType> => {
 
 export const getGames = async (): Promise<GameType[]> => {
   const res = await axiosWithInterceptors.get(`/games`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -393,7 +394,7 @@ export const getGames = async (): Promise<GameType[]> => {
 
 export const waitGame = async (isLadder: boolean): Promise<AxiosResponse> => {
   const res = await axiosWithInterceptors.post(`/games/queue`, { isLadder });
-  if (res.status !== 201) {
+  if (res.status !== StatusCodes.CREATED) {
     throw new Error(res.statusText);
   }
   return res;
@@ -401,7 +402,7 @@ export const waitGame = async (isLadder: boolean): Promise<AxiosResponse> => {
 
 export const cancelWaitingGame = async () => {
   const res = await axiosWithInterceptors.delete(`/games/queue`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -409,7 +410,7 @@ export const cancelWaitingGame = async () => {
 
 export const inviteGame = async (userId: number) => {
   const res = await axiosWithInterceptors.post(`/games/invite`, { userId });
-  if (res.status !== 201) {
+  if (res.status !== StatusCodes.CREATED) {
     throw new Error(res.statusText);
   }
   return res;
@@ -417,7 +418,7 @@ export const inviteGame = async (userId: number) => {
 
 export const cancelInvitingGame = async () => {
   const res = await axiosWithInterceptors.delete(`/games/invite`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -433,7 +434,7 @@ export const replyGameInvitation = async ({
   const res = await axiosWithInterceptors.patch(`/games/${gameId}/invite`, {
     isAccepted,
   });
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -441,7 +442,7 @@ export const replyGameInvitation = async ({
 
 export const getGameSetting = async (gameId: number): Promise<GameType> => {
   const res = await axiosWithInterceptors.get(`/games/${gameId}/setting`);
-  if (res.status !== 200) {
+  if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
   return res.data;
@@ -452,7 +453,7 @@ export const updateGameSetting = async ({ id, mode, theme }: GameType) => {
     mode,
     theme,
   });
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -460,7 +461,7 @@ export const updateGameSetting = async ({ id, mode, theme }: GameType) => {
 
 export const startGame = async (gameId: number) => {
   const res = await axiosWithInterceptors.patch(`/games/${gameId}/play`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
@@ -468,7 +469,7 @@ export const startGame = async (gameId: number) => {
 
 export const joinGameLive = async (gameId: number) => {
   const res = await axiosWithInterceptors.patch(`/games/${gameId}/users`);
-  if (res.status !== 204) {
+  if (res.status !== StatusCodes.NO_CONTENT) {
     throw new Error(res.statusText);
   }
   return res;
