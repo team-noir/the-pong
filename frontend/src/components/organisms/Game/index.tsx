@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Stage, Layer, Rect } from 'react-konva';
+import { Stage, Layer, Image } from 'react-konva';
 import konva from 'konva';
 import {
   ChevronLeftIcon,
@@ -15,6 +15,7 @@ import GameScoretable from 'components/molecule/GameScoretable';
 import Button from 'components/atoms/Button';
 import { classNames } from 'utils';
 import { GameType } from 'types';
+import { GAME_THEMES } from 'constants/index';
 
 interface Props {
   game: GameType;
@@ -23,6 +24,8 @@ interface Props {
 export default function Game({ game }: Props) {
   const myUserId = useUser((state) => state.id);
   const [stageSize, setStageSize] = useState(0);
+  const [backgroundImage, setBackgroundImage] =
+    useState<HTMLImageElement | null>(null);
 
   const containerRef = useRef<HTMLElement>(null);
   const canvasRef = useRef<konva.Layer>(null);
@@ -53,6 +56,15 @@ export default function Game({ game }: Props) {
   );
 
   useEffect(() => {
+    if (!amIOwner) return;
+    const image = new window.Image();
+    image.src = GAME_THEMES[game.theme].backgroundImage;
+    image.onload = () => {
+      setBackgroundImage(image);
+    };
+  }, []);
+
+  useEffect(() => {
     handleScreenResize();
     window.addEventListener('resize', handleScreenResize);
     return () => window.removeEventListener('resize', handleScreenResize);
@@ -74,32 +86,38 @@ export default function Game({ game }: Props) {
         />
       </div>
       <div
-        className="relative bg-white"
+        className="relative bg-black"
         style={{ width: `${stageSize}px`, height: `${stageSize}px` }}
       >
         {amIOwner ? (
           <Stage width={stageSize} height={stageSize}>
-            <Layer ref={canvasRef}>
-              <Rect width={stageSize} height={stageSize} fill="white" />
+            <Layer>
+              {backgroundImage && (
+                <Image
+                  image={backgroundImage}
+                  width={stageSize}
+                  height={stageSize}
+                />
+              )}
               <Ball
                 x={ball.x * stageSize}
                 y={ball.y * stageSize}
                 r={ball.r * stageSize}
-                color="black"
+                color="white"
               />
               <Paddle
                 x={paddles.up.x * stageSize}
                 y={paddles.up.y * stageSize}
                 width={paddles.up.w * stageSize}
                 height={paddles.up.h * stageSize}
-                color="red"
+                color="#C3BCBA"
               />
               <Paddle
                 x={paddles.down.x * stageSize}
                 y={paddles.down.y * stageSize}
                 width={paddles.down.w * stageSize}
                 height={paddles.down.h * stageSize}
-                color="green"
+                color="#CD392B"
               />
             </Layer>
           </Stage>
@@ -107,7 +125,7 @@ export default function Game({ game }: Props) {
           <video
             ref={videoRef}
             className={classNames(
-              'w-full h-full bg-white',
+              'w-full h-full bg-black',
               !amIViewer && !amIOwner && '-scale-y-100'
             )}
             muted
@@ -151,6 +169,48 @@ export default function Game({ game }: Props) {
           >
             <ChevronRightIcon />
           </Button>
+        </div>
+      )}
+
+      {/* NOTE: 내가 아닌 회원들에게 보이는 비디오를 스트리밍하는 캔버스 */}
+      {amIOwner && (
+        <div
+          className="relative bg-black hidden"
+          style={{ width: `${stageSize}px`, height: `${stageSize}px` }}
+        >
+          <Stage width={stageSize} height={stageSize}>
+            <Layer ref={canvasRef}>
+              {backgroundImage && (
+                <Image
+                  y={stageSize}
+                  image={backgroundImage}
+                  width={stageSize}
+                  height={stageSize}
+                  scaleY={-1}
+                />
+              )}
+              <Ball
+                x={ball.x * stageSize}
+                y={ball.y * stageSize}
+                r={ball.r * stageSize}
+                color="white"
+              />
+              <Paddle
+                x={paddles.up.x * stageSize}
+                y={paddles.up.y * stageSize}
+                width={paddles.up.w * stageSize}
+                height={paddles.up.h * stageSize}
+                color="#CD392B"
+              />
+              <Paddle
+                x={paddles.down.x * stageSize}
+                y={paddles.down.y * stageSize}
+                width={paddles.down.w * stageSize}
+                height={paddles.down.h * stageSize}
+                color="#C3BCBA"
+              />
+            </Layer>
+          </Stage>
         </div>
       )}
       <div className="inline-flex items-center py-1 text-s text-gray-light float-right">

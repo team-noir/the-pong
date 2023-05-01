@@ -6,8 +6,8 @@ import { SocketContext } from 'contexts/socket';
 import { GameResultType, GameType, PlayerType } from 'types';
 
 type ReturnType = [
-  ball: typeof initialState.ball,
-  paddles: typeof initialState.paddles,
+  ball: typeof initialStateDefault.ball,
+  paddles: typeof initialStateDefault.paddles,
   isPlaying: boolean,
   count: number | null,
   handleMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => void,
@@ -24,6 +24,8 @@ export default function useGamePlay(
   myPlayer: PlayerType | undefined,
   otherPlayer: PlayerType | undefined
 ): ReturnType {
+  const initialState = initialStates[game.mode];
+
   const [ball, setBall] = useState(initialState.ball);
   const [paddles, setPaddles] = useState(initialState.paddles);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -32,8 +34,8 @@ export default function useGamePlay(
   const socket = useContext(SocketContext);
   const queryClient = useQueryClient();
 
-  const interval = useRef<NodeJS.Timer | null>(null);
-  const animationFrame = useRef<number | null>(null);
+  const countInterval = useRef<NodeJS.Timer | null>(null);
+  const drawInterval = useRef<NodeJS.Timer | null>(null);
   const isMyKeyDown = useRef({ left: false, right: false });
   const isOtherKeyDown = useRef({ left: false, right: false });
 
@@ -53,10 +55,10 @@ export default function useGamePlay(
     });
 
     socket.on('gameStart', () => {
-      interval.current = setInterval(
-        () => setCount((prevState) => prevState - 1),
-        1000
-      );
+      if (countInterval.current) return;
+      countInterval.current = setInterval(() => {
+        setCount((prevState) => prevState - 1);
+      }, 1000);
     });
 
     socket.on('gameViewer', (data: { viwerCount: number }) => {
@@ -111,13 +113,14 @@ export default function useGamePlay(
       socket.off('gameOver');
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
-      interval.current && clearInterval(interval.current);
+      countInterval.current && clearInterval(countInterval.current);
+      drawInterval.current && clearInterval(drawInterval.current);
     };
   }, []);
 
   useEffect(() => {
     if (count > 0) return;
-    interval.current && clearInterval(interval.current);
+    countInterval.current && clearInterval(countInterval.current);
     setIsPlaying(true);
   }, [count]);
 
@@ -125,18 +128,14 @@ export default function useGamePlay(
     if (amIViewer || !amIOwner) return;
     if (myPlayer?.score === 11 || otherPlayer?.score === 11) {
       setIsPlaying(false);
-    } else {
-      setBall(initialState.ball);
-      setPaddles(initialState.paddles);
     }
   }, [myPlayer?.score, otherPlayer?.score]);
 
   useEffect(() => {
     if (amIViewer || !amIOwner || !isPlaying) return;
-    animationFrame.current = requestAnimationFrame(draw);
+    drawInterval.current = setInterval(draw, 10);
     return () => {
-      if (!animationFrame.current) return;
-      cancelAnimationFrame(animationFrame.current);
+      drawInterval.current && clearInterval(drawInterval.current);
     };
   }, [ball, isPlaying]);
 
@@ -146,6 +145,15 @@ export default function useGamePlay(
       socket.emit('roundOver', {
         winnerId: player?.id,
       });
+      // NOTE: 점수를 얻은 플레이어가 먼저 서브
+      setBall({
+        ...initialState.ball,
+        dy:
+          player?.id === myPlayer?.id
+            ? initialState.ball.dy
+            : -initialState.ball.dy,
+      });
+      setPaddles(initialState.paddles);
       return;
     }
 
@@ -340,13 +348,13 @@ const paddleSize = {
   h: 0.05,
 };
 
-const initialState = {
+const initialStateDefault = {
   ball: {
     x: 0.5,
     y: 0.5,
     r: 0.025,
-    dx: 0.003,
-    dy: 0.004,
+    dx: 0.004,
+    dy: 0.005,
   },
   paddles: {
     up: {
@@ -364,7 +372,38 @@ const initialState = {
   },
 };
 
-const ballLimit = 1 - initialState.ball.r;
+const initialStateSpeedy = {
+  ...initialStateDefault,
+  ball: {
+    ...initialStateDefault.ball,
+    dx: 0.006,
+    dy: 0.008,
+  },
+};
+
+const initialStateShortPaddle = {
+  ...initialStateDefault,
+  paddles: {
+    up: {
+      ...initialStateDefault.paddles.up,
+      x: 0.5 - paddleSize.w / 4,
+      w: paddleSize.w / 2,
+    },
+    down: {
+      ...initialStateDefault.paddles.down,
+      x: 0.5 - paddleSize.w / 4,
+      w: paddleSize.w / 2,
+    },
+  },
+};
+
+const initialStates = [
+  initialStateDefault,
+  initialStateSpeedy,
+  initialStateShortPaddle,
+];
+
+const ballLimit = 1 - initialStateDefault.ball.r;
 
 const paddleDeltaX = 0.01;
 const paddleLimitX = 1 - paddleSize.w;

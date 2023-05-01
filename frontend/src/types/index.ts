@@ -116,11 +116,6 @@ export interface GameType {
   createdAt: string;
 }
 
-export interface GameSettingType extends GameType {
-  modeCount: number;
-  themeCount: number;
-}
-
 export interface GameResultType {
   id: number;
   winner: PlayerType;
@@ -134,4 +129,12 @@ export interface GameHistoryType {
   winner: PlayerType;
   loser: PlayerType;
   createdAt: string;
+}
+
+export interface GameOptionType {
+  name: string;
+}
+
+export interface GameThemeType extends GameOptionType {
+  backgroundImage: string;
 }

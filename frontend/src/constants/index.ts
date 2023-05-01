@@ -1,3 +1,5 @@
+import { GameOptionType, GameThemeType } from 'types';
+
 export const NOTICE_STATUS = {
   USER_JOIN: 100,
   USER_LEAVE: 101,
@@ -22,3 +24,24 @@ export const DEFAULT_PROFILE_IMAGE = `${process.env.PUBLIC_URL}/images/default-p
 
 export const SOCKET_URI =
   process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
+export const GAME_MODES: readonly GameOptionType[] = [
+  { name: '보통' },
+  { name: '빠른 공' },
+  { name: '짧은 패들' },
+] as const;
+
+export const GAME_THEMES: readonly GameThemeType[] = [
+  {
+    name: '창고',
+    backgroundImage: BACKGROUND_IMAGES.GAME_STORAGE,
+  },
+  {
+    name: '뒷골목',
+    backgroundImage: BACKGROUND_IMAGES.GAME_BACKSTREET,
+  },
+  {
+    name: '부두',
+    backgroundImage: BACKGROUND_IMAGES.GAME_PIER,
+  },
+] as const;
