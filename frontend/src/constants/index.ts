@@ -1,5 +1,10 @@
 export const SERVICE_NAME = 'The Pong';
 
+/** Socket */
+
+export const SOCKET_URI =
+  process.env.REACT_APP_API_URL || 'http://localhost:8080';
+
 export const NOTICE_STATUS = {
   USER_JOIN: 100,
   USER_LEAVE: 101,
@@ -13,6 +18,8 @@ export const NOTICE_STATUS = {
   CHANNEL_REMOVE: 400,
 } as const;
 
+/** Image files */
+
 export const BACKGROUND_IMAGES = {
   WELCOME: `${process.env.PUBLIC_URL}/images/welcome-background.jpg`,
   GAME_BACKSTREET: `${process.env.PUBLIC_URL}/images/bg_backstreet.jpg`,
@@ -22,5 +29,8 @@ export const BACKGROUND_IMAGES = {
 
 export const DEFAULT_PROFILE_IMAGE = `${process.env.PUBLIC_URL}/images/default-profile-image.png`;
 
-export const SOCKET_URI =
-  process.env.REACT_APP_API_URL || 'http://localhost:8080';
+export const UI_TEXT = {
+  ERROR: {
+    DEFAULT: '무언가 잘못되었습니다. 다시 시도해주세요.',
+  },
+};

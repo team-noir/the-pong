@@ -6,6 +6,7 @@ import useGame from 'hooks/useGame';
 import { SocketContext } from 'contexts/socket';
 import Modal from 'components/templates/Modal';
 import Button from 'components/atoms/Button';
+import { UI_TEXT } from 'constants/index';
 
 export default function GameButtons() {
   const [isWating, setIsWating, alertCode, setAlertCode] = useGame();
@@ -27,7 +28,7 @@ export default function GameButtons() {
     onSuccess: () => setIsWating(true),
     onError: () => {
       socket.off('queue');
-      console.log('다시 시도해 주세요.');
+      console.log(UI_TEXT.ERROR.DEFAULT);
     },
   });
 
