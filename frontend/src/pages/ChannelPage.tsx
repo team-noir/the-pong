@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { Bars3Icon } from '@heroicons/react/24/outline';
 import { getChannel } from 'api/api.v1';
 import { useUser } from 'hooks/useStore';
 import AppTemplate from 'components/templates/AppTemplate';
@@ -25,7 +26,11 @@ export default function ChannelPage() {
         <Header
           title={channel?.title}
           noTitle={!channel?.title}
-          button={<Button onClick={() => setIsShowDetail(true)}>메뉴</Button>}
+          button={
+            <Button onClick={() => setIsShowDetail(true)}>
+              <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
+            </Button>
+          }
           hasBackButton
         />
       }
