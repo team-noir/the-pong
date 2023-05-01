@@ -162,7 +162,15 @@ export class GamesService {
 
   async watchGame(userId: number, gameId: number) {
     const player = await this.gameModel.createPlayer(userId);
-    const game = this.gameModel.getGame(gameId);
+    let game;
+    
+    try {
+      game = this.gameModel.getGame(gameId);
+    } catch (error) {
+      const code = HttpStatus.NOT_FOUND;
+      const message = error.message;
+      throw { code, message };
+    }
 
     if (game.hasPlayer(player)) {
       const code = HttpStatus.BAD_REQUEST;
