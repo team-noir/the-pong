@@ -6,7 +6,6 @@ import {
   ChannelUserRoleType,
   ChannelUserStatusType,
   ChannelFormType,
-  GameSettingType,
 } from 'types';
 
 export const API_PREFIX = `/api/v1`;
@@ -429,9 +428,7 @@ export const replyGameInvitation = async ({
   return res;
 };
 
-export const getGameSetting = async (
-  gameId: number
-): Promise<GameSettingType> => {
+export const getGameSetting = async (gameId: number): Promise<GameType> => {
   const res = await axiosWithInterceptors.get(`/games/${gameId}/setting`);
   if (res.status !== 200) {
     throw new Error(res.statusText);
