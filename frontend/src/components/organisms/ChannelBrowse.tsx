@@ -13,10 +13,16 @@ interface Props {
 
 export default function ChannelBrowse({ channels }: Props) {
   const [isShowPasswordInput, setIsShowPasswordInput] = useState(false);
-  const [protectedChannelId, setProtectedChannelId] = useState<number>(-1);
+  const [protectedChannelId, setProtectedChannelId] = useState<number | null>(
+    null
+  );
   const navigate = useNavigate();
 
   const joinChannelMutation = useMutation(joinChannel);
+  const joinProtectedChannelMutation = useMutation({
+    mutationFn: joinChannel,
+    onError: () => alert('비밀번호가 틀렸습니다.'),
+  });
 
   const handleClickChannel = (channel: ChannelType) => {
     if (channel.isJoined) {
@@ -38,12 +44,13 @@ export default function ChannelBrowse({ channels }: Props) {
   };
 
   const handlePasswordSubmit = (password: string) => {
-    joinChannelMutation.mutate(
-      { id: protectedChannelId, password },
-      {
-        onSuccess: () => navigate(ROUTES.CHANNEL.ROOM(protectedChannelId)),
-      }
-    );
+    protectedChannelId &&
+      joinProtectedChannelMutation.mutate(
+        { id: protectedChannelId, password },
+        {
+          onSuccess: () => navigate(ROUTES.CHANNEL.ROOM(protectedChannelId)),
+        }
+      );
   };
 
   return (
