@@ -34,7 +34,7 @@ export class ChannelsService {
 
   // Channel getter
 
-  // 채널의 상세 정보를 찾는다.
+  // 채널에 있는 유저를 찾는다.
   getUserJoinedChannel(userId: number, channelId: number): ChannelUser {
     const channel: Channel = this.channelModel.get(channelId);
     const user: ChannelUser = this.userModel.getUser(userId);
@@ -47,7 +47,7 @@ export class ChannelsService {
     return user;
   }
 
-  // 채널 목록을 찾는다.
+  // 채널에 있는 유저 리스트를 가져온다.
   getUserArrayJoinedChannel(channelId: number) {
     const channel: Channel = this.channelModel.get(channelId);
     const data = [];
@@ -180,9 +180,14 @@ export class ChannelsService {
       }
     });
 
+    let title = channel.title;
+    if (channel.isDm) {
+      title = users.filter((user) => user.id != userId)[0].nickname;
+    } 
+
     const channelInfo = {
       id: channel.id,
-      title: channel.title,
+      title: title,
       isProtected: !channel.isPrivate && channel.password ? true : false,
       isPrivate: channel.isPrivate,
       isDm: channel.isDm,
