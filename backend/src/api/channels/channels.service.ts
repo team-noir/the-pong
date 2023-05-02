@@ -346,11 +346,18 @@ export class ChannelsService {
       await this.noticeToChannel(channel, NOTICE_STATUS.USER_KICK, [settedUser]);
       await this.channelModel.kick(user, channel, settedUser);
     } else if (status == 'ban') {
-      await this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [settedUser]);
-      await this.channelModel.ban(user, channel, settedUser);
+      if (!channel.banned.has(settedUser.id)) {
+        await this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [settedUser]);
+        await this.channelModel.ban(user, channel, settedUser);
+      }
     } else if (status == 'mute') {
-      await this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [settedUser]);
-      await this.channelModel.mute(user, channel, settedUser, 30);
+      if (!channel.muted.has(settedUser.id)) {
+        await this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [settedUser]);
+        await this.channelModel.mute(user, channel, settedUser, 30);
+        setTimeout(async () => {
+          await this.noticeToChannel(channel, NOTICE_STATUS.USER_UNMUTE, [settedUser]);
+        }, 30000);
+      }
     }
   }
 
