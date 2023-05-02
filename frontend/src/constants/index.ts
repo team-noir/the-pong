@@ -20,6 +20,23 @@ export const NOTICE_STATUS = {
   CHANNEL_REMOVE: 400,
 } as const;
 
+export const GAME_SETTING_TEXT = {
+  CHANGE: 'change',
+  DONE: 'done',
+  LEAVE: 'leave',
+} as const;
+
+export const GAME_INVITE_TEXT = {
+  CANCELED: 'canceled',
+};
+
+export const GAME_KEY_EVENT = {
+  DOWN_LEFT: 'DL',
+  DOWN_RIGHT: 'DR',
+  UP_LEFT: 'UL',
+  UP_RIGHT: 'UR',
+};
+
 /** Image files */
 
 export const BACKGROUND_IMAGES = {

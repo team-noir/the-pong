@@ -1,5 +1,6 @@
 import { createContext } from 'react';
 import { io } from 'socket.io-client';
+import { onConnect, onDisconnect } from 'api/socket.v1';
 import { SOCKET_URI } from 'constants/index';
 
 export const socket = io(SOCKET_URI, {
@@ -7,7 +8,7 @@ export const socket = io(SOCKET_URI, {
   autoConnect: false,
 });
 
-socket.on('connect', () => console.info('socket connected'));
-socket.on('disconnect', () => console.info('socket disconnected'));
+onConnect();
+onDisconnect();
 
 export const SocketContext = createContext(socket);

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { checkProfile } from 'api/api.v1';
+import { checkProfile } from 'api/rest.v1';
 import { FormData } from 'components/organisms/OnBoarding';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import { validateNickname } from 'utils/validatorUtils';

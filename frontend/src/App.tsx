@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-query';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { healthCheck, whoami } from 'api/api.v1';
+import { healthCheck, whoami } from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
 import { socket, SocketContext } from 'contexts/socket';
 import LoadingFallback from 'components/organisms/LoadingFalback';

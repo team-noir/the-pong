@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { getUsers } from 'api/api.v1';
+import { getUsers } from 'api/rest.v1';
 import UserList from 'components/molecule/UserList';
 import TextInput from 'components/atoms/TextInput';
 import Button from 'components/atoms/Button';

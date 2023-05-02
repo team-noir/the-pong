@@ -1,4 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
+import { onAchievment } from 'api/socket.v1';
 import { Stage, Layer, Image } from 'react-konva';
 import konva from 'konva';
 import {
@@ -23,6 +24,7 @@ import {
   MY_PADDLE_COLOR,
   OTHER_PADDLE_COLOR,
 } from 'constants/index';
+import SOCKET_EVENTS from 'constants/socketEvents';
 
 interface Props {
   game: GameType;
@@ -87,14 +89,14 @@ export default function Game({ game }: Props) {
   };
 
   useEffect(() => {
-    socket.on('achievement', (data: AchievementType) => {
+    onAchievment((data: AchievementType) => {
       setAchievements((prev) => {
         if (prev) return [...prev, data];
         return [data];
       });
     });
     return () => {
-      socket.off('achievement');
+      socket.off(SOCKET_EVENTS.GAME.ACHIEVMENT);
     };
   }, [socket]);
 

@@ -1,7 +1,9 @@
 import { useContext, useEffect, useRef } from 'react';
+import * as api from 'api/socket.v1';
 import konva from 'konva';
 import { useUser } from 'hooks/useStore';
 import { SocketContext } from 'contexts/socket';
+import SOCKET_EVENTS from 'constants/socketEvents';
 
 type ReturnType = [
   dataChannelRef: React.MutableRefObject<RTCDataChannel | null>
@@ -29,10 +31,10 @@ export default function useGameRTC(
     !amIOwner && addNonOwnerRTCSocketListeners();
 
     return () => {
-      socket.off('rtcInit');
-      socket.off('rtcGetCandidate');
-      socket.off('rtcGetOffer');
-      socket.off('rtcGetAnswer');
+      socket.off(SOCKET_EVENTS.GAME.RTC.INIT);
+      socket.off(SOCKET_EVENTS.GAME.RTC.GET_CANDIDATE);
+      socket.off(SOCKET_EVENTS.GAME.RTC.GET_ANSWER);
+      socket.off(SOCKET_EVENTS.GAME.RTC.GET_OFFER);
       if (!peerConnectionsRef.current) return;
       for (const userId in peerConnectionsRef.current) {
         peerConnectionsRef.current[userId].close();
@@ -41,8 +43,7 @@ export default function useGameRTC(
   }, []);
 
   const addRTCSocketListeners = () => {
-    socket.on(
-      'rtcGetCandidate',
+    api.onRtcGetCandidate(
       async (data: {
         candidate: RTCIceCandidateInit;
         candidateSendUserId: number;
@@ -59,9 +60,7 @@ export default function useGameRTC(
   };
 
   const addOwnerRTCSocketListeners = () => {
-    socket.on('rtcInit', async (data: { userId: number }) => {
-      // TODO: 테스트 완료 후 삭제
-      console.log('rtcInit');
+    api.onRtcInit(async (data: { userId: number }) => {
       if (!canvasRef.current) return;
       const stream = canvasRef.current.getNativeCanvasElement().captureStream();
       canvasStreamRef.current = stream;
@@ -79,19 +78,13 @@ export default function useGameRTC(
         await peerConnection.setLocalDescription(
           new RTCSessionDescription(localSdp)
         );
-
-        socket.emit('rtcOffer', {
-          sdp: localSdp,
-          offerSendUserId: myUserId,
-          offerReceiveUserId: data.userId,
-        });
+        myUserId && api.emitRtcOffer(localSdp, myUserId, data.userId);
       } catch (e) {
         console.error(e);
       }
     });
 
-    socket.on(
-      'rtcGetAnswer',
+    api.onRtcGetAnswer(
       async (data: {
         sdp: RTCSessionDescription;
         answerSendUserId: number;
@@ -104,15 +97,13 @@ export default function useGameRTC(
         await peerConnection.setRemoteDescription(
           new RTCSessionDescription(sdp)
         );
-
-        socket.emit('rtcConnected', { userId: answerSendUserId });
+        api.emitConnected(answerSendUserId);
       }
     );
   };
 
   const addNonOwnerRTCSocketListeners = () => {
-    socket.on(
-      'rtcGetOffer',
+    api.onRtcGetOffer(
       async (data: { sdp: RTCSessionDescription; offerSendUserId: number }) => {
         const { sdp, offerSendUserId } = data;
         const peerConnection = createAnswerPeerConnection(offerSendUserId);
@@ -130,11 +121,7 @@ export default function useGameRTC(
           await peerConnection.setLocalDescription(
             new RTCSessionDescription(localSdp)
           );
-          socket.emit('rtcAnswer', {
-            sdp: localSdp,
-            answerSendUserId: myUserId,
-            answerReceiveUserId: offerSendUserId,
-          });
+          myUserId && api.emitRtcAnswer(localSdp, myUserId, offerSendUserId);
         } catch (e) {
           console.error(e);
         }
@@ -170,11 +157,7 @@ export default function useGameRTC(
       peerConnection.ontrack = getRemoteStream;
       peerConnection.onicecandidate = (e) => {
         if (!e.candidate) return;
-        socket.emit('rtcCandidate', {
-          candidate: e.candidate,
-          candidateSendUserId: myUserId,
-          candidateReceiveUserId: userId,
-        });
+        myUserId && api.emitRtcCandidate(e.candidate, myUserId, userId);
       };
 
       if (!canvasStreamRef.current) {
@@ -196,11 +179,7 @@ export default function useGameRTC(
 
       peerConnection.onicecandidate = (e) => {
         if (!e.candidate) return;
-        socket.emit('rtcCandidate', {
-          candidate: e.candidate,
-          candidateSendUserId: myUserId,
-          candidateReceiveUserId: userId,
-        });
+        myUserId && api.emitRtcCandidate(e.candidate, myUserId, userId);
       };
       peerConnection.ondatachannel = (e) => {
         dataChannelRef.current = e.channel;

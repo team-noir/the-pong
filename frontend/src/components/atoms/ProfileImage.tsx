@@ -1,4 +1,4 @@
-import { API_PREFIX } from 'api/api.v1';
+import { API_PREFIX } from 'api/rest.v1';
 import { DEFAULT_PROFILE_IMAGE } from 'constants/index';
 
 interface Props {

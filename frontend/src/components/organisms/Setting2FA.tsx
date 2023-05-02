@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { get2faCode, delete2fa } from 'api/api.v1';
+import { get2faCode, delete2fa } from 'api/rest.v1';
 import { CheckCircleIcon } from '@heroicons/react/20/solid';
 import { useUser } from 'hooks/useStore';
 import Modal from 'components/templates/Modal';

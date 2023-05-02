@@ -1,7 +1,7 @@
 import { Fragment, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { logout as logoutApi } from 'api/api.v1';
+import { logout as logoutApi } from 'api/rest.v1';
 import { Disclosure, Menu, Transition } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useUser } from 'hooks/useStore';
