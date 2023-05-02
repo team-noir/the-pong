@@ -35,21 +35,19 @@ export default function UserItem({
         )}
       >
         <Link to={`${ROUTES.PROFILE.USER(user.id)}`}>
-          <div className="relative">
-            {hasStatus ? (
-              <ProfileImageWithStatus
-                userId={user.id}
-                nickname={`${user.nickname}`}
-                size={imageSize}
-              />
-            ) : (
-              <ProfileImage
-                userId={user.id}
-                nickname={`${user.nickname}`}
-                size={imageSize}
-              />
-            )}
-          </div>
+          {hasStatus ? (
+            <ProfileImageWithStatus
+              userId={user.id}
+              nickname={`${user.nickname}`}
+              size={imageSize}
+            />
+          ) : (
+            <ProfileImage
+              userId={user.id}
+              nickname={`${user.nickname}`}
+              size={imageSize}
+            />
+          )}
         </Link>
       </div>
 

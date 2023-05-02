@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getUserStatus } from 'api/api.v1';
 import ProfileImage from 'components/atoms/ProfileImage';
@@ -27,7 +26,7 @@ export default function ProfileImageWithStatus({
   }, [data]);
 
   return (
-    <>
+    <div className="relative">
       <ProfileImage userId={userId} nickname={nickname} size={size} />
       {data?.status && (
         <>
@@ -39,6 +38,6 @@ export default function ProfileImageWithStatus({
           )}
         </>
       )}
-    </>
+    </div>
   );
 }
