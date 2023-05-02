@@ -9,6 +9,7 @@ import { SocketContext } from 'contexts/socket';
 import ProfileImage from 'components/atoms/ProfileImage';
 import Logo from 'components/atoms/Logo';
 import { classNames } from 'utils';
+import ROUTES from 'constants/routes';
 
 const navigation = [
   { name: '게임', href: '/game', current: false },
@@ -85,19 +86,21 @@ export default function HeaderGnb() {
                     leaveTo="transform opacity-0 scale-95"
                   >
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-gray-darker py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                      <Menu.Item>
-                        {({ active }) => (
-                          <Link
-                            to={`/profile/${myUserId}`}
-                            className={classNames(
-                              active ? 'bg-gray-dark' : '',
-                              'block px-4 py-2 text-sm text-text-light'
-                            )}
-                          >
-                            내 프로필
-                          </Link>
-                        )}
-                      </Menu.Item>
+                      {myUserId && (
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to={`${ROUTES.PROFILE.USER(myUserId)}`}
+                              className={classNames(
+                                active ? 'bg-gray-dark' : '',
+                                'block px-4 py-2 text-sm text-text-light'
+                              )}
+                            >
+                              내 프로필
+                            </Link>
+                          )}
+                        </Menu.Item>
+                      )}
                       <Menu.Item>
                         {({ active }) => (
                           <Link

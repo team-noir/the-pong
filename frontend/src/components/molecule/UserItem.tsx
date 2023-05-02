@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import ProfileImage from 'components/atoms/ProfileImage';
 import { UserType } from 'types';
 import { classNames } from 'utils';
+import ProfileImageWithStatus from './ProfileImageWithStatus';
+import ROUTES from 'constants/routes';
 
 interface Props {
   user: UserType;
@@ -32,18 +34,20 @@ export default function UserItem({
           inviteList && 'pointer-events-none cursor-default'
         )}
       >
-        <Link to={`/profile/${user.id}`}>
+        <Link to={`${ROUTES.PROFILE.USER(user.id)}`}>
           <div className="relative">
-            <ProfileImage
-              userId={user.id}
-              nickname={`${user.nickname}`}
-              size={imageSize}
-            />
-            {hasStatus && user.status === 'online' && (
-              <span className="user-indicator w-3.5 h-3.5 bg-status-online"></span>
-            )}
-            {hasStatus && user.status === 'game' && (
-              <span className="user-indicator w-3.5 h-3.5 bg-status-game border-2"></span>
+            {hasStatus ? (
+              <ProfileImageWithStatus
+                userId={user.id}
+                nickname={`${user.nickname}`}
+                size={imageSize}
+              />
+            ) : (
+              <ProfileImage
+                userId={user.id}
+                nickname={`${user.nickname}`}
+                size={imageSize}
+              />
             )}
           </div>
         </Link>
@@ -58,7 +62,7 @@ export default function UserItem({
         <div
           className={inviteList ? 'pointer-events-none cursor-default' : 'mb-1'}
         >
-          <Link to={`/profile/${user.id}`}>
+          <Link to={`${ROUTES.PROFILE.USER(user.id)}`}>
             <span className="text-lg font-medium">{user.nickname}</span>
           </Link>
         </div>

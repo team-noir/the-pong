@@ -62,26 +62,28 @@ export default function GameInviteModal() {
 
   return (
     <>
-      {isShow && (
+      {isShow && user && (
         /* eslint-disable */
         <Modal onClickClose={() => {}} isShowClose={false} fitContent>
-          <p className="flex items-center">
-            <ProfileImage
-              userId={user?.id}
-              nickname={`${user?.nickname}`}
-              size={40}
-            />
-            <span className="ml-2">
-              {user?.nickname}님이 게임에 초대하였습니다.
-            </span>
-          </p>
-          <div className="flex justify-evenly mt-4">
-            <Button primary onClick={handleClickAccept}>
-              수락
-            </Button>
-            <Button secondary onClick={handleClickReject}>
-              거절
-            </Button>
+          <div className="flex flex-col">
+            <p className="flex items-center">
+              <ProfileImage
+                userId={user.id}
+                nickname={`${user.nickname}`}
+                size={40}
+              />
+              <span className="ml-2">
+                {user.nickname}님이 게임에 초대하였습니다.
+              </span>
+            </p>
+            <div className="flex justify-evenly mt-4">
+              <Button primary onClick={handleClickAccept}>
+                수락
+              </Button>
+              <Button secondary onClick={handleClickReject}>
+                거절
+              </Button>
+            </div>
           </div>
         </Modal>
       )}
