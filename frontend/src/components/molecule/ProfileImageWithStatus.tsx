@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query';
 import { getUserStatus } from 'api/rest.v1';
 import ProfileImage from 'components/atoms/ProfileImage';
 import QUERY_KEYS from 'constants/queryKeys';
-import { useEffect } from 'react';
 
 interface Props {
   userId: number;
@@ -20,10 +19,6 @@ export default function ProfileImageWithStatus({
     queryFn: () => getUserStatus(userId),
     staleTime: 0,
   });
-
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
 
   return (
     <div className="relative">
