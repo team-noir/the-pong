@@ -34,7 +34,7 @@ export class ChannelsService {
 
   // Channel getter
 
-  // 채널의 상세 정보를 찾는다.
+  // 채널에 있는 유저를 찾는다.
   getUserJoinedChannel(userId: number, channelId: number): ChannelUser {
     const channel: Channel = this.channelModel.get(channelId);
     const user: ChannelUser = this.userModel.getUser(userId);
@@ -47,7 +47,7 @@ export class ChannelsService {
     return user;
   }
 
-  // 채널 목록을 찾는다.
+  // 채널에 있는 유저 리스트를 가져온다.
   getUserArrayJoinedChannel(channelId: number) {
     const channel: Channel = this.channelModel.get(channelId);
     const data = [];
@@ -92,7 +92,7 @@ export class ChannelsService {
     const user: ChannelUser = this.userModel.getUser(userId);
 
     await this.channelModel.joinChannel(user, channel, password);
-    this.noticeToChannel(channel, NOTICE_STATUS.USER_JOIN, [user]);
+    await this.noticeToChannel(channel, NOTICE_STATUS.USER_JOIN, [user]);
   }
 
   async leave(userId: number, channelId: number) {
@@ -109,7 +109,7 @@ export class ChannelsService {
       await this.channelModel.leaveChannel(user, channel);
     }
 
-    this.noticeToChannel(channel, NOTICE_STATUS.USER_LEAVE, [user]);
+    await this.noticeToChannel(channel, NOTICE_STATUS.USER_LEAVE, [user]);
   }
 
   list(userId: number, query) {
@@ -123,6 +123,7 @@ export class ChannelsService {
 
     channels.forEach((channel) => {
       if (
+        channel.banned.has(userId) ||
         !this.channelModel.checkCanListed(channel, user.id) ||
         (query.isEnter && !channel.isUserJoined(user.id)) ||
         this.channelModel.checkListedRange(channel, query)
@@ -180,9 +181,14 @@ export class ChannelsService {
       }
     });
 
+    let title = channel.title;
+    if (channel.isDm) {
+      title = users.filter((user) => user.id != userId)[0].nickname;
+    }
+
     const channelInfo = {
       id: channel.id,
-      title: channel.title,
+      title: title,
       isProtected: !channel.isPrivate && channel.password ? true : false,
       isPrivate: channel.isPrivate,
       isDm: channel.isDm,
@@ -207,7 +213,7 @@ export class ChannelsService {
     return;
   }
 
-  setUserInChannel(
+  async setUserInChannel(
     userId: number,
     channelId: number,
     settedUserId: number,
@@ -239,10 +245,14 @@ export class ChannelsService {
 
     if (role == 'admin') {
       channel.admin.add(settedUser.id);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_GRANT, [settedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_GRANT, [
+        settedUser,
+      ]);
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_REVOKE, [settedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_REVOKE, [
+        settedUser,
+      ]);
     }
   }
 
@@ -276,12 +286,12 @@ export class ChannelsService {
     return { id: found.id };
   }
 
-  invite(userId: number, channelId: number, invitedUserId: number[]) {
+  async invite(userId: number, channelId: number, invitedUserId: number[]) {
     const channel = this.channelModel.get(channelId);
     const invitedBy = this.getUserJoinedChannel(userId, channelId);
     const role = channel.getChannelUserRole(invitedBy);
 
-    if (channel.isDm || channel.isPrivate) {
+    if (channel.isDm || !channel.isPrivate) {
       throw {
         code: HttpStatus.BAD_REQUEST,
         message: 'You invited the user to the wrong channel.',
@@ -301,7 +311,9 @@ export class ChannelsService {
       if (invitedUser.socket) {
         invitedUser.socket.emit('invited', { channelId: channel.id });
       }
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, [invitedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, [
+        invitedUser,
+      ]);
       return;
     }
 
@@ -317,7 +329,8 @@ export class ChannelsService {
         invitedUser.socket.emit('invited', { channelId: channel.id });
       }
     });
-    this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, users);
+
+    await this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, users);
   }
 
   async setUserStatus(
@@ -334,14 +347,29 @@ export class ChannelsService {
     );
 
     if (status == 'kick') {
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_KICK, [
+        settedUser,
+      ]);
       await this.channelModel.kick(user, channel, settedUser);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_KICK, [user]);
     } else if (status == 'ban') {
-      await this.channelModel.ban(user, channel, settedUser);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [user]);
+      if (!channel.banned.has(settedUser.id)) {
+        await this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [
+          settedUser,
+        ]);
+        await this.channelModel.ban(user, channel, settedUser);
+      }
     } else if (status == 'mute') {
-      await this.channelModel.mute(user, channel, settedUser, 30);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [user]);
+      if (!channel.muted.has(settedUser.id)) {
+        await this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [
+          settedUser,
+        ]);
+        await this.channelModel.mute(user, channel, settedUser, 30);
+        setTimeout(async () => {
+          await this.noticeToChannel(channel, NOTICE_STATUS.USER_UNMUTE, [
+            settedUser,
+          ]);
+        }, 30000);
+      }
     }
   }
 
@@ -389,17 +417,13 @@ export class ChannelsService {
   }
 
   // 채널에 공지를 보낸다.
-  async noticeToChannel(
-    channel: Channel,
-    code: number,
-    users: ChannelUser[]
-  ): Promise<Message> {
-    const newMessage = await this.messageModel.createMessage(
-      channel,
-      NOTICE_STATUS_MESSAGE[code]
-    );
-    this.messageModel.sendNotice(channel.id, code, newMessage, users);
-
-    return newMessage;
+  async noticeToChannel(channel: Channel, code: number, users: ChannelUser[]) {
+    for (const user of users) {
+      const newMessage = await this.messageModel.createMessage(
+        channel,
+        user.name + ' ' + NOTICE_STATUS_MESSAGE[code]
+      );
+      await this.messageModel.sendNotice(channel.id, code, newMessage, users);
+    }
   }
 }

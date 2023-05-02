@@ -111,16 +111,16 @@ export class MessageModel {
   }
 
   // NOTE: message와 같은 id, createdAt를 보내기 위해서 message를 인자로 받음
-  sendNotice(
+  async sendNotice(
     channelId: number,
     code: number,
     message: Message,
     users: ChannelUser[]
   ) {
-    this.server.to(String(channelId)).emit('notice', {
+    await this.server.to(String(channelId)).emit('notice', {
       id: message.id,
-      channelId: channelId,
-      text: NOTICE_STATUS_MESSAGE[code],
+      channelId: message.channelId,
+      text: message.text,
       code: code,
       users: users.map((user) => ({
         id: user.id,

@@ -158,11 +158,21 @@ export class GameModel implements OnModuleInit {
     const userHistoryLadder = userHistory.filter((game) => game.isLadder);
     const results = [];
 
-    if (userHistory.length == 1 && gameResult.winner.id == userId) { results.push(1); }
-    if (gameResult.loser.score == 0 && gameResult.winner.id == userId) { results.push(2); }
-    if (userHistory.length == 11) { results.push(3); }
-    if (gameResult.isLadder && userHistoryLadder.length == 1) { results.push(4); }
-    if (gameResult.winner.id == userId) { results.push(5); }
+    if (userHistory.length == 1 && gameResult.winner.id == userId) {
+      results.push(1);
+    }
+    if (gameResult.loser.score == 0 && gameResult.winner.id == userId) {
+      results.push(2);
+    }
+    if (userHistory.length == 11) {
+      results.push(3);
+    }
+    if (gameResult.isLadder && userHistoryLadder.length == 1) {
+      results.push(4);
+    }
+    if (gameResult.winner.id == userId) {
+      results.push(5);
+    }
 
     return results;
   }
@@ -176,7 +186,7 @@ export class GameModel implements OnModuleInit {
         select: {
           achievement: {
             select: {
-              id: true
+              id: true,
             },
           },
         },
@@ -187,26 +197,30 @@ export class GameModel implements OnModuleInit {
   }
 
   async checkUserAchievements(userId: number, gameResult) {
-    const achievementIds: number[] = await this.getGameAchievements(userId, gameResult);
+    const achievementIds: number[] = await this.getGameAchievements(
+      userId,
+      gameResult
+    );
     const userAchievements = await this.getUserAchievements(userId);
     const uesrSocket = this.appGateway.getUserSocket(userId);
     const results = [];
 
     for (const achievementId of achievementIds) {
       if (!userAchievements.includes(achievementId)) {
-        const achievement_user = await this.prismaService.achievement_User.upsert({
-          where: {
-            unique: {
+        const achievement_user =
+          await this.prismaService.achievement_User.upsert({
+            where: {
+              unique: {
+                userId,
+                achievementId,
+              },
+            },
+            update: {},
+            create: {
               userId,
               achievementId,
             },
-          },
-          update: {},
-          create: {
-            userId,
-            achievementId,
-          },
-        });
+          });
 
         const achievement = await this.prismaService.achievement.findUnique({
           where: {
@@ -238,7 +252,9 @@ export class GameModel implements OnModuleInit {
 
     game.status = GAME_STATUS.FINISHED;
 
-    if (gameResult.isLadder) { this.setUserLadderScore(gameResult.winner.id); }
+    if (gameResult.isLadder) {
+      this.setUserLadderScore(gameResult.winner.id);
+    }
     await game.noticeToPlayers('gameOver', gameResult);
     await this.checkUserAchievements(gameResult.winner.id, gameResult);
     await this.checkUserAchievements(gameResult.loser.id, gameResult);
