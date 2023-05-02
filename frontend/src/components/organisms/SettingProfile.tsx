@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import {
   API_PREFIX,
   checkProfile,
+  deleteMyProfileImage,
   updateMyProfile,
   updateMyProfileImage,
 } from 'api/rest.v1';
@@ -26,9 +27,14 @@ export default function SettingProfile() {
     imageFile: null,
   });
   const [isValidNickname, setIsValidNickname] = useState(false);
-  const [isAvailableNickname, setIsAvailableNickname] = useState(true);
+  const [isAvailableNickname, setIsAvailableNickname] = useState(false);
+  const [isClickDelete, setIsClickDelete] = useState(false);
   const navigate = useNavigate();
 
+  const onSuccess = () => {
+    setNickname(formData.nickname);
+    myUserId && navigate(ROUTES.PROFILE.USER(myUserId));
+  };
   const checkProfileMutation = useMutation({
     mutationFn: checkProfile,
     onSuccess: (data) => {
@@ -36,7 +42,12 @@ export default function SettingProfile() {
     },
   });
   const updateMyProfileMutation = useMutation(updateMyProfile);
-  const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
+  const updateMyProfileImageMutation = useMutation(updateMyProfileImage, {
+    onSuccess,
+  });
+  const deleteMyProfileImageMutation = useMutation(deleteMyProfileImage, {
+    onSuccess,
+  });
 
   useEffect(() => {
     if (!myUserNickname) return;
@@ -46,7 +57,8 @@ export default function SettingProfile() {
       ...prevState,
       nickname,
     }));
-    setIsValidNickname(validateNickname(nickname));
+    setIsValidNickname(true);
+    setIsAvailableNickname(true);
   }, [myUserNickname]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +69,7 @@ export default function SettingProfile() {
       ...prevState,
       imageFile: files[0],
     }));
+    setIsClickDelete(false);
   };
 
   const handleClickFileRemove = () => {
@@ -64,6 +77,7 @@ export default function SettingProfile() {
       ...prevState,
       imageFile: null,
     }));
+    setIsClickDelete(true);
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,19 +85,15 @@ export default function SettingProfile() {
     if (!isValidNickname || !isAvailableNickname) return;
     updateMyProfileMutation.mutate(formData.nickname, {
       onSuccess: () => {
-        !formData.imageFile && handleSuccess();
+        !isClickDelete && !formData.imageFile && onSuccess();
       },
     });
-    if (formData.imageFile) {
-      updateMyProfileImageMutation.mutate(formData.imageFile, {
-        onSuccess: handleSuccess,
-      });
+    if (isClickDelete) {
+      deleteMyProfileImageMutation.mutate();
     }
-  };
-
-  const handleSuccess = () => {
-    setNickname(formData.nickname);
-    myUserId && navigate(ROUTES.PROFILE.USER(myUserId));
+    if (formData.imageFile) {
+      updateMyProfileImageMutation.mutate(formData.imageFile);
+    }
   };
 
   const checkNicknameAvailable = (value: string) => {
@@ -98,7 +108,9 @@ export default function SettingProfile() {
         className="flex flex-col justify-center items-center"
       >
         <FileInputWithImage
-          imageUrl={`${API_PREFIX}/users/${myUserId}/profile-image`}
+          imageUrl={
+            isClickDelete ? '' : `${API_PREFIX}/users/${myUserId}/profile-image`
+          }
           onChange={handleFileChange}
           onClickRemove={handleClickFileRemove}
         />

@@ -145,6 +145,14 @@ export const updateMyProfile = async (nickname: string): Promise<UserType> => {
   return res.data;
 };
 
+export const deleteMyProfileImage = async () => {
+  const res = await axiosWithInterceptors.delete(`/my/profile-image`);
+  if (res.status !== StatusCodes.NO_CONTENT) {
+    throw new Error(res.statusText);
+  }
+  return res;
+};
+
 export const updateMyProfileImage = async (imageFile: File) => {
   const formData = new FormData();
   formData.append('file', imageFile);
