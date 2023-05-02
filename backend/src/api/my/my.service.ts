@@ -4,6 +4,8 @@ import { SettingDto } from './dtos/setting.dto';
 import { MyDto } from './dtos/my.dto';
 import { Prisma, User } from '@prisma';
 import { AuthService } from '../auth/auth.service';
+import { readdir, unlink, rmdir } from 'node:fs/promises';
+import { PROFILE_PATH } from '@const';
 
 @Injectable()
 export class MyService {
@@ -56,6 +58,32 @@ export class MyService {
         updatedAt: new Date(),
       },
     });
+  }
+
+  async deleteProfileImage(userId: number) {
+    this.deleteProfileImageFile(userId);
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        imageUrl: null,
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  async deleteProfileImageFile(userId: number) {
+    try {
+      const dir = `${PROFILE_PATH}/${userId}`;
+      for (const file of await readdir(dir)) {
+        await unlink(`${dir}/${file}`);
+      }
+      await rmdir(dir);
+    } catch (e) {
+      // if there is no directory, do nothing
+      if (e.code !== 'ENOENT') {
+        throw e;
+      }
+    }
   }
 
   async setUser(userId: number, newData: SettingDto): Promise<User> {
