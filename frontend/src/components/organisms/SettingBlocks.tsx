@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { unblockUser } from 'api/api.v1';
+import { unblockUser } from 'api/rest.v1';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
 import { UserType } from 'types';

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getMyBlocks } from 'api/api.v1';
+import { getMyBlocks } from 'api/rest.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import SettingBlocks from 'components/organisms/SettingBlocks';
 import Header from 'components/molecule/Header';

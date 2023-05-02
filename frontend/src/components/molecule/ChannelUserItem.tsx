@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateChannelUserRole, updateChannelUserStatus } from 'api/api.v1';
+import { updateChannelUserRole, updateChannelUserStatus } from 'api/rest.v1';
 import ProfileImageWithStatus from 'components/molecule/ProfileImageWithStatus';
 import Button from 'components/atoms/Button';
 import GameInviteButton from 'components/molecule/GameInviteButton';

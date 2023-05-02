@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { startGame, updateGameSetting } from 'api/api.v1';
+import { startGame, updateGameSetting } from 'api/rest.v1';
+import { onGameSetting, onPing } from 'api/socket.v1';
 import { RadioGroup } from '@headlessui/react';
 import { InformationCircleIcon } from '@heroicons/react/24/outline';
 import { useUser } from 'hooks/useStore';
@@ -12,7 +13,9 @@ import Button from 'components/atoms/Button';
 import { classNames } from 'utils';
 import ROUTES from 'constants/routes';
 import { GameType } from 'types';
-import { GAME_MODES, GAME_THEMES } from 'constants/index';
+import { GAME_MODES, GAME_SETTING_TEXT, GAME_THEMES } from 'constants/index';
+import QUERY_KEYS from 'constants/queryKeys';
+import SOCKET_EVENTS from 'constants/socketEvents';
 
 interface Props {
   gameSetting: GameType;
@@ -38,36 +41,31 @@ export default function GameSetting({ gameSetting }: Props) {
   });
 
   useEffect(() => {
-    socket.on('ping', () => {
-      socket.emit('pong');
+    onPing();
+
+    onGameSetting((data: { text: string; mode?: number; theme?: number }) => {
+      const { text, mode, theme } = data;
+      if (text === GAME_SETTING_TEXT.CHANGE) {
+        queryClient.setQueryData<GameType>(
+          [QUERY_KEYS.GAME_SETTING, String(gameSetting.id)],
+          (prevData) =>
+            prevData &&
+            ({
+              ...prevData,
+              mode: mode !== null ? mode : prevData.mode,
+              theme: theme !== null ? theme : prevData.theme,
+            } as GameType)
+        );
+      } else if (text === GAME_SETTING_TEXT.DONE) {
+        navigate(ROUTES.GAME.ROOM(gameSetting.id));
+      } else if (text === GAME_SETTING_TEXT.LEAVE) {
+        setIsOtherUserLeft(true);
+      }
     });
 
-    socket.on(
-      'gameSetting',
-      (data: { text: string; mode?: number; theme?: number }) => {
-        const { text, mode, theme } = data;
-        if (text === 'change') {
-          queryClient.setQueryData<GameType>(
-            ['gameSetting', String(gameSetting.id)],
-            (prevData) =>
-              prevData &&
-              ({
-                ...prevData,
-                mode: mode !== null ? mode : prevData.mode,
-                theme: theme !== null ? theme : prevData.theme,
-              } as GameType)
-          );
-        } else if (text === 'done') {
-          navigate(ROUTES.GAME.ROOM(gameSetting.id));
-        } else if (text === 'leave') {
-          setIsOtherUserLeft(true);
-        }
-      }
-    );
-
     return () => {
-      socket.off('ping');
-      socket.off('gameSetting');
+      socket.off(SOCKET_EVENTS.GAME.PING);
+      socket.off(SOCKET_EVENTS.GAME.SETTING);
     };
   }, []);
 

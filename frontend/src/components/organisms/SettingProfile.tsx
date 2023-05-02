@@ -6,7 +6,7 @@ import {
   checkProfile,
   updateMyProfile,
   updateMyProfileImage,
-} from 'api/api.v1';
+} from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import FileInputWithImage from 'components/molecule/FileInputWithImage';

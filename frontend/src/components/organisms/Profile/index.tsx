@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import * as api from 'api/api.v1';
+import * as api from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
 import Button from 'components/atoms/Button';
 import ProfileImage from 'components/atoms/ProfileImage';

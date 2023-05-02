@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getUsers, inviteUserToChannel } from 'api/api.v1';
+import { getUsers, inviteUserToChannel } from 'api/rest.v1';
 import { XMarkIcon } from '@heroicons/react/20/solid';
 import Modal from 'components/templates/Modal';
 import UserList from 'components/molecule/UserList';
 import SearchCombobox from 'components/molecule/SearchCombobox';
 import Button from 'components/atoms/Button';
 import { UserType, ChannelUserType } from 'types';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   channelId: number;
@@ -30,7 +31,7 @@ export default function ChannelInvite({
     mutationFn: inviteUserToChannel,
     onSuccess: () => {
       onClickClose();
-      queryClient.refetchQueries(['getChannel', String(channelId)]);
+      queryClient.invalidateQueries([QUERY_KEYS.CHANNEL, String(channelId)]);
     },
   });
 

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Bars3Icon } from '@heroicons/react/24/outline';
-import { getChannel } from 'api/api.v1';
+import { getChannel } from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
 import AppTemplate from 'components/templates/AppTemplate';
 import Channel from 'components/organisms/Channel';

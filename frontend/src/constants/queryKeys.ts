@@ -9,6 +9,7 @@ const QUERY_KEYS = {
   GAME: 'game',
   GAMES: 'games',
   GAME_SETTING: 'gameSetting',
+  GAME_HISTORY: 'gameHistory',
   CHANNEL: 'channel',
   CHANNELS: 'channels',
   CHANNELS_BROWSE: 'channelsBrowse',

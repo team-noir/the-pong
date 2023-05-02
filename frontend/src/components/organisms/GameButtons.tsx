@@ -1,13 +1,15 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { cancelWaitingGame, waitGame } from 'api/api.v1';
+import { cancelWaitingGame, waitGame } from 'api/rest.v1';
+import { onQueue } from 'api/socket.v1';
 import useGame from 'hooks/useGame';
 import { SocketContext } from 'contexts/socket';
 import Modal from 'components/templates/Modal';
 import Button from 'components/atoms/Button';
 import ROUTES from 'constants/routes';
 import { UI_TEXT } from 'constants/index';
+import SOCKET_EVENTS from 'constants/socketEvents';
 
 export default function GameButtons() {
   const [isWating, setIsWating, alertCode, setAlertCode] = useGame();
@@ -17,7 +19,7 @@ export default function GameButtons() {
   const waitGameMutation = useMutation({
     mutationFn: waitGame,
     onMutate: () => {
-      socket.on('queue', (data: { text: string; gameId?: number }) => {
+      onQueue((data: { text: string; gameId?: number }) => {
         if (data.gameId) {
           navigate(ROUTES.GAME.SETTING(data.gameId));
         } else {
@@ -28,7 +30,7 @@ export default function GameButtons() {
     },
     onSuccess: () => setIsWating(true),
     onError: () => {
-      socket.off('queue');
+      socket.off(SOCKET_EVENTS.GAME.QUEUE);
       alert(UI_TEXT.ERROR.DEFAULT);
     },
   });

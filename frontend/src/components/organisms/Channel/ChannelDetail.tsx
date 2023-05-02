@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { leaveChannel } from 'api/api.v1';
+import { leaveChannel } from 'api/rest.v1';
 import Modal from 'components/templates/Modal';
 import ChannelUserList from 'components/molecule/ChannelUserList';
 import Button from 'components/atoms/Button';

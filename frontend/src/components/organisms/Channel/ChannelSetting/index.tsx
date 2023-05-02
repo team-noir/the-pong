@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { updateChannelSetting } from 'api/api.v1';
+import { updateChannelSetting } from 'api/rest.v1';
 import { ChevronRightIcon } from '@heroicons/react/24/outline';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Modal from 'components/templates/Modal';
 import ChannelSettingPassword from 'components/organisms/Channel/ChannelSetting/ChannelSettingPassword';
 import ChannelSettingTitle from 'components/organisms/Channel/ChannelSetting/ChannelSettingTitle';
 import { ChannelType } from 'types';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   channel: ChannelType;
@@ -26,7 +27,7 @@ export default function ChannelSetting({ channel, onClickClose }: Props) {
     mutationFn: updateChannelSetting,
     onSuccess: async () => {
       onClickClose();
-      queryClient.refetchQueries(['getChannel', String(channel.id)]);
+      queryClient.invalidateQueries([QUERY_KEYS.CHANNEL, String(channel.id)]);
     },
   });
 

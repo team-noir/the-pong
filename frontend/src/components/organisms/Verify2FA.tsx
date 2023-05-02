@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { verify2fa } from 'api/api.v1';
+import { verify2fa } from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
 import TextInput from 'components/atoms/TextInput';
 import Button from 'components/atoms/Button';

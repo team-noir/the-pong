@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { joinChannel } from 'api/api.v1';
+import { joinChannel } from 'api/rest.v1';
 import ChannelList from 'components/molecule/ChannelList';
 import PasswordModal from 'components/molecule/PasswordModal';
 import { ChannelType } from 'types';
