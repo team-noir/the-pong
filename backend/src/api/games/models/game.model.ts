@@ -494,10 +494,10 @@ export class GameModel implements OnModuleInit {
     }
 
     const score = game.score.get(winnerId) + 1;
+    game.score.set(winnerId, score);
     if (score >= 11) {
       this.setGameOver(game, null);
     } else {
-      game.score.set(winnerId, score);
       await game.noticeToPlayers('roundOver', {
         winnerId: winnerId,
         score: game.score.get(winnerId),
