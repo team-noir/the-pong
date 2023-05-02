@@ -123,6 +123,7 @@ export class ChannelsService {
 
     channels.forEach((channel) => {
       if (
+        channel.banned.has(userId) ||
         !this.channelModel.checkCanListed(channel, user.id) ||
         (query.isEnter && !channel.isUserJoined(user.id)) ||
         this.channelModel.checkListedRange(channel, query)

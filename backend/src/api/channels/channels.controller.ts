@@ -161,14 +161,14 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Join channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  joinChannel(
+  async joinChannel(
     @Req() req,
     @Body() body: ChannelPasswordDto,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.join(req.user.id, channelId, body.password);
+      await this.channelsService.join(req.user.id, channelId, body.password);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
