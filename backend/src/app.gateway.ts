@@ -97,6 +97,10 @@ export class AppGateway
     return this.userSockets.has(userId);
   }
 
+  isUserPlaying(userId: number) {
+    return this.gamesService.gameModel.isPlayerInGame(userId);
+  }
+
   setUserOnline(userId: number, socket: Socket) {
     this.userSockets.set(userId, socket);
   }

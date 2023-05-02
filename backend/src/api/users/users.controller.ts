@@ -1,5 +1,6 @@
 import {
   Controller,
+  Req,
   Res,
   Get,
   Post,
@@ -16,6 +17,7 @@ import {
   ApiOperation,
   ApiTags,
   ApiOkResponse,
+  ApiCreatedResponse,
   ApiUnauthorizedResponse,
   ApiQuery,
   ApiNotFoundResponse,
@@ -53,17 +55,19 @@ export class UsersController {
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async requestUsers(
+    @Req() req,
     @Res() res: Response,
     @Query('q') q?: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('per_page', new DefaultValuePipe(30), ParseIntPipe) per_page?: number
   ) {
     try {
-      const users: UserDto[] = await this.usersService.getUsers({
-        q,
-        page,
-        per_page,
-      });
+      const myUserId = req.user.id;
+      const userQuery = { q, page, per_page };
+      const users: UserDto[] = await this.usersService.getUsers(
+        myUserId,
+        userQuery
+      );
       res.status(HttpStatus.OK).send(users);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -76,9 +80,14 @@ export class UsersController {
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async requestProfile(@Param('userId') userId: number, @Res() res: Response) {
+  async requestProfile(
+    @Req() req,
+    @Param('userId') userId: number,
+    @Res() res: Response
+  ) {
     try {
-      const user: UserDto = await this.usersService.getUser(Number(userId));
+      const myUserId = req.user.id;
+      const user: UserDto = await this.usersService.getUser(myUserId, userId);
       const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
       res.status(statusCode).send(user);
     } catch (error) {
@@ -147,7 +156,7 @@ export class UsersController {
   // TODO: remove this endpoint
   @Post(':userId/achievements/:achievementId')
   @ApiOperation({ summary: 'TEST - Add achievement' })
-  @ApiOkResponse({ description: 'ADD achievement', type: AchievementDto })
+  @ApiCreatedResponse({ description: 'ADD achievement', type: AchievementDto })
   @ApiNotFoundResponse({ description: 'User not found' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
@@ -161,7 +170,21 @@ export class UsersController {
         Number(userId),
         Number(achievementId)
       );
-      res.status(HttpStatus.OK).send(achievement);
+      res.status(HttpStatus.CREATED).send(achievement);
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
+  @Get(':userId/status')
+  async getUserStatus(
+    @Param('userId') userId: number,
+    @Res({ passthrough: true }) res
+  ) {
+    try {
+      const data = await this.usersService.getUserStatus(userId);
+      res.status(HttpStatus.OK);
+      return data;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
