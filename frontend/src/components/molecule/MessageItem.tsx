@@ -29,7 +29,7 @@ export default function MessageItem({
         ${message.isLog && 'self-center'}
       `}`}
       >
-        {!message.isLog && isShowProfile && (
+        {!message.isLog && isShowProfile && message.senderId && (
           <div className="flex">
             <ProfileImage
               userId={message.senderId}
