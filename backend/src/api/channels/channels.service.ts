@@ -92,7 +92,7 @@ export class ChannelsService {
     const user: ChannelUser = this.userModel.getUser(userId);
 
     await this.channelModel.joinChannel(user, channel, password);
-    this.noticeToChannel(channel, NOTICE_STATUS.USER_JOIN, [user]);
+    await this.noticeToChannel(channel, NOTICE_STATUS.USER_JOIN, [user]);
   }
 
   async leave(userId: number, channelId: number) {
@@ -109,7 +109,7 @@ export class ChannelsService {
       await this.channelModel.leaveChannel(user, channel);
     }
 
-    this.noticeToChannel(channel, NOTICE_STATUS.USER_LEAVE, [user]);
+    await this.noticeToChannel(channel, NOTICE_STATUS.USER_LEAVE, [user]);
   }
 
   list(userId: number, query) {
@@ -212,7 +212,7 @@ export class ChannelsService {
     return;
   }
 
-  setUserInChannel(
+  async setUserInChannel(
     userId: number,
     channelId: number,
     settedUserId: number,
@@ -244,10 +244,10 @@ export class ChannelsService {
 
     if (role == 'admin') {
       channel.admin.add(settedUser.id);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_GRANT, [settedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_GRANT, [settedUser]);
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_REVOKE, [settedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_REVOKE, [settedUser]);
     }
   }
 
@@ -281,7 +281,7 @@ export class ChannelsService {
     return { id: found.id };
   }
 
-  invite(userId: number, channelId: number, invitedUserId: number[]) {
+  async invite(userId: number, channelId: number, invitedUserId: number[]) {
     const channel = this.channelModel.get(channelId);
     const invitedBy = this.getUserJoinedChannel(userId, channelId);
     const role = channel.getChannelUserRole(invitedBy);
@@ -306,7 +306,7 @@ export class ChannelsService {
       if (invitedUser.socket) {
         invitedUser.socket.emit('invited', { channelId: channel.id });
       }
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, [invitedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, [invitedUser]);
       return;
     }
 
@@ -322,7 +322,8 @@ export class ChannelsService {
         invitedUser.socket.emit('invited', { channelId: channel.id });
       }
     });
-    this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, users);
+
+    await this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, users);
   }
 
   async setUserStatus(
@@ -332,21 +333,24 @@ export class ChannelsService {
     status: string
   ) {
     const channel: Channel = this.channelModel.get(channelId);
-    const user: ChannelUser = this.getUserJoinedChannel(userId, channelId);
+    const user: ChannelUser = this.getUserJoinedChannel(
+      userId, 
+      channelId
+    );
     const settedUser: ChannelUser = this.getUserJoinedChannel(
       settedUserId,
       channelId
     );
 
     if (status == 'kick') {
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_KICK, [settedUser]);
       await this.channelModel.kick(user, channel, settedUser);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_KICK, [user]);
     } else if (status == 'ban') {
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [settedUser]);
       await this.channelModel.ban(user, channel, settedUser);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [user]);
     } else if (status == 'mute') {
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [settedUser]);
       await this.channelModel.mute(user, channel, settedUser, 30);
-      this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [user]);
     }
   }
 
@@ -404,7 +408,7 @@ export class ChannelsService {
         channel,
         user.name + ' ' +NOTICE_STATUS_MESSAGE[code]
       );
-      this.messageModel.sendNotice(channel.id, code, newMessage, users);
+      await this.messageModel.sendNotice(channel.id, code, newMessage, users);
     }
   }
 }
