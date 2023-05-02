@@ -2,7 +2,7 @@ import { API_PREFIX } from 'api/rest.v1';
 import { DEFAULT_PROFILE_IMAGE } from 'constants/index';
 
 interface Props {
-  userId: number | undefined;
+  userId: number;
   nickname: string;
   size: number;
 }
@@ -20,11 +20,7 @@ export default function ProfileImage({ userId, nickname, size }: Props) {
 
   return (
     <img
-      src={
-        userId !== undefined
-          ? `${API_PREFIX}/users/${userId}/profile-image`
-          : DEFAULT_PROFILE_IMAGE
-      }
+      src={`${API_PREFIX}/users/${userId}/profile-image`}
       className="rounded-full object-cover"
       alt={`${nickname}의 프로필 이미지`}
       width={size}

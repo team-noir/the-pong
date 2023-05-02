@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { updateChannelUserRole, updateChannelUserStatus } from 'api/rest.v1';
-import ProfileImage from 'components/atoms/ProfileImage';
+import ProfileImageWithStatus from 'components/molecule/ProfileImageWithStatus';
 import Button from 'components/atoms/Button';
-import GameInviteButton from './GameInviteButton';
+import GameInviteButton from 'components/molecule/GameInviteButton';
 import {
   ChannelUserStatusType,
   ChannelUserType,
@@ -11,6 +11,7 @@ import {
   USER_ROLES,
 } from 'types';
 import QUERY_KEYS from 'constants/queryKeys';
+import ROUTES from 'constants/routes';
 
 interface Props {
   channelId: number;
@@ -69,24 +70,18 @@ export default function ChannelUserItem({
       data-user-id={user.id}
       className="mb-2 px-2 py-2 flex items-center space-x-4"
     >
-      <div className="flex-shrink-0">
-        <Link to={`/profile/${user.id}`}>
-          <ProfileImage
+      <div className="flex-shrink-0 relative">
+        <Link to={`${ROUTES.PROFILE.USER(user.id)}`}>
+          <ProfileImageWithStatus
             userId={user.id}
             nickname={`${user.nickname}`}
             size={imageSize}
           />
         </Link>
-        {user.status === 'online' && (
-          <span className="user-indicator w-3.5 h-3.5 bg-status-online"></span>
-        )}
-        {user.status === 'game' && (
-          <span className="user-indicator w-3.5 h-3.5 bg-status-game border-2"></span>
-        )}
       </div>
       <div className="flex-1 truncate">
         <div className="mb-1">
-          <Link to={`/profile/${user.id}`}>
+          <Link to={`${ROUTES.PROFILE.USER(user.id)}`}>
             <span>
               {user.role === USER_ROLES.OWNER && `🕶 `}
               {user.role === USER_ROLES.ADMIN && `👓 `}

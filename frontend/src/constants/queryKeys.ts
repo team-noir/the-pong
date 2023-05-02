@@ -2,6 +2,7 @@ const QUERY_KEYS = {
   HEALTH: 'health',
   WHOAMI: 'whoami',
   PROFILE: 'profile',
+  STATUS: 'status',
   FOLLOWINGS: 'followings',
   BLOCKS: 'blocks',
   ACHIEVEMENTS: 'achievements',
