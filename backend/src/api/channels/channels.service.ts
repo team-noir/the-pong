@@ -184,7 +184,7 @@ export class ChannelsService {
     let title = channel.title;
     if (channel.isDm) {
       title = users.filter((user) => user.id != userId)[0].nickname;
-    } 
+    }
 
     const channelInfo = {
       id: channel.id,
@@ -245,10 +245,14 @@ export class ChannelsService {
 
     if (role == 'admin') {
       channel.admin.add(settedUser.id);
-      await this.noticeToChannel(channel, NOTICE_STATUS.USER_GRANT, [settedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_GRANT, [
+        settedUser,
+      ]);
     } else if (role == 'normal') {
       channel.admin.delete(settedUser.id);
-      await this.noticeToChannel(channel, NOTICE_STATUS.USER_REVOKE, [settedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_REVOKE, [
+        settedUser,
+      ]);
     }
   }
 
@@ -307,7 +311,9 @@ export class ChannelsService {
       if (invitedUser.socket) {
         invitedUser.socket.emit('invited', { channelId: channel.id });
       }
-      await this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, [invitedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_INVITE, [
+        invitedUser,
+      ]);
       return;
     }
 
@@ -334,29 +340,34 @@ export class ChannelsService {
     status: string
   ) {
     const channel: Channel = this.channelModel.get(channelId);
-    const user: ChannelUser = this.getUserJoinedChannel(
-      userId, 
-      channelId
-    );
+    const user: ChannelUser = this.getUserJoinedChannel(userId, channelId);
     const settedUser: ChannelUser = this.getUserJoinedChannel(
       settedUserId,
       channelId
     );
 
     if (status == 'kick') {
-      await this.noticeToChannel(channel, NOTICE_STATUS.USER_KICK, [settedUser]);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_KICK, [
+        settedUser,
+      ]);
       await this.channelModel.kick(user, channel, settedUser);
     } else if (status == 'ban') {
       if (!channel.banned.has(settedUser.id)) {
-        await this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [settedUser]);
+        await this.noticeToChannel(channel, NOTICE_STATUS.USER_BAN, [
+          settedUser,
+        ]);
         await this.channelModel.ban(user, channel, settedUser);
       }
     } else if (status == 'mute') {
       if (!channel.muted.has(settedUser.id)) {
-        await this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [settedUser]);
+        await this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [
+          settedUser,
+        ]);
         await this.channelModel.mute(user, channel, settedUser, 30);
         setTimeout(async () => {
-          await this.noticeToChannel(channel, NOTICE_STATUS.USER_UNMUTE, [settedUser]);
+          await this.noticeToChannel(channel, NOTICE_STATUS.USER_UNMUTE, [
+            settedUser,
+          ]);
         }, 30000);
       }
     }
@@ -406,15 +417,11 @@ export class ChannelsService {
   }
 
   // 채널에 공지를 보낸다.
-  async noticeToChannel(
-    channel: Channel,
-    code: number,
-    users: ChannelUser[]
-  ) {
+  async noticeToChannel(channel: Channel, code: number, users: ChannelUser[]) {
     for (const user of users) {
       const newMessage = await this.messageModel.createMessage(
         channel,
-        user.name + ' ' +NOTICE_STATUS_MESSAGE[code]
+        user.name + ' ' + NOTICE_STATUS_MESSAGE[code]
       );
       await this.messageModel.sendNotice(channel.id, code, newMessage, users);
     }
