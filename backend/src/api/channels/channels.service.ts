@@ -398,13 +398,13 @@ export class ChannelsService {
     channel: Channel,
     code: number,
     users: ChannelUser[]
-  ): Promise<Message> {
-    const newMessage = await this.messageModel.createMessage(
-      channel,
-      NOTICE_STATUS_MESSAGE[code]
-    );
-    this.messageModel.sendNotice(channel.id, code, newMessage, users);
-
-    return newMessage;
+  ) {
+    for (const user of users) {
+      const newMessage = await this.messageModel.createMessage(
+        channel,
+        user.name + ' ' +NOTICE_STATUS_MESSAGE[code]
+      );
+      this.messageModel.sendNotice(channel.id, code, newMessage, users);
+    }
   }
 }

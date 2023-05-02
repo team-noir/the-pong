@@ -119,8 +119,8 @@ export class MessageModel {
   ) {
     this.server.to(String(channelId)).emit('notice', {
       id: message.id,
-      channelId: channelId,
-      text: NOTICE_STATUS_MESSAGE[code],
+      channelId: message.channelId,
+      text: message.text,
       code: code,
       users: users.map((user) => ({
         id: user.id,

@@ -27,7 +27,7 @@ export const NOTICE_STATUS_MESSAGE = {
   [NOTICE_STATUS.USER_MUTE]: '님이 30초간 조용히 상태가 되었습니다.',
   [NOTICE_STATUS.USER_UNMUTE]: '님의 조용히 상태가 해제되었습니다.',
   [NOTICE_STATUS.CHANNEL_REMOVE]:
-    '채널장이 채널을 삭제했습니다. 더 이상 대화를 할 수 없습니다.',
+    '님이 채널을 삭제했습니다. 더 이상 대화를 할 수 없습니다.',
 };
 
 export const GAME_STATUS = {
