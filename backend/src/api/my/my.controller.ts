@@ -132,6 +132,20 @@ export class MyController {
     }
   }
 
+  @Delete('profile-image')
+  @ApiOperation({ summary: 'Delete profile image' })
+  @ApiNoContentResponse({ description: 'Successfully deleted profile image' })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
+  @UseGuards(AuthenticatedGuard)
+  async deleteProfileImage(@Req() req, @Res() res) {
+    try {
+      await this.myService.deleteProfileImage(req.user.id);
+      res.status(HttpStatus.NO_CONTENT).send();
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+    }
+  }
+
   @Get('following')
   @ApiOperation({ summary: 'Get following list' })
   @ApiOkResponse({
