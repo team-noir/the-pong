@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { getDmChannel, unfollowUser } from 'api/api.v1';
+import { getDmChannel, unfollowUser } from 'api/rest.v1';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
 import GameInviteButton from 'components/molecule/GameInviteButton';

@@ -1,5 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
+import { onPing } from 'api/socket.v1';
 import { SocketContext } from 'contexts/socket';
+import SOCKET_EVENTS from 'constants/socketEvents';
 
 type ReturnType = [
   boolean,
@@ -15,14 +17,11 @@ export default function useGame(): ReturnType {
 
   useEffect(() => {
     if (!isWating) return;
-
-    socket.on('ping', () => {
-      socket.emit('pong');
-    });
+    onPing();
 
     return () => {
-      socket.off('ping');
-      socket.off('queue');
+      socket.off(SOCKET_EVENTS.GAME.PING);
+      socket.off(SOCKET_EVENTS.GAME.QUEUE);
     };
   }, [isWating]);
 

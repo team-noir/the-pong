@@ -5,7 +5,7 @@ import {
   checkProfile,
   updateMyProfile,
   updateMyProfileImage,
-} from 'api/api.v1';
+} from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
 import MultiSteps from 'components/organisms/OnBoarding/MultiSteps';
 import StepAgreements from 'components/organisms/OnBoarding/StepAgreements';

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { createChannel } from 'api/api.v1';
+import { createChannel } from 'api/rest.v1';
 import CheckboxInputWithLabel from 'components/molecule/CheckboxInputWithLabel';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import Button from 'components/atoms/Button';

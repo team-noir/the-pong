@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getGame } from 'api/api.v1';
+import { getGame } from 'api/rest.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import Game from 'components/organisms/Game';
 import Header from 'components/molecule/Header';

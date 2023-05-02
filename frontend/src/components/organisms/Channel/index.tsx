@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getMessages, sendMessage } from 'api/api.v1';
+import { getMessages, sendMessage } from 'api/rest.v1';
 import { SocketContext } from 'contexts/socket';
 import ChannelDetail from 'components/organisms/Channel/ChannelDetail';
 import ChannelSetting from 'components/organisms/Channel/ChannelSetting';
@@ -13,6 +13,8 @@ import { ChannelType, MessageType, NoticeType } from 'types';
 import ROUTES from 'constants/routes';
 import { NOTICE_STATUS } from 'constants/index';
 import QUERY_KEYS from 'constants/queryKeys';
+import { onMessage, onNotice } from 'api/socket.v1';
+import SOCKET_EVENTS from 'constants/socketEvents';
 
 interface Props {
   channel: ChannelType;
@@ -75,7 +77,7 @@ export default function Channel({
   }, [channel.users]);
 
   useEffect(() => {
-    socket.on('message', (data: MessageType) => {
+    onMessage((data: MessageType) => {
       const newMessage: MessageType = {
         id: data.id,
         senderId: data.senderId,
@@ -88,7 +90,8 @@ export default function Channel({
         oldData ? [...oldData, newMessage] : oldData
       );
     });
-    socket.on('notice', (data: NoticeType) => {
+
+    onNotice((data: NoticeType) => {
       const newNotice: MessageType = {
         id: data.id,
         isLog: true,
@@ -139,8 +142,8 @@ export default function Channel({
       }
     });
     return () => {
-      socket.off('message');
-      socket.off('notice');
+      socket.off(SOCKET_EVENTS.CHANNEL.MESSAGE);
+      socket.off(SOCKET_EVENTS.CHANNEL.NOTICE);
     };
   }, [socket]);
 

@@ -117,6 +117,14 @@ export const getUsers = async (
   return res.data;
 };
 
+export const getUserStatus = async (userId: number): Promise<UserType> => {
+  const res = await axiosWithInterceptors.get(`/users/${userId}/status`);
+  if (res.status !== StatusCodes.OK) {
+    throw new Error(res.statusText);
+  }
+  return res.data;
+};
+
 export const getAchievements = async (
   userId: number
 ): Promise<AchievementType[]> => {

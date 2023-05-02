@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getGames } from 'api/api.v1';
+import { getGames } from 'api/rest.v1';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import GameButtons from 'components/organisms/GameButtons';
 import GameLives from 'components/organisms/GameLives';
