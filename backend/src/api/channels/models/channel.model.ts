@@ -62,7 +62,7 @@ export class Channel {
   size() {
     return this.users.size;
   }
-  
+
   isUserJoined(userId: number): boolean {
     return this.users.has(userId);
   }
@@ -363,8 +363,8 @@ export class ChannelModel {
       },
       data: {
         deletedAt: new Date(),
-      }
-    })
+      },
+    });
   }
 
   async inviteChannel(invitedUser: ChannelUser, channel: Channel) {
