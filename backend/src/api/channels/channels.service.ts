@@ -286,7 +286,7 @@ export class ChannelsService {
     const invitedBy = this.getUserJoinedChannel(userId, channelId);
     const role = channel.getChannelUserRole(invitedBy);
 
-    if (channel.isDm || channel.isPrivate) {
+    if (channel.isDm || !channel.isPrivate) {
       throw {
         code: HttpStatus.BAD_REQUEST,
         message: 'You invited the user to the wrong channel.',
