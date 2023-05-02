@@ -59,6 +59,10 @@ export class Channel {
     this.password = password;
   }
 
+  size() {
+    return this.users.size;
+  }
+  
   isUserJoined(userId: number): boolean {
     return this.users.has(userId);
   }
@@ -169,6 +173,7 @@ export class ChannelModel {
 
   async initChannel() {
     const dbChannels = await this.prismaService.channel.findMany({
+      where: { deletedAt: null },
       select: {
         id: true,
         title: true,
@@ -319,6 +324,20 @@ export class ChannelModel {
     if (channel.isUserBanned(user.id)) {
       return;
     }
+
+    const found = await this.prismaService.channel_User.findUnique({
+      where: {
+        id: {
+          channelId: channel.id,
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!found) {
+      return;
+    }
+
     await this.prismaService.channel_User.delete({
       where: {
         id: {
@@ -327,6 +346,25 @@ export class ChannelModel {
         },
       },
     });
+  }
+
+  async deleteChannel(channel: Channel) {
+    this.channelMap.delete(channel.id);
+
+    await this.prismaService.channel_User.deleteMany({
+      where: {
+        channelId: channel.id,
+      },
+    });
+
+    await this.prismaService.channel.update({
+      where: {
+        id: channel.id,
+      },
+      data: {
+        deletedAt: new Date(),
+      }
+    })
   }
 
   async inviteChannel(invitedUser: ChannelUser, channel: Channel) {

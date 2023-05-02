@@ -32,7 +32,9 @@ export class ChannelUser {
   }
 
   leave(channel: Channel) {
-    this.socket.leave(String(channel.id));
+    if (this.socket) {
+      this.socket.leave(String(channel.id));
+    }
     this.joined.delete(channel.id);
   }
 
