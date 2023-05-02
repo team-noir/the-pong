@@ -27,7 +27,6 @@ const queryClient = new QueryClient({
       useErrorBoundary: true,
     },
     mutations: {
-      retry: false,
       onError: () => alert(UI_TEXT.ERROR.DEFAULT),
     },
   },
