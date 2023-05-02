@@ -16,6 +16,7 @@ import FileInputWithImage from 'components/molecule/FileInputWithImage';
 import Button from 'components/atoms/Button';
 import { validateNickname } from 'utils/validatorUtils';
 import { ProfileFormType } from 'types';
+import { UI_TEXT } from 'constants/index';
 import ROUTES from 'constants/routes';
 
 export default function SettingProfile() {
@@ -47,9 +48,11 @@ export default function SettingProfile() {
   const updateMyProfileImageMutation = useMutation(updateMyProfileImage, {
     onSuccess,
     onError: (error: AxiosError) => {
-      // TODO: 이미지 업로드 실패 처리
-      if (error.response?.status === StatusCodes.REQUEST_TOO_LONG)
-        alert('이미지 용량이 너무 큽니다.');
+      if (error.response?.status === StatusCodes.REQUEST_TOO_LONG) {
+        alert('1MB 이하의 이미지를 선택해 주세요.');
+        return;
+      }
+      alert(UI_TEXT.ERROR.DEFAULT);
     },
   });
   const deleteMyProfileImageMutation = useMutation(deleteMyProfileImage, {
