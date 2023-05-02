@@ -80,12 +80,14 @@ export default function Channel({
     onMessage((data: MessageType) => {
       const newMessage: MessageType = {
         id: data.id,
+        channelId: data.channelId,
         senderId: data.senderId,
         senderNickname: data.senderNickname,
         isLog: false,
         text: data.text,
         createdAt: data.createdAt,
       };
+      if (data.channelId !== channel.id) return;
       queryClient.setQueryData<MessageType[]>(messageQueryKey, (oldData) =>
         oldData ? [...oldData, newMessage] : oldData
       );
@@ -94,10 +96,12 @@ export default function Channel({
     onNotice((data: NoticeType) => {
       const newNotice: MessageType = {
         id: data.id,
+        channelId: data.channelId,
         isLog: true,
         text: data.text,
         createdAt: data.createdAt,
       };
+      if (data.channelId !== channel.id) return;
       queryClient.setQueryData<MessageType[]>(messageQueryKey, (oldData) =>
         oldData ? [...oldData, newNotice] : oldData
       );
