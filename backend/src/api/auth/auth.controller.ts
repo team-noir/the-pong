@@ -19,6 +19,8 @@ import {
   ApiBearerAuth,
   ApiOkResponse,
   ApiNoContentResponse,
+  ApiAcceptedResponse,
+  ApiNotAcceptableResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { MyService } from '../my/my.service';
@@ -73,7 +75,8 @@ export class AuthController {
 
   @Post('2fa')
   @ApiOperation({ summary: 'Verify 2FA code. Turn on 2FA if not on' })
-  @ApiOkResponse({ description: 'Turn on 2FA' })
+  @ApiAcceptedResponse({ description: 'Verify 2FA code' })
+  @ApiNotAcceptableResponse({ description: 'Wrong 2FA code' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   async verifyTwoFa(
     @Req() req,
@@ -135,7 +138,8 @@ export class AuthController {
   @Post('login/anonymous')
   @ApiOperation({ summary: 'Login as an anonymous user' })
   @ApiOkResponse({
-    description: 'Login as an anonymous user. Remove cookie.',
+    description:
+      'Login as an anonymous user. Set cookie and redirect to app main page',
   })
   async loginAnonymous(@Res({ passthrough: true }) res) {
     try {
