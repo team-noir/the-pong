@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { getChannels } from 'api/api.v1';
+import { getChannels } from 'api/rest.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import ChannelLobby from 'components/organisms/ChannelLobby';
 import HeaderGnb from 'components/molecule/HeaderGnb';

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { getGameHistories } from 'api/api.v1';
+import { getGameHistories } from 'api/rest.v1';
 import GameHistoryList from 'components/molecule/GameHistoryList';
+import QUERY_KEYS from 'constants/queryKeys';
 
 interface Props {
   userId: number;
@@ -8,7 +9,7 @@ interface Props {
 
 export default function GameHistory({ userId }: Props) {
   const { data: histories } = useQuery({
-    queryKey: ['gameHistory', String(userId)],
+    queryKey: [QUERY_KEYS.GAME_HISTORY, String(userId)],
     queryFn: () => getGameHistories(userId),
   });
 

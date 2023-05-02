@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { getUser } from 'api/api.v1';
+import { getUser } from 'api/rest.v1';
 import AppTemplate from 'components/templates/AppTemplate';
 import Profile from 'components/organisms/Profile';
 import HeaderGnb from 'components/molecule/HeaderGnb';

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { AxiosError } from 'axios';
-import { getAchievements } from 'api/api.v1';
+import { getAchievements } from 'api/rest.v1';
 import { AchievementType } from 'types';
 import QUERY_KEYS from 'constants/queryKeys';
 

@@ -124,43 +124,140 @@ export class GameModel implements OnModuleInit {
     this.invites.delete(invitedId);
   }
 
+  async setUserLadderScore(userId: number) {
+    const dbUser = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        level: true,
+        exp: true,
+      },
+    });
+
+    if (dbUser.exp >= dbUser.level) {
+      dbUser.level += 1;
+      dbUser.exp = 0;
+    } else {
+      dbUser.exp += 1;
+    }
+
+    await this.prismaService.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        level: dbUser.level,
+        exp: dbUser.exp,
+      },
+    });
+  }
+
+  async getGameAchievements(userId: number, gameResult) {
+    const userHistory = await this.getGameHistory(userId, 1, 20);
+    const userHistoryLadder = userHistory.filter((game) => game.isLadder);
+    const results = [];
+
+    if (userHistory.length == 1 && gameResult.winner.id == userId) {
+      results.push(1);
+    }
+    if (gameResult.loser.score == 0 && gameResult.winner.id == userId) {
+      results.push(2);
+    }
+    if (userHistory.length == 11) {
+      results.push(3);
+    }
+    if (gameResult.isLadder && userHistoryLadder.length == 1) {
+      results.push(4);
+    }
+    if (gameResult.winner.id == userId) {
+      results.push(5);
+    }
+
+    return results;
+  }
+
+  async getUserAchievements(userId: number) {
+    return await this.prismaService.achievement_User
+      .findMany({
+        where: {
+          userId,
+        },
+        select: {
+          achievement: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      })
+      .then((achievements) =>
+        achievements.map((achievement) => achievement.achievement.id)
+      );
+  }
+
+  async checkUserAchievements(userId: number, gameResult) {
+    const achievementIds: number[] = await this.getGameAchievements(
+      userId,
+      gameResult
+    );
+    const userAchievements = await this.getUserAchievements(userId);
+    const uesrSocket = this.appGateway.getUserSocket(userId);
+    const results = [];
+
+    for (const achievementId of achievementIds) {
+      if (!userAchievements.includes(achievementId)) {
+        const achievement_user =
+          await this.prismaService.achievement_User.upsert({
+            where: {
+              unique: {
+                userId,
+                achievementId,
+              },
+            },
+            update: {},
+            create: {
+              userId,
+              achievementId,
+            },
+          });
+
+        const achievement = await this.prismaService.achievement.findUnique({
+          where: {
+            id: achievementId,
+          },
+          select: {
+            title: true,
+            description: true,
+          },
+        });
+
+        if (uesrSocket) {
+          await uesrSocket.emit('achievement', {
+            id: achievement_user.id,
+            title: achievement.title,
+            description: achievement.description,
+            createdAt: achievement_user.createdAt,
+          });
+        }
+      }
+    }
+
+    return results;
+  }
+
   async setGameOver(game: Game, giveupId?: number) {
     const data = await this.createGameResult(game.gameId, giveupId);
+    const gameResult = { ...data, isLadder: game.isLadder };
 
     game.status = GAME_STATUS.FINISHED;
 
-    if (game.isLadder) {
-      const winner = data.winner;
-
-      const dbUser = await this.prismaService.user.findUnique({
-        where: {
-          id: winner.id,
-        },
-        select: {
-          level: true,
-          exp: true,
-        },
-      });
-
-      if (dbUser.exp >= dbUser.level) {
-        dbUser.level += 1;
-        dbUser.exp = 0;
-      } else {
-        dbUser.exp += 1;
-      }
-
-      await this.prismaService.user.update({
-        where: {
-          id: winner.id,
-        },
-        data: {
-          level: dbUser.level,
-          exp: dbUser.exp,
-        },
-      });
+    if (gameResult.isLadder) {
+      this.setUserLadderScore(gameResult.winner.id);
     }
-
-    await game.noticeToPlayers('gameOver', data);
+    await game.noticeToPlayers('gameOver', gameResult);
+    await this.checkUserAchievements(gameResult.winner.id, gameResult);
+    await this.checkUserAchievements(gameResult.loser.id, gameResult);
   }
 
   async createGameResult(gameId: number, giveupId?: number) {

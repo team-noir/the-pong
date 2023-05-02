@@ -1,9 +1,13 @@
 import { useContext, useEffect, useRef, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
+import * as api from 'api/socket.v1';
 import konva from 'konva';
 import useGameRTC from 'hooks/useGameRTC';
 import { SocketContext } from 'contexts/socket';
 import { GameResultType, GameType, PlayerType } from 'types';
+import QUERY_KEYS from 'constants/queryKeys';
+import SOCKET_EVENTS from 'constants/socketEvents';
+import { GAME_KEY_EVENT } from 'constants/index';
 
 type Return = [
   ball: typeof initialStateDefault.ball,
@@ -50,20 +54,18 @@ export default function useGamePlay(
   useEffect(() => {
     setIsPlaying(!!game?.isPlaying);
 
-    socket.on('ping', () => {
-      socket.emit('pong');
-    });
+    api.onPing();
 
-    socket.on('gameStart', () => {
+    api.onGameStart(() => {
       if (countInterval.current) return;
       countInterval.current = setInterval(() => {
         setCount((prevState) => prevState - 1);
       }, 1000);
     });
 
-    socket.on('gameViewer', (data: { viewerCount: number }) => {
+    api.onGameViewer((data: { viewerCount: number }) => {
       queryClient.setQueryData<GameType>(
-        ['game', String(game.id)],
+        [QUERY_KEYS.GAME, String(game.id)],
         (prevData) =>
           prevData && {
             ...prevData,
@@ -72,10 +74,10 @@ export default function useGamePlay(
       );
     });
 
-    socket.on('roundOver', (data: { winnerId: number; score: number }) => {
+    api.onRoundOver((data: { winnerId: number; score: number }) => {
       const { winnerId, score } = data;
       queryClient.setQueryData<GameType>(
-        ['game', String(game.id)],
+        [QUERY_KEYS.GAME, String(game.id)],
         (prevData) =>
           prevData &&
           ({
@@ -87,11 +89,11 @@ export default function useGamePlay(
       );
     });
 
-    socket.on('gameOver', (data: GameResultType) => {
+    api.onGameOver((data: GameResultType) => {
       setResult(data);
       setIsPlaying(false);
       queryClient.setQueryData<GameType>(
-        ['game', String(game.id)],
+        [QUERY_KEYS.GAME, String(game.id)],
         (prevData) =>
           prevData &&
           ({
@@ -108,11 +110,11 @@ export default function useGamePlay(
     document.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      socket.off('ping');
-      socket.off('gameStart');
-      socket.off('gameViewer');
-      socket.off('roundOver');
-      socket.off('gameOver');
+      socket.off(SOCKET_EVENTS.GAME.PING);
+      socket.off(SOCKET_EVENTS.GAME.START);
+      socket.off(SOCKET_EVENTS.GAME.VIEWER);
+      socket.off(SOCKET_EVENTS.GAME.ROUND_OVER);
+      socket.off(SOCKET_EVENTS.GAME.GAME_OVER);
       document.removeEventListener('keydown', handleKeyDown);
       document.removeEventListener('keyup', handleKeyUp);
       countInterval.current && clearInterval(countInterval.current);
@@ -144,9 +146,7 @@ export default function useGamePlay(
   const drawBall = () => {
     if (ball.y === ball.r || ball.y === ballLimit) {
       const player = ball.y === ball.r ? myPlayer : otherPlayer;
-      socket.emit('roundOver', {
-        winnerId: player?.id,
-      });
+      player?.id && api.emitRoundOver(player.id);
       // NOTE: 점수를 얻은 플레이어가 먼저 서브
       setBall({
         ...initialState.ball,
@@ -269,14 +269,14 @@ export default function useGamePlay(
       if (amIOwner) {
         isMyKeyDown.current.left = true;
       } else {
-        dataChannelRef.current?.send('DL');
+        dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_LEFT);
       }
     }
     if (e.key === 'ArrowRight') {
       if (amIOwner) {
         isMyKeyDown.current.right = true;
       } else {
-        dataChannelRef.current?.send('DR');
+        dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_RIGHT);
       }
     }
   };
@@ -286,14 +286,14 @@ export default function useGamePlay(
       if (amIOwner) {
         isMyKeyDown.current.left = false;
       } else {
-        dataChannelRef.current?.send('UL');
+        dataChannelRef.current?.send(GAME_KEY_EVENT.UP_LEFT);
       }
     }
     if (e.key === 'ArrowRight') {
       if (amIOwner) {
         isMyKeyDown.current.right = false;
       } else {
-        dataChannelRef.current?.send('UR');
+        dataChannelRef.current?.send(GAME_KEY_EVENT.UP_RIGHT);
       }
     }
   };
@@ -304,14 +304,14 @@ export default function useGamePlay(
       if (amIOwner) {
         isMyKeyDown.current.left = true;
       } else {
-        dataChannelRef.current?.send('DL');
+        dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_LEFT);
       }
     }
     if (value === 'right') {
       if (amIOwner) {
         isMyKeyDown.current.right = true;
       } else {
-        dataChannelRef.current?.send('DR');
+        dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_RIGHT);
       }
     }
   };
@@ -322,14 +322,14 @@ export default function useGamePlay(
       if (amIOwner) {
         isMyKeyDown.current.left = false;
       } else {
-        dataChannelRef.current?.send('UL');
+        dataChannelRef.current?.send(GAME_KEY_EVENT.UP_LEFT);
       }
     }
     if (value === 'right') {
       if (amIOwner) {
         isMyKeyDown.current.right = false;
       } else {
-        dataChannelRef.current?.send('UR');
+        dataChannelRef.current?.send(GAME_KEY_EVENT.UP_RIGHT);
       }
     }
   };

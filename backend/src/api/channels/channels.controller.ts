@@ -161,14 +161,14 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Join channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  joinChannel(
+  async joinChannel(
     @Req() req,
     @Body() body: ChannelPasswordDto,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.join(req.user.id, channelId, body.password);
+      await this.channelsService.join(req.user.id, channelId, body.password);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
@@ -180,14 +180,14 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Invite user to channel' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  inviteChannel(
+  async inviteChannel(
     @Req() req,
     @Param('channelId') channelId: number,
     @Body() body: ChannelInviteDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.invite(req.user.id, channelId, body.userIds);
+      await this.channelsService.invite(req.user.id, channelId, body.userIds);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {
@@ -217,7 +217,7 @@ export class ChannelsController {
   @ApiOperation({ summary: 'Change channel user role' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  changeRoleUser(
+  async changeRoleUser(
     @Req() req,
     @Param('channelId') channelId: number,
     @Param('userId') userId: number,
@@ -225,7 +225,7 @@ export class ChannelsController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.setUserInChannel(
+      await this.channelsService.setUserInChannel(
         req.user.id,
         channelId,
         userId,

@@ -11,21 +11,16 @@ type channelId = number;
 export class Channel {
   id: number;
   title?: string;
-  // channelCode: string;
   password?: string;
-  isPrivate: boolean; // isPublic
+  isPrivate: boolean;
   isDm: boolean;
   createdAt: Date;
-  // updatedAt: Date;
-  // deletedAt: Date;
 
-  owner?: userId; // none
+  owner?: userId;
   users: Set<userId>;
-  admin: Set<userId>; // none
-  banned: Set<userId>; // none
-  muted: Map<userId, Date>; // none
-
-  // messages: Message[]
+  admin: Set<userId>;
+  banned: Set<userId>;
+  muted: Map<userId, Date>;
 
   constructor(
     id: number,

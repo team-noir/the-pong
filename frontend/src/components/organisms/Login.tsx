@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { anonymousLogin, API_LOGIN_FT } from 'api/api.v1';
+import { anonymousLogin, API_LOGIN_FT } from 'api/rest.v1';
 import Button from 'components/atoms/Button';
 import Background from 'components/atoms/Background';
 import { BACKGROUND_IMAGES } from 'constants/index';
