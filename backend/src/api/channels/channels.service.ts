@@ -99,17 +99,25 @@ export class ChannelsService {
     const channel: Channel = this.channelModel.get(channelId);
     const user: ChannelUser = this.userModel.getUser(userId);
 
+    if (channel.isDm) {
+      return;
+    }
+
     channel.checkUserJoined(user);
+    await this.channelModel.leaveChannel(user, channel);
     if (channel.owner == user.id) {
+      await this.noticeToChannel(channel, NOTICE_STATUS.CHANNEL_REMOVE, [user]);
       channel.users.forEach(async (joinedUserId) => {
         const joined = this.userModel.getUser(joinedUserId);
         await this.channelModel.leaveChannel(joined, channel);
       });
+      this.channelModel.deleteChannel(channel);
+    } else if (channel.size() == 0) {
+      await this.noticeToChannel(channel, NOTICE_STATUS.CHANNEL_REMOVE, [user]);
+      this.channelModel.deleteChannel(channel);
     } else {
-      await this.channelModel.leaveChannel(user, channel);
+      await this.noticeToChannel(channel, NOTICE_STATUS.USER_LEAVE, [user]);
     }
-
-    await this.noticeToChannel(channel, NOTICE_STATUS.USER_LEAVE, [user]);
   }
 
   list(userId: number, query) {
