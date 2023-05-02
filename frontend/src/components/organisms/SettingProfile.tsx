@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { StatusCodes } from 'http-status-codes';
+import { AxiosError } from 'axios';
 import {
   API_PREFIX,
   checkProfile,
@@ -44,6 +46,11 @@ export default function SettingProfile() {
   const updateMyProfileMutation = useMutation(updateMyProfile);
   const updateMyProfileImageMutation = useMutation(updateMyProfileImage, {
     onSuccess,
+    onError: (error: AxiosError) => {
+      // TODO: 이미지 업로드 실패 처리
+      if (error.response?.status === StatusCodes.REQUEST_TOO_LONG)
+        alert('이미지 용량이 너무 큽니다.');
+    },
   });
   const deleteMyProfileImageMutation = useMutation(deleteMyProfileImage, {
     onSuccess,
