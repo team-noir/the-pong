@@ -10,6 +10,7 @@ interface Props {
   secondary?: boolean;
   fullLength?: boolean;
   linkStyle?: boolean;
+  textStyle?: boolean;
   size?: 'small' | 'medium' | 'large';
   className?: string;
   disabled?: boolean;
@@ -27,6 +28,7 @@ export default function Button({
   secondary = false,
   fullLength = false,
   linkStyle = false,
+  textStyle = false,
   size = 'medium',
   className,
   disabled = false,
@@ -41,6 +43,7 @@ export default function Button({
         secondary && 'secondary',
         fullLength && 'w-full',
         linkStyle && 'link',
+        textStyle && 'text',
         'button',
         size === 'small' && 'small',
         size === 'medium' && 'medium',

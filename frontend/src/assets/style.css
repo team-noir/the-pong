@@ -78,6 +78,11 @@
   .button.link span {
     @apply underline;
   }
+  .button.text {
+    @apply p-[initial];
+    @apply text-primary hover:text-primary-dark;
+    @apply text-base;
+  }
   .badge {
     @apply items-center mt-1 px-2 py-1 bg-gray-dark rounded-full text-xs text-text-light;
   }
