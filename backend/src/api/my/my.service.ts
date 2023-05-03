@@ -43,10 +43,12 @@ export class MyService {
     const newUser: User = await this.setUser(req.user.id, newData);
     const payload: JwtPayloadDto = this.authService.getJwtPayloadFromReq(req);
     try {
-      this.channelService.informToAllChannel(newUser.id);
+      await this.channelService.informToAllChannel(newUser.id);
     } catch (error) {
       console.log(error);
     }
+
+    this.channelService.updateChannelUser(newUser.id, newUser.nickname);
     return this.userToMyDto(newUser, payload.isVerifiedTwoFactor);
   }
 

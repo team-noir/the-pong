@@ -445,4 +445,8 @@ export class ChannelsService {
     }
   }
 
+  updateChannelUser(userId: number, nickname: string) {
+    this.userModel.setUserNickname(userId, nickname);
+  }
+
 }
