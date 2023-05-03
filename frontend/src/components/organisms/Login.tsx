@@ -22,7 +22,7 @@ export default function Login() {
       <div className="relative w-10/12">
         <div className="flex-col vh-center gap-3 mb-12 w-full">
           <h1 className="text-3xl">The Pong</h1>
-          <p>Table Tennis, Conversation and Revenges</p>
+          <p>게임와 대화 그리고 복수</p>
         </div>
         <div className="flex-col vh-center gap-2 w-full">
           {is42LoginClicked ? (
