@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { onAchievment } from 'api/socket.v1';
+import { onAchievement } from 'api/socket.v1';
 import { Stage, Layer, Image } from 'react-konva';
 import konva from 'konva';
 import {
@@ -89,14 +89,14 @@ export default function Game({ game }: Props) {
   };
 
   useEffect(() => {
-    onAchievment((data: AchievementType) => {
+    onAchievement((data: AchievementType) => {
       setAchievements((prev) => {
         if (prev) return [...prev, data];
         return [data];
       });
     });
     return () => {
-      socket.off(SOCKET_EVENTS.GAME.ACHIEVMENT);
+      socket.off(SOCKET_EVENTS.GAME.ACHIEVEMENT);
     };
   }, [socket]);
 
