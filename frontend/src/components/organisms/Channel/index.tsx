@@ -1,8 +1,10 @@
 import { useEffect, useState, useRef, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMessages, sendMessage } from 'api/rest.v1';
+import { onMessage, onNotice } from 'api/socket.v1';
 import { SocketContext } from 'contexts/socket';
+import Modal from 'components/templates/Modal';
 import ChannelDetail from 'components/organisms/Channel/ChannelDetail';
 import ChannelSetting from 'components/organisms/Channel/ChannelSetting';
 import ChannelInvite from 'components/organisms/Channel/ChannelInvite';
@@ -13,7 +15,6 @@ import { ChannelType, MessageType, NoticeType } from 'types';
 import ROUTES from 'constants/routes';
 import { NOTICE_STATUS } from 'constants/index';
 import QUERY_KEYS from 'constants/queryKeys';
-import { onMessage, onNotice } from 'api/socket.v1';
 import SOCKET_EVENTS from 'constants/socketEvents';
 
 interface Props {
@@ -42,8 +43,8 @@ export default function Channel({
   });
   const [isShowSetting, setIsShowSetting] = useState(false);
   const [isShowInvite, setIsShowInvite] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
   const socket = useContext(SocketContext);
-  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -105,16 +106,15 @@ export default function Channel({
       queryClient.setQueryData<MessageType[]>(messageQueryKey, (oldData) =>
         oldData ? [...oldData, newNotice] : oldData
       );
+
+      if (data.code === NOTICE_STATUS.CHANNEL_REMOVE) {
+        setModalMessage(
+          '채널장이 채널을 삭제했습니다. 더 이상 대화를 할 수 없습니다.'
+        );
+        return;
+      }
+
       queryClient.invalidateQueries([QUERY_KEYS.CHANNEL, String(channel.id)]);
-
-      data.code === NOTICE_STATUS.CHANNEL_REMOVE &&
-        setFormData((prevState) => ({
-          ...prevState,
-          placeholder:
-            '채널장이 채널을 삭제했습니다. 더 이상 대화를 할 수 없습니다.',
-          disabled: true,
-        }));
-
       const isIncludeMeInUsers = data.users.some(
         (user) => user.id === myUserId
       );
@@ -122,7 +122,7 @@ export default function Channel({
         data.code === NOTICE_STATUS.USER_MUTE &&
           setFormData((prevState) => ({
             ...prevState,
-            placeholder: '30초간 조용히 상태가 되었습니다.',
+            placeholder: '30초간 채팅이 금지되었습니다.',
             disabled: true,
           }));
         data.code === NOTICE_STATUS.USER_UNMUTE &&
@@ -131,18 +131,14 @@ export default function Channel({
             placeholder: '메시지를 입력하세요',
             disabled: false,
           }));
-        if (data.code === NOTICE_STATUS.USER_KICK) {
-          alert(
-            '채널에서 내보내졌습니다. 채널에 다시 참여할 수 있습니다. 채널 페이지로 이동합니다.'
+        data.code === NOTICE_STATUS.USER_KICK &&
+          setModalMessage(
+            '채널에서 내보내졌습니다. 채널에 다시 참여할 수 있습니다.'
           );
-          navigate(ROUTES.CHANNEL.INDEX);
-        }
-        if (data.code === NOTICE_STATUS.USER_BAN) {
-          alert(
-            '채널에서 차단되었습니다. 채널에 다시 참여할 수 없습니다. 채널 페이지로 이동합니다.'
+        data.code === NOTICE_STATUS.USER_BAN &&
+          setModalMessage(
+            '채널에서 차단되었습니다. 채널에 다시 참여할 수 없습니다.'
           );
-          navigate(ROUTES.CHANNEL.INDEX);
-        }
       }
     });
     return () => {
@@ -216,6 +212,23 @@ export default function Channel({
           channelUsers={channel.users}
           onClickClose={() => setIsShowInvite(false)}
         />
+      )}
+      {modalMessage && (
+        /* eslint-disable */
+        <Modal onClickClose={() => {}} isShowClose={false} fitContent>
+          <div className="flex flex-col vh-center">
+            <p>{modalMessage}</p>
+            <div className="mt-4">
+              <Link
+                to={ROUTES.CHANNEL.INDEX}
+                className="button primary"
+                replace={true}
+              >
+                채널 로비로 돌아가기
+              </Link>
+            </div>
+          </div>
+        </Modal>
       )}
     </>
   );

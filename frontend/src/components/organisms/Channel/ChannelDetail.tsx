@@ -38,7 +38,7 @@ export default function ChannelDetail({
   const leaveChannelMutation = useMutation({
     mutationFn: leaveChannel,
     onSuccess: () => {
-      navigate(ROUTES.CHANNEL.INDEX);
+      navigate(ROUTES.CHANNEL.INDEX, { replace: true });
     },
   });
 
