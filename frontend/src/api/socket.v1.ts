@@ -62,8 +62,8 @@ export const onGameOver = (callback: (data: GameResultType) => void) => {
   socket.on(SOCKET_EVENTS.GAME.GAME_OVER, callback);
 };
 
-export const onAchievment = (callback: (data: AchievementType) => void) => {
-  socket.on(SOCKET_EVENTS.GAME.ACHIEVMENT, callback);
+export const onAchievement = (callback: (data: AchievementType) => void) => {
+  socket.on(SOCKET_EVENTS.GAME.ACHIEVEMENT, callback);
 };
 
 export const emitPong = () => {

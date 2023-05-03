@@ -11,7 +11,7 @@ const SOCKET_EVENTS = {
     VIEWER: 'gameViewer',
     ROUND_OVER: 'roundOver',
     GAME_OVER: 'gameOver',
-    ACHIEVMENT: 'achievment',
+    ACHIEVEMENT: 'achievement',
     RTC: {
       INIT: 'rtcInit',
       GET_CANDIDATE: 'rtcGetCandidate',
