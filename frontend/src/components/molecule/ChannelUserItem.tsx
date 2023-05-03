@@ -132,7 +132,7 @@ export default function ChannelUserItem({
                   className="text-red"
                 >
                   차단하기
-                </Button>{' '}
+                </Button>
               </>
             )}
           </div>

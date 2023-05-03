@@ -21,7 +21,8 @@ export default function GameResultModal({
           <div className="relative inline-flex items-center gap-2 my-12">
             <GameResultModalPlayer player={result.winner} isWinner />
             <span className="pt-8 text-4xl text-gray-lighter font-light italic">
-              <span className="text-green">{result.winner.score}</span> :{' '}
+              <span className="text-green">{result.winner.score}</span>
+              <span> : </span>
               <span className="relative">{result.loser.score}</span>
             </span>
             <GameResultModalPlayer player={result.loser} />

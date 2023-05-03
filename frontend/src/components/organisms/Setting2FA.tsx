@@ -27,10 +27,10 @@ export default function Setting2FA() {
     <>
       <h2 className="section-title">Two-Factor Authentication (2FA)</h2>
       <p className="mt-4 mb-8">
-        2단계 보안 인증을 설정하고 계정을 더욱 강력하게 보호하세요.{' '}
+        2단계 보안 인증을 설정하고 계정을 더욱 강력하게 보호하세요.
         <span
           onClick={() => setIsShowInfo(true)}
-          className="underline cursor-pointer"
+          className="underline cursor-pointer ml-1"
         >
           더 알아보기
         </span>

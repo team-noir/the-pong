@@ -19,7 +19,8 @@ export default function GameScoretable({
     <div className="relative inline-flex items-center gap-2">
       <GameHistoryItemPlayer player={player1} />
       <span className="text-4xl text-gray-lighter font-light italic">
-        <span className="text-green">{liveScore1 || player1.score}</span> :{' '}
+        <span className="text-green">{liveScore1 || player1.score}</span>
+        <span> : </span>
         <span className={classNames('relative')}>
           {liveScore2 || player2.score}
         </span>
