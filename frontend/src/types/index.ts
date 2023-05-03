@@ -77,6 +77,7 @@ export interface ChannelFormType {
 
 export interface MessageType {
   id: number;
+  channelId: number;
   senderId?: number;
   senderNickname?: string;
   isLog: boolean;
