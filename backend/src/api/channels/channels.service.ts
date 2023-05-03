@@ -371,8 +371,9 @@ export class ChannelsService {
         await this.noticeToChannel(channel, NOTICE_STATUS.USER_MUTE, [
           settedUser,
         ]);
-        await this.channelModel.mute(user, channel, settedUser, 30);
+        this.channelModel.mute(user, channel, settedUser, 30);
         setTimeout(async () => {
+          this.channelModel.unmute(channel, settedUser);
           await this.noticeToChannel(channel, NOTICE_STATUS.USER_UNMUTE, [
             settedUser,
           ]);

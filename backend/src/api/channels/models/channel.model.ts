@@ -405,7 +405,7 @@ export class ChannelModel {
     bannedUser.leave(channel);
   }
 
-  async mute(
+  mute(
     user: ChannelUser,
     channel: Channel,
     mutedUser: ChannelUser,
@@ -418,7 +418,7 @@ export class ChannelModel {
     channel.muted.set(mutedUser.id, expiresAt);
   }
 
-  async unmute(channel: Channel, mutedUser: ChannelUser) {
+  unmute(channel: Channel, mutedUser: ChannelUser) {
     channel.muted.delete(mutedUser.id);
   }
 }
