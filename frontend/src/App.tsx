@@ -11,7 +11,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { healthCheck, whoami } from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
 import { socket, SocketContext } from 'contexts/socket';
-import LoadingFallback from 'components/organisms/LoadingFalback';
+import LoadingFallback from 'components/organisms/LoadingFallback';
 import ErrorFallbackWithHeader from 'components/organisms/ErrorFallbackWithHeader';
 import { routes } from 'routes';
 import { UI_TEXT } from 'constants/index';

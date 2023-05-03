@@ -2,7 +2,7 @@ import React, { Suspense } from 'react';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary';
 import ErrorFallback from 'components/organisms/ErrorFallback';
-import LoadingFallback from 'components/organisms/LoadingFalback';
+import LoadingFallback from 'components/organisms/LoadingFallback';
 
 interface Props {
   children: React.ReactNode;
