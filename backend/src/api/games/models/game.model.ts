@@ -154,23 +154,25 @@ export class GameModel implements OnModuleInit {
   }
 
   async getGameAchievements(userId: number, gameResult) {
+    const player = this.players.get(userId);
     const userHistory = await this.getGameHistory(userId, 1, 20);
+    const userHistoryNormal = userHistory.filter((game) => !game.isLadder);
     const userHistoryLadder = userHistory.filter((game) => game.isLadder);
     const results = [];
 
-    if (userHistory.length == 1 && gameResult.winner.id == userId) {
+    if (gameResult.winner.id == userId) {
       results.push(1);
     }
     if (gameResult.loser.score == 0 && gameResult.winner.id == userId) {
       results.push(2);
     }
-    if (userHistory.length == 11) {
+    if (userHistoryNormal.length == 11) {
       results.push(3);
     }
     if (gameResult.isLadder && userHistoryLadder.length == 1) {
       results.push(4);
     }
-    if (gameResult.winner.id == userId) {
+    if (player.level == 42) {
       results.push(5);
     }
 
@@ -196,9 +198,10 @@ export class GameModel implements OnModuleInit {
       );
   }
 
-  async checkUserAchievements(userId: number, gameResult) {
+  async checkUserAchievements(player: Player, gameResult) {
+    const userId = player.userId;
     const achievementIds: number[] = await this.getGameAchievements(
-      userId,
+      player,
       gameResult
     );
     const userAchievements = await this.getUserAchievements(userId);
@@ -232,14 +235,12 @@ export class GameModel implements OnModuleInit {
           },
         });
 
-        if (uesrSocket) {
-          await uesrSocket.emit('achievement', {
-            id: achievement_user.id,
-            title: achievement.title,
-            description: achievement.description,
-            createdAt: achievement_user.createdAt,
-          });
-        }
+        await player.socket.emit('achievement', {
+          id: achievement_user.id,
+          title: achievement.title,
+          description: achievement.description,
+          createdAt: achievement_user.createdAt,
+        });
       }
     }
 
@@ -253,11 +254,11 @@ export class GameModel implements OnModuleInit {
     game.status = GAME_STATUS.FINISHED;
 
     if (gameResult.isLadder) {
-      this.setUserLadderScore(gameResult.winner.id);
+      await this.setUserLadderScore(gameResult.winner.id);
     }
+    await this.checkUserAchievements(game.getPlayer(gameResult.winner.id), gameResult);
+    await this.checkUserAchievements(game.getPlayer(gameResult.loser.id), gameResult);
     await game.noticeToPlayers('gameOver', gameResult);
-    await this.checkUserAchievements(gameResult.winner.id, gameResult);
-    await this.checkUserAchievements(gameResult.loser.id, gameResult);
   }
 
   async createGameResult(gameId: number, giveupId?: number) {
@@ -517,7 +518,7 @@ export class GameModel implements OnModuleInit {
           });
           return;
         } else {
-          this.setGameOver(player.game, playerId);
+          await this.setGameOver(player.game, playerId);
         }
       }
       this.removeGame(player.game);
@@ -593,7 +594,7 @@ export class GameModel implements OnModuleInit {
     const score = game.score.get(winnerId) + 1;
     game.score.set(winnerId, score);
     if (score >= 11) {
-      this.setGameOver(game, null);
+      await this.setGameOver(game, null);
     } else {
       await game.noticeToPlayers('roundOver', {
         winnerId: winnerId,
