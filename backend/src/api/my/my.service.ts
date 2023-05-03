@@ -1,4 +1,4 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable, Req, Res } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 import { ChannelsService } from '../channels/channels.service';
 import { SettingDto } from './dtos/setting.dto';
@@ -36,18 +36,17 @@ export class MyService {
     const user = await this.prismaService.user.findUnique({
       where: { id: payload.id },
     });
+    if (!user) return null;
     return this.userToMyDto(user, payload.isVerifiedTwoFactor);
   }
 
-  async setMyProfile(@Req() req, newData: SettingDto): Promise<MyDto> {
+  async setMyProfile(@Req() req, newData: SettingDto, @Res() res): Promise<MyDto> {
     const newUser: User = await this.setUser(req.user.id, newData);
     const payload: JwtPayloadDto = this.authService.getJwtPayloadFromReq(req);
-    try {
-      await this.channelService.informToAllChannel(newUser.id);
-    } catch (error) {
-      console.log(error);
-    }
 
+    payload.nickname = newUser.nickname;
+    await this.authService.setJwt(res, this.authService.signJwt(payload));
+    await this.channelService.informToAllChannel(newUser.id);
     this.channelService.updateChannelUser(newUser.id, newUser.nickname);
     return this.userToMyDto(newUser, payload.isVerifiedTwoFactor);
   }

@@ -63,7 +63,7 @@ export class MyController {
   @UseGuards(AuthenticatedGuard)
   async setMyProfile(@Req() req, @Body() body: SettingDto, @Res({ passthrough: true }) res) {
     try {
-      const user: MyDto = await this.myService.setMyProfile(req, body);
+      const user: MyDto = await this.myService.setMyProfile(req, body, res);
       res.status(HttpStatus.OK);
       return user;
     } catch (error) {
