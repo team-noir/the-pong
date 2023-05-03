@@ -18,7 +18,7 @@ export default function ErrorPage() {
       <Header />
       <div className="container mx-auto max-w-xl min-h-screen py-24 px-4">
         <div className="vh-center flex-col text-center mb-4">
-          <h2>에러가 발생했습니다.</h2>
+          <h2 className="mb-4">에러가 발생했습니다.</h2>
           <Link to="/" className="button primary w-full" replace={true}>
             메인으로 가기
           </Link>
