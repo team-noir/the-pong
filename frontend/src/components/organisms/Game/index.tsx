@@ -120,6 +120,7 @@ export default function Game({ game }: Props) {
           liveScore1={otherPlayer ? otherPlayer.score : game.players[0].score}
           liveScore2={myPlayer ? myPlayer.score : game.players[1].score}
           myUserId={myUserId}
+          amIViewer={amIViewer}
           layout="horizontal"
         />
       </div>

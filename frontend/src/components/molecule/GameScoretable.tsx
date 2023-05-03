@@ -8,6 +8,7 @@ interface Props {
   liveScore1?: number;
   liveScore2?: number;
   myUserId?: number | null;
+  amIViewer?: boolean;
   layout?: 'vertical' | 'horizontal';
 }
 
@@ -17,17 +18,30 @@ export default function GameScoretable({
   liveScore1,
   liveScore2,
   myUserId,
+  amIViewer = false,
   layout = 'vertical',
 }: Props) {
   return (
     <div className="relative inline-flex items-center gap-2">
       <GameHistoryItemPlayer player={player1} layout={layout} />
       <span className="text-4xl text-gray-lighter font-light italic">
-        <span className={myUserId === player1.id ? 'text-green' : ''}>
+        <span
+          className={classNames(
+            'mr-1',
+            myUserId === player1.id && 'text-green',
+            amIViewer && !player1.isOwner && 'text-red'
+          )}
+        >
           {liveScore1 || player1.score}
         </span>
-        <span> : </span>
-        <span className={myUserId === player2.id ? 'text-green' : ''}>
+        <span>:</span>
+        <span
+          className={classNames(
+            'ml-1',
+            myUserId === player2.id ? 'text-green' : '',
+            amIViewer && !player2.isOwner && 'text-red'
+          )}
+        >
           {liveScore2 || player2.score}
         </span>
       </span>
