@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { StatusCodes } from 'http-status-codes';
+import { AxiosError } from 'axios';
 import {
   API_PREFIX,
   checkProfile,
@@ -14,6 +16,7 @@ import FileInputWithImage from 'components/molecule/FileInputWithImage';
 import Button from 'components/atoms/Button';
 import { validateNickname } from 'utils/validatorUtils';
 import { ProfileFormType } from 'types';
+import { UI_TEXT } from 'constants/index';
 import ROUTES from 'constants/routes';
 
 export default function SettingProfile() {
@@ -44,6 +47,13 @@ export default function SettingProfile() {
   const updateMyProfileMutation = useMutation(updateMyProfile);
   const updateMyProfileImageMutation = useMutation(updateMyProfileImage, {
     onSuccess,
+    onError: (error: AxiosError) => {
+      if (error.response?.status === StatusCodes.REQUEST_TOO_LONG) {
+        alert('1MB 이하의 이미지를 선택해 주세요.');
+        return;
+      }
+      alert(UI_TEXT.ERROR.DEFAULT);
+    },
   });
   const deleteMyProfileImageMutation = useMutation(deleteMyProfileImage, {
     onSuccess,

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { StatusCodes } from 'http-status-codes';
+import { AxiosError } from 'axios';
 import {
   checkProfile,
   updateMyProfile,
@@ -13,6 +15,7 @@ import StepNickname from 'components/organisms/OnBoarding/StepNickname';
 import StepProfileImage from 'components/organisms/OnBoarding/StepProfileImage';
 import { validateAgreements, validateNickname } from 'utils/validatorUtils';
 import { ProfileFormType } from 'types';
+import { UI_TEXT } from 'constants/index';
 import ROUTES from 'constants/routes';
 
 export interface FormData extends ProfileFormType {
@@ -38,7 +41,15 @@ export default function OnBoarding() {
   const navigate = useNavigate();
 
   const updateMyProfileMutation = useMutation(updateMyProfile);
-  const updateMyProfileImageMutation = useMutation(updateMyProfileImage);
+  const updateMyProfileImageMutation = useMutation(updateMyProfileImage, {
+    onError: (error: AxiosError) => {
+      if (error.response?.status === StatusCodes.REQUEST_TOO_LONG) {
+        alert('1MB 이하의 이미지를 선택해 주세요.');
+        return;
+      }
+      alert(UI_TEXT.ERROR.DEFAULT);
+    },
+  });
   const checkProfileMutation = useMutation({
     mutationFn: checkProfile,
     onSuccess: (data) => {

@@ -14,6 +14,9 @@ import {
   HttpException,
   UploadedFile,
   UseInterceptors,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import {
@@ -122,9 +125,20 @@ export class MyController {
       }),
     })
   )
-  async uploadProfileImage(@Req() req, @Res() res, @UploadedFile() file) {
+  async uploadProfileImage(
+    @Req() req,
+    @Res() res,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new FileTypeValidator({ fileType: /^image\// }),
+          new MaxFileSizeValidator({ maxSize: 1000 }),
+        ],
+      })
+    )
+    file
+  ) {
     try {
-      // TODO: file validation(format, size, etc...)
       const statusCode = file ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
       await this.myService.uploadProfileImage(req.user.id, file);
       res.status(statusCode).send();
