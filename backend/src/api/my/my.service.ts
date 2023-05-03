@@ -1,17 +1,20 @@
 import { Injectable, Req } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
+import { ChannelsService } from '../channels/channels.service';
 import { SettingDto } from './dtos/setting.dto';
 import { MyDto } from './dtos/my.dto';
 import { Prisma, User } from '@prisma';
 import { AuthService } from '../auth/auth.service';
 import { readdir, unlink, rmdir } from 'node:fs/promises';
 import { PROFILE_PATH } from '@const';
+import { JwtPayloadDto } from '../auth/dtos/jwtPayload.dto';
 
 @Injectable()
 export class MyService {
   constructor(
     private prismaService: PrismaService,
-    private authService: AuthService
+    private authService: AuthService,
+    private channelService: ChannelsService,
   ) {}
 
   userToMyDto(user: User, isVerifiedTwoFactor: boolean): MyDto {
@@ -38,7 +41,8 @@ export class MyService {
 
   async setMyProfile(@Req() req, newData: SettingDto): Promise<MyDto> {
     const newUser: User = await this.setUser(req.user.id, newData);
-    const payload = await this.authService.getJwtPayloadFromReq(req);
+    const payload: JwtPayloadDto = this.authService.getJwtPayloadFromReq(req);
+    this.channelService.informToAllChannel(newUser.id);
     return this.userToMyDto(newUser, payload.isVerifiedTwoFactor);
   }
 

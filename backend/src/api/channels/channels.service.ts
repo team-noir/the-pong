@@ -434,4 +434,18 @@ export class ChannelsService {
       await this.messageModel.sendNotice(channel.id, code, newMessage, users);
     }
   }
+
+  // 유저 정보가 변경되었음을 유저가 속한 모든 채널에 알린다.
+  async informToAllChannel(userId: number) {
+    const user = this.userModel.getUser(userId);
+    const channels = user.joined.keys();
+
+    for (const channelId of channels) {
+      await this.server.to(String(channelId)).emit('user', {
+        id: user.id,
+        nickname: user.name,
+      });
+    }
+  }
+
 }

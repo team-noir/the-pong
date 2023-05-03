@@ -58,10 +58,11 @@ export class MyController {
   @ApiOkResponse({ description: 'Successfully set my profile', type: MyDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async setMyProfile(@Req() req, @Body() body: SettingDto, @Res() res) {
+  async setMyProfile(@Req() req, @Body() body: SettingDto, @Res({ passthrough: true }) res) {
     try {
       const user: MyDto = await this.myService.setMyProfile(req, body);
-      res.status(HttpStatus.OK).send(user);
+      res.status(HttpStatus.OK);
+      return user;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

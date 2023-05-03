@@ -23,7 +23,6 @@ import {
   ApiNotAcceptableResponse,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { MyService } from '../my/my.service';
 import { MyDto } from '../my/dtos/my.dto';
 import { AuthService } from './auth.service';
 import { twoFaDto } from './dtos/auth.dto';
@@ -31,7 +30,7 @@ import { twoFaDto } from './dtos/auth.dto';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
-  constructor(private myService: MyService, private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
   @Get('42')
   @ApiOkResponse({
@@ -84,7 +83,7 @@ export class AuthController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      const user: MyDto | null = await this.myService.whoami(req);
+      const user: MyDto | null = await this.authService.authWhoami(req);
       if (!user) {
         throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
       }
