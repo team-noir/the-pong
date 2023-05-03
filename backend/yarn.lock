@@ -1445,6 +1445,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/bcrypt@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@types/bcrypt@npm:5.0.0"
+  dependencies:
+    "@types/node": "*"
+  checksum: 063c32c7a519d64768dfc0169a319b8244d6a6cb50a355c93992b3c5fee1dbc236526a1111f0e7bb25abc8b0473e5f40a5edfeb8b33cad2a6ea35aa2d7d7db14
+  languageName: node
+  linkType: hard
+
 "@types/body-parser@npm:*":
   version: 1.19.2
   resolution: "@types/body-parser@npm:1.19.2"
@@ -2727,6 +2736,13 @@ __metadata:
     "@mapbox/node-pre-gyp": ^1.0.10
     node-addon-api: ^5.0.0
   checksum: a590b65d276d75d861dc85acc3128508b8f78c87431719658ea3be7996368b34b397b6efefe6bca0a3d555bf41a9267307fd4ce04e956598fca3ba81199c6706
+  languageName: node
+  linkType: hard
+
+"bcryptjs@npm:^2.4.3":
+  version: 2.4.3
+  resolution: "bcryptjs@npm:2.4.3"
+  checksum: 0e80ed852a41f5dfb1853f53ee14a7390b0ef263ce05dba6e2ef3cd919dfad025a7c21ebcfe5bc7fa04b100990edf90c7a877ff7fe623d3e479753253131b629
   languageName: node
   linkType: hard
 
@@ -7701,6 +7717,7 @@ __metadata:
     "@nestjs/testing": ^9.0.0
     "@nestjs/websockets": ^9.3.12
     "@prisma/client": 4.11.0
+    "@types/bcrypt": ^5.0.0
     "@types/express": ^4.17.13
     "@types/jest": 29.2.4
     "@types/node": ^18.14.6
@@ -7710,6 +7727,7 @@ __metadata:
     "@typescript-eslint/parser": ^5.0.0
     "@yarnpkg/pnpify": ^4.0.0-rc.40
     bcrypt: ^5.1.0
+    bcryptjs: ^2.4.3
     class-transformer: ^0.5.1
     class-validator: ^0.14.0
     connect-ensure-login: ^0.1.1
