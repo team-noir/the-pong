@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsNumber,
   IsArray,
+  Matches
 } from 'class-validator';
 import { ChannelUser } from '../models/user.model';
 
@@ -13,6 +14,7 @@ export class CreateChannelDto {
     example: 'title',
   })
   @IsString()
+  @Matches(/^.{2,25}$/)
   public title: string;
 
   @ApiProperty({
@@ -27,6 +29,7 @@ export class CreateChannelDto {
   })
   @IsString()
   @IsOptional()
+  @Matches(/^(?=.*[a-zA-Z0-9])[a-zA-Z0-9]{4,10}$/)
   public password?: string;
 }
 
