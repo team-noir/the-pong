@@ -17,7 +17,6 @@ export default function ChannelPage() {
   const { data: channel } = useQuery({
     queryKey: [QUERY_KEYS.CHANNEL, channelId],
     queryFn: () => getChannel(Number(channelId)),
-    refetchInterval: 1000 * 60, // 1분
   });
 
   return (
