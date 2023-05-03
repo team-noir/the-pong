@@ -156,3 +156,7 @@ export const onMessage = (callback: (data: MessageType) => void) => {
 export const onNotice = (callback: (data: NoticeType) => void) => {
   socket.on(SOCKET_EVENTS.CHANNEL.NOTICE, callback);
 };
+
+export const onUser = (callback: () => void) => {
+  socket.on(SOCKET_EVENTS.CHANNEL.USER, callback);
+};

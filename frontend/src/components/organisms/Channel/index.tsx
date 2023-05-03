@@ -2,7 +2,7 @@ import { useEffect, useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getMessages, sendMessage } from 'api/rest.v1';
-import { onMessage, onNotice } from 'api/socket.v1';
+import { onMessage, onNotice, onUser } from 'api/socket.v1';
 import { SocketContext } from 'contexts/socket';
 import Modal from 'components/templates/Modal';
 import ChannelDetail from 'components/organisms/Channel/ChannelDetail';
@@ -142,9 +142,15 @@ export default function Channel({
           );
       }
     });
+
+    onUser(() => {
+      queryClient.invalidateQueries([QUERY_KEYS.CHANNEL, String(channel.id)]);
+    });
+
     return () => {
       socket.off(SOCKET_EVENTS.CHANNEL.MESSAGE);
       socket.off(SOCKET_EVENTS.CHANNEL.NOTICE);
+      socket.off(SOCKET_EVENTS.CHANNEL.USER);
     };
   }, [socket]);
 
