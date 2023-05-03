@@ -42,7 +42,11 @@ export class MyService {
   async setMyProfile(@Req() req, newData: SettingDto): Promise<MyDto> {
     const newUser: User = await this.setUser(req.user.id, newData);
     const payload: JwtPayloadDto = this.authService.getJwtPayloadFromReq(req);
-    this.channelService.informToAllChannel(newUser.id);
+    try {
+      this.channelService.informToAllChannel(newUser.id);
+    } catch (error) {
+      console.log(error);
+    }
     return this.userToMyDto(newUser, payload.isVerifiedTwoFactor);
   }
 
