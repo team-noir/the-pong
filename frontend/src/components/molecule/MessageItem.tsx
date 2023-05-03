@@ -1,6 +1,6 @@
 import ProfileImage from 'components/atoms/ProfileImage';
 import { MessageType } from 'types';
-import { formatDate, formatTime } from 'utils';
+import { formatDate, formatTime, classNames } from 'utils';
 
 interface Props {
   message: MessageType;
@@ -22,47 +22,55 @@ export default function MessageItem({
           {`${formatDate(message.createdAt)}`}
         </span>
       )}
-      <div
-        className={`flex mb-4 items-end ${`
-        ${isMyMessage ? 'self-end flex-row-reverse' : 'self-start flex-row'}
-        ${isShowProfile ? 'flex-col' : 'flex-row'}
-        ${message.isLog && 'self-center'}
-      `}`}
-      >
-        {!message.isLog && isShowProfile && message.senderId && (
-          <div className="flex">
-            <ProfileImage
-              userId={message.senderId}
-              nickname={`${message.senderNickname}`}
-              size={52}
-            />
-            <span>{message.senderNickname}</span>
-          </div>
-        )}
-        <li
-          className={`flex
-        ${isMyMessage ? 'flex-row-reverse' : 'flex-row'}`}
-        >
-          <p
-            className={`p-2 rounded ${
-              isMyMessage
-                ? 'bg-green text-text-light'
-                : 'bg-gray text-text-dark'
-            }`}
-          >
+      {message.isLog ? (
+        <div className="flex mb-4 vh-center">
+          <span className="p-2 rounded bg-gray-dark text-text-light text-xs leading-3">
             {message.text}
-          </p>
-          {!message.isLog && (
-            <span
-              className={`mx-2 text-xs leading-3 self-end ${
-                isMyMessage && 'text-right'
-              }`}
-            >
-              {`${formatTime(message.createdAt)}`}
-            </span>
+          </span>
+        </div>
+      ) : (
+        <div className={classNames('flex flex-col mb-2 gap-2')}>
+          {isShowProfile && message.senderId && (
+            <div className="flex flex-row items-end gap-2">
+              <ProfileImage
+                userId={message.senderId}
+                nickname={message.senderNickname || ''}
+                size={40}
+              />
+              <span className="leading-none mb-1">
+                {message.senderNickname}
+              </span>
+            </div>
           )}
-        </li>
-      </div>
+          <div className="flex flex-col gap-2">
+            <li
+              className={classNames(
+                'flex',
+                isMyMessage ? 'flex-row-reverse' : 'flex-row'
+              )}
+            >
+              <p
+                className={classNames(
+                  'p-2 rounded',
+                  isMyMessage
+                    ? 'bg-green text-text-light'
+                    : 'bg-gray text-text-dark'
+                )}
+              >
+                {message.text}
+              </p>
+              <span
+                className={classNames(
+                  'mx-2 text-xs leading-3 self-end',
+                  isMyMessage && 'text-right'
+                )}
+              >
+                {formatTime(message.createdAt)}
+              </span>
+            </li>
+          </div>
+        </div>
+      )}
     </>
   );
 }

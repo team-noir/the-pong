@@ -10,7 +10,7 @@ export default function ErrorFallbackWithHeader({
   return (
     <>
       <header className="relative">
-        <div className="container mx-auto max-w-xl fixed top-0 left-0 right-0">
+        <div className="header">
           <div className="h-14 vh-center px-2">
             <h1 className="text-xl font-normal text-stone-100">
               <a href={ROUTES.MAIN}>{SERVICE_NAME}</a>

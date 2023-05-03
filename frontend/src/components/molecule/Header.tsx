@@ -25,7 +25,7 @@ export default function Header({
   };
 
   return (
-    <div className="container mx-auto max-w-xl fixed top-0 left-0 right-0 backdrop-blur-md">
+    <div className="header">
       <div className="mx-auto max-w-xl px-2">
         <div className="relative flex h-14 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center">
