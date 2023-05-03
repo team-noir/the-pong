@@ -1,4 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
+import * as bcrypt from 'bcryptjs';
 
 import { ChannelUser } from './user.model';
 import { PrismaService } from '@/prisma/prisma.service';
@@ -108,11 +109,14 @@ export class Channel {
   }
 
   checkPassword(password?: string) {
-    if (this.password && password && password != this.password) {
-      throw {
-        code: HttpStatus.FORBIDDEN,
-        message: 'You entered an incorrect password.',
-      };
+    if (this.password && password) {
+      const isValid = bcrypt.compareSync(password, this.password);
+      if (!isValid) {
+        throw {
+          code: HttpStatus.FORBIDDEN,
+          message: 'You entered an incorrect password.',
+        };
+      }
     }
   }
 
@@ -282,6 +286,9 @@ export class ChannelModel {
   // Setter
 
   async createChannel(data, owner?: ChannelUser) {
+    if (data.password) {
+      data.password = bcrypt.hashSync(data.password, process.env.SALT_ROUNDS);
+    }
     const created = await this.prismaService.channel.create({
       data: {
         title: data.title,
