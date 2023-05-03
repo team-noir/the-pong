@@ -22,7 +22,7 @@ export default function ChannelLobby({ channels }: Props) {
         <ChannelButtons />
       </section>
       <section className="section">
-        <h2 className="section-title">입장 중인 채널 목록</h2>
+        <h2 className="section-title">참여 중인 채널 목록</h2>
         {channels.length ? (
           <ChannelList channels={channels} onClick={handleClickChannel} />
         ) : (
