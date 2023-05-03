@@ -27,8 +27,13 @@ export default function Setting2FA() {
     <>
       <h2 className="section-title">Two-Factor Authentication (2FA)</h2>
       <p className="mt-4 mb-8">
-        2단계 보안 인증을 설정하고 계정을 더욱 강력하게 보호하세요.{' '}
-        <Button onClick={() => setIsShowInfo(true)} linkStyle>
+        2단계 보안 인증을 설정하고 계정을 더욱 강력하게 보호하세요.
+        <Button
+          onClick={() => setIsShowInfo(true)}
+          linkStyle
+          textStyle
+          className="ml-1"
+        >
           더 알아보기
         </Button>
       </p>

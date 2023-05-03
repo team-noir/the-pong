@@ -26,7 +26,10 @@ export default function AppTemplate({ header, children }: Props) {
             )}
           >
             <Suspense fallback={<LoadingFallback />}>
-              <main className="container mx-auto max-w-xl min-h-screen py-24 px-4">
+              <main
+                className="container mx-auto max-w-xl
+               px-4 pt-24"
+              >
                 {children}
               </main>
             </Suspense>

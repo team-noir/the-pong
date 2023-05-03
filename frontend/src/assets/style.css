@@ -16,11 +16,16 @@
 @tailwind components;
 
 @layer components {
+  .header {
+    @apply container mx-auto max-w-xl;
+    @apply fixed top-0 left-0 right-0;
+    @apply backdrop-blur-md bg-gray-darker/50 z-50;
+  }
   .vh-center {
     @apply flex items-center justify-center;
   }
   .modal-wrapper {
-    @apply relative z-10 text-text-light;
+    @apply relative z-[100] text-text-light;
   }
   .modal-backdrop {
     @apply fixed inset-0 bg-black bg-opacity-50;
@@ -72,6 +77,11 @@
   }
   .button.link span {
     @apply underline;
+  }
+  .button.text {
+    @apply p-[initial];
+    @apply text-primary hover:text-primary-dark;
+    @apply text-base;
   }
   .badge {
     @apply items-center mt-1 px-2 py-1 bg-gray-dark rounded-full text-xs text-text-light;

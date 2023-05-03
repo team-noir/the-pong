@@ -119,6 +119,9 @@ export default function Game({ game }: Props) {
           player2={myPlayer || game.players[1]}
           liveScore1={otherPlayer ? otherPlayer.score : game.players[0].score}
           liveScore2={myPlayer ? myPlayer.score : game.players[1].score}
+          myUserId={myUserId}
+          amIViewer={amIViewer}
+          layout="horizontal"
         />
       </div>
 

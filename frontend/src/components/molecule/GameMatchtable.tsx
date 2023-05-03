@@ -56,9 +56,9 @@ function GameItemPlayer({
       )}
     >
       <div
-        className={`flex-1 duotone-image rounded-full max-w-${
+        className={`flex-1 rounded-full max-w-${imageSize / 4} max-h-${
           imageSize / 4
-        } max-h-${imageSize / 4}`}
+        }`}
       >
         <ProfileImage
           userId={player.id}
