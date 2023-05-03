@@ -68,13 +68,14 @@ export default function Channel({
   useEffect(() => {
     if (!channel.users) return;
     const myUser = channel.users.find((user) => user.id === myUserId);
-    if (myUser?.isMuted) {
+    myUser &&
       setFormData((prevState) => ({
         ...prevState,
-        placeholder: '30초간 채팅이 금지되었습니다.',
-        disabled: true,
+        placeholder: myUser.isMuted
+          ? '30초간 채팅이 금지되었습니다.'
+          : '메시지를 입력하세요',
+        disabled: myUser.isMuted,
       }));
-    }
   }, [channel.users]);
 
   useEffect(() => {
