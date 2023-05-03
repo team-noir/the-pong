@@ -103,24 +103,32 @@ export class MyController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: async (req, _, cb) => {
-          const dir = `${PROFILE_PATH}/${req.user.id}`;
-          if (!existsSync(dir)) {
-            await mkdirSync(dir, { recursive: true });
+          try {
+            const dir = `${PROFILE_PATH}/${req.user.id}`;
+            if (!existsSync(dir)) {
+              await mkdirSync(dir, { recursive: true });
+            }
+            // remove previous image in dir
+            for (const file of await readdir(dir)) {
+              await unlink(`${dir}/${file}`);
+            }
+            return cb(null, dir);
+          } catch (error) {
+            console.log(error);
           }
-          // remove previous image in dir
-          for (const file of await readdir(dir)) {
-            await unlink(`${dir}/${file}`);
-          }
-          return cb(null, dir);
         },
         filename: (_, file, cb) => {
-          const ext: string = file.mimetype.split('/')[1];
-          // YYYYMMDDHHMMSS
-          const now = new Date()
-            .toISOString()
-            .replace(/:/g, '')
-            .replace(/\./g, '');
-          return cb(null, `${now}.${ext}`);
+          try {
+            const ext: string = file.mimetype.split('/')[1];
+            // YYYYMMDDHHMMSS
+            const now = new Date()
+              .toISOString()
+              .replace(/:/g, '')
+              .replace(/\./g, '');
+            return cb(null, `${now}.${ext}`);
+          } catch (error) {
+            console.log(error);
+          }
         },
       }),
     })
