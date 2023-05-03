@@ -105,9 +105,10 @@ export default function useGamePlay(
       );
     });
 
-    if (amIViewer) return;
-    document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('keyup', handleKeyUp);
+    if (!amIViewer) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.addEventListener('keyup', handleKeyUp);
+    }
 
     return () => {
       socket.off(SOCKET_EVENTS.GAME.PING);
