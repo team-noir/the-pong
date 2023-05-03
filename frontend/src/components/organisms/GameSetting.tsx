@@ -33,12 +33,7 @@ export default function GameSetting({ gameSetting }: Props) {
   const amIOwner = !!myPlayer?.isOwner;
 
   const updateGameSettingMutation = useMutation(updateGameSetting);
-
-  const startGameMutation = useMutation({
-    mutationFn: startGame,
-    onSuccess: () =>
-      navigate(ROUTES.GAME.ROOM(gameSetting.id), { replace: true }),
-  });
+  const startGameMutation = useMutation(startGame);
 
   useEffect(() => {
     onPing();
