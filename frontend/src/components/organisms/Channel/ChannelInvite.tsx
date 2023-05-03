@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getUsers, inviteUserToChannel } from 'api/rest.v1';
 import { XMarkIcon } from '@heroicons/react/20/solid';
+import useDebounce from 'hooks/useDebounce';
 import Modal from 'components/templates/Modal';
 import UserList from 'components/molecule/UserList';
 import SearchCombobox from 'components/molecule/SearchCombobox';
@@ -26,6 +27,7 @@ export default function ChannelInvite({
   const [users, setUsers] = useState<UserType[]>([]);
 
   const getUsersMutation = useMutation(getUsers);
+  const debouncedGetUsers = useDebounce(getUsersMutation.mutate, 300);
 
   const inviteUserToChannelMutation = useMutation({
     mutationFn: inviteUserToChannel,
@@ -36,9 +38,12 @@ export default function ChannelInvite({
   });
 
   useEffect(() => {
-    if (!nickname.trim()) return;
+    if (!nickname.trim()) {
+      getUsersMutation.reset();
+      return;
+    }
 
-    getUsersMutation.mutate(nickname);
+    debouncedGetUsers(nickname);
   }, [nickname]);
 
   const handleClickInvite = () => {
@@ -77,7 +82,7 @@ export default function ChannelInvite({
         <div className="mb-4 relative">
           <SearchCombobox
             placeholder="닉네임을 입력해주세요."
-            dataList={getUsersMutation.isSuccess ? getUsersMutation.data : []}
+            dataList={getUsersMutation.data ? getUsersMutation.data : []}
             channelUsers={channelUsers}
             setValue={(value) => setNickname(value)}
             onSelect={handleSelect}
