@@ -14,10 +14,10 @@ import { AppGateway } from './app.gateway';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    UsersModule,
-    MyModule,
     PrismaModule,
     AuthModule,
+    MyModule,
+    UsersModule,
     ChannelsModule,
     GamesModule,
   ],

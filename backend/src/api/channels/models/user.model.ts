@@ -124,6 +124,12 @@ export class UserModel {
     this.channelUserMap.set(userId, user);
   }
 
+  setUserNickname(userId: number, nickname: string): void {
+    const user = this.getUser(userId);
+    user.name = nickname;
+    this.setUser(userId, user);
+  }
+
   addUser(userId: number, username: string, socket: Socket) {
     const newUser = new ChannelUser(userId, username, socket);
     this.setUser(userId, newUser);

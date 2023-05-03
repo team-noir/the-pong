@@ -9,6 +9,7 @@ import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { JwtPayloadDto } from './dtos/jwtPayload.dto';
 import { ONESECOND } from '@const';
+import { MyDto } from '../my/dtos/my.dto';
 
 @Injectable()
 export class AuthService {
@@ -117,16 +118,16 @@ export class AuthService {
     return result;
   }
 
-  async getJwtPayloadFromReq(@Req() req: Request): Promise<JwtPayloadDto> {
+  getJwtPayloadFromReq(@Req() req: Request) {
     const jwt: string = this.getJwt(req);
     if (!jwt) {
       return null;
     }
-    return await this.getJwtPayload(jwt);
+    return this.getJwtPayload(jwt);
   }
 
   async getUserFromJwt(@Req() req: Request): Promise<User> {
-    const payload: JwtPayloadDto = await this.getJwtPayloadFromReq(req);
+    const payload: JwtPayloadDto = this.getJwtPayloadFromReq(req);
     if (!payload) {
       return null;
     }
@@ -178,6 +179,28 @@ export class AuthService {
         });
       }
     );
+  }
+
+  userToMyDto(user: User, isVerifiedTwoFactor: boolean): MyDto {
+    return {
+      id: user.id,
+      nickname: user.nickname,
+      level: user.level,
+      isTwoFactor: user.isTwoFactor,
+      isVerifiedTwoFactor,
+      ftUsername: user.ftUsername,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
+
+  async authWhoami(@Req() req): Promise<MyDto | null> {
+    const payload = await this.getJwtPayloadFromReq(req);
+    if (!payload) return null;
+    const user = await this.prismaService.user.findUnique({
+      where: { id: payload.id },
+    });
+    return this.userToMyDto(user, payload.isVerifiedTwoFactor);
   }
 
   /** 2FA */
