@@ -59,6 +59,15 @@ export class Game {
     return this.players;
   }
 
+  getPlayer(userId: number): Player {
+    for (const player of this.players) {
+      if (player.userId == userId) {
+        return player;
+      }
+    }
+    return null;
+  }
+
   getOwnerPlayer(): Player {
     return this.players[0];
   }

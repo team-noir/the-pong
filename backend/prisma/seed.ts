@@ -26,7 +26,7 @@ const achievementData: Prisma.AchievementCreateInput[] = [
   },
   {
     title: '완전한 복수',
-    condition: '승급전에서 1위를 했습니다.',
+    condition: '42 레벨을 달성했습니다.',
     description: '“나는 악하지 않아. 세상이 날 그렇게 만들었지.”',
   },
   {
