@@ -26,6 +26,7 @@ const SOCKET_EVENTS = {
   CHANNEL: {
     MESSAGE: 'message',
     NOTICE: 'notice',
+    USER: 'user',
   },
 } as const;
 
