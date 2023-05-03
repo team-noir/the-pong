@@ -168,13 +168,17 @@ export default function Channel({
     <>
       <div
         id="message-list-wrapper"
-        className="h-[80vh] overflow-y-auto"
+        // NOTE: height: 100vh - upper padding - input bar
+        className="h-[calc(100vh-6rem-82px)] overflow-y-auto"
         ref={scrollRef}
       >
         {messages && <MessageList messages={messages} myUserId={myUserId} />}
       </div>
-      <form onSubmit={handleSubmit} className="inline-flex w-full">
-        <div className="w-10/12 vh-center pr-2">
+      <form
+        onSubmit={handleSubmit}
+        className="container max-w-xl inline-flex absolute bottom-0 pt-2 pb-4 px-4 -mx-4 gap-2"
+      >
+        <div className="w-[85%] vh-center">
           <TextInput
             id="message"
             value={formData.message}
@@ -184,7 +188,7 @@ export default function Channel({
             disabled={formData.disabled}
           />
         </div>
-        <div className="w-2/12 vh-center pl-2">
+        <div className="w-[15%] vh-center">
           <Button type="submit" primary fullLength disabled={formData.disabled}>
             보내기
           </Button>
