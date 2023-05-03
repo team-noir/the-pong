@@ -59,6 +59,12 @@ function GameHistoryItem({
         </div>
 
         <div className="flex items-center mx-4 my-1 text-xs text-gray-light justify-end">
+          {history.isLadder && (
+            <>
+              <span>{'승급전'}</span>
+              <span className="w-[1px] h-3 bg-gray-dark mx-2"></span>
+            </>
+          )}
           <span>{`${formatDate(history.createdAt)} ${formatTime(
             history.createdAt
           )}`}</span>
