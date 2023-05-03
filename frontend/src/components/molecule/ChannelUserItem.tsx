@@ -10,6 +10,7 @@ import {
   CHANNEL_USER_STATUS,
   USER_ROLES,
 } from 'types';
+import { classNames } from 'utils';
 import QUERY_KEYS from 'constants/queryKeys';
 import ROUTES from 'constants/routes';
 
@@ -79,19 +80,25 @@ export default function ChannelUserItem({
           />
         </Link>
       </div>
+
       <div className="flex-1 truncate">
-        <div className="mb-1">
-          <Link to={`${ROUTES.PROFILE.USER(user.id)}`}>
-            <span>
-              {user.role === USER_ROLES.OWNER && `🕶 `}
-              {user.role === USER_ROLES.ADMIN && `👓 `}
-              {user.nickname}
-            </span>
-          </Link>
-        </div>
+        <Link
+          to={`${ROUTES.PROFILE.USER(user.id)}`}
+          className="flex items-center"
+        >
+          {user.role !== USER_ROLES.NORMAL && (
+            <CrownIcon
+              className={classNames(
+                'w-5 inline-block mr-1',
+                user.role === USER_ROLES.OWNER ? 'text-yellow-400' : 'text-gray'
+              )}
+            />
+          )}
+          <span>{user.nickname}</span>
+        </Link>
 
         {!isSelf && (
-          <div className="inline-flex items-center space-x-2">
+          <div className="inline-flex items-center space-x-2 mt-1">
             <GameInviteButton />
             {amIOwner && (
               <>
@@ -139,5 +146,24 @@ export default function ChannelUserItem({
         )}
       </div>
     </li>
+  );
+}
+
+function CrownIcon({ className }: { className?: string }) {
+  return (
+    <div className={className}>
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        strokeWidth="2"
+        stroke="currentColor"
+        fill="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+        <path d="M12 6l4 6l5 -4l-2 10h-14l-2 -10l5 4z"></path>
+      </svg>
+    </div>
   );
 }
