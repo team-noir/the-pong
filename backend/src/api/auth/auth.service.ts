@@ -118,7 +118,7 @@ export class AuthService {
     return result;
   }
 
-  getJwtPayloadFromReq(@Req() req: Request): JwtPayloadDto {
+  getJwtPayloadFromReq(@Req() req: Request) {
     const jwt: string = this.getJwt(req);
     if (!jwt) {
       return null;

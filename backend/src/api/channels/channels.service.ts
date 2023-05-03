@@ -441,10 +441,7 @@ export class ChannelsService {
     const channels = user.joined.keys();
 
     for (const channelId of channels) {
-      await this.server.to(String(channelId)).emit('user', {
-        id: user.id,
-        nickname: user.name,
-      });
+      await this.server.to(String(channelId)).emit('user', {});
     }
   }
 
