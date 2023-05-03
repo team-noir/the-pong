@@ -57,7 +57,7 @@ export default function GameSetting({ gameSetting }: Props) {
             } as GameType)
         );
       } else if (text === GAME_SETTING_TEXT.DONE) {
-        navigate(ROUTES.GAME.ROOM(gameSetting.id));
+        navigate(ROUTES.GAME.ROOM(gameSetting.id), { replace: true });
       } else if (text === GAME_SETTING_TEXT.LEAVE) {
         setIsOtherUserLeft(true);
       }
