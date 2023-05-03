@@ -16,12 +16,10 @@ export class AuthenticatedGuard implements CanActivate {
     const res = context.switchToHttp().getResponse();
 
     const user: User = await this.authService.getUserFromJwt(req);
-    const { isVerifiedTwoFactor } = await this.authService.getJwtPayloadFromReq(
-      req
-    );
+    const payload = await this.authService.getJwtPayloadFromReq(req);
     const now: Date = new Date(Date.now());
 
-    if (user === null) {
+    if (!user || !payload) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     }
@@ -39,7 +37,7 @@ export class AuthenticatedGuard implements CanActivate {
       return true;
     }
 
-    if (user.isTwoFactor && !isVerifiedTwoFactor) {
+    if (user.isTwoFactor && !payload.isVerifiedTwoFactor) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     }
@@ -59,7 +57,7 @@ export class AuthenticatedGuard implements CanActivate {
       id: user.id,
       nickname: user.nickname,
       isTwoFactor: user.isTwoFactor,
-      isVerifiedTwoFactor,
+      isVerifiedTwoFactor: payload.isVerifiedTwoFactor,
     });
     this.authService.setJwt(res, newJwt);
     return true;
