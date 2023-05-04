@@ -198,15 +198,19 @@ export class Game {
     ) {
       return false;
     }
+    return (!this.checkIsNotBlocked(tarPlayer));
+  }
+
+  checkIsNotBlocked(tarPlayer: Player): boolean {
     for (const player of this.players) {
       if (player.isBlockUser(tarPlayer.userId)) {
-        return false;
+        return true;
       }
       if (tarPlayer.isBlockUser(player.userId)) {
-        return false;
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   reconnectPlayer(player: Player) {
