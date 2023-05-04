@@ -43,8 +43,6 @@ show: ## Show containers, images, and logs
 	@$(DOCKER_COMPOSE) ps
 	@echo "\n<Images>"
 	@$(DOCKER_COMPOSE) images
-	@echo "\n<Logs>"
-	@$(DOCKER_COMPOSE) logs
 
 .PHONY: logs
 logs: ## Show logs
