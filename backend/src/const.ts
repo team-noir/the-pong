@@ -1,5 +1,6 @@
 export const ONESECOND = 1000;
 export const PROFILE_PATH = 'uploads/profile-images/';
+export const PROFILE_IMAGE_MAX_SIZE = 1048576; // 1MB
 
 // Socket API 'notice' event codes
 export const NOTICE_STATUS = {
