@@ -45,9 +45,20 @@ export class Game {
 
     this.countPlayer++;
     if (this.countPlayer == 2) {
-      await this.players[0].socket.emit('rtcInit', {
-        userId: this.players[1].userId,
+      const player1 = this.players[0];
+      const player2 = this.players[1];
+
+      await player1.socket.emit('rtcInit', {
+        userId: player2.userId,
       });
+      this.viewerConnections.add(player2.userId);
+      setTimeout(() => {
+        if (this.viewerConnections.has(player2.userId)) {
+          player1.socket.emit('rtcInit', {
+            userId: player2.userId,
+          });
+        }
+      }, 4000);
     }
   }
 
@@ -281,7 +292,7 @@ export class Game {
           userId: viewerId,
         });
       }
-    }, 2000);
+    }, 4000);
 
     return true;
   }
