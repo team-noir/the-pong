@@ -15,7 +15,7 @@ build: ## Build containers
 
 .PHONY: up
 up: ## Create and start containers
-	$(DOCKER_COMPOSE) up -d
+	$(DOCKER_COMPOSE) up --build
 
 .PHONY: down
 down: ## Stop and remove containers, networks
