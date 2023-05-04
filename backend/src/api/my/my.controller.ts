@@ -37,7 +37,7 @@ import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import { SettingDto, CheckSettingDto, FileUploadDto } from './dtos/setting.dto';
 import { MyService } from './my.service';
 import { MyDto, FollowDto, BlockDto } from './dtos/my.dto';
-import { PROFILE_PATH } from '@const';
+import { PROFILE_PATH, PROFILE_IMAGE_MAX_SIZE } from '@const';
 
 @ApiTags('my')
 @Controller('my')
@@ -140,7 +140,7 @@ export class MyController {
       new ParseFilePipe({
         validators: [
           new FileTypeValidator({ fileType: /^image\// }),
-          new MaxFileSizeValidator({ maxSize: 1000 }),
+          new MaxFileSizeValidator({ maxSize: PROFILE_IMAGE_MAX_SIZE }),
         ],
       })
     )
