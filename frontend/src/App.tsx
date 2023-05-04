@@ -77,6 +77,7 @@ function Init() {
   useQuery({
     queryKey: [QUERY_KEYS.HEALTH],
     queryFn: healthCheck,
+    suspense: false,
   });
 
   useQuery({
