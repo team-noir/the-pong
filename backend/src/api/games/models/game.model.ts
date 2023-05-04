@@ -42,7 +42,7 @@ export class GameModel implements OnModuleInit {
   }
 
   isPlayerInGame(playerId: number): boolean {
-    return this.players.has(playerId);
+    return this.players.has(playerId) || this.invites.has(playerId);
   }
 
   setReadyTime(time: number) {
@@ -313,9 +313,9 @@ export class GameModel implements OnModuleInit {
       const code = HttpStatus.BAD_REQUEST;
       const message = 'This user is not online';
       throw { code, message };
-    } else if (this.isPlayerInGame(userId) || this.isInvited(userId)) {
+    } else if (this.isInvited(userId)) {
       const code = HttpStatus.CONFLICT;
-      const message = 'This user is already in game';
+      const message = 'This user has already been invited to the game.';
       throw { code, message };
     }
 
@@ -439,24 +439,24 @@ export class GameModel implements OnModuleInit {
       const code = HttpStatus.BAD_REQUEST;
       const message = 'You cannot invite this user';
       throw { code, message };
-    }
-
-    newGame.join(player, false);
-    if (!newGame.canJoin(invited, false)) {
+    } else if (this.isPlayerInGame(invited.userId) || this.isInvited(invited.userId)) {
+      const code = HttpStatus.CONFLICT;
+      const message = 'This invited user is already in game';
+      throw { code, message };
+    } else if (player.isBlockUser(invited.userId) || invited.isBlockUser(player.userId)) {
       const code = HttpStatus.BAD_REQUEST;
       const message = 'You cannot invite this user';
       throw { code, message };
     }
 
+    newGame.join(player, false);
     player.joinGame(newGame);
     this.setPlayer(player);
     this.setGame(newGame);
-    await this.setGameRoomTimeout(newGame.gameId);
-
     this.addQueue(newGame);
     this.addInvite(newGame, invited.userId);
-    newGame.setInvitedId(invited.userId);
-
+    await this.setGameRoomTimeout(newGame.gameId);
+    
     return newGame.gameId;
   }
 
@@ -475,19 +475,12 @@ export class GameModel implements OnModuleInit {
   }
 
   findQueue(player: Player, isLadder: boolean): Game | null {
-    if (this.isPlayerInGame(player.userId)) {
-      const code = HttpStatus.CONFLICT;
-      const message = 'This user is already in queue';
-      throw { code, message };
-    }
-
     for (const id of this.queue) {
       const game = this.getGame(id);
       if (game.canJoin(player, isLadder)) {
         return game;
       }
     }
-
     return null;
   }
 

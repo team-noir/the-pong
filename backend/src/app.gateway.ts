@@ -123,7 +123,7 @@ export class AppGateway
 
     if (this.channelsService.userModel.has(userId)) {
       this.channelsService.userModel.reconnectUserSocket(userId, socket);
-      log = `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`;
+      log = `${socket.id} 소켓 userModel에 재연결 성공 : { id: ${userId}, username: ${username} }`;
     }
     if (this.gamesService.gameModel.isPlayerInGame(userId)) {
       this.gamesService.gameModel.reconnectPlayerSocket(userId, socket);
@@ -134,6 +134,7 @@ export class AppGateway
       log = `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`;
       this.channelsService.userModel.addUser(userId, username, socket);
     }
+
     this.logger.log(log);
     this.setUserOnline(userId, socket);
   }
