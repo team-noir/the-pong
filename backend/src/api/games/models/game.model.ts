@@ -201,7 +201,7 @@ export class GameModel implements OnModuleInit {
   async checkUserAchievements(player: Player, gameResult) {
     const userId = player.userId;
     const achievementIds: number[] = await this.getGameAchievements(
-      player,
+      userId,
       gameResult
     );
     const userAchievements = await this.getUserAchievements(userId);
