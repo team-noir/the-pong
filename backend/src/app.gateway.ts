@@ -127,7 +127,8 @@ export class AppGateway
     }
     if (this.gamesService.gameModel.isPlayerInGame(userId)) {
       this.gamesService.gameModel.reconnectPlayerSocket(userId, socket);
-      log = `${socket.id} 소켓 gameModel에 재연결 성공 : { id: ${userId}, username: ${username} }`;
+      this.gamesService.gameModel.checkPlayerInvitation(userId);
+      log = `${socket.id} 소켓 재연결 성공 : { id: ${userId}, username: ${username} }`;
     }
     if (!log) {
       log = `${socket.id} 소켓 연결 성공 : { id: ${userId}, username: ${username} }`;

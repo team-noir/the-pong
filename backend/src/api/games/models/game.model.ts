@@ -201,7 +201,7 @@ export class GameModel implements OnModuleInit {
   async checkUserAchievements(player: Player, gameResult) {
     const userId = player.userId;
     const achievementIds: number[] = await this.getGameAchievements(
-      player,
+      userId,
       gameResult
     );
     const userAchievements = await this.getUserAchievements(userId);
@@ -365,6 +365,23 @@ export class GameModel implements OnModuleInit {
       player.reconnectSocket(socket);
       this.pongRecords.add(playerId);
     }
+  }
+
+  async checkPlayerInvitation(playerId: number) {
+    const player = this.players.get(playerId);
+    if (!player || !player.gameInvited) return ;
+    const invitedGame = player.gameInvited;
+    const invitetdBy = invitedGame.getOwnerPlayer();
+    if (!invitetdBy) return ;
+
+    await player.socket.emit('gameInvite', {
+      text: 'invited',
+      gameId: invitedGame.gameId,
+      user: {
+        id: invitetdBy.userId,
+        nickname: invitetdBy.username,
+      },
+    });
   }
 
   async gameStatus(socket: Socket) {

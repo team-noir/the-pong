@@ -151,12 +151,7 @@ export class Game {
   }
 
   hasViewer(tarPlayer: Player): boolean {
-    this.viewers.forEach((player) => {
-      if (player.userId == tarPlayer.userId) {
-        return true;
-      }
-    });
-    return false;
+    return this.viewers.includes(tarPlayer);
   }
 
   getViewerCount(): number {
