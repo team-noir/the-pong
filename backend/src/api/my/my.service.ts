@@ -14,7 +14,7 @@ export class MyService {
   constructor(
     private prismaService: PrismaService,
     private authService: AuthService,
-    private channelService: ChannelsService,
+    private channelService: ChannelsService
   ) {}
 
   userToMyDto(user: User, isVerifiedTwoFactor: boolean): MyDto {
@@ -40,7 +40,11 @@ export class MyService {
     return this.userToMyDto(user, payload.isVerifiedTwoFactor);
   }
 
-  async setMyProfile(@Req() req, newData: SettingDto, @Res() res): Promise<MyDto> {
+  async setMyProfile(
+    @Req() req,
+    newData: SettingDto,
+    @Res() res
+  ): Promise<MyDto> {
     const newUser: User = await this.setUser(req.user.id, newData);
     const payload: JwtPayloadDto = this.authService.getJwtPayloadFromReq(req);
 

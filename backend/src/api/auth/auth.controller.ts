@@ -66,7 +66,8 @@ export class AuthController {
       const { secret, qrCode } = await this.authService.generateTwoFaSecret(
         req.user.id
       );
-      res.status(HttpStatus.OK).send({ qr: qrCode, key: secret });
+      res.status(HttpStatus.OK);
+      return { qr: qrCode, key: secret };
     } catch (error) {
       throw new HttpException(error.message, error.code);
     }
@@ -105,7 +106,8 @@ export class AuthController {
       });
       await this.authService.setJwt(res, jwt);
 
-      res.status(HttpStatus.ACCEPTED).send();
+      res.status(HttpStatus.ACCEPTED);
+      return;
     } catch (error) {
       throw new HttpException(error.message, error.code);
     }
@@ -128,7 +130,8 @@ export class AuthController {
       });
       await this.authService.setJwt(res, jwt);
 
-      res.status(HttpStatus.NO_CONTENT).send();
+      res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, error.code);
     }

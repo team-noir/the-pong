@@ -256,8 +256,14 @@ export class GameModel implements OnModuleInit {
     if (gameResult.isLadder) {
       await this.setUserLadderScore(gameResult.winner.id);
     }
-    await this.checkUserAchievements(game.getPlayer(gameResult.winner.id), gameResult);
-    await this.checkUserAchievements(game.getPlayer(gameResult.loser.id), gameResult);
+    await this.checkUserAchievements(
+      game.getPlayer(gameResult.winner.id),
+      gameResult
+    );
+    await this.checkUserAchievements(
+      game.getPlayer(gameResult.loser.id),
+      gameResult
+    );
     await game.noticeToPlayers('gameOver', gameResult);
   }
 
@@ -369,10 +375,10 @@ export class GameModel implements OnModuleInit {
 
   async checkPlayerInvitation(playerId: number) {
     const player = this.players.get(playerId);
-    if (!player || !player.gameInvited) return ;
+    if (!player || !player.gameInvited) return;
     const invitedGame = player.gameInvited;
     const invitetdBy = invitedGame.getOwnerPlayer();
-    if (!invitetdBy) return ;
+    if (!invitetdBy) return;
 
     await player.socket.emit('gameInvite', {
       text: 'invited',
@@ -439,11 +445,17 @@ export class GameModel implements OnModuleInit {
       const code = HttpStatus.BAD_REQUEST;
       const message = 'You cannot invite this user';
       throw { code, message };
-    } else if (this.isPlayerInGame(invited.userId) || this.isInvited(invited.userId)) {
+    } else if (
+      this.isPlayerInGame(invited.userId) ||
+      this.isInvited(invited.userId)
+    ) {
       const code = HttpStatus.CONFLICT;
       const message = 'This invited user is already in game';
       throw { code, message };
-    } else if (player.isBlockUser(invited.userId) || invited.isBlockUser(player.userId)) {
+    } else if (
+      player.isBlockUser(invited.userId) ||
+      invited.isBlockUser(player.userId)
+    ) {
       const code = HttpStatus.BAD_REQUEST;
       const message = 'You cannot invite this user';
       throw { code, message };
@@ -456,7 +468,7 @@ export class GameModel implements OnModuleInit {
     this.addQueue(newGame);
     this.addInvite(newGame, invited.userId);
     await this.setGameRoomTimeout(newGame.gameId);
-    
+
     return newGame.gameId;
   }
 

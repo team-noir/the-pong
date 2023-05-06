@@ -438,7 +438,9 @@ export class ChannelsService {
 
   // 유저 정보가 변경되었음을 유저가 속한 모든 채널에 알린다.
   async informToAllChannel(userId: number) {
-    if (!this.userModel.has(userId)) { return; }
+    if (!this.userModel.has(userId)) {
+      return;
+    }
     const user = this.userModel.getUser(userId);
     const channels = user.joined.keys();
 
@@ -448,8 +450,9 @@ export class ChannelsService {
   }
 
   updateChannelUser(userId: number, nickname: string) {
-    if (!this.userModel.has(userId)) { return; }
+    if (!this.userModel.has(userId)) {
+      return;
+    }
     this.userModel.setUserNickname(userId, nickname);
   }
-
 }

@@ -48,12 +48,13 @@ export class MyController {
   @ApiOperation({ summary: 'Get my profile' })
   @ApiOkResponse({ description: 'Get my profile', type: MyDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
-  async whoami(@Req() req, @Res() res) {
+  async whoami(@Req() req, @Res({ passthrough: true }) res) {
     const user: MyDto = await this.myService.whoami(req);
     if (!user) {
       throw new HttpException('Unauthorized', HttpStatus.UNAUTHORIZED);
     }
-    res.status(HttpStatus.OK).send(user);
+    res.status(HttpStatus.OK);
+    return user;
   }
 
   @Patch('settings')
@@ -61,7 +62,11 @@ export class MyController {
   @ApiOkResponse({ description: 'Successfully set my profile', type: MyDto })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async setMyProfile(@Req() req, @Body() body: SettingDto, @Res({ passthrough: true }) res) {
+  async setMyProfile(
+    @Req() req,
+    @Body() body: SettingDto,
+    @Res({ passthrough: true }) res
+  ) {
     try {
       const user: MyDto = await this.myService.setMyProfile(req, body, res);
       res.status(HttpStatus.OK);
@@ -79,16 +84,18 @@ export class MyController {
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async checkMyProfile(@Body() body: CheckSettingDto, @Res() res) {
+  async checkMyProfile(
+    @Body() body: CheckSettingDto,
+    @Res({ passthrough: true }) res
+  ) {
     const { nickname } = body;
     const resultNickname = await this.myService.checkMyProfile(
       'nickname',
       nickname
     );
 
-    res.status(HttpStatus.OK).send({
-      nickname: resultNickname,
-    });
+    res.status(HttpStatus.OK);
+    return { nickname: resultNickname };
   }
 
   @Post('profile-image')
@@ -135,7 +142,7 @@ export class MyController {
   )
   async uploadProfileImage(
     @Req() req,
-    @Res() res,
+    @Res({ passthrough: true }) res,
     @UploadedFile(
       new ParseFilePipe({
         validators: [
@@ -149,7 +156,8 @@ export class MyController {
     try {
       const statusCode = file ? HttpStatus.CREATED : HttpStatus.BAD_REQUEST;
       await this.myService.uploadProfileImage(req.user.id, file);
-      res.status(statusCode).send();
+      res.status(statusCode);
+      return;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -160,10 +168,11 @@ export class MyController {
   @ApiNoContentResponse({ description: 'Successfully deleted profile image' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async deleteProfileImage(@Req() req, @Res() res) {
+  async deleteProfileImage(@Req() req, @Res({ passthrough: true }) res) {
     try {
       await this.myService.deleteProfileImage(req.user.id);
-      res.status(HttpStatus.NO_CONTENT).send();
+      res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -177,9 +186,11 @@ export class MyController {
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async getFollowing(@Req() req) {
+  async getFollowing(@Req() req, @Res({ passthrough: true }) res) {
     try {
-      return this.myService.getFollowing(req);
+      const list = await this.myService.getFollowing(req);
+      res.status(HttpStatus.OK);
+      return list;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -190,10 +201,15 @@ export class MyController {
   @ApiNoContentResponse({ description: 'Successfully followed user' })
   @ApiBadRequestResponse({ description: 'Bad request\n- Invalid user id' })
   @UseGuards(AuthenticatedGuard)
-  async putFollowing(@Req() req, @Param('userId') userId: number, @Res() res) {
+  async putFollowing(
+    @Req() req,
+    @Param('userId') userId: number,
+    @Res({ passthrough: true }) res
+  ) {
     try {
       await this.myService.putFollowing(req);
-      return res.status(HttpStatus.NO_CONTENT).send();
+      res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -209,11 +225,12 @@ export class MyController {
   async deleteFollowing(
     @Req() req,
     @Param('userId') userId: number,
-    @Res() res
+    @Res({ passthrough: true }) res
   ) {
     try {
       await this.myService.deleteFollowing(req);
-      return res.status(HttpStatus.NO_CONTENT).send();
+      res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -226,9 +243,11 @@ export class MyController {
     type: [BlockDto],
   })
   @UseGuards(AuthenticatedGuard)
-  async getBlocks(@Req() req) {
+  async getBlocks(@Req() req, @Res({ passthrough: true }) res) {
     try {
-      return this.myService.getBlocks(req);
+      const list = await this.myService.getBlocks(req);
+      res.status(HttpStatus.OK);
+      return list;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -239,10 +258,15 @@ export class MyController {
   @ApiNoContentResponse({ description: 'Successfully blocked user' })
   @ApiBadRequestResponse({ description: 'Bad request\n- Invalid user id' })
   @UseGuards(AuthenticatedGuard)
-  async putBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
+  async putBlocks(
+    @Req() req,
+    @Param('userId') userId: number,
+    @Res({ passthrough: true }) res
+  ) {
     try {
       await this.myService.putBlocks(req);
-      return res.status(HttpStatus.NO_CONTENT).send();
+      res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -255,10 +279,15 @@ export class MyController {
     description: 'Bad request\n- Invalid user id\n- Not blocking user id',
   })
   @UseGuards(AuthenticatedGuard)
-  async deleteBlocks(@Req() req, @Param('userId') userId: number, @Res() res) {
+  async deleteBlocks(
+    @Req() req,
+    @Param('userId') userId: number,
+    @Res({ passthrough: true }) res
+  ) {
     try {
       await this.myService.deleteBlocks(req);
-      return res.status(HttpStatus.NO_CONTENT).send();
+      res.status(HttpStatus.NO_CONTENT);
+      return;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
