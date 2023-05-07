@@ -5,7 +5,7 @@ import {
   IsOptional,
   IsNumber,
   IsArray,
-  Matches
+  Matches,
 } from 'class-validator';
 import { ChannelUser } from '../models/user.model';
 

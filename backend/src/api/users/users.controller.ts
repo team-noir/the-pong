@@ -56,7 +56,7 @@ export class UsersController {
   @UseGuards(AuthenticatedGuard)
   async requestUsers(
     @Req() req,
-    @Res() res: Response,
+    @Res({ passthrough: true }) res,
     @Query('q') q?: string,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
     @Query('per_page', new DefaultValuePipe(30), ParseIntPipe) per_page?: number
@@ -68,7 +68,8 @@ export class UsersController {
         myUserId,
         userQuery
       );
-      res.status(HttpStatus.OK).send(users);
+      res.status(HttpStatus.OK);
+      return users;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -83,13 +84,14 @@ export class UsersController {
   async requestProfile(
     @Req() req,
     @Param('userId') userId: number,
-    @Res() res: Response
+    @Res({ passthrough: true }) res
   ) {
     try {
       const myUserId = req.user.id;
       const user: UserDto = await this.usersService.getUser(myUserId, userId);
       const statusCode = user ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-      res.status(statusCode).send(user);
+      res.status(statusCode);
+      return user;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -141,13 +143,14 @@ export class UsersController {
   @UseGuards(AuthenticatedGuard)
   async requestAchievements(
     @Param('userId') userId: number,
-    @Res() res: Response
+    @Res({ passthrough: true }) res
   ) {
     try {
       const achievements: AchievementDto[] =
         await this.usersService.getAchievements(Number(userId));
       const statusCode = achievements ? HttpStatus.OK : HttpStatus.NOT_FOUND;
-      res.status(statusCode).send(achievements);
+      res.status(statusCode);
+      return achievements;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -163,14 +166,15 @@ export class UsersController {
   async requestAchievement(
     @Param('userId') userId: number,
     @Param('achievementId') achievementId: number,
-    @Res() res: Response
+    @Res({ passthrough: true }) res
   ) {
     try {
       const achievement: any = await this.usersService.addAchievement(
         Number(userId),
         Number(achievementId)
       );
-      res.status(HttpStatus.CREATED).send(achievement);
+      res.status(HttpStatus.CREATED);
+      return achievement;
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }

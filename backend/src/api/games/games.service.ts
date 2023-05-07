@@ -62,7 +62,7 @@ export class GamesService {
     const user = await this.gameModel.createPlayer(userId);
     const invited = await this.gameModel.createPlayer(invitedUserId);
     const gameId = await this.gameModel.newInvite(user, invited);
-    
+
     await invited.socket.emit('gameInvite', {
       text: 'invited',
       gameId: gameId,
