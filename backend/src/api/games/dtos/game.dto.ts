@@ -204,7 +204,7 @@ export class Game {
     ) {
       return false;
     }
-    return (!this.checkIsNotBlocked(tarPlayer));
+    return !this.checkIsNotBlocked(tarPlayer);
   }
 
   checkIsNotBlocked(tarPlayer: Player): boolean {
