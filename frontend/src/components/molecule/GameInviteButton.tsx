@@ -10,7 +10,7 @@ import { SocketContext } from 'contexts/socket';
 import Modal from 'components/templates/Modal';
 import Button from 'components/atoms/Button';
 import ROUTES from 'constants/routes';
-import { UI_TEXT } from 'constants/index';
+import { GAME_INVITE_TEXT, UI_TEXT } from 'constants/index';
 import SOCKET_EVENTS from 'constants/socketEvents';
 
 export default function GameInviteButton() {
@@ -38,7 +38,7 @@ export default function GameInviteButton() {
           error.response.status
         )
       ) {
-        setAlertCode('unavailable');
+        setAlertCode(GAME_INVITE_TEXT.UNAVAILABLE);
       } else {
         alert(UI_TEXT.ERROR.DEFAULT);
       }
@@ -80,10 +80,12 @@ export default function GameInviteButton() {
         <Modal onClickClose={() => setAlertCode(null)} fitContent>
           <div className="text-center">
             <p>
-              {alertCode === 'rejected' && '초대가 거절되었습니다.'}
-              {alertCode === 'timeout' &&
+              {alertCode === GAME_INVITE_TEXT.REJECTED &&
+                '초대가 거절되었습니다.'}
+              {alertCode === GAME_INVITE_TEXT.TIMEOUT &&
                 '60초 동안 응답이 없어 대기를 종료합니다.'}
-              {alertCode == 'unavailable' && '초대할 수 없는 회원입니다.'}
+              {alertCode == GAME_INVITE_TEXT.UNAVAILABLE &&
+                '초대할 수 없는 회원입니다.'}
             </p>
           </div>
         </Modal>

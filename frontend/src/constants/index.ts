@@ -28,6 +28,9 @@ export const GAME_SETTING_TEXT = {
 
 export const GAME_INVITE_TEXT = {
   CANCELED: 'canceled',
+  REJECTED: 'rejected',
+  TIMEOUT: 'timeout',
+  UNAVAILABLE: 'unavailable',
 };
 
 export const GAME_KEY_EVENT = {
