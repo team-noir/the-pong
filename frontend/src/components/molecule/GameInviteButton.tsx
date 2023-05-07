@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
+import { StatusCodes } from 'http-status-codes';
 import { AxiosError } from 'axios';
 import { cancelInvitingGame, inviteGame } from 'api/rest.v1';
 import { onQueue } from 'api/socket.v1';
@@ -22,7 +23,7 @@ export default function GameInviteButton() {
     onMutate: () => {
       onQueue((data: { text: string; gameId?: number }) => {
         if (data.gameId) {
-          navigate(ROUTES.GAME.ROOM(data.gameId));
+          navigate(ROUTES.GAME.SETTING(data.gameId));
         } else {
           setAlertCode(data.text);
           setIsWating(false);
@@ -32,7 +33,11 @@ export default function GameInviteButton() {
     onSuccess: () => setIsWating(true),
     onError: (error: AxiosError) => {
       if (!error.response?.status) return;
-      if ([400, 409].includes(error.response.status)) {
+      if (
+        [StatusCodes.BAD_REQUEST, StatusCodes.CONFLICT].includes(
+          error.response.status
+        )
+      ) {
         setAlertCode('unavailable');
       } else {
         alert(UI_TEXT.ERROR.DEFAULT);
