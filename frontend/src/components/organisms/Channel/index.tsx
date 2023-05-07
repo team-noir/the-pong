@@ -115,7 +115,6 @@ export default function Channel({
         return;
       }
 
-      queryClient.invalidateQueries([QUERY_KEYS.CHANNEL, String(channel.id)]);
       const isIncludeMeInUsers = data.users.some(
         (user) => user.id === myUserId
       );
@@ -132,15 +131,20 @@ export default function Channel({
             placeholder: '메시지를 입력하세요',
             disabled: false,
           }));
-        data.code === NOTICE_STATUS.USER_KICK &&
-          setModalMessage(
-            '채널에서 내보내졌습니다. 채널에 다시 참여할 수 있습니다.'
-          );
-        data.code === NOTICE_STATUS.USER_BAN &&
+        if (data.code === NOTICE_STATUS.USER_BAN) {
           setModalMessage(
             '채널에서 차단되었습니다. 채널에 다시 참여할 수 없습니다.'
           );
+          return;
+        }
+        if (data.code === NOTICE_STATUS.USER_KICK) {
+          setModalMessage(
+            '채널에서 내보내졌습니다. 채널에 다시 참여할 수 있습니다.'
+          );
+          return;
+        }
       }
+      queryClient.invalidateQueries([QUERY_KEYS.CHANNEL, String(channel.id)]);
     });
 
     onUser(() => {
