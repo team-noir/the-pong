@@ -110,6 +110,23 @@ export class MessageModel {
     });
   }
 
+  sendMessageToUser(
+    user: ChannelUser,
+    channel: Channel,
+    message: Message,
+    sender?: ChannelUser
+  ) {
+    user.socket.emit('message', {
+      id: message.id,
+      channelId: message.channelId,
+      senderId: sender ? sender.id : null,
+      senderNickname: sender ? sender.name : null,
+      isLog: message.isLog,
+      text: message.text,
+      createdAt: message.createdAt,
+    });
+  }
+
   // NOTE: message와 같은 id, createdAt를 보내기 위해서 message를 인자로 받음
   async sendNotice(
     channelId: number,

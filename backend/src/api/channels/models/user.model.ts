@@ -74,7 +74,7 @@ export class UserModel {
             channelId: true,
           },
         },
-        blockeds: {
+        blockers: {
           select: {
             blockedId: true,
           },
@@ -89,8 +89,8 @@ export class UserModel {
         newUser.joined.add(channel.channelId);
       });
 
-      dbUser.blockeds.forEach((blocked) => {
-        newUser.blockUser.add(blocked.blockedId);
+      dbUser.blockers.forEach((blocker) => {
+        newUser.blockUser.add(blocker.blockedId);
       });
 
       this.channelUserMap.set(newUser.id, newUser);
@@ -116,6 +116,30 @@ export class UserModel {
 
   getUsernameList() {
     return [...this.channelUserMap.keys()];
+  }
+
+  async getUserBlockSet(user: ChannelUser): Promise<Set<number>> {
+    const blockSet = new Set<number>();
+    const blocked = await this.prismaService.blockUser.findMany({
+      where: { blockerId: user.id },
+      select: {
+        blocked: { select: { id: true, nickname: true } },
+      },
+    });
+    const blocker = await this.prismaService.blockUser.findMany({
+      where: { blockedId: user.id },
+      select: {
+        blocker: { select: { id: true, nickname: true } },
+      },
+    });
+
+    blocked.forEach((block) => {
+      blockSet.add(block.blocked.id);
+    });
+    blocker.forEach((block) => {
+      blockSet.add(block.blocker.id);
+    });
+    return blockSet;
   }
 
   // Setter

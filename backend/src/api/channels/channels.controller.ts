@@ -84,7 +84,7 @@ export class ChannelsController {
   @ApiOkResponse({ type: [ChannelInfoDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  list(
+  async list(
     @Req() req,
     @Query('enter') enter: string,
     @Query('kind') kind: string[],
@@ -98,7 +98,7 @@ export class ChannelsController {
         isDm: kind && kind.includes('dm'),
       };
       res.status(HttpStatus.OK);
-      return this.channelsService.list(req.user.id, query);
+      return await this.channelsService.list(req.user.id, query);
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
@@ -274,7 +274,7 @@ export class ChannelsController {
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  getChannelMessages(
+  async getChannelMessages(
     @Req() req,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
@@ -282,7 +282,10 @@ export class ChannelsController {
     try {
       const channel = this.channelsService.channelModel.get(channelId);
       const user = this.channelsService.userModel.getUser(req.user.id);
-      const messages = this.channelsService.getChannelMessages(user, channel);
+      const messages = await this.channelsService.getChannelMessages(
+        user,
+        channel
+      );
       res.status(HttpStatus.OK);
       return messages;
     } catch (error) {

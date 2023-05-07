@@ -127,7 +127,7 @@ describe('Channel list', () => {
     }
   });
 
-  it('/channels \n\t: 모든 public, protected 채널', () => {
+  it('/channels \n\t: 모든 public, protected 채널', async () => {
     const query = {
       isEnter: false,
       isPublic: true,
@@ -139,7 +139,7 @@ describe('Channel list', () => {
     let cntPrivate = 0;
     let cntDm = 0;
 
-    const channelList = service.list(1, query);
+    const channelList = await service.list(1, query);
     channelList.forEach((v) => {
       if (v.title == 'public') {
         ++cntPublic;
@@ -161,7 +161,7 @@ describe('Channel list', () => {
     console.log('cntDm', cntDm);
   });
 
-  it('/channels?kind=public \n\t: 모든 public, protected 채널', () => {
+  it('/channels?kind=public \n\t: 모든 public, protected 채널', async () => {
     const query = {
       isEnter: false,
       isPublic: true,
@@ -173,7 +173,7 @@ describe('Channel list', () => {
     let cntPrivate = 0;
     let cntDm = 0;
 
-    const channelList = service.list(1, query);
+    const channelList = await service.list(1, query);
     channelList.forEach((v) => {
       if (v.title == 'public') {
         ++cntPublic;
@@ -195,79 +195,11 @@ describe('Channel list', () => {
     console.log('cntDm', cntDm);
   });
 
-  it('/channels?kind=public,private \n\t: 모든 public, protected, private 채널', () => {
-    const query = {
-      isEnter: false,
-      isPublic: true,
-      isPriv: true,
-      isDm: false,
-    };
-    let cntPublic = 0;
-    let cntProtected = 0;
-    let cntPrivate = 0;
-    let cntDm = 0;
-
-    const channelList = service.list(1, query);
-    channelList.forEach((v) => {
-      if (v.title == 'public') {
-        ++cntPublic;
-      }
-      if (v.title == 'protected') {
-        ++cntProtected;
-      }
-      if (v.title == 'private') {
-        ++cntPrivate;
-      }
-      if (v.isDm) {
-        ++cntDm;
-      }
-    });
-
-    console.log('cntPublic', cntPublic);
-    console.log('cntProtected', cntProtected);
-    console.log('cntPrivate', cntPrivate);
-    console.log('cntDm', cntDm);
-  });
-
-  it('/channels?kind=public,private,dm \n\t: 모든 public, protected, private, dm 채널', () => {
+  it('/channels?kind=public,private \n\t: 모든 public, protected, private 채널', async () => {
     const query = {
       isEnter: false,
       isPublic: true,
       isPriv: true,
-      isDm: true,
-    };
-    let cntPublic = 0;
-    let cntProtected = 0;
-    let cntPrivate = 0;
-    let cntDm = 0;
-
-    const channelList = service.list(1, query);
-    channelList.forEach((v) => {
-      if (v.title == 'public') {
-        ++cntPublic;
-      }
-      if (v.title == 'protected') {
-        ++cntProtected;
-      }
-      if (v.title == 'private') {
-        ++cntPrivate;
-      }
-      if (v.isDm) {
-        ++cntDm;
-      }
-    });
-
-    console.log('cntPublic', cntPublic);
-    console.log('cntProtected', cntProtected);
-    console.log('cntPrivate', cntPrivate);
-    console.log('cntDm', cntDm);
-  });
-
-  it('/channels?enter \n\t: 참여 중인 public, protected 채널', () => {
-    const query = {
-      isEnter: true,
-      isPublic: true,
-      isPriv: false,
       isDm: false,
     };
     let cntPublic = 0;
@@ -275,7 +207,7 @@ describe('Channel list', () => {
     let cntPrivate = 0;
     let cntDm = 0;
 
-    const channelList = service.list(1, query);
+    const channelList = await service.list(1, query);
     channelList.forEach((v) => {
       if (v.title == 'public') {
         ++cntPublic;
@@ -297,77 +229,9 @@ describe('Channel list', () => {
     console.log('cntDm', cntDm);
   });
 
-  it('/channels?enter?kind=public \n\t: 참여 중인 public, protected 채널', () => {
+  it('/channels?kind=public,private,dm \n\t: 모든 public, protected, private, dm 채널', async () => {
     const query = {
-      isEnter: true,
-      isPublic: true,
-      isPriv: false,
-      isDm: false,
-    };
-    let cntPublic = 0;
-    let cntProtected = 0;
-    let cntPrivate = 0;
-    let cntDm = 0;
-
-    const channelList = service.list(1, query);
-    channelList.forEach((v) => {
-      if (v.title == 'public') {
-        ++cntPublic;
-      }
-      if (v.title == 'protected') {
-        ++cntProtected;
-      }
-      if (v.title == 'private') {
-        ++cntPrivate;
-      }
-      if (v.isDm) {
-        ++cntDm;
-      }
-    });
-
-    console.log('cntPublic', cntPublic);
-    console.log('cntProtected', cntProtected);
-    console.log('cntPrivate', cntPrivate);
-    console.log('cntDm', cntDm);
-  });
-
-  it('/channels?enter?kind=public,private \n\t: 참여 중인 public, protected, private 채널', () => {
-    const query = {
-      isEnter: true,
-      isPublic: true,
-      isPriv: true,
-      isDm: false,
-    };
-    let cntPublic = 0;
-    let cntProtected = 0;
-    let cntPrivate = 0;
-    let cntDm = 0;
-
-    const channelList = service.list(1, query);
-    channelList.forEach((v) => {
-      if (v.title == 'public') {
-        ++cntPublic;
-      }
-      if (v.title == 'protected') {
-        ++cntProtected;
-      }
-      if (v.title == 'private') {
-        ++cntPrivate;
-      }
-      if (v.isDm) {
-        ++cntDm;
-      }
-    });
-
-    console.log('cntPublic', cntPublic);
-    console.log('cntProtected', cntProtected);
-    console.log('cntPrivate', cntPrivate);
-    console.log('cntDm', cntDm);
-  });
-
-  it('/channels?enter?kind=public,private,dm \n\t: 참여 중인 public, protected, private, dm 채널', () => {
-    const query = {
-      isEnter: true,
+      isEnter: false,
       isPublic: true,
       isPriv: true,
       isDm: true,
@@ -377,7 +241,7 @@ describe('Channel list', () => {
     let cntPrivate = 0;
     let cntDm = 0;
 
-    const channelList = service.list(1, query);
+    const channelList = await service.list(1, query);
     channelList.forEach((v) => {
       if (v.title == 'public') {
         ++cntPublic;
@@ -399,7 +263,143 @@ describe('Channel list', () => {
     console.log('cntDm', cntDm);
   });
 
-  it('/channels \n\t: 어떠한 채널에도 들어가지 않은 유저', () => {
+  it('/channels?enter \n\t: 참여 중인 public, protected 채널', async () => {
+    const query = {
+      isEnter: true,
+      isPublic: true,
+      isPriv: false,
+      isDm: false,
+    };
+    let cntPublic = 0;
+    let cntProtected = 0;
+    let cntPrivate = 0;
+    let cntDm = 0;
+
+    const channelList = await service.list(1, query);
+    channelList.forEach((v) => {
+      if (v.title == 'public') {
+        ++cntPublic;
+      }
+      if (v.title == 'protected') {
+        ++cntProtected;
+      }
+      if (v.title == 'private') {
+        ++cntPrivate;
+      }
+      if (v.isDm) {
+        ++cntDm;
+      }
+    });
+
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
+  });
+
+  it('/channels?enter?kind=public \n\t: 참여 중인 public, protected 채널', async () => {
+    const query = {
+      isEnter: true,
+      isPublic: true,
+      isPriv: false,
+      isDm: false,
+    };
+    let cntPublic = 0;
+    let cntProtected = 0;
+    let cntPrivate = 0;
+    let cntDm = 0;
+
+    const channelList = await service.list(1, query);
+    channelList.forEach((v) => {
+      if (v.title == 'public') {
+        ++cntPublic;
+      }
+      if (v.title == 'protected') {
+        ++cntProtected;
+      }
+      if (v.title == 'private') {
+        ++cntPrivate;
+      }
+      if (v.isDm) {
+        ++cntDm;
+      }
+    });
+
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
+  });
+
+  it('/channels?enter?kind=public,private \n\t: 참여 중인 public, protected, private 채널', async () => {
+    const query = {
+      isEnter: true,
+      isPublic: true,
+      isPriv: true,
+      isDm: false,
+    };
+    let cntPublic = 0;
+    let cntProtected = 0;
+    let cntPrivate = 0;
+    let cntDm = 0;
+
+    const channelList = await service.list(1, query);
+    channelList.forEach((v) => {
+      if (v.title == 'public') {
+        ++cntPublic;
+      }
+      if (v.title == 'protected') {
+        ++cntProtected;
+      }
+      if (v.title == 'private') {
+        ++cntPrivate;
+      }
+      if (v.isDm) {
+        ++cntDm;
+      }
+    });
+
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
+  });
+
+  it('/channels?enter?kind=public,private,dm \n\t: 참여 중인 public, protected, private, dm 채널', async () => {
+    const query = {
+      isEnter: true,
+      isPublic: true,
+      isPriv: true,
+      isDm: true,
+    };
+    let cntPublic = 0;
+    let cntProtected = 0;
+    let cntPrivate = 0;
+    let cntDm = 0;
+
+    const channelList = await service.list(1, query);
+    channelList.forEach((v) => {
+      if (v.title == 'public') {
+        ++cntPublic;
+      }
+      if (v.title == 'protected') {
+        ++cntProtected;
+      }
+      if (v.title == 'private') {
+        ++cntPrivate;
+      }
+      if (v.isDm) {
+        ++cntDm;
+      }
+    });
+
+    console.log('cntPublic', cntPublic);
+    console.log('cntProtected', cntProtected);
+    console.log('cntPrivate', cntPrivate);
+    console.log('cntDm', cntDm);
+  });
+
+  it('/channels \n\t: 어떠한 채널에도 들어가지 않은 유저', async () => {
     const query = {
       isEnter: false,
       isPublic: false,
@@ -411,7 +411,7 @@ describe('Channel list', () => {
     let cntPrivate = 0;
     let cntDm = 0;
 
-    const channelList = service.list(3, query);
+    const channelList = await service.list(3, query);
     channelList.forEach((v) => {
       if (v.title == 'public') {
         ++cntPublic;
@@ -433,7 +433,7 @@ describe('Channel list', () => {
     console.log('cntDm', cntDm);
   });
 
-  it('/channels?enter \n\t: 어떠한 채널에도 들어가지 않은 유저', () => {
+  it('/channels?enter \n\t: 어떠한 채널에도 들어가지 않은 유저', async () => {
     const query = {
       isEnter: true,
     };
@@ -442,7 +442,7 @@ describe('Channel list', () => {
     let cntPrivate = 0;
     let cntDm = 0;
 
-    const channelList = service.list(3, query);
+    const channelList = await service.list(3, query);
     channelList.forEach((v) => {
       if (v.title == 'public') {
         ++cntPublic;

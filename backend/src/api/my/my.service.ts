@@ -248,6 +248,9 @@ export class MyService {
         blockedId: Number(userId),
       },
     });
+
+    const channelUser = this.channelService.userModel.getUser(myUserId);
+    channelUser.blockUser.add(Number(userId));
     return following;
   }
 
