@@ -533,11 +533,12 @@ export class GameModel implements OnModuleInit {
         await player.game.noticeToPlayers('gameSetting', { text: 'leave' });
       } else if (player.game.status == GAME_STATUS.PLAYING) {
         if (player.isViewer()) {
-          const viewerCount = player.game.removeViewer(player.userId);
-          this.players.delete(player.userId);
+          const viewerCount = player.game.getViewerCount();
           await player.game.noticeToPlayers('gameViewer', {
-            viewerCount: viewerCount,
+            viewerCount: viewerCount - 1,
           });
+          player.game.removeViewer(player.userId);
+          this.players.delete(player.userId);
           return;
         } else {
           await this.setGameOver(player.game, playerId);

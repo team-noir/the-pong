@@ -189,6 +189,7 @@ export class GamesService {
       throw { code, message };
     }
 
+    player.game = game;
     this.gameModel.setPlayer(player);
     await game.addViewer(player);
     await game.noticeToPlayers('gameViewer', {
