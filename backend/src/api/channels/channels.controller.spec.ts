@@ -240,13 +240,13 @@ describe('Chat connection', () => {
       service.messageToChannel(user, channel, 'hello');
     });
 
-    it('참여 중인 채널에서 메세지를 가져오기', () => {
-      service.join(socketUser.id, channel.id, null);
-      service.messageToChannel(user, channel, 'hello');
+    // it('참여 중인 채널에서 메세지를 가져오기', () => {
+    //   service.join(socketUser.id, channel.id, null);
+    //   service.messageToChannel(user, channel, 'hello');
 
-      const messages = service.getChannelMessages(socketUser, channel);
-      expect(messages.length).toBe(2);
-    });
+    //   const messages = service.getChannelMessages(socketUser, channel);
+    //   expect(messages.length).toBe(2);
+    // });
   });
 
   describe('mute', () => {

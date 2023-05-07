@@ -120,10 +120,11 @@ export class ChannelsService {
     }
   }
 
-  list(userId: number, query) {
+  async list(userId: number, query) {
     const data = [];
     const channels = this.channelModel.getAll();
     const user = this.userModel.getUser(userId);
+    const blockSet = await this.userModel.getUserBlockSet(user);
 
     if (!query.isPublic && !query.isPriv && !query.isDm) {
       query.isPublic = true;
@@ -158,6 +159,9 @@ export class ChannelsService {
             info.title = this.userModel.getUser(id).name;
           }
         });
+        if (blockSet.has(info.dmUserId)) {
+          return;
+        }
       }
       data.push(info);
     });
@@ -315,7 +319,6 @@ export class ChannelsService {
       const invitedUser = this.userModel.getUser(invitedUserId[0]);
       this.channelModel.inviteChannel(invitedUser, channel);
 
-      // socket massage
       if (invitedUser.socket) {
         invitedUser.socket.emit('invited', { channelId: channel.id });
       }
@@ -382,23 +385,29 @@ export class ChannelsService {
     }
   }
 
-  getChannelMessages(user: ChannelUser, channel: Channel): ChannelMessageDto[] {
+  async getChannelMessages(
+    user: ChannelUser,
+    channel: Channel
+  ): Promise<ChannelMessageDto[]> {
     channel.checkUserJoined(user);
+    const blockSet = await this.userModel.getUserBlockSet(user);
 
     const data = [];
     this.messageModel.getAllMessages().forEach((message) => {
-      const sender = message.senderId
-        ? this.userModel.getUser(message.senderId)
-        : null;
-
       if (message.channelId == channel.id) {
-        const tarMessage = new ChannelMessageDto(
-          message.id,
-          message.text,
-          sender,
-          message.isLog
-        );
-        data.push(tarMessage);
+        const sender = message.senderId
+          ? this.userModel.getUser(message.senderId)
+          : null;
+
+        if (!sender || !blockSet.has(sender.id)) {
+          const tarMessage = new ChannelMessageDto(
+            message.id,
+            message.text,
+            sender,
+            message.isLog
+          );
+          data.push(tarMessage);
+        }
       }
     });
     return data;
@@ -421,7 +430,20 @@ export class ChannelsService {
       message,
       user
     );
-    this.messageModel.sendMessage(channel, newMessage, user);
+
+    const userIds = [...channel.users.values()];
+    for (const id of userIds) {
+      const tarUser = this.userModel.getUser(id);
+      if (
+        user.id == tarUser.id ||
+        tarUser.blockUser.has(user.id) ||
+        user.blockUser.has(tarUser.id)
+      ) {
+        continue;
+      }
+      this.messageModel.sendMessageToUser(tarUser, channel, newMessage, user);
+    }
+    this.messageModel.sendMessageToUser(user, channel, newMessage, user);
     return newMessage;
   }
 
@@ -438,7 +460,9 @@ export class ChannelsService {
 
   // 유저 정보가 변경되었음을 유저가 속한 모든 채널에 알린다.
   async informToAllChannel(userId: number) {
-    if (!this.userModel.has(userId)) { return; }
+    if (!this.userModel.has(userId)) {
+      return;
+    }
     const user = this.userModel.getUser(userId);
     const channels = user.joined.keys();
 
@@ -448,8 +472,9 @@ export class ChannelsService {
   }
 
   updateChannelUser(userId: number, nickname: string) {
-    if (!this.userModel.has(userId)) { return; }
+    if (!this.userModel.has(userId)) {
+      return;
+    }
     this.userModel.setUserNickname(userId, nickname);
   }
-
 }
