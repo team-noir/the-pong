@@ -124,7 +124,6 @@ export class ChannelsService {
     const data = [];
     const channels = this.channelModel.getAll();
     const user = this.userModel.getUser(userId);
-    const blockSet = await this.userModel.getUserBlockSet(user);
 
     if (!query.isPublic && !query.isPriv && !query.isDm) {
       query.isPublic = true;
@@ -159,7 +158,7 @@ export class ChannelsService {
             info.title = this.userModel.getUser(id).name;
           }
         });
-        if (blockSet.has(info.dmUserId)) {
+        if (user.isBlockUser(info.dmUserId)) {
           return;
         }
       }
@@ -272,7 +271,7 @@ export class ChannelsService {
     const invitedUser: ChannelUser = this.userModel.getUser(invitedUserId);
     const user: ChannelUser = this.userModel.getUser(userId);
 
-    if (invitedUser.blockUser.has(userId)) {
+    if (user.blockUser.has(invitedUser.id)) {
       throw {
         code: HttpStatus.BAD_REQUEST,
         message: 'You cannot send dm to.',
@@ -390,7 +389,6 @@ export class ChannelsService {
     channel: Channel
   ): Promise<ChannelMessageDto[]> {
     channel.checkUserJoined(user);
-    const blockSet = await this.userModel.getUserBlockSet(user);
 
     const data = [];
     this.messageModel.getAllMessages().forEach((message) => {
@@ -399,7 +397,7 @@ export class ChannelsService {
           ? this.userModel.getUser(message.senderId)
           : null;
 
-        if (!sender || !blockSet.has(sender.id)) {
+        if (!sender || !user.isBlockUser(sender.id)) {
           const tarMessage = new ChannelMessageDto(
             message.id,
             message.text,
@@ -434,16 +432,11 @@ export class ChannelsService {
     const userIds = [...channel.users.values()];
     for (const id of userIds) {
       const tarUser = this.userModel.getUser(id);
-      if (
-        user.id == tarUser.id ||
-        tarUser.blockUser.has(user.id) ||
-        user.blockUser.has(tarUser.id)
-      ) {
+      if (tarUser.blockUser.has(user.id)) {
         continue;
       }
       this.messageModel.sendMessageToUser(tarUser, channel, newMessage, user);
     }
-    this.messageModel.sendMessageToUser(user, channel, newMessage, user);
     return newMessage;
   }
 

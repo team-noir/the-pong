@@ -116,6 +116,7 @@ export class MessageModel {
     message: Message,
     sender?: ChannelUser
   ) {
+    if (!user.socket) { return; }
     user.socket.emit('message', {
       id: message.id,
       channelId: message.channelId,

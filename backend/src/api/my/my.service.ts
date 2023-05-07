@@ -286,6 +286,9 @@ export class MyService {
           throw new Error('not blocked');
         }
       });
+    
+    const channelUser = this.channelService.userModel.getUser(myUserId);
+    channelUser.blockUser.delete(Number(userId));
     return following;
   }
 }
