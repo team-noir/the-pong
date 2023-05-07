@@ -17,7 +17,7 @@ export default function ChannelNew() {
   const [formData, setformData] = useState<ChannelFormType>({
     title: '',
     isPrivate: false,
-    password: '',
+    password: null,
   });
   const [isValidated, setIsValidated] = useState({
     title: false,
@@ -36,7 +36,7 @@ export default function ChannelNew() {
 
   useEffect(() => {
     if (!hasPassword || formData.isPrivate) {
-      setformData((prevState) => ({ ...prevState, password: '' }));
+      setformData((prevState) => ({ ...prevState, password: null }));
       setIsValidated((prevState) => ({ ...prevState, password: true }));
     }
   }, [hasPassword, formData.isPrivate]);
