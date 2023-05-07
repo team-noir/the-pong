@@ -48,7 +48,7 @@ export default function Login() {
             linkStyle
             fullLength
           >
-            로그인 없이 둘러보기
+            임시 프로필로 둘러보기
           </Button>
         </div>
       </div>
