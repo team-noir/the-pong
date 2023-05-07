@@ -22,7 +22,7 @@ export default function GameInviteButton() {
     onMutate: () => {
       onQueue((data: { text: string; gameId?: number }) => {
         if (data.gameId) {
-          navigate(ROUTES.GAME.ROOM(data.gameId));
+          navigate(ROUTES.GAME.SETTING(data.gameId));
         } else {
           setAlertCode(data.text);
           setIsWating(false);
