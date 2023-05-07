@@ -72,7 +72,7 @@ export interface ChannelFormType {
   id?: number;
   title?: string;
   isPrivate?: boolean;
-  password?: string;
+  password?: string | null;
 }
 
 export interface MessageType {
