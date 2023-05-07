@@ -409,7 +409,7 @@ export class GameModel implements OnModuleInit {
         if (invitedSocket) {
           await invitedSocket.emit('gameInvite', { text: 'canceled' });
         }
-        await game.noticeToPlayers('gameInvite', { text: 'canceled' });
+        await game.noticeToPlayers('queue', { text: 'timeout' });
         this.deleteInvite(invitetId);
       } else {
         await game.noticeToPlayers('queue', { text: 'timeout' });
