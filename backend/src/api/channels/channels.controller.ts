@@ -28,6 +28,7 @@ import {
 } from '@nestjs/swagger';
 import {
   CreateChannelDto,
+  ChannelListDto,
   SettingChannelDto,
   ChannelPasswordDto,
   ChannelRoleDto,
@@ -86,17 +87,10 @@ export class ChannelsController {
   @UseGuards(AuthenticatedGuard)
   async list(
     @Req() req,
-    @Query('enter') enter: string,
-    @Query('kind') kind: string[],
+    @Query() query: ChannelListDto,
     @Res({ passthrough: true }) res
   ) {
     try {
-      const query = {
-        isEnter: enter != undefined,
-        isPublic: kind && kind.includes('public'),
-        isPriv: kind && kind.includes('private'),
-        isDm: kind && kind.includes('dm'),
-      };
       res.status(HttpStatus.OK);
       return await this.channelsService.list(req.user.id, query);
     } catch (error) {

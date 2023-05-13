@@ -8,6 +8,7 @@ import {
   Matches,
 } from 'class-validator';
 import { ChannelUser } from '../models/user.model';
+import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
 
 export class CreateChannelDto {
   @ApiProperty({
@@ -31,6 +32,33 @@ export class CreateChannelDto {
   @IsOptional()
   @Matches(/^(?=.*[a-zA-Z0-9])[a-zA-Z0-9]{4,10}$/)
   public password?: string;
+}
+
+export class ChannelListDto extends PageRequestDto {
+  @ApiProperty({
+    name: 'enter',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  public enter?: string;
+
+  @ApiProperty({
+    name: 'kind',
+    required: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  public kind: string[];
+
+  getConditions() {
+    return {
+      isEnter: this.enter != undefined,
+      isPublic: this.kind && this.kind.includes('public'),
+      isPriv: this.kind && this.kind.includes('private'),
+      isDm: this.kind && this.kind.includes('dm'),
+    };
+  }
 }
 
 export class ChannelDmDto {

@@ -1,7 +1,7 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
-import { CreateChannelDto, ChannelMessageDto } from './dtos/channel.dto';
+import { CreateChannelDto, ChannelListDto, ChannelMessageDto } from './dtos/channel.dto';
 
 import { ChannelModel, Channel } from './models/channel.model';
 import { UserModel, ChannelUser } from './models/user.model';
@@ -120,21 +120,31 @@ export class ChannelsService {
     }
   }
 
-  async list(userId: number, query) {
+  async list(userId: number, query: ChannelListDto) {
     const data = [];
     const channels = this.channelModel.getAll();
     const user = this.userModel.getUser(userId);
+    const conditions = query.getConditions();
+    const page = query.getPageOptions();
 
-    if (!query.isPublic && !query.isPriv && !query.isDm) {
-      query.isPublic = true;
+    if (!conditions.isPublic && !conditions.isPriv && !conditions.isDm) {
+      conditions.isPublic = true;
     }
 
     channels.forEach((channel) => {
       if (
         channel.banned.has(userId) ||
         !this.channelModel.checkCanListed(channel, user.id) ||
-        (query.isEnter && !channel.isUserJoined(user.id)) ||
+        (conditions.isEnter && !channel.isUserJoined(user.id)) ||
         this.channelModel.checkListedRange(channel, query)
+      ) {
+        return;
+      }
+
+      if (
+        page.cursor && channel.id < page.cursor.id ||
+        --page.skip > 0 ||
+        --page.take < 0
       ) {
         return;
       }
