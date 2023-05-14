@@ -26,6 +26,12 @@ export class PageRequestDto {
 	@IsOptional()
 	public lastId?: number;
 
+	constructor(pageSize: number, pageNo: number, lastId?: number) {
+		this.pageSize = pageSize;
+		this.pageNo = pageNo;
+		this.lastId = lastId;
+	}
+
 	getLimit(): number {
 		if (
 			this.pageSize < 1 ||

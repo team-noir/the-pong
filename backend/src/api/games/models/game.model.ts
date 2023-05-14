@@ -165,7 +165,7 @@ export class GameModel implements OnModuleInit {
 
   async getGameAchievements(userId: number, gameResult) {
     const player = this.players.get(userId);
-    const userHistory = await this.getGameHistory(userId, 1, 20);
+    const userHistory = await this.getGameHistory(userId, new PageRequestDto(20, 1));
     const userHistoryNormal = userHistory.filter((game) => !game.isLadder);
     const userHistoryLadder = userHistory.filter((game) => game.isLadder);
     const results = [];
@@ -636,13 +636,16 @@ export class GameModel implements OnModuleInit {
     }
   }
 
-  async getGameHistory(userId: number, page: number, perPage: number) {
+  async getGameHistory(userId: number, query: PageRequestDto) {
+    const page = query.getPageOptions();
+
     const history = await this.prismaService.gameResult.findMany({
       where: {
         OR: [{ loserId: userId }, { winnerId: userId }],
       },
-      skip: (page - 1) * perPage,
-      take: perPage,
+      skip: page.skip,
+      take: page.take,
+      cursor: page.cursor,
       select: {
         id: true,
         isLadder: true,

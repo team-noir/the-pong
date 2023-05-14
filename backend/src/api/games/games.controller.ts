@@ -298,27 +298,17 @@ export class GamesController {
 
   @Get('users/:userId')
   @ApiOperation({ summary: 'Get game history.' })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'per_page',
-    required: false,
-  })
   @UseGuards(AuthenticatedGuard)
   async getGameHistory(
     @Req() req,
     @Param('userId') userId: number,
-    @Query('page') page: number,
-    @Query('per_page') perPage: number,
+    @Query() query: PageRequestDto,
     @Res({ passthrough: true }) res
   ) {
     try {
       const history = await this.gamesService.gameModel.getGameHistory(
         userId,
-        page,
-        perPage
+        query
       );
       res.status(HttpStatus.OK);
       return history;
