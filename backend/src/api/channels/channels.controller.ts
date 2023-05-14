@@ -40,6 +40,7 @@ import {
   ChannelDetailDto,
   ChannelMessageTextDto,
 } from './dtos/channel.dto';
+import { PageRequestDto } from '../dtos/pageRequest.dto';
 
 @ApiTags('channels')
 @Controller('channels')
@@ -271,6 +272,7 @@ export class ChannelsController {
   async getChannelMessages(
     @Req() req,
     @Param('channelId') channelId: number,
+    @Query() query: PageRequestDto,
     @Res({ passthrough: true }) res
   ) {
     try {
@@ -278,7 +280,8 @@ export class ChannelsController {
       const user = this.channelsService.userModel.getUser(req.user.id);
       const messages = await this.channelsService.getChannelMessages(
         user,
-        channel
+        channel,
+        query
       );
       res.status(HttpStatus.OK);
       return messages;

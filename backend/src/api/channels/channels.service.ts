@@ -10,6 +10,7 @@ import { MessageModel, Message } from './models/message.model';
 import { PrismaService } from '@/prisma/prisma.service';
 
 import { NOTICE_STATUS, NOTICE_STATUS_MESSAGE } from '@const';
+import { PageRequestDto } from '../dtos/pageRequest.dto';
 
 @Injectable()
 export class ChannelsService {
@@ -396,11 +397,14 @@ export class ChannelsService {
 
   async getChannelMessages(
     user: ChannelUser,
-    channel: Channel
+    channel: Channel,
+    query: PageRequestDto
   ): Promise<ChannelMessageDto[]> {
     channel.checkUserJoined(user);
 
     const data = [];
+    const page = query.getPageOptions();
+    
     this.messageModel.getAllMessages().forEach((message) => {
       if (message.channelId == channel.id) {
         const sender = message.senderId
@@ -408,6 +412,15 @@ export class ChannelsService {
           : null;
 
         if (!sender || !user.isBlockUser(sender.id)) {
+
+          if (
+            page.cursor && channel.id < page.cursor.id ||
+            --page.skip > 0 ||
+            --page.take < 0
+          ) {
+            return;
+          }
+
           const tarMessage = new ChannelMessageDto(
             message.id,
             message.text,

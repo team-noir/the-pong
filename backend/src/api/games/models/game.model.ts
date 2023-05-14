@@ -85,7 +85,7 @@ export class GameModel implements OnModuleInit {
         --page.skip > 0 ||
         --page.take < 0
       ) {
-        return;
+        continue;
       }
 
       for (const player of players) {
