@@ -14,6 +14,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
 import { GAME_STATUS } from '@const';
+import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
 
 type gameId = number;
 type playerId = number;
@@ -71,12 +72,21 @@ export class GameModel implements OnModuleInit {
     return this.games.get(gameId);
   }
 
-  getGameList() {
+  getGameList(query) {
     const gamelist = [];
+    const page = query.getPageOptions();
 
     for (const game of this.games.values()) {
       const { gameId, isLadder, players, createdAt, status } = game;
       const list = [];
+
+      if (
+        page.cursor && gameId < page.cursor.id ||
+        --page.skip > 0 ||
+        --page.take < 0
+      ) {
+        return;
+      }
 
       for (const player of players) {
         list.push({
