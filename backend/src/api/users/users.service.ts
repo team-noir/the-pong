@@ -9,6 +9,8 @@ import { join } from 'path';
 import { PROFILE_PATH } from '@const';
 
 import { AppGateway } from '@/app.gateway';
+import { PageRequestDto } from '../dtos/pageRequest.dto';
+import { AchievementDto } from './dtos/achievement.dto';
 
 interface getUsersQuery {
   q?: string;
@@ -143,12 +145,17 @@ export class UsersService implements OnModuleInit {
 
   /** Achievements */
 
-  async getAchievements(userId: number) {
+  async getAchievements(
+    userId: number, 
+    query: PageRequestDto
+  ): Promise<AchievementDto[]> {
+
     return await this.prismaService.achievement_User
       .findMany({
         where: {
           userId,
         },
+        ...query.getPageOptions(),
         select: {
           id: true,
           achievement: {
@@ -161,15 +168,15 @@ export class UsersService implements OnModuleInit {
           createdAt: true,
         },
       })
-      .then((achievements) =>
-        achievements.map((achievement) => ({
-          id: achievement.id,
-          title: achievement.achievement.title,
-          condition: achievement.achievement.condition,
-          description: achievement.achievement.description,
-          createdAt: achievement.createdAt,
+      .then((achievement_users) => {
+        return achievement_users.map((achievement_user) => ({
+          id: achievement_user.id,
+          title: achievement_user.achievement.title,
+          condition: achievement_user.achievement.condition,
+          description: achievement_user.achievement.description,
+          createdAt: achievement_user.createdAt,
         }))
-      );
+      });
   }
 
   async addAchievement(userId: number, achievementId: number) {

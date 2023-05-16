@@ -41,7 +41,7 @@ export class PageRequestDto {
 			this.pageSize = 10;
 		}
 		
-		return this.pageSize;
+		return Number(this.pageSize);
 	}
 
 	getOffset(): number {
@@ -61,15 +61,15 @@ export class PageRequestDto {
 			this.pageSize = 10;
 		}
 
-		return (this.pageNo - 1) * this.pageSize;
+		return Number((this.pageNo - 1) * this.pageSize);
 	}
 
 	getPageOptions() {
 		return {
 			take: this.getLimit(),
-			skip: this.lastId ? 1 : this.getOffset(),
+			skip: Number(this.lastId) ? 1 : this.getOffset(),
 			...(this.lastId && {
-				cursor: { id: this.lastId }
+				cursor: { id: Number(this.lastId) }
 			}),
 		}
 	}

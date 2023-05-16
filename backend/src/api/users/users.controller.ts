@@ -28,6 +28,7 @@ import { UsersService } from './users.service';
 import { Response } from 'express';
 import { UserDto } from './dtos/users.dto';
 import { AchievementDto } from './dtos/achievement.dto';
+import { PageRequestDto } from '../dtos/pageRequest.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -143,11 +144,12 @@ export class UsersController {
   @UseGuards(AuthenticatedGuard)
   async requestAchievements(
     @Param('userId') userId: number,
+    @Query() query: PageRequestDto,
     @Res({ passthrough: true }) res
   ) {
     try {
       const achievements: AchievementDto[] =
-        await this.usersService.getAchievements(Number(userId));
+        await this.usersService.getAchievements(Number(userId), query);
       const statusCode = achievements ? HttpStatus.OK : HttpStatus.NOT_FOUND;
       res.status(statusCode);
       return achievements;
