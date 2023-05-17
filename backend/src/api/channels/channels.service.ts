@@ -127,9 +127,14 @@ export class ChannelsService {
     const user = this.userModel.getUser(userId);
     const conditions = query.getConditions();
     const page = query.getPageOptions();
+    const order = query.getOrderBy();
 
     if (!conditions.isPublic && !conditions.isPriv && !conditions.isDm) {
       conditions.isPublic = true;
+    }
+
+    if (order == 'desc') {
+      channels.reverse();
     }
 
     channels.forEach((channel) => {
@@ -137,13 +142,17 @@ export class ChannelsService {
         channel.banned.has(userId) ||
         !this.channelModel.checkCanListed(channel, user.id) ||
         (conditions.isEnter && !channel.isUserJoined(user.id)) ||
-        this.channelModel.checkListedRange(channel, query)
+        this.channelModel.checkListedRange(channel, conditions)
       ) {
         return;
       }
 
       if (
-        page.cursor && channel.id < page.cursor.id ||
+        page.cursor && 
+        (order == 'desc' 
+          ? channel.id < page.cursor.id 
+          : channel.id > page.cursor.id
+        ) ||
         --page.skip > 0 ||
         --page.take < 0
       ) {
@@ -404,8 +413,14 @@ export class ChannelsService {
 
     const data = [];
     const page = query.getPageOptions();
+    const messages = [...this.messageModel.getAllMessages()];
+    const order = query.getOrderBy();
+
+    if (order == 'desc') {
+      messages.reverse();
+    }
     
-    this.messageModel.getAllMessages().forEach((message) => {
+    messages.forEach((message) => {
       if (message.channelId == channel.id) {
         const sender = message.senderId
           ? this.userModel.getUser(message.senderId)
@@ -414,7 +429,11 @@ export class ChannelsService {
         if (!sender || !user.isBlockUser(sender.id)) {
 
           if (
-            page.cursor && channel.id < page.cursor.id ||
+            page.cursor && 
+            (order == 'desc' 
+              ? message.id < page.cursor.id 
+              : message.id > page.cursor.id
+            ) ||
             --page.skip > 0 ||
             --page.take < 0
           ) {

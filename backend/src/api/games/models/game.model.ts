@@ -75,17 +75,27 @@ export class GameModel implements OnModuleInit {
   getGameList(query) {
     const gamelist = [];
     const page = query.getPageOptions();
+    const games = [...this.games.values()];
+    const order = query.getOrderBy();
 
-    for (const game of this.games.values()) {
+    if (order == 'desc') {
+      games.reverse();
+    }
+
+    for (const game of games) {
       const { gameId, isLadder, players, createdAt, status } = game;
       const list = [];
 
       if (
-        page.cursor && gameId < page.cursor.id ||
+        page.cursor && 
+        (order == 'desc' 
+          ? gameId < page.cursor.id 
+          : gameId > page.cursor.id
+        ) ||
         --page.skip > 0 ||
         --page.take < 0
       ) {
-        continue;
+        return;
       }
 
       for (const player of players) {
@@ -643,9 +653,10 @@ export class GameModel implements OnModuleInit {
       where: {
         OR: [{ loserId: userId }, { winnerId: userId }],
       },
-      skip: page.skip,
-      take: page.take,
-      cursor: page.cursor,
+      ...query.getPageOptions(),
+      orderBy: {
+        id: query.getOrderBy(),
+      },
       select: {
         id: true,
         isLadder: true,

@@ -1,13 +1,20 @@
 export class PageDto<T> {
-	size: number;
 	totalCount: number;
-	totalPage: number;
-	items: T[];
-	
-	constructor(totalCount: number, size: number, items: T[]) {
+	data: T[];
+	paging: {
+		prevCursor: number | null;
+		nextCursor: number | null;
+	}
+
+	constructor(totalCount: number, data: T[]) {
 		this.totalCount = totalCount;
-		this.size = size;
-		this.totalPage = Math.ceil(totalCount / size);
-		this.items = items;
+		this.data = data;
+	}
+
+	setPaging(prevCursor: number | null, nextCursor: number | null) {
+		this.paging = {
+			prevCursor,
+			nextCursor,
+		};
 	}
 }

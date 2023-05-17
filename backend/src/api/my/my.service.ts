@@ -129,6 +129,7 @@ export class MyService {
             followeeId: Number(query.cursor)
           }}
         }),
+        orderBy: { followeeId: query.getOrderBy() },
         select: {
           follewee: { select: { id: true, nickname: true } },
         },
@@ -229,6 +230,7 @@ export class MyService {
             blockedId: Number(query.cursor)
           }}
         }),
+        orderBy: { blockedId: query.getOrderBy() },
         select: {
           blocked: { select: { id: true, nickname: true } },
         },

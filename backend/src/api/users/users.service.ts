@@ -66,6 +66,9 @@ export class UsersService implements OnModuleInit {
       .findMany({
         where,
         ...query.getPageOptions(),
+        orderBy: {
+          id: query.getOrderBy()
+        },
         select: {
           id: true,
           nickname: true,

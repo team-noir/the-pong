@@ -75,14 +75,6 @@ export class ChannelsController {
 
   @Get()
   @ApiOperation({ summary: 'Get channel list' })
-  @ApiQuery({
-    name: 'enter',
-    required: false,
-  })
-  @ApiQuery({
-    name: 'kind',
-    required: false,
-  })
   @ApiOkResponse({ type: [ChannelInfoDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
