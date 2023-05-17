@@ -12,6 +12,7 @@ import { AppGateway } from '@/app.gateway';
 import { PageRequestDto } from '../dtos/pageRequest.dto';
 import { AchievementDto } from './dtos/achievement.dto';
 import { GetUserRequestDto } from './dtos/users.dto';
+import { PageDto } from '../dtos/page.dto';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -62,7 +63,7 @@ export class UsersService implements OnModuleInit {
       },
     };
 
-    return await this.prismaService.user
+    const data = await this.prismaService.user
       .findMany({
         where,
         ...query.getPageOptions(),
@@ -88,6 +89,31 @@ export class UsersService implements OnModuleInit {
           }))
         )
       );
+
+      const length = await this.prismaService.user.count({
+        where
+      });
+  
+      const prevData = await this.prismaService.user.findMany({
+        where,
+        take: -query.getLimit(),
+        skip: 1,
+        ...(query.cursor && {
+          cursor: { id: Number(query.cursor) },
+        }),
+        orderBy: { id: query.getOrderBy() },
+      });
+  
+      let cursor = { prev: null, next: null };
+      if (prevData.length == query.getLimit()) {
+        cursor.prev = prevData[0].id;
+      }
+      if (data.length == query.getLimit()) {
+        cursor.next = data[data.length - 1].id;
+      }
+      const result = new PageDto(length, data);
+      result.setPaging(cursor.prev, cursor.next);
+      return result;
   }
 
   async getUser(myUserId: number, userId: number) {
@@ -145,9 +171,9 @@ export class UsersService implements OnModuleInit {
   async getAchievements(
     userId: number, 
     query: PageRequestDto
-  ): Promise<AchievementDto[]> {
+  ): Promise<PageDto<AchievementDto>> {
 
-    return await this.prismaService.achievement_User
+    const data = await this.prismaService.achievement_User
       .findMany({
         where: {
           userId,
@@ -177,6 +203,37 @@ export class UsersService implements OnModuleInit {
           createdAt: achievement_user.createdAt,
         }))
       });
+
+    const length = await this.prismaService.achievement_User.count({
+      where: {
+        userId,
+      },
+    });
+
+    const prevData = await this.prismaService.achievement_User.findMany({
+      where: {
+        userId,
+      },
+      take: -query.getLimit(),
+      skip: 1,
+			...(query.cursor && {
+				cursor: { id: Number(query.cursor) }
+			}),
+      orderBy: {
+        id: query.getOrderBy(),
+      },
+    });
+
+    let cursor = { prev: null, next: null };
+    if (prevData.length == query.getLimit()) {
+      cursor.prev = prevData[0].id;
+    }
+    if (data.length == query.getLimit()) {
+      cursor.next = data[data.length - 1].id;
+    }
+    const result = new PageDto(length, data);
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   async addAchievement(userId: number, achievementId: number) {

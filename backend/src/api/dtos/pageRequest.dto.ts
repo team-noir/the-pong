@@ -59,11 +59,9 @@ export class PageRequestDto {
 	getPageOptions() {
 		return {
 			take: this.getLimit(),
-			skip: Number(this.cursor) ? 1 : 0,
 			...(this.cursor && {
 				cursor: { id: Number(this.cursor) }
 			}),
 		}
 	}
-
 }

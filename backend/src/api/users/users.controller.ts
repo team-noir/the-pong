@@ -29,6 +29,7 @@ import { Response } from 'express';
 import { GetUserRequestDto, UserDto } from './dtos/users.dto';
 import { AchievementDto } from './dtos/achievement.dto';
 import { PageRequestDto } from '../dtos/pageRequest.dto';
+import { PageDto } from '../dtos/page.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -47,7 +48,7 @@ export class UsersController {
   ) {
     try {
       const myUserId = req.user.id;
-      const users: UserDto[] = await this.usersService.getUsers(myUserId, query);
+      const users: PageDto<UserDto> = await this.usersService.getUsers(myUserId, query);
       res.status(HttpStatus.OK);
       return users;
     } catch (error) {
@@ -127,7 +128,7 @@ export class UsersController {
     @Res({ passthrough: true }) res
   ) {
     try {
-      const achievements: AchievementDto[] =
+      const achievements: PageDto<AchievementDto> =
         await this.usersService.getAchievements(Number(userId), query);
       const statusCode = achievements ? HttpStatus.OK : HttpStatus.NOT_FOUND;
       res.status(statusCode);

@@ -15,6 +15,7 @@ import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
 import { GAME_STATUS } from '@const';
 import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
+import { PageDto } from '@/api/dtos/page.dto';
 
 type gameId = number;
 type playerId = number;
@@ -77,26 +78,32 @@ export class GameModel implements OnModuleInit {
     const page = query.getPageOptions();
     const games = [...this.games.values()];
     const order = query.getOrderBy();
+    let prevIdx = 0;
 
+    games.sort((a,b) => a.gameId - b.gameId);
     if (order == 'desc') {
       games.reverse();
     }
 
-    for (const game of games) {
+    games.forEach((game, idx) => {
       const { gameId, isLadder, players, createdAt, status } = game;
       const list = [];
 
       if (
         page.cursor && 
         (order == 'desc' 
-          ? gameId < page.cursor.id 
-          : gameId > page.cursor.id
+          ? gameId > page.cursor.id 
+          : gameId < page.cursor.id
         ) ||
         --page.skip > 0 ||
         --page.take < 0
       ) {
         return;
       }
+
+      if (page.skip == 1) {
+        prevIdx = idx;
+      } 
 
       for (const player of players) {
         list.push({
@@ -107,7 +114,7 @@ export class GameModel implements OnModuleInit {
       }
 
       if (status != GAME_STATUS.PLAYING) {
-        continue;
+        return;
       }
       gamelist.push({
         id: gameId,
@@ -116,8 +123,19 @@ export class GameModel implements OnModuleInit {
         isLadder: isLadder,
         createdAt: createdAt,
       });
+    });
+
+    const result = new PageDto(games.length, gamelist);
+    let cursor = { prev: null, next: null };
+
+    if (prevIdx - query.getLimit() >= 0) {
+      cursor.prev = games[prevIdx - query.getLimit()].gameId;
     }
-    return gamelist;
+    if (gamelist.length == query.getLimit()) {
+      cursor.next = gamelist[gamelist.length - 1].gameId;
+    }
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   setGame(game: Game) {
@@ -176,8 +194,8 @@ export class GameModel implements OnModuleInit {
   async getGameAchievements(userId: number, gameResult) {
     const player = this.players.get(userId);
     const userHistory = await this.getGameHistory(userId, new PageRequestDto(20, 1));
-    const userHistoryNormal = userHistory.filter((game) => !game.isLadder);
-    const userHistoryLadder = userHistory.filter((game) => game.isLadder);
+    const userHistoryNormal = userHistory.data.filter((game) => !game.isLadder);
+    const userHistoryLadder = userHistory.data.filter((game) => game.isLadder);
     const results = [];
 
     if (gameResult.winner.id == userId) {
@@ -647,8 +665,6 @@ export class GameModel implements OnModuleInit {
   }
 
   async getGameHistory(userId: number, query: PageRequestDto) {
-    const page = query.getPageOptions();
-
     const history = await this.prismaService.gameResult.findMany({
       where: {
         OR: [{ loserId: userId }, { winnerId: userId }],
@@ -680,7 +696,7 @@ export class GameModel implements OnModuleInit {
       },
     });
 
-    return history.map((h) => {
+    const data = history.map((h) => {
       return {
         id: h.id,
         isLadder: h.isLadder,
@@ -689,5 +705,36 @@ export class GameModel implements OnModuleInit {
         createdAt: h.createdAt,
       };
     });
+
+    const length = await this.prismaService.gameResult.count({
+      where: {
+        OR: [{ loserId: userId }, { winnerId: userId }],
+      },
+    });
+
+    const prevHistory = await this.prismaService.gameResult.findMany({
+      where: {
+        OR: [{ loserId: userId }, { winnerId: userId }],
+      },
+      take: -query.getLimit(),
+      skip: 1,
+			...(query.cursor && {
+				cursor: { id: Number(query.cursor) }
+			}),
+      orderBy: {
+        id: query.getOrderBy(),
+      },
+    });
+
+    let cursor = { prev: null, next: null };
+    if (prevHistory.length == query.getLimit()) {
+      cursor.prev = prevHistory[0].id;
+    }
+    if (data.length == query.getLimit()) {
+      cursor.next = data[data.length - 1].id;
+    }
+    const result = new PageDto(length, data);
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 }

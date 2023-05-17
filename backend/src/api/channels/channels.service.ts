@@ -11,6 +11,7 @@ import { PrismaService } from '@/prisma/prisma.service';
 
 import { NOTICE_STATUS, NOTICE_STATUS_MESSAGE } from '@const';
 import { PageRequestDto } from '../dtos/pageRequest.dto';
+import { PageDto } from '../dtos/page.dto';
 
 @Injectable()
 export class ChannelsService {
@@ -128,16 +129,18 @@ export class ChannelsService {
     const conditions = query.getConditions();
     const page = query.getPageOptions();
     const order = query.getOrderBy();
+    let prevIdx = 0;
 
     if (!conditions.isPublic && !conditions.isPriv && !conditions.isDm) {
       conditions.isPublic = true;
     }
 
+    channels.sort((a,b) => a.id - b.id);
     if (order == 'desc') {
       channels.reverse();
     }
 
-    channels.forEach((channel) => {
+    channels.forEach((channel, idx) => {
       if (
         channel.banned.has(userId) ||
         !this.channelModel.checkCanListed(channel, user.id) ||
@@ -150,14 +153,17 @@ export class ChannelsService {
       if (
         page.cursor && 
         (order == 'desc' 
-          ? channel.id < page.cursor.id 
-          : channel.id > page.cursor.id
+          ? channel.id > page.cursor.id 
+          : channel.id < page.cursor.id
         ) ||
-        --page.skip > 0 ||
         --page.take < 0
       ) {
         return;
       }
+
+      if (page.take == query.getLimit()) {
+        prevIdx = idx;
+      } 
 
       const info = {
         id: channel.id,
@@ -185,7 +191,17 @@ export class ChannelsService {
       data.push(info);
     });
 
-    return data;
+    const result = new PageDto(channels.length, data);
+    let cursor = { prev: null, next: null };
+
+    if (prevIdx - query.getLimit() >= 0) {
+      cursor.prev = channels[prevIdx - query.getLimit()].id;
+    }
+    if (data.length == query.getLimit()) {
+      cursor.next = data[data.length - 1].id;
+    }
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   getChannelInfo(userId: number, channelId: number) {
@@ -408,19 +424,21 @@ export class ChannelsService {
     user: ChannelUser,
     channel: Channel,
     query: PageRequestDto
-  ): Promise<ChannelMessageDto[]> {
+  ): Promise<PageDto<ChannelMessageDto>> {
     channel.checkUserJoined(user);
 
     const data = [];
     const page = query.getPageOptions();
     const messages = [...this.messageModel.getAllMessages()];
     const order = query.getOrderBy();
+    let prevIdx = 0;
 
+    messages.sort((a,b) => a.id - b.id);
     if (order == 'desc') {
       messages.reverse();
     }
     
-    messages.forEach((message) => {
+    messages.forEach((message, idx) => {
       if (message.channelId == channel.id) {
         const sender = message.senderId
           ? this.userModel.getUser(message.senderId)
@@ -431,14 +449,17 @@ export class ChannelsService {
           if (
             page.cursor && 
             (order == 'desc' 
-              ? message.id < page.cursor.id 
-              : message.id > page.cursor.id
+              ? message.id > page.cursor.id 
+              : message.id < page.cursor.id
             ) ||
-            --page.skip > 0 ||
             --page.take < 0
           ) {
             return;
           }
+
+          if (page.take == query.getLimit()) {
+            prevIdx = idx;
+          } 
 
           const tarMessage = new ChannelMessageDto(
             message.id,
@@ -450,7 +471,18 @@ export class ChannelsService {
         }
       }
     });
-    return data;
+
+    const result = new PageDto(messages.length, data);
+    let cursor = { prev: null, next: null };
+
+    if (prevIdx - query.getLimit() >= 0) {
+      cursor.prev = messages[prevIdx - query.getLimit()].id;
+    }
+    if (data.length == query.getLimit()) {
+      cursor.next = data[data.length - 1].id;
+    }
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   // 채널에 메세지를 보낸다.
