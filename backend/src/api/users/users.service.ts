@@ -150,6 +150,9 @@ export class UsersService implements OnModuleInit {
           userId,
         },
         ...query.getPageOptions(),
+        orderBy: {
+          id: query.getOrderBy(),
+        },
         select: {
           id: true,
           achievement: {

@@ -1,12 +1,13 @@
 export class PageDto<T> {
-	pageSize: number;
+	size: number;
 	totalCount: number;
 	totalPage: number;
 	items: T[];
-	constructor(totalCount: number, pageSize: number, items: T[]) {
+	
+	constructor(totalCount: number, size: number, items: T[]) {
 		this.totalCount = totalCount;
-		this.pageSize = pageSize;
-		this.totalPage = Math.ceil(totalCount / pageSize);
+		this.size = size;
+		this.totalPage = Math.ceil(totalCount / size);
 		this.items = items;
 	}
 }

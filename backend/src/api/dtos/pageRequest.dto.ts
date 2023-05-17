@@ -3,76 +3,65 @@ import { IsOptional, IsNumberString } from 'class-validator';
 
 export class PageRequestDto {
 	@ApiProperty({
-		name: 'pageSize',
+		name: 'size',
 		required: false,
 		description: 'Number of information per page\n- Default: `10`',
 	})
 	@IsNumberString()
 	@IsOptional()
-	public pageSize?: number | 10;
+	public size?: number | 10;
 
 	@ApiProperty({
-		name: 'pageNo',
+		name: 'cursor',
 		required: false,
-		description: 'Page number\n- Default: `1`',
+		description: 'Cursor id\n- Default: `null`',
 	})
 	@IsNumberString()
 	@IsOptional()
-	public pageNo?: number | 1;
+	public cursor?: number;
 
 	@ApiProperty({
-		name: 'lastId',
+		name: 'order',
 		required: false,
-		description: 'Cursor id',
+		description: 'Order\n- Default: `desc`',
 	})
-	@IsNumberString()
 	@IsOptional()
-	public lastId?: number;
+	public order?: 'asc' | 'desc';
 
-	constructor(pageSize: number, pageNo: number, lastId?: number) {
-		this.pageSize = pageSize;
-		this.pageNo = pageNo;
-		this.lastId = lastId;
+	constructor(size: number, cursor?: number) {
+		this.size = size;
+		this.cursor = cursor;
 	}
 
 	getLimit(): number {
 		if (
-			this.pageSize < 1 ||
-			this.pageSize === null ||
-			this.pageSize === undefined
+			this.size < 1 ||
+			this.size === null ||
+			this.size === undefined
 		) {
-			this.pageSize = 10;
+			this.size = 10;
 		}
 		
-		return Number(this.pageSize);
+		return Number(this.size);
 	}
 
-	getOffset(): number {
+	getOrderBy(): 'asc' | 'desc' {
 		if (
-			this.pageNo < 1 || 
-			this.pageNo === null || 
-			this.pageNo === undefined
+			this.order !== 'asc' &&
+			this.order !== 'desc'
 		) {
-			this.pageNo = 1;
-		}
-	
-		if (
-			this.pageSize < 1 ||
-			this.pageSize === null ||
-			this.pageSize === undefined
-		) {
-			this.pageSize = 10;
+			this.order = 'desc';
 		}
 
-		return Number((this.pageNo - 1) * this.pageSize);
+		return this.order;
 	}
 
 	getPageOptions() {
 		return {
 			take: this.getLimit(),
-			skip: Number(this.lastId) ? 1 : this.getOffset(),
-			...(this.lastId && {
-				cursor: { id: Number(this.lastId) }
+			skip: Number(this.cursor) ? 1 : 0,
+			...(this.cursor && {
+				cursor: { id: Number(this.cursor) }
 			}),
 		}
 	}

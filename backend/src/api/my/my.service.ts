@@ -122,11 +122,11 @@ export class MyService {
       .findMany({
         where: { followerId: myUserId },
         take: query.getLimit(),
-        skip: Number(query.lastId) ? 1 : query.getOffset(),
-        ...(query.lastId && {
+        skip: Number(query.cursor) ? 1 : 0,
+        ...(query.cursor && {
           cursor: { id: {
             followerId: myUserId,
-            followeeId: Number(query.lastId)
+            followeeId: Number(query.cursor)
           }}
         }),
         select: {
@@ -222,11 +222,11 @@ export class MyService {
       .findMany({
         where: { blockerId: myUserId },
         take: query.getLimit(),
-        skip: Number(query.lastId) ? 1 : query.getOffset(),
-        ...(query.lastId && {
+        skip: Number(query.cursor) ? 1 : 0,
+        ...(query.cursor && {
           cursor: { id: {
             blockerId: myUserId,
-            blockedId: Number(query.lastId)
+            blockedId: Number(query.cursor)
           }}
         }),
         select: {
