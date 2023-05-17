@@ -70,6 +70,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["otplib", "npm:12.0.1"],\
             ["passport", "npm:0.6.0"],\
             ["passport-42", "npm:1.2.6"],\
+            ["passport-google-oauth2", "npm:0.2.0"],\
             ["passport-jwt", "npm:4.0.1"],\
             ["passport-local", "npm:1.0.0"],\
             ["passport-oauth2-refresh", "npm:2.1.0"],\
@@ -8364,6 +8365,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
+      ["passport-google-oauth2", [\
+        ["npm:0.2.0", {\
+          "packageLocation": "./.yarn/cache/passport-google-oauth2-npm-0.2.0-9c74db66df-b65c7b954c.zip/node_modules/passport-google-oauth2/",\
+          "packageDependencies": [\
+            ["passport-google-oauth2", "npm:0.2.0"],\
+            ["passport-oauth2", "npm:1.7.0"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
       ["passport-jwt", [\
         ["npm:4.0.1", {\
           "packageLocation": "./.yarn/cache/passport-jwt-npm-4.0.1-2841eea09e-0669d5bf8f.zip/node_modules/passport-jwt/",\
@@ -9702,6 +9713,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["otplib", "npm:12.0.1"],\
             ["passport", "npm:0.6.0"],\
             ["passport-42", "npm:1.2.6"],\
+            ["passport-google-oauth2", "npm:0.2.0"],\
             ["passport-jwt", "npm:4.0.1"],\
             ["passport-local", "npm:1.0.0"],\
             ["passport-oauth2-refresh", "npm:2.1.0"],\

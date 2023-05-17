@@ -32,7 +32,7 @@ import { twoFaDto } from './dtos/auth.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Get('42')
+  @Get('google')
   @ApiOkResponse({
     description: 'Redirect to 42 api. Set cookie.',
   })
@@ -43,7 +43,7 @@ export class AuthController {
     return;
   }
 
-  @Get('42/return')
+  @Get('google/return')
   @ApiOperation({ summary: '42 api callback' })
   @ApiOkResponse({ description: 'Get access token' })
   @ApiHeader({ name: 'Authorization', description: 'jwt' })

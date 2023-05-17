@@ -1,33 +1,32 @@
-import { Strategy, Profile, VerifyCallback } from 'passport-42';
+// import { Profile, VerifyCallback } from 'passport-42';
+import { Strategy, Profile } from 'passport-google-oauth2';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@/prisma/prisma.service';
 
 @Injectable()
-export class FTStrategy extends PassportStrategy(Strategy, '42') {
+export class FTStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(private prismaService: PrismaService) {
     const options = {
-      clientID: process.env.FT_UID,
-      clientSecret: process.env.FT_SECRET,
-      callbackURL: process.env.FT_CB,
-      passReqToCallback: true,
-      failureRedirect: process.env.CLIENT_APP_URL,
-    };
+      clientID: process.env.GOOGLE_ID,
+      clientSecret: process.env.GOOGLE_SECRET,
+      callbackURL: process.env.GOOGLE_CB,
+      scope: ['email', 'profile'],
+    }
     super(options);
   }
 
   async validate(
-    request,
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-    done: VerifyCallback
   ): Promise<any> {
-    const { id, username } = profile;
+    const { id, name, emails } = profile;
+
     const user = await this.prismaService.user.upsert({
       create: {
         ftId: id,
-        ftUsername: username,
+        ftUsername: name,
         ftAccessToken: accessToken,
         ftRefreshToken: refreshToken,
       },
@@ -40,6 +39,11 @@ export class FTStrategy extends PassportStrategy(Strategy, '42') {
       },
     });
 
-    done(null, user);
+    return {
+      provider: 'google',
+      providerId: id,
+      name: name.givenName,
+      email: emails[0].value,
+    }
   }
 }
