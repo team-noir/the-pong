@@ -8,6 +8,7 @@ import { AuthService } from '../auth/auth.service';
 import { readdir, unlink, rmdir } from 'node:fs/promises';
 import { PROFILE_PATH } from '@const';
 import { JwtPayloadDto } from '../auth/dtos/jwtPayload.dto';
+import { PageRequestDto } from '../dtos/pageRequest.dto';
 
 @Injectable()
 export class MyService {
@@ -111,7 +112,7 @@ export class MyService {
     return user;
   }
 
-  async getFollowing(@Req() req) {
+  async getFollowing(@Req() req, query: PageRequestDto) {
     const myUserId = req.user.id;
     if (!myUserId) {
       return null;
@@ -120,6 +121,14 @@ export class MyService {
     const following = await this.prismaService.followUser
       .findMany({
         where: { followerId: myUserId },
+        take: query.getLimit(),
+        skip: Number(query.lastId) ? 1 : query.getOffset(),
+        ...(query.lastId && {
+          cursor: { id: {
+            followerId: myUserId,
+            followeeId: Number(query.lastId)
+          }}
+        }),
         select: {
           follewee: { select: { id: true, nickname: true } },
         },
@@ -204,7 +213,7 @@ export class MyService {
     return following;
   }
 
-  async getBlocks(@Req() req) {
+  async getBlocks(@Req() req, query: PageRequestDto) {
     const myUserId = req.user.id;
     if (!myUserId) {
       return null;
@@ -212,6 +221,14 @@ export class MyService {
     const following = await this.prismaService.blockUser
       .findMany({
         where: { blockerId: myUserId },
+        take: query.getLimit(),
+        skip: Number(query.lastId) ? 1 : query.getOffset(),
+        ...(query.lastId && {
+          cursor: { id: {
+            blockerId: myUserId,
+            blockedId: Number(query.lastId)
+          }}
+        }),
         select: {
           blocked: { select: { id: true, nickname: true } },
         },

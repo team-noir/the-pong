@@ -7,6 +7,7 @@ import {
   Delete,
   Req,
   Param,
+  Query,
   Res,
   Body,
   UseGuards,
@@ -38,6 +39,7 @@ import { SettingDto, CheckSettingDto, FileUploadDto } from './dtos/setting.dto';
 import { MyService } from './my.service';
 import { MyDto, FollowDto, BlockDto } from './dtos/my.dto';
 import { PROFILE_PATH, PROFILE_IMAGE_MAX_SIZE } from '@const';
+import { PageRequestDto } from '../dtos/pageRequest.dto';
 
 @ApiTags('my')
 @Controller('my')
@@ -186,9 +188,13 @@ export class MyController {
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
-  async getFollowing(@Req() req, @Res({ passthrough: true }) res) {
+  async getFollowing(
+    @Req() req, 
+    @Query() query: PageRequestDto,
+    @Res({ passthrough: true }) res
+  ) {
     try {
-      const list = await this.myService.getFollowing(req);
+      const list = await this.myService.getFollowing(req, query);
       res.status(HttpStatus.OK);
       return list;
     } catch (error) {
@@ -243,9 +249,13 @@ export class MyController {
     type: [BlockDto],
   })
   @UseGuards(AuthenticatedGuard)
-  async getBlocks(@Req() req, @Res({ passthrough: true }) res) {
+  async getBlocks(
+    @Req() req, 
+    @Query() query: PageRequestDto,
+    @Res({ passthrough: true }) res
+  ) {
     try {
-      const list = await this.myService.getBlocks(req);
+      const list = await this.myService.getBlocks(req, query);
       res.status(HttpStatus.OK);
       return list;
     } catch (error) {
