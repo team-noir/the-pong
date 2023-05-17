@@ -11,6 +11,7 @@ import {
   updateMyProfileImage,
 } from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
+import useDebounce from 'hooks/useDebounce';
 import TextInputWithMessage from 'components/molecule/TextInputWithMessage';
 import FileInputWithImage from 'components/molecule/FileInputWithImage';
 import Button from 'components/atoms/Button';
@@ -44,6 +45,9 @@ export default function SettingProfile() {
       setIsAvailableNickname(data.nickname);
     },
   });
+  const debouncedCheckProfile = useDebounce((nickname: string) => {
+    checkProfileMutation.mutate({ nickname });
+  }, 300);
   const updateMyProfileMutation = useMutation(updateMyProfile);
   const updateMyProfileImageMutation = useMutation(updateMyProfileImage, {
     onSuccess,
@@ -108,7 +112,7 @@ export default function SettingProfile() {
 
   const checkNicknameAvailable = (value: string) => {
     if (!isValidNickname || value === myUserNickname) return false;
-    checkProfileMutation.mutate({ nickname: value });
+    debouncedCheckProfile(value);
   };
 
   return (
