@@ -9,6 +9,7 @@ import {
   updateMyProfileImage,
 } from 'api/rest.v1';
 import { useUser } from 'hooks/useStore';
+import useDebounce from 'hooks/useDebounce';
 import MultiSteps from 'components/organisms/OnBoarding/MultiSteps';
 import StepAgreements from 'components/organisms/OnBoarding/StepAgreements';
 import StepNickname from 'components/organisms/OnBoarding/StepNickname';
@@ -56,10 +57,13 @@ export default function OnBoarding() {
       setIsAvailableNickname(data.nickname);
     },
   });
+  const debouncedCheckProfile = useDebounce((nickname: string) => {
+    checkProfileMutation.mutate({ nickname });
+  }, 300);
 
   useEffect(() => {
     if (!formData.nickname) return;
-    checkProfileMutation.mutate({ nickname: formData.nickname });
+    debouncedCheckProfile(formData.nickname);
   }, [formData.nickname]);
 
   const handleSubmit = (formData: ProfileFormType) => {
