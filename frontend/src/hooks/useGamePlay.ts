@@ -14,8 +14,8 @@ type Return = [
   paddles: typeof initialStateDefault.paddles,
   isPlaying: boolean,
   count: number | null,
-  handleMouseDown: (e: React.MouseEvent<HTMLButtonElement>) => void,
-  handleMouseUp: (e: React.MouseEvent<HTMLButtonElement>) => void,
+  handlePointerDown: (e: React.MouseEvent<HTMLButtonElement>) => void,
+  handlePointerUp: (e: React.MouseEvent<HTMLButtonElement>) => void,
   result: GameResultType | null
 ];
 
@@ -219,6 +219,7 @@ export default function useGamePlay(
 
   const drawPaddles = () => {
     if (isMyKeyDown.current.left) {
+      console.log('drawPaddles my left');
       const nextX = paddles.down.x - paddleDeltaX;
       setPaddles((prevState) => ({
         ...prevState,
@@ -265,74 +266,58 @@ export default function useGamePlay(
     drawBall();
   };
 
+  const downLeft = () => {
+    if (amIOwner) {
+      isMyKeyDown.current.left = true;
+    } else {
+      dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_LEFT);
+    }
+  };
+
+  const upLeft = () => {
+    if (amIOwner) {
+      isMyKeyDown.current.left = false;
+    } else {
+      dataChannelRef.current?.send(GAME_KEY_EVENT.UP_LEFT);
+    }
+  };
+
+  const downRight = () => {
+    if (amIOwner) {
+      isMyKeyDown.current.right = true;
+    } else {
+      dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_RIGHT);
+    }
+  };
+
+  const upRight = () => {
+    if (amIOwner) {
+      isMyKeyDown.current.right = false;
+    } else {
+      dataChannelRef.current?.send(GAME_KEY_EVENT.UP_RIGHT);
+    }
+  };
+
   const handleKeyDown = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') {
-      if (amIOwner) {
-        isMyKeyDown.current.left = true;
-      } else {
-        dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_LEFT);
-      }
-    }
-    if (e.key === 'ArrowRight') {
-      if (amIOwner) {
-        isMyKeyDown.current.right = true;
-      } else {
-        dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_RIGHT);
-      }
-    }
+    e.key === 'ArrowLeft' && downLeft();
+    e.key === 'ArrowRight' && downRight();
   };
 
   const handleKeyUp = (e: KeyboardEvent) => {
-    if (e.key === 'ArrowLeft') {
-      if (amIOwner) {
-        isMyKeyDown.current.left = false;
-      } else {
-        dataChannelRef.current?.send(GAME_KEY_EVENT.UP_LEFT);
-      }
-    }
-    if (e.key === 'ArrowRight') {
-      if (amIOwner) {
-        isMyKeyDown.current.right = false;
-      } else {
-        dataChannelRef.current?.send(GAME_KEY_EVENT.UP_RIGHT);
-      }
-    }
+    e.key === 'ArrowLeft' && upLeft();
+    e.key === 'ArrowRight' && upRight();
   };
 
-  const handleMouseDown = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePointerDown = (e: React.MouseEvent<HTMLButtonElement>) => {
     const { value } = e.currentTarget;
-    if (value === 'left') {
-      if (amIOwner) {
-        isMyKeyDown.current.left = true;
-      } else {
-        dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_LEFT);
-      }
-    }
-    if (value === 'right') {
-      if (amIOwner) {
-        isMyKeyDown.current.right = true;
-      } else {
-        dataChannelRef.current?.send(GAME_KEY_EVENT.DOWN_RIGHT);
-      }
-    }
+    value === 'left' && downLeft();
+    value === 'right' && downRight();
   };
 
-  const handleMouseUp = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handlePointerUp = (e: React.MouseEvent<HTMLButtonElement>) => {
     const { value } = e.currentTarget;
-    if (value === 'left') {
-      if (amIOwner) {
-        isMyKeyDown.current.left = false;
-      } else {
-        dataChannelRef.current?.send(GAME_KEY_EVENT.UP_LEFT);
-      }
-    }
-    if (value === 'right') {
-      if (amIOwner) {
-        isMyKeyDown.current.right = false;
-      } else {
-        dataChannelRef.current?.send(GAME_KEY_EVENT.UP_RIGHT);
-      }
-    }
+    value === 'left' && upLeft();
+    value === 'right' && upRight();
   };
 
   return [
@@ -340,8 +325,8 @@ export default function useGamePlay(
     paddles,
     isPlaying,
     count,
-    handleMouseDown,
-    handleMouseUp,
+    handlePointerDown,
+    handlePointerUp,
     result,
   ];
 }

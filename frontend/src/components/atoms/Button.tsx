@@ -15,8 +15,8 @@ interface Props {
   className?: string;
   disabled?: boolean;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  onMouseDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  onMouseUp?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onPointerDown?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onPointerUp?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 export default function Button({
@@ -33,8 +33,8 @@ export default function Button({
   className,
   disabled = false,
   onClick,
-  onMouseDown,
-  onMouseUp,
+  onPointerDown,
+  onPointerUp,
 }: Props) {
   return (
     <button
@@ -54,8 +54,8 @@ export default function Button({
       value={value}
       disabled={disabled}
       onClick={onClick}
-      onMouseDown={onMouseDown}
-      onMouseUp={onMouseUp}
+      onPointerDown={onPointerDown}
+      onPointerUp={onPointerUp}
     >
       {logoImageUrl && (
         <img
