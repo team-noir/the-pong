@@ -64,14 +64,16 @@ export class GamesService {
     const invited = await this.gameModel.createPlayer(invitedUserId);
     const gameId = await this.gameModel.newInvite(user, invited);
 
-    await invited.socket.emit('gameInvite', {
-      text: 'invited',
-      gameId: gameId,
-      user: {
-        id: user.userId,
-        nickname: user.username,
-      },
-    });
+    if (invited.socket) {
+      await invited.socket.emit('gameInvite', {
+        text: 'invited',
+        gameId: gameId,
+        user: {
+          id: user.userId,
+          nickname: user.username,
+        },
+      });
+    }
   }
 
   cancelInvitation(userId: number) {

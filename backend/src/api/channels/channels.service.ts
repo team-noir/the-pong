@@ -81,10 +81,11 @@ export class ChannelsService {
 
     await this.channelModel.joinChannel(createdBy, newChannel, null);
 
-    // socket message
-    createdBy.socket.emit('message', {
-      channelId: newChannel.id,
-    });
+    if (createdBy.socket) {
+      createdBy.socket.emit('message', {
+        channelId: newChannel.id,
+      });
+    }
 
     return { id: newChannel.id };
   }
@@ -370,7 +371,6 @@ export class ChannelsService {
       this.channelModel.inviteChannel(invitedUser, channel);
       users.push(invitedUser);
 
-      // socket massage
       if (invitedUser.socket) {
         invitedUser.socket.emit('invited', { channelId: channel.id });
       }

@@ -48,15 +48,19 @@ export class Game {
       const player1 = this.players[0];
       const player2 = this.players[1];
 
-      await player1.socket.emit('rtcInit', {
-        userId: player2.userId,
-      });
+      if (player1.socket) {
+        await player1.socket.emit('rtcInit', {
+          userId: player2.userId,
+        });
+      }
       this.viewerConnections.add(player2.userId);
       setTimeout(() => {
         if (this.viewerConnections.has(player2.userId)) {
-          player1.socket.emit('rtcInit', {
-            userId: player2.userId,
-          });
+          if (player1.socket) {
+            player1.socket.emit('rtcInit', {
+              userId: player2.userId,
+            });
+          }
         }
       }, 4000);
     }
@@ -280,16 +284,20 @@ export class Game {
     viewer.game = this;
     viewer.socket.join(this.getName());
 
-    await this.players[0].socket.emit('rtcInit', {
-      userId: viewerId,
-    });
+    if (this.players[0].socket) {
+      await this.players[0].socket.emit('rtcInit', {
+        userId: viewerId,
+      });
+    }
 
     this.viewerConnections.add(viewerId);
     setTimeout(() => {
       if (this.viewerConnections.has(viewerId)) {
-        this.players[0].socket.emit('rtcInit', {
-          userId: viewerId,
-        });
+        if (this.players[0].socket) {
+          this.players[0].socket.emit('rtcInit', {
+            userId: viewerId,
+          });
+        }
       }
     }, 4000);
 
@@ -299,8 +307,10 @@ export class Game {
   leave(tarPlayer: Player): void {
     if (this.hasPlayer(tarPlayer)) {
       this.players.forEach((player) => {
-        player.socket.leave(this.getName());
-        player.socket.emit('message', '대기열에서 나왔습니다.');
+        if (player.socket) {
+          player.socket.leave(this.getName());
+          player.socket.emit('message', '대기열에서 나왔습니다.');
+        }
       });
     }
   }
@@ -328,10 +338,14 @@ export class Game {
   // Socket message
   async noticeToPlayers(event: string, data) {
     for (const player of this.players) {
-      await player.socket.emit(event, data);
+      if (player.socket) {
+        await player.socket.emit(event, data);
+      }
     }
     for (const viewer of this.viewers) {
-      await viewer.socket.emit(event, data);
+      if (viewer.socket) {
+        await viewer.socket.emit(event, data);
+      }
     }
   }
 }

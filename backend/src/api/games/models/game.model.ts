@@ -273,12 +273,14 @@ export class GameModel implements OnModuleInit {
           },
         });
 
-        await player.socket.emit('achievement', {
-          id: achievement_user.id,
-          title: achievement.title,
-          description: achievement.description,
-          createdAt: achievement_user.createdAt,
-        });
+        if (player.socket) {
+          await player.socket.emit('achievement', {
+            id: achievement_user.id,
+            title: achievement.title,
+            description: achievement.description,
+            createdAt: achievement_user.createdAt,
+          });
+        }
       }
     }
 
@@ -418,14 +420,16 @@ export class GameModel implements OnModuleInit {
     const invitetdBy = invitedGame.getOwnerPlayer();
     if (!invitetdBy) return;
 
-    await player.socket.emit('gameInvite', {
-      text: 'invited',
-      gameId: invitedGame.gameId,
-      user: {
-        id: invitetdBy.userId,
-        nickname: invitetdBy.username,
-      },
-    });
+    if (player.socket) {
+      await player.socket.emit('gameInvite', {
+        text: 'invited',
+        gameId: invitedGame.gameId,
+        user: {
+          id: invitetdBy.userId,
+          nickname: invitetdBy.username,
+        },
+      });
+    }
   }
 
   async gameStatus(socket: Socket) {
