@@ -5,6 +5,7 @@ export class PageRequestDto {
 	@ApiProperty({
 		name: 'pageSize',
 		required: false,
+		description: 'Number of information per page\n- Default: `10`',
 	})
 	@IsNumberString()
 	@IsOptional()
@@ -13,6 +14,7 @@ export class PageRequestDto {
 	@ApiProperty({
 		name: 'pageNo',
 		required: false,
+		description: 'Page number\n- Default: `1`',
 	})
 	@IsNumberString()
 	@IsOptional()
@@ -21,6 +23,7 @@ export class PageRequestDto {
 	@ApiProperty({
 		name: 'lastId',
 		required: false,
+		description: 'Cursor id',
 	})
 	@IsNumberString()
 	@IsOptional()

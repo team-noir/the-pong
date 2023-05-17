@@ -26,7 +26,7 @@ import {
 import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import { UsersService } from './users.service';
 import { Response } from 'express';
-import { UserDto } from './dtos/users.dto';
+import { GetUserRequestDto, UserDto } from './dtos/users.dto';
 import { AchievementDto } from './dtos/achievement.dto';
 import { PageRequestDto } from '../dtos/pageRequest.dto';
 
@@ -37,38 +37,17 @@ export class UsersController {
 
   @Get()
   @ApiOperation({ summary: 'Get users' })
-  @ApiQuery({
-    name: 'q',
-    required: false,
-    description: 'Search users by nickname',
-  })
-  @ApiQuery({
-    name: 'page',
-    required: false,
-    description: 'Page number\n- Default: `1`',
-  })
-  @ApiQuery({
-    name: 'per_page',
-    required: false,
-    description: 'Number of users per page\n- Default: `30`',
-  })
   @ApiOkResponse({ description: 'Get users', type: [UserDto] })
   @ApiUnauthorizedResponse({ description: 'Unauthorized(No JWT)' })
   @UseGuards(AuthenticatedGuard)
   async requestUsers(
     @Req() req,
     @Res({ passthrough: true }) res,
-    @Query('q') q?: string,
-    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page?: number,
-    @Query('per_page', new DefaultValuePipe(30), ParseIntPipe) per_page?: number
+    @Query() query: GetUserRequestDto,
   ) {
     try {
       const myUserId = req.user.id;
-      const userQuery = { q, page, per_page };
-      const users: UserDto[] = await this.usersService.getUsers(
-        myUserId,
-        userQuery
-      );
+      const users: UserDto[] = await this.usersService.getUsers(myUserId, query);
       res.status(HttpStatus.OK);
       return users;
     } catch (error) {

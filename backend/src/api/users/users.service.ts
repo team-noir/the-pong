@@ -11,12 +11,7 @@ import { PROFILE_PATH } from '@const';
 import { AppGateway } from '@/app.gateway';
 import { PageRequestDto } from '../dtos/pageRequest.dto';
 import { AchievementDto } from './dtos/achievement.dto';
-
-interface getUsersQuery {
-  q?: string;
-  page?: number;
-  per_page?: number;
-}
+import { GetUserRequestDto } from './dtos/users.dto';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -60,18 +55,17 @@ export class UsersService implements OnModuleInit {
       .then((block) => !!block);
   }
 
-  async getUsers(myUserId: number, { q, page, per_page }: getUsersQuery) {
-    const where = q && {
+  async getUsers(myUserId: number, query: GetUserRequestDto) {
+    const where = query.q && {
       nickname: {
-        contains: q,
+        contains: query.q,
       },
     };
 
     return await this.prismaService.user
       .findMany({
         where,
-        skip: (page - 1) * per_page,
-        take: per_page,
+        ...query.getPageOptions(),
         select: {
           id: true,
           nickname: true,
