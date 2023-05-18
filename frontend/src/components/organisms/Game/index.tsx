@@ -55,8 +55,8 @@ export default function Game({ game }: Props) {
     paddles,
     isPlaying,
     count,
-    handleMouseDown,
-    handleMouseUp,
+    handlePointerDown,
+    handlePointerUp,
     result,
   ] = useGamePlay(
     game,
@@ -195,8 +195,8 @@ export default function Game({ game }: Props) {
         <div className="flex justify-center gap-2 mt-2">
           <Button
             value="left"
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
             className="w-20 h-20"
             primary
           >
@@ -204,8 +204,8 @@ export default function Game({ game }: Props) {
           </Button>
           <Button
             value="right"
-            onMouseDown={handleMouseDown}
-            onMouseUp={handleMouseUp}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
             className="w-20 h-20"
             primary
           >
