@@ -10,6 +10,8 @@ import {
   ChannelUserStatusType,
   ChannelFormType,
   MessageType,
+  ListWithPagingType,
+  PageParamsType,
 } from 'types';
 
 export const API_PREFIX = `/api/v1`;
@@ -103,13 +105,16 @@ export const getUser = async (userId: number): Promise<UserType> => {
   return res.data;
 };
 
-export const getUsers = async (
-  q: string,
-  page = 1,
-  per_page = 30
-): Promise<UserType[]> => {
+export const getUsers = async ({
+  q,
+  paging,
+}: {
+  q: string;
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<UserType>> => {
+  const { cursor, size, order } = paging;
   const res = await axios.get(`/users`, {
-    params: { q, page, per_page },
+    params: { q, cursor, size, order },
   });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
