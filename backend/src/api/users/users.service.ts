@@ -66,7 +66,10 @@ export class UsersService implements OnModuleInit {
     const data = await this.prismaService.user
       .findMany({
         where,
-        ...query.getPageOptions(),
+        take: query.getLimit() + 1,
+        ...(query.cursor && {
+          cursor: { id: Number(query.cursor) }
+        }),
         orderBy: {
           id: query.getOrderBy()
         },
@@ -96,7 +99,7 @@ export class UsersService implements OnModuleInit {
   
       const prevData = await this.prismaService.user.findMany({
         where,
-        take: -query.getLimit(),
+        take: -1 * query.getLimit(),
         skip: 1,
         ...(query.cursor && {
           cursor: { id: Number(query.cursor) },
@@ -105,11 +108,12 @@ export class UsersService implements OnModuleInit {
       });
   
       let cursor = { prev: null, next: null };
-      if (prevData.length == query.getLimit()) {
+      if (query.cursor && prevData.length == query.getLimit()) {
         cursor.prev = prevData[0].id;
       }
-      if (data.length == query.getLimit()) {
+      if (data.length == query.getLimit() + 1) {
         cursor.next = data[data.length - 1].id;
+        data.pop();
       }
       const result = new PageDto(length, data);
       result.setPaging(cursor.prev, cursor.next);
@@ -178,7 +182,10 @@ export class UsersService implements OnModuleInit {
         where: {
           userId,
         },
-        ...query.getPageOptions(),
+        take: query.getLimit() + 1,
+        ...(query.cursor && {
+          cursor: { id: Number(query.cursor) }
+        }),
         orderBy: {
           id: query.getOrderBy(),
         },
@@ -214,7 +221,7 @@ export class UsersService implements OnModuleInit {
       where: {
         userId,
       },
-      take: -query.getLimit(),
+      take: -1 * query.getLimit(),
       skip: 1,
 			...(query.cursor && {
 				cursor: { id: Number(query.cursor) }
@@ -225,11 +232,12 @@ export class UsersService implements OnModuleInit {
     });
 
     let cursor = { prev: null, next: null };
-    if (prevData.length == query.getLimit()) {
+    if (query.cursor && prevData.length == query.getLimit()) {
       cursor.prev = prevData[0].id;
     }
-    if (data.length == query.getLimit()) {
+    if (data.length == query.getLimit() + 1) {
       cursor.next = data[data.length - 1].id;
+      data.pop();
     }
     const result = new PageDto(length, data);
     result.setPaging(cursor.prev, cursor.next);

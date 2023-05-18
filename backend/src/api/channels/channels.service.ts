@@ -131,6 +131,7 @@ export class ChannelsService {
     const page = query.getPageOptions();
     const order = query.getOrderBy();
     let prevIdx = 0;
+    let nextIdx = 0;
 
     if (!conditions.isPublic && !conditions.isPriv && !conditions.isDm) {
       conditions.isPublic = true;
@@ -155,16 +156,20 @@ export class ChannelsService {
         page.cursor && 
         (order == 'desc' 
           ? channel.id > page.cursor.id 
-          : channel.id < page.cursor.id
-        ) ||
-        --page.take < 0
-      ) {
+          : channel.id < page.cursor.id)
+      ) { 
+        return; 
+      } 
+
+      if (page.take == query.getLimit()) { 
+        prevIdx = idx; 
+        nextIdx = idx;
+      } else if (page.take > 0) {  
+        nextIdx = idx;
+      } else { 
         return;
       }
-
-      if (page.take == query.getLimit()) {
-        prevIdx = idx;
-      } 
+      page.take -= 1;
 
       const info = {
         id: channel.id,
@@ -198,8 +203,8 @@ export class ChannelsService {
     if (prevIdx - query.getLimit() >= 0) {
       cursor.prev = channels[prevIdx - query.getLimit()].id;
     }
-    if (data.length == query.getLimit()) {
-      cursor.next = data[data.length - 1].id;
+    if (data.length == query.getLimit() && nextIdx + 1 <= channels.length - 1) {
+      cursor.next = channels[nextIdx + 1].id;
     }
     result.setPaging(cursor.prev, cursor.next);
     return result;
@@ -432,6 +437,7 @@ export class ChannelsService {
     const messages = [...this.messageModel.getAllMessages()];
     const order = query.getOrderBy();
     let prevIdx = 0;
+    let nextIdx = 0;
 
     messages.sort((a,b) => a.id - b.id);
     if (order == 'desc') {
@@ -450,16 +456,20 @@ export class ChannelsService {
             page.cursor && 
             (order == 'desc' 
               ? message.id > page.cursor.id 
-              : message.id < page.cursor.id
-            ) ||
-            --page.take < 0
-          ) {
+              : message.id < page.cursor.id)
+          ) { 
+            return; 
+          } 
+    
+          if (page.take == query.getLimit()) { 
+            prevIdx = idx; 
+            nextIdx = idx;
+          } else if (page.take > 0) {  
+            nextIdx = idx;
+          } else { 
             return;
           }
-
-          if (page.take == query.getLimit()) {
-            prevIdx = idx;
-          } 
+          page.take -= 1;
 
           const tarMessage = new ChannelMessageDto(
             message.id,

@@ -122,7 +122,7 @@ export class MyService {
     const data = await this.prismaService.followUser
       .findMany({
         where: { followerId: myUserId },
-        take: query.getLimit(),
+        take: query.getLimit() + 1,
         ...(query.cursor && {
           cursor: { id: {
             followerId: myUserId,
@@ -137,7 +137,7 @@ export class MyService {
       .then((follows) =>
         follows.map((follow) => ({
           ...follow.follewee,
-          status: 'offline', // TODO: implement ("online", "offline", "game")
+          status: 'offline',
         }))
       );
 
@@ -147,7 +147,7 @@ export class MyService {
 
     const prevData = await this.prismaService.followUser.findMany({
       where: { followerId: Number(myUserId) },
-      take: -query.getLimit(),
+      take: -1 * query.getLimit(),
       skip: 1,
       ...(query.cursor && {
         cursor: { id: {
@@ -162,11 +162,12 @@ export class MyService {
     });
 
     let cursor = { prev: null, next: null };
-    if (prevData.length == query.getLimit()) {
+    if (query.cursor && prevData.length == query.getLimit()) {
       cursor.prev = prevData[0].follewee.id;
     }
-    if (data.length == query.getLimit()) {
+    if (data.length == query.getLimit() + 1) {
       cursor.next = data[data.length - 1].id;
+      data.pop();
     }
     const result = new PageDto(length, data);
     result.setPaging(cursor.prev, cursor.next);
@@ -251,7 +252,7 @@ export class MyService {
     const data = await this.prismaService.blockUser
       .findMany({
         where: { blockerId: myUserId },
-        take: query.getLimit(),
+        take: query.getLimit() + 1,
         ...(query.cursor && {
           cursor: { id: {
             blockerId: myUserId,
@@ -271,7 +272,7 @@ export class MyService {
   
     const prevData = await this.prismaService.blockUser.findMany({
       where: { blockerId: Number(myUserId) },
-      take: -query.getLimit(),
+      take: -1 * query.getLimit(),
       skip: 1,
       ...(query.cursor && {
         cursor: { id: {
@@ -286,11 +287,12 @@ export class MyService {
     });
 
     let cursor = { prev: null, next: null };
-    if (prevData.length == query.getLimit()) {
+    if (query.cursor && prevData.length == query.getLimit()) {
       cursor.prev = prevData[0].blocked.id;
     }
-    if (data.length == query.getLimit()) {
+    if (data.length == query.getLimit() + 1) {
       cursor.next = data[data.length - 1].id;
+      data.pop();
     }
     const result = new PageDto(length, data);
     result.setPaging(cursor.prev, cursor.next);

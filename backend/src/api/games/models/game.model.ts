@@ -79,6 +79,7 @@ export class GameModel implements OnModuleInit {
     const games = [...this.games.values()];
     const order = query.getOrderBy();
     let prevIdx = 0;
+    let nextIdx = 0;
 
     games.sort((a,b) => a.gameId - b.gameId);
     if (order == 'desc') {
@@ -94,16 +95,20 @@ export class GameModel implements OnModuleInit {
         (order == 'desc' 
           ? gameId > page.cursor.id 
           : gameId < page.cursor.id
-        ) ||
-        --page.skip > 0 ||
-        --page.take < 0
+        )
       ) {
         return;
       }
 
-      if (page.skip == 1) {
-        prevIdx = idx;
-      } 
+      if (page.take == query.getLimit()) { 
+        prevIdx = idx; 
+        nextIdx = idx;
+      } else if (page.take > 0) {  
+        nextIdx = idx;
+      } else { 
+        return;
+      }
+      page.take -= 1;
 
       for (const player of players) {
         list.push({
@@ -673,7 +678,10 @@ export class GameModel implements OnModuleInit {
       where: {
         OR: [{ loserId: userId }, { winnerId: userId }],
       },
-      ...query.getPageOptions(),
+      take: query.getLimit() + 1,
+			...(query.cursor && {
+				cursor: { id: Number(query.cursor) }
+			}),
       orderBy: {
         id: query.getOrderBy(),
       },
@@ -720,7 +728,7 @@ export class GameModel implements OnModuleInit {
       where: {
         OR: [{ loserId: userId }, { winnerId: userId }],
       },
-      take: -query.getLimit(),
+      take: -1 * query.getLimit(),
       skip: 1,
 			...(query.cursor && {
 				cursor: { id: Number(query.cursor) }
@@ -731,11 +739,12 @@ export class GameModel implements OnModuleInit {
     });
 
     let cursor = { prev: null, next: null };
-    if (prevHistory.length == query.getLimit()) {
+    if (query.cursor && prevHistory.length == query.getLimit()) {
       cursor.prev = prevHistory[0].id;
     }
-    if (data.length == query.getLimit()) {
+    if (data.length == query.getLimit() + 1) {
       cursor.next = data[data.length - 1].id;
+      data.pop();
     }
     const result = new PageDto(length, data);
     result.setPaging(cursor.prev, cursor.next);
