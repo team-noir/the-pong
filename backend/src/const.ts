@@ -1,4 +1,5 @@
 export const ONESECOND = 1000;
+export const ONEHOUR = 3600 * ONESECOND;
 export const PROFILE_PATH = 'uploads/profile-images/';
 export const PROFILE_IMAGE_MAX_SIZE = 1048576; // 1MB
 

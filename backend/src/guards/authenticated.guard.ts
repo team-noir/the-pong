@@ -42,12 +42,13 @@ export class AuthenticatedGuard implements CanActivate {
       return false;
     }
 
-    if (now > user.ftRefreshExpiresAt) {
+    // TODO: Refresh google oauth token
+    if (user.googleRefreshToken && now > user.googleRefreshExpiresAt) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
-    } else if (now > user.ftAccessExpiresAt && now < user.ftRefreshExpiresAt) {
+    } else if (user.googleRefreshToken && now > user.googleAccessExpiresAt && now < user.googleRefreshExpiresAt) {
       try {
-        this.authService.refreshToken(user.ftRefreshToken);
+        this.authService.refreshToken(user.googleRefreshToken);
       } catch (err) {
         console.log(err);
       }

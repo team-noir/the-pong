@@ -25,7 +25,7 @@ export class MyDto {
   // TODO: remove
   @ApiProperty()
   @IsString()
-  public ftUsername: string;
+  public googleEmail: string;
 
   @ApiProperty()
   @IsDateString()

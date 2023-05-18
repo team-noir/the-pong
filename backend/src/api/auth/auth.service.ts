@@ -8,7 +8,7 @@ import { Response } from 'express';
 import { authenticator } from 'otplib';
 import { toDataURL } from 'qrcode';
 import { JwtPayloadDto } from './dtos/jwtPayload.dto';
-import { ONESECOND } from '@const';
+import { ONESECOND, ONEHOUR } from '@const';
 import { MyDto } from '../my/dtos/my.dto';
 
 @Injectable()
@@ -19,13 +19,28 @@ export class AuthService {
   ) {}
 
   async auth(@Req() req, @Res() res) {
-    this.refreshToken(req.user.ftRefreshToken);
+    if (req.user.googleRefreshToken) {
+      this.refreshToken(req.user.googleRefreshToken);
+    } else {
+      const accessToken = req.user.googleAccessToken;
+      const accessExpiresAt = new Date(new Date().getTime() + ONEHOUR);
+
+      await this.prismaService.user.update({
+        where: { googleAccessToken: accessToken },
+        data: {
+          googleAccessToken: accessToken,
+          googleAccessExpiresAt: accessExpiresAt,
+        },
+      });
+    }
+
     const jwt = this.signJwt({
       id: req.user.id,
       nickname: req.user.nickname,
       isTwoFactor: req.user.isTwoFactor,
       isVerifiedTwoFactor: false,
     });
+
     await this.setJwt(res, jwt);
     if (req.user.isTwoFactor) {
       res.redirect(`${process.env.CLIENT_APP_URL}/2fa`);
@@ -63,7 +78,7 @@ export class AuthService {
     const user = await this.prismaService.user.create({
       data: {
         id: userId,
-        ftId: `${userId}`,
+        googleId: `${userId}`,
         nickname: this.generateRandomString(10),
       },
     });
@@ -144,9 +159,9 @@ export class AuthService {
       'refresh-42',
       new Strategy(
         {
-          clientID: process.env.FT_UID,
-          clientSecret: process.env.FT_SECRET,
-          callbackURL: process.env.FT_CB,
+          clientID: process.env.GOOGLE_ID,
+          clientSecret: process.env.GOOGLE_SECRET,
+          callbackURL: process.env.GOOGLE_CB,
         },
         () => {
           return;
@@ -169,12 +184,12 @@ export class AuthService {
         ); // 7 days later
 
         await prisma.user.update({
-          where: { ftRefreshToken: refreshToken },
+          where: { googleRefreshToken: refreshToken },
           data: {
-            ftAccessToken: newAccessToken,
-            ftRefreshToken: newRefreshToken,
-            ftAccessExpiresAt: accessExpiresAt,
-            ftRefreshExpiresAt: refreshExpiresAt,
+            googleAccessToken: newAccessToken,
+            googleRefreshToken: newRefreshToken,
+            googleAccessExpiresAt: accessExpiresAt,
+            googleRefreshExpiresAt: refreshExpiresAt,
           },
         });
       }
@@ -188,7 +203,7 @@ export class AuthService {
       level: user.level,
       isTwoFactor: user.isTwoFactor,
       isVerifiedTwoFactor,
-      ftUsername: user.ftUsername,
+      googleEmail: user.googleEmail,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };

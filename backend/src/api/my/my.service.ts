@@ -24,7 +24,7 @@ export class MyService {
       level: user.level,
       isTwoFactor: user.isTwoFactor,
       isVerifiedTwoFactor,
-      ftUsername: user.ftUsername,
+      googleEmail: user.googleEmail,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
