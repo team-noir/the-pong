@@ -219,7 +219,6 @@ export default function useGamePlay(
 
   const drawPaddles = () => {
     if (isMyKeyDown.current.left) {
-      console.log('drawPaddles my left');
       const nextX = paddles.down.x - paddleDeltaX;
       setPaddles((prevState) => ({
         ...prevState,
