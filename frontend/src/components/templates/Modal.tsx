@@ -40,7 +40,7 @@ export default function Modal({
           <div className="modal-backdrop" onClick={onClickClose}></div>
         </Transition.Child>
 
-        <div className="modal-panel-wrapper">
+        <div className={classNames('modal-panel-wrapper', fitContent && 'p-4')}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -53,7 +53,7 @@ export default function Modal({
             <Dialog.Panel
               className={classNames(
                 `modal-panel`,
-                fitContent ? 'h-fit w-fit' : 'mt-20'
+                fitContent ? 'h-fit w-fit' : 'h-[90vh] w-screen self-end'
               )}
             >
               <div className="flex justify-between items-center mb-4">
