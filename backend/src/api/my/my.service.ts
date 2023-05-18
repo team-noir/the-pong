@@ -8,6 +8,8 @@ import { AuthService } from '../auth/auth.service';
 import { readdir, unlink, rmdir } from 'node:fs/promises';
 import { PROFILE_PATH } from '@const';
 import { JwtPayloadDto } from '../auth/dtos/jwtPayload.dto';
+import { PageRequestDto } from '../dtos/pageRequest.dto';
+import { PageDto } from '../dtos/page.dto';
 
 @Injectable()
 export class MyService {
@@ -111,15 +113,23 @@ export class MyService {
     return user;
   }
 
-  async getFollowing(@Req() req) {
+  async getFollowing(@Req() req, query: PageRequestDto) {
     const myUserId = req.user.id;
     if (!myUserId) {
       return null;
     }
 
-    const following = await this.prismaService.followUser
+    const data = await this.prismaService.followUser
       .findMany({
         where: { followerId: myUserId },
+        take: query.getLimit() + 1,
+        ...(query.cursor && {
+          cursor: { id: {
+            followerId: myUserId,
+            followeeId: Number(query.cursor)
+          }}
+        }),
+        orderBy: { followeeId: query.getOrderBy() },
         select: {
           follewee: { select: { id: true, nickname: true } },
         },
@@ -127,11 +137,41 @@ export class MyService {
       .then((follows) =>
         follows.map((follow) => ({
           ...follow.follewee,
-          status: 'offline', // TODO: implement ("online", "offline", "game")
+          status: 'offline',
         }))
       );
 
-    return following;
+    const length = await this.prismaService.followUser.count({
+      where: { followerId: myUserId },
+    });
+
+    const prevData = await this.prismaService.followUser.findMany({
+      where: { followerId: Number(myUserId) },
+      take: -1 * query.getLimit(),
+      skip: 1,
+      ...(query.cursor && {
+        cursor: { id: {
+          followerId: myUserId,
+          followeeId: Number(query.cursor)
+        }}
+      }),
+      orderBy: { followeeId: query.getOrderBy() },
+      select: {
+        follewee: { select: { id: true, nickname: true } },
+      },
+    });
+
+    let cursor = { prev: null, next: null };
+    if (query.cursor && prevData.length == query.getLimit()) {
+      cursor.prev = prevData[0].follewee.id;
+    }
+    if (data.length == query.getLimit() + 1) {
+      cursor.next = data[data.length - 1].id;
+      data.pop();
+    }
+    const result = new PageDto(length, data);
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   async putFollowing(@Req() req) {
@@ -204,21 +244,61 @@ export class MyService {
     return following;
   }
 
-  async getBlocks(@Req() req) {
+  async getBlocks(@Req() req, query: PageRequestDto) {
     const myUserId = req.user.id;
     if (!myUserId) {
       return null;
     }
-    const following = await this.prismaService.blockUser
+    const data = await this.prismaService.blockUser
       .findMany({
         where: { blockerId: myUserId },
+        take: query.getLimit() + 1,
+        ...(query.cursor && {
+          cursor: { id: {
+            blockerId: myUserId,
+            blockedId: Number(query.cursor)
+          }}
+        }),
+        orderBy: { blockedId: query.getOrderBy() },
         select: {
           blocked: { select: { id: true, nickname: true } },
         },
       })
       .then((follows) => follows.map((follow) => follow.blocked));
-    return following;
+
+      const length = await this.prismaService.blockUser.count({
+        where: { blockerId: myUserId },
+      });
+  
+    const prevData = await this.prismaService.blockUser.findMany({
+      where: { blockerId: Number(myUserId) },
+      take: -1 * query.getLimit(),
+      skip: 1,
+      ...(query.cursor && {
+        cursor: { id: {
+          blockerId: myUserId,
+          blockedId: Number(query.cursor)
+        }}
+      }),
+      orderBy: { blockedId: query.getOrderBy() },
+      select: {
+        blocked: { select: { id: true, nickname: true } },
+      },
+    });
+
+    let cursor = { prev: null, next: null };
+    if (query.cursor && prevData.length == query.getLimit()) {
+      cursor.prev = prevData[0].blocked.id;
+    }
+    if (data.length == query.getLimit() + 1) {
+      cursor.next = data[data.length - 1].id;
+      data.pop();
+    }
+    const result = new PageDto(length, data);
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
+
   async putBlocks(@Req() req) {
     const myUserId = req.user.id;
     if (!myUserId) {

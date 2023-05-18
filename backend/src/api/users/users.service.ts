@@ -9,12 +9,10 @@ import { join } from 'path';
 import { PROFILE_PATH } from '@const';
 
 import { AppGateway } from '@/app.gateway';
-
-interface getUsersQuery {
-  q?: string;
-  page?: number;
-  per_page?: number;
-}
+import { PageRequestDto } from '../dtos/pageRequest.dto';
+import { AchievementDto } from './dtos/achievement.dto';
+import { GetUserRequestDto } from './dtos/users.dto';
+import { PageDto } from '../dtos/page.dto';
 
 @Injectable()
 export class UsersService implements OnModuleInit {
@@ -58,18 +56,23 @@ export class UsersService implements OnModuleInit {
       .then((block) => !!block);
   }
 
-  async getUsers(myUserId: number, { q, page, per_page }: getUsersQuery) {
-    const where = q && {
+  async getUsers(myUserId: number, query: GetUserRequestDto) {
+    const where = query.q && {
       nickname: {
-        contains: q,
+        contains: query.q,
       },
     };
 
-    return await this.prismaService.user
+    const data = await this.prismaService.user
       .findMany({
         where,
-        skip: (page - 1) * per_page,
-        take: per_page,
+        take: query.getLimit() + 1,
+        ...(query.cursor && {
+          cursor: { id: Number(query.cursor) }
+        }),
+        orderBy: {
+          id: query.getOrderBy()
+        },
         select: {
           id: true,
           nickname: true,
@@ -89,6 +92,32 @@ export class UsersService implements OnModuleInit {
           }))
         )
       );
+
+      const length = await this.prismaService.user.count({
+        where
+      });
+  
+      const prevData = await this.prismaService.user.findMany({
+        where,
+        take: -1 * query.getLimit(),
+        skip: 1,
+        ...(query.cursor && {
+          cursor: { id: Number(query.cursor) },
+        }),
+        orderBy: { id: query.getOrderBy() },
+      });
+  
+      let cursor = { prev: null, next: null };
+      if (query.cursor && prevData.length == query.getLimit()) {
+        cursor.prev = prevData[0].id;
+      }
+      if (data.length == query.getLimit() + 1) {
+        cursor.next = data[data.length - 1].id;
+        data.pop();
+      }
+      const result = new PageDto(length, data);
+      result.setPaging(cursor.prev, cursor.next);
+      return result;
   }
 
   async getUser(myUserId: number, userId: number) {
@@ -143,11 +172,22 @@ export class UsersService implements OnModuleInit {
 
   /** Achievements */
 
-  async getAchievements(userId: number) {
-    return await this.prismaService.achievement_User
+  async getAchievements(
+    userId: number, 
+    query: PageRequestDto
+  ): Promise<PageDto<AchievementDto>> {
+
+    const data = await this.prismaService.achievement_User
       .findMany({
         where: {
           userId,
+        },
+        take: query.getLimit() + 1,
+        ...(query.cursor && {
+          cursor: { id: Number(query.cursor) }
+        }),
+        orderBy: {
+          id: query.getOrderBy(),
         },
         select: {
           id: true,
@@ -161,15 +201,47 @@ export class UsersService implements OnModuleInit {
           createdAt: true,
         },
       })
-      .then((achievements) =>
-        achievements.map((achievement) => ({
-          id: achievement.id,
-          title: achievement.achievement.title,
-          condition: achievement.achievement.condition,
-          description: achievement.achievement.description,
-          createdAt: achievement.createdAt,
+      .then((achievement_users) => {
+        return achievement_users.map((achievement_user) => ({
+          id: achievement_user.id,
+          title: achievement_user.achievement.title,
+          condition: achievement_user.achievement.condition,
+          description: achievement_user.achievement.description,
+          createdAt: achievement_user.createdAt,
         }))
-      );
+      });
+
+    const length = await this.prismaService.achievement_User.count({
+      where: {
+        userId,
+      },
+    });
+
+    const prevData = await this.prismaService.achievement_User.findMany({
+      where: {
+        userId,
+      },
+      take: -1 * query.getLimit(),
+      skip: 1,
+			...(query.cursor && {
+				cursor: { id: Number(query.cursor) }
+			}),
+      orderBy: {
+        id: query.getOrderBy(),
+      },
+    });
+
+    let cursor = { prev: null, next: null };
+    if (query.cursor && prevData.length == query.getLimit()) {
+      cursor.prev = prevData[0].id;
+    }
+    if (data.length == query.getLimit() + 1) {
+      cursor.next = data[data.length - 1].id;
+      data.pop();
+    }
+    const result = new PageDto(length, data);
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   async addAchievement(userId: number, achievementId: number) {

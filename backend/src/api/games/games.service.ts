@@ -4,6 +4,7 @@ import { Player } from './dtos/player.dto';
 import { GameModel } from './models/game.model';
 import { GameSettingInfoDto } from './dtos/games.dto';
 import { GAME_STATUS } from '@/const';
+import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
 
 @Injectable()
 export class GamesService {
@@ -23,8 +24,8 @@ export class GamesService {
     clearInterval(this.pingInterval);
   }
 
-  getGameList() {
-    return this.gameModel.getGameList();
+  getGameList(query: PageRequestDto) {
+    return this.gameModel.getGameList(query);
   }
 
   async addUserToQueue(userId: number, isLadder: boolean) {
@@ -63,14 +64,16 @@ export class GamesService {
     const invited = await this.gameModel.createPlayer(invitedUserId);
     const gameId = await this.gameModel.newInvite(user, invited);
 
-    await invited.socket.emit('gameInvite', {
-      text: 'invited',
-      gameId: gameId,
-      user: {
-        id: user.userId,
-        nickname: user.username,
-      },
-    });
+    if (invited.socket) {
+      await invited.socket.emit('gameInvite', {
+        text: 'invited',
+        gameId: gameId,
+        user: {
+          id: user.userId,
+          nickname: user.username,
+        },
+      });
+    }
   }
 
   cancelInvitation(userId: number) {

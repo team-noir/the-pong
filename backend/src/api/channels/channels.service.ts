@@ -1,7 +1,7 @@
 import { Injectable, HttpStatus } from '@nestjs/common';
 import { Server } from 'socket.io';
 import { WebSocketServer } from '@nestjs/websockets';
-import { CreateChannelDto, ChannelMessageDto } from './dtos/channel.dto';
+import { CreateChannelDto, ChannelListDto, ChannelMessageDto } from './dtos/channel.dto';
 
 import { ChannelModel, Channel } from './models/channel.model';
 import { UserModel, ChannelUser } from './models/user.model';
@@ -10,6 +10,8 @@ import { MessageModel, Message } from './models/message.model';
 import { PrismaService } from '@/prisma/prisma.service';
 
 import { NOTICE_STATUS, NOTICE_STATUS_MESSAGE } from '@const';
+import { PageRequestDto } from '../dtos/pageRequest.dto';
+import { PageDto } from '../dtos/page.dto';
 
 @Injectable()
 export class ChannelsService {
@@ -79,10 +81,11 @@ export class ChannelsService {
 
     await this.channelModel.joinChannel(createdBy, newChannel, null);
 
-    // socket message
-    createdBy.socket.emit('message', {
-      channelId: newChannel.id,
-    });
+    if (createdBy.socket) {
+      createdBy.socket.emit('message', {
+        channelId: newChannel.id,
+      });
+    }
 
     return { id: newChannel.id };
   }
@@ -120,24 +123,53 @@ export class ChannelsService {
     }
   }
 
-  async list(userId: number, query) {
+  async list(userId: number, query: ChannelListDto) {
     const data = [];
     const channels = this.channelModel.getAll();
     const user = this.userModel.getUser(userId);
+    const conditions = query.getConditions();
+    const page = query.getPageOptions();
+    const order = query.getOrderBy();
+    let prevIdx = 0;
+    let nextIdx = 0;
 
-    if (!query.isPublic && !query.isPriv && !query.isDm) {
-      query.isPublic = true;
+    if (!conditions.isPublic && !conditions.isPriv && !conditions.isDm) {
+      conditions.isPublic = true;
     }
 
-    channels.forEach((channel) => {
+    channels.sort((a,b) => a.id - b.id);
+    if (order == 'desc') {
+      channels.reverse();
+    }
+
+    channels.forEach((channel, idx) => {
       if (
         channel.banned.has(userId) ||
         !this.channelModel.checkCanListed(channel, user.id) ||
-        (query.isEnter && !channel.isUserJoined(user.id)) ||
-        this.channelModel.checkListedRange(channel, query)
+        (conditions.isEnter && !channel.isUserJoined(user.id)) ||
+        this.channelModel.checkListedRange(channel, conditions)
       ) {
         return;
       }
+
+      if (
+        page.cursor && 
+        (order == 'desc' 
+          ? channel.id > page.cursor.id 
+          : channel.id < page.cursor.id)
+      ) { 
+        return; 
+      } 
+
+      if (page.take == query.getLimit()) { 
+        prevIdx = idx; 
+        nextIdx = idx;
+      } else if (page.take > 0) {  
+        nextIdx = idx;
+      } else { 
+        return;
+      }
+      page.take -= 1;
 
       const info = {
         id: channel.id,
@@ -165,7 +197,17 @@ export class ChannelsService {
       data.push(info);
     });
 
-    return data;
+    const result = new PageDto(channels.length, data);
+    let cursor = { prev: null, next: null };
+
+    if (prevIdx - query.getLimit() >= 0) {
+      cursor.prev = channels[prevIdx - query.getLimit()].id;
+    }
+    if (data.length == query.getLimit() && nextIdx + 1 <= channels.length - 1) {
+      cursor.next = channels[nextIdx + 1].id;
+    }
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   getChannelInfo(userId: number, channelId: number) {
@@ -334,7 +376,6 @@ export class ChannelsService {
       this.channelModel.inviteChannel(invitedUser, channel);
       users.push(invitedUser);
 
-      // socket massage
       if (invitedUser.socket) {
         invitedUser.socket.emit('invited', { channelId: channel.id });
       }
@@ -386,18 +427,50 @@ export class ChannelsService {
 
   async getChannelMessages(
     user: ChannelUser,
-    channel: Channel
-  ): Promise<ChannelMessageDto[]> {
+    channel: Channel,
+    query: PageRequestDto
+  ): Promise<PageDto<ChannelMessageDto>> {
     channel.checkUserJoined(user);
 
     const data = [];
-    this.messageModel.getAllMessages().forEach((message) => {
+    const page = query.getPageOptions();
+    const messages = [...this.messageModel.getAllMessages()];
+    const order = query.getOrderBy();
+    let prevIdx = 0;
+    let nextIdx = 0;
+
+    messages.sort((a,b) => a.id - b.id);
+    if (order == 'desc') {
+      messages.reverse();
+    }
+    
+    messages.forEach((message, idx) => {
       if (message.channelId == channel.id) {
         const sender = message.senderId
           ? this.userModel.getUser(message.senderId)
           : null;
 
         if (!sender || !user.isBlockUser(sender.id)) {
+
+          if (
+            page.cursor && 
+            (order == 'desc' 
+              ? message.id > page.cursor.id 
+              : message.id < page.cursor.id)
+          ) { 
+            return; 
+          } 
+    
+          if (page.take == query.getLimit()) { 
+            prevIdx = idx; 
+            nextIdx = idx;
+          } else if (page.take > 0) {  
+            nextIdx = idx;
+          } else { 
+            return;
+          }
+          page.take -= 1;
+
           const tarMessage = new ChannelMessageDto(
             message.id,
             message.text,
@@ -408,7 +481,18 @@ export class ChannelsService {
         }
       }
     });
-    return data;
+
+    const result = new PageDto(messages.length, data);
+    let cursor = { prev: null, next: null };
+
+    if (prevIdx - query.getLimit() >= 0) {
+      cursor.prev = messages[prevIdx - query.getLimit()].id;
+    }
+    if (data.length == query.getLimit()) {
+      cursor.next = data[data.length - 1].id;
+    }
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   // 채널에 메세지를 보낸다.

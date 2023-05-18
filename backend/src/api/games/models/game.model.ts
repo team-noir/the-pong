@@ -14,6 +14,8 @@ import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
 import { PrismaClient } from '@prisma';
 import { GAME_STATUS } from '@const';
+import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
+import { PageDto } from '@/api/dtos/page.dto';
 
 type gameId = number;
 type playerId = number;
@@ -71,12 +73,42 @@ export class GameModel implements OnModuleInit {
     return this.games.get(gameId);
   }
 
-  getGameList() {
+  getGameList(query) {
     const gamelist = [];
+    const page = query.getPageOptions();
+    const games = [...this.games.values()];
+    const order = query.getOrderBy();
+    let prevIdx = 0;
+    let nextIdx = 0;
 
-    for (const game of this.games.values()) {
+    games.sort((a,b) => a.gameId - b.gameId);
+    if (order == 'desc') {
+      games.reverse();
+    }
+
+    games.forEach((game, idx) => {
       const { gameId, isLadder, players, createdAt, status } = game;
       const list = [];
+
+      if (
+        page.cursor && 
+        (order == 'desc' 
+          ? gameId > page.cursor.id 
+          : gameId < page.cursor.id
+        )
+      ) {
+        return;
+      }
+
+      if (page.take == query.getLimit()) { 
+        prevIdx = idx; 
+        nextIdx = idx;
+      } else if (page.take > 0) {  
+        nextIdx = idx;
+      } else { 
+        return;
+      }
+      page.take -= 1;
 
       for (const player of players) {
         list.push({
@@ -87,7 +119,7 @@ export class GameModel implements OnModuleInit {
       }
 
       if (status != GAME_STATUS.PLAYING) {
-        continue;
+        return;
       }
       gamelist.push({
         id: gameId,
@@ -96,8 +128,19 @@ export class GameModel implements OnModuleInit {
         isLadder: isLadder,
         createdAt: createdAt,
       });
+    });
+
+    const result = new PageDto(games.length, gamelist);
+    let cursor = { prev: null, next: null };
+
+    if (prevIdx - query.getLimit() >= 0) {
+      cursor.prev = games[prevIdx - query.getLimit()].gameId;
     }
-    return gamelist;
+    if (gamelist.length == query.getLimit()) {
+      cursor.next = gamelist[gamelist.length - 1].gameId;
+    }
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 
   setGame(game: Game) {
@@ -155,9 +198,9 @@ export class GameModel implements OnModuleInit {
 
   async getGameAchievements(userId: number, gameResult) {
     const player = this.players.get(userId);
-    const userHistory = await this.getGameHistory(userId, 1, 20);
-    const userHistoryNormal = userHistory.filter((game) => !game.isLadder);
-    const userHistoryLadder = userHistory.filter((game) => game.isLadder);
+    const userHistory = await this.getGameHistory(userId, new PageRequestDto(20, 1));
+    const userHistoryNormal = userHistory.data.filter((game) => !game.isLadder);
+    const userHistoryLadder = userHistory.data.filter((game) => game.isLadder);
     const results = [];
 
     if (gameResult.winner.id == userId) {
@@ -235,12 +278,14 @@ export class GameModel implements OnModuleInit {
           },
         });
 
-        await player.socket.emit('achievement', {
-          id: achievement_user.id,
-          title: achievement.title,
-          description: achievement.description,
-          createdAt: achievement_user.createdAt,
-        });
+        if (player.socket) {
+          await player.socket.emit('achievement', {
+            id: achievement_user.id,
+            title: achievement.title,
+            description: achievement.description,
+            createdAt: achievement_user.createdAt,
+          });
+        }
       }
     }
 
@@ -380,14 +425,16 @@ export class GameModel implements OnModuleInit {
     const invitetdBy = invitedGame.getOwnerPlayer();
     if (!invitetdBy) return;
 
-    await player.socket.emit('gameInvite', {
-      text: 'invited',
-      gameId: invitedGame.gameId,
-      user: {
-        id: invitetdBy.userId,
-        nickname: invitetdBy.username,
-      },
-    });
+    if (player.socket) {
+      await player.socket.emit('gameInvite', {
+        text: 'invited',
+        gameId: invitedGame.gameId,
+        user: {
+          id: invitetdBy.userId,
+          nickname: invitetdBy.username,
+        },
+      });
+    }
   }
 
   async gameStatus(socket: Socket) {
@@ -626,13 +673,18 @@ export class GameModel implements OnModuleInit {
     }
   }
 
-  async getGameHistory(userId: number, page: number, perPage: number) {
+  async getGameHistory(userId: number, query: PageRequestDto) {
     const history = await this.prismaService.gameResult.findMany({
       where: {
         OR: [{ loserId: userId }, { winnerId: userId }],
       },
-      skip: (page - 1) * perPage,
-      take: perPage,
+      take: query.getLimit() + 1,
+			...(query.cursor && {
+				cursor: { id: Number(query.cursor) }
+			}),
+      orderBy: {
+        id: query.getOrderBy(),
+      },
       select: {
         id: true,
         isLadder: true,
@@ -656,7 +708,7 @@ export class GameModel implements OnModuleInit {
       },
     });
 
-    return history.map((h) => {
+    const data = history.map((h) => {
       return {
         id: h.id,
         isLadder: h.isLadder,
@@ -665,5 +717,37 @@ export class GameModel implements OnModuleInit {
         createdAt: h.createdAt,
       };
     });
+
+    const length = await this.prismaService.gameResult.count({
+      where: {
+        OR: [{ loserId: userId }, { winnerId: userId }],
+      },
+    });
+
+    const prevHistory = await this.prismaService.gameResult.findMany({
+      where: {
+        OR: [{ loserId: userId }, { winnerId: userId }],
+      },
+      take: -1 * query.getLimit(),
+      skip: 1,
+			...(query.cursor && {
+				cursor: { id: Number(query.cursor) }
+			}),
+      orderBy: {
+        id: query.getOrderBy(),
+      },
+    });
+
+    let cursor = { prev: null, next: null };
+    if (query.cursor && prevHistory.length == query.getLimit()) {
+      cursor.prev = prevHistory[0].id;
+    }
+    if (data.length == query.getLimit() + 1) {
+      cursor.next = data[data.length - 1].id;
+      data.pop();
+    }
+    const result = new PageDto(length, data);
+    result.setPaging(cursor.prev, cursor.next);
+    return result;
   }
 }
