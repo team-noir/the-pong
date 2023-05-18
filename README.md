@@ -1,40 +1,52 @@
 # The Pong
 
+## Summary
+
+The Pong is a application that provides a chat and 1:1 game service.
+
+- Development period: 2023.3 ~ 2023.5 (10 weeks)
+
+## Team Members
+
+- [@srngch](https://github.com/srngch): Team Leader, Frontend, Backend
+- [@hhkim0729](https://github.com/hhkim0729): Frontend
+- [@PCHANUL](https://github.com/PCHANUL): Backend
+
 ## Key Features
 
 ### User
 
-- OAuth 로그인
+- OAuth login
 - Two-Factor Authentication
-- 닉네임과 프로필 사진 설정 및 변경
-- 프로필 페이지
-- 팔로워 추가 및 삭제
-- 차단 및 차단 해제
-- 접속 상태 표시: 온라인, 오프라인, 게임중
+- Set and change nickname and profile image
+- Profile page
+- Follow and unfollow users
+- Block and unblock users
+- User status display: online, offline, in-game
 
 ### Chat
 
-- 채널 설정: 채널 이름, 채널 종류, 채널 비밀번호 변경
-- 채널 종류
-  - 공개 채널: 모든 사용자와 채팅
-  - 잠금 채널: 채널 입장 시 비밀번호가 필요한 공개 채널
-  - 비공개 채널: 초대된 사용자와 채팅
-  - DM: 다른 사용자와 1:1 채팅
-- 채널 관리: 채널 생성, 채널 삭제, 채널 초대, 채널 나가기
-- 채널 참가자 관리:
-  - 관리자 임명/해제
-  - 조용히: 30초 동안 메시지를 보낼 수 없음
-  - 내보내기: 채널에서 내보냄, 재입장 가능
-  - 차단하기: 채널에서 차단, 재입장 불가능
+- Channel settings: change channel name, type and password
+- Channel types:
+  - Public channels: Chat with all users
+  - Locked Channel: A public channel that requires a password to enter
+  - Private Channel: Chat with invited users
+  - DM: 1:1 chat with another user
+- Channel management: create channel, delete channel, invite users to the channel, leave channel
+- Manage channel participants:
+  - Grant/Revoke admin
+  - Mute: Unable to send messages for 30 seconds
+  - Kick: Removed from the channel but can re-enter
+  - Ban: Blocked from the channel, re-entry is not possible
 
 ### 1:1 Game
 
-- 랜덤 플레이어 매칭
-- 게임 커스텀: 모드, 맵
-- 게임 결과 히스토리
-- 레벨 시스템
+- Random player matching
+- Game customization: mods, maps
+- Game result history
+- Level system
 
-## Stack
+## Stacks
 
 ### Frontend
 
@@ -48,10 +60,6 @@
 ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![HeadlessUI](https://img.shields.io/badge/headlessui-66E3FF?style=for-the-badge&logo=headlessui&logoColor=white)
 ![Heroicons](https://img.shields.io/badge/Heroicons-8B5CF6?style=for-the-badge&logoColor=white)
-![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
-![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)
-![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)
-![Yarn Berry](https://img.shields.io/badge/yarn_berry-%232C8EBB.svg?style=for-the-badge&logo=yarn&logoColor=white)
 
 ### Backend
 
@@ -59,54 +67,65 @@
 ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/postgreSQL-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Passport](https://img.shields.io/badge/passport-34E27A?style=for-the-badge&logo=passport&logoColor=white)
+![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)
+![WebRTC](https://img.shields.io/badge/webrtc-333333?style=for-the-badge&logo=webrtc&logoColor=white)
+
+### Development
+
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)
 ![Prettier](https://img.shields.io/badge/Prettier-F7B93E?style=for-the-badge&logo=prettier&logoColor=white)
 ![Yarn Berry](https://img.shields.io/badge/yarn_berry-%232C8EBB.svg?style=for-the-badge&logo=yarn&logoColor=white)
-
-### Communication
-
-![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)
-![WebRTC](https://img.shields.io/badge/webrtc-333333?style=for-the-badge&logo=webrtc&logoColor=white)
+![Git](https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 
 ### DevOps
 
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Make](https://img.shields.io/badge/Make-000000?style=for-the-badge&logo=make&logoColor=white)
 
-### Collaboration
+### Communication
 
 ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
-![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=for-the-badge&logo=notion&logoColor=white)
+![Notion](https://img.shields.io/badge/Notion-FFFFFF.svg?style=for-the-badge&logo=notion&logoColor=black)
 ![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)
 ![Figma](https://img.shields.io/badge/figma-%23F24E1E.svg?style=for-the-badge&logo=figma&logoColor=white)
 
 ## How to Run
 
+### Requirements
+
+Install dependencies with...
+
+- [Node.js(^18)](https://nodejs.org/)
+- [Yarn Berry(^3.4)](https://yarnpkg.com/getting-started/install)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Make](https://www.gnu.org/software/make/)
+
 ```shell
-# Create and start containers
-$ docker compose up -d
-
-# Start services
-$ docker compose start --build
-
-# Stop and remove containers, networks
-$ docker compose down
-
-# Removes stopped service containers
-$ docker compose rm
-
-# Stop and remove running containers, networks, images, and volumes
-$ docker compose down --rmi all --volumes --remove-orphans
+$ node -v
+v18.14.2
+$ yarn set version stable
+$ yarn --version
+3.4.1
 ```
 
-## Setup
-
-### .env
+### Installation & Run
 
 ```shell
+$ git clone https://github.com/team-noir/the-pong
+$ cd the-pong
+
+# Set and edit env file
 $ cp .env.example .env
-$ vi .env # edit file
+$ vi .env
+
+# Run containers
+$ docker compose build --no-cache
+$ docker compose up -d
+
+# Use Makefile instead of docker-compose
+$ make up
 ```
 
 ### 외부 API 서비스 키 발급 받기
@@ -122,25 +141,43 @@ $ vi .env # edit file
 
 ## Development
 
-Install dependencies with [Node.js(^18)](https://nodejs.org/) and [yarn berry](https://yarnpkg.com/getting-started/install)
-
-```bash
-$ node -v
-v18.14.2
-$ yarn set version stable
-$ yarn --version
-3.4.1
-```
-
 ```shell
+$ git clone https://github.com/team-noir/the-pong
+$ cd the-pong
+
+# Set and edit env file
 $ cp .env.development.example .env.development
-$ vi .env.development # edit file
+$ vi .env.development
+
+#
 $ docker compose -f docker-compose-dev.yml --env-file .env.development build --no-cache
 $ docker compose -f docker-compose-dev.yml --env-file .env.development up -d
 ```
 
+### Project Structure
+
+```shell
+/
+├── .github    # github settings
+├── .vscode    # vscode settings
+├── backend
+│   ├── prisma # database schema
+│   ├── src    # source code
+│   └── test   # test code
+├── frontend
+│   ├── public # static files
+│   └── src    # source code
+└── nginx      # nginx config
+```
+
+### Commit Message Convention
+
+[.gitmessage](.gitmessage.txt)
+
+### Development Ports & URLs
+
 - Frontend: http://localhost:8080
 - Backend API: http://localhost:8080/api
 - Backend API Docs(Swagger): http://localhost:8080/api/docs
-- Backend socket.io: http://localhost:8080/socket.io
+- Backend socket.io API: http://localhost:8080/socket.io
 - Database GUI(Prisma studio): http://localhost:5555
