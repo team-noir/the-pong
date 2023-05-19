@@ -123,12 +123,13 @@ export class MyService {
       .findMany({
         where: { followerId: myUserId },
         take: query.getLimit() + 1,
-        ...(query.cursor && {
-          cursor: { id: {
-            followerId: myUserId,
-            followeeId: Number(query.cursor)
-          }}
-        }),
+        ...query.getCursor(),
+        // ...(query.cursor && {
+        //   cursor: { id: {
+        //     followerId: myUserId,
+        //     followeeId: Number(query.cursor)
+        //   }}
+        // }),
         orderBy: { followeeId: query.getOrderBy() },
         select: {
           follewee: { select: { id: true, nickname: true } },
@@ -149,28 +150,31 @@ export class MyService {
       where: { followerId: Number(myUserId) },
       take: -1 * query.getLimit(),
       skip: 1,
-      ...(query.cursor && {
-        cursor: { id: {
-          followerId: myUserId,
-          followeeId: Number(query.cursor)
-        }}
-      }),
+      ...query.getCursor(),
+      // ...(query.cursor && {
+      //   cursor: { id: {
+      //     followerId: myUserId,
+      //     followeeId: Number(query.cursor)
+      //   }}
+      // }),
       orderBy: { followeeId: query.getOrderBy() },
       select: {
         follewee: { select: { id: true, nickname: true } },
       },
     });
 
-    let cursor = { prev: null, next: null };
+    const result = new PageDto(length, data);
     if (query.cursor && prevData.length == query.getLimit()) {
-      cursor.prev = prevData[0].follewee.id;
+      result.setCursor({
+        id: prevData[0].follewee.id,
+      }, true);
     }
     if (data.length == query.getLimit() + 1) {
-      cursor.next = data[data.length - 1].id;
+      result.setCursor({
+        id: data[data.length - 1].id,
+      }, false);
       data.pop();
     }
-    const result = new PageDto(length, data);
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 
@@ -253,12 +257,13 @@ export class MyService {
       .findMany({
         where: { blockerId: myUserId },
         take: query.getLimit() + 1,
-        ...(query.cursor && {
-          cursor: { id: {
-            blockerId: myUserId,
-            blockedId: Number(query.cursor)
-          }}
-        }),
+        ...query.getCursor(),
+        // ...(query.cursor && {
+        //   cursor: { id: {
+        //     blockerId: myUserId,
+        //     blockedId: Number(query.cursor)
+        //   }}
+        // }),
         orderBy: { blockedId: query.getOrderBy() },
         select: {
           blocked: { select: { id: true, nickname: true } },
@@ -274,28 +279,31 @@ export class MyService {
       where: { blockerId: Number(myUserId) },
       take: -1 * query.getLimit(),
       skip: 1,
-      ...(query.cursor && {
-        cursor: { id: {
-          blockerId: myUserId,
-          blockedId: Number(query.cursor)
-        }}
-      }),
+      ...query.getCursor(),
+      // ...(query.cursor && {
+      //   cursor: { id: {
+      //     blockerId: myUserId,
+      //     blockedId: Number(query.cursor)
+      //   }}
+      // }),
       orderBy: { blockedId: query.getOrderBy() },
       select: {
         blocked: { select: { id: true, nickname: true } },
       },
     });
 
-    let cursor = { prev: null, next: null };
+    const result = new PageDto(length, data);
     if (query.cursor && prevData.length == query.getLimit()) {
-      cursor.prev = prevData[0].blocked.id;
+      result.setCursor({
+        id: prevData[0].blocked.id,
+      }, true);
     }
     if (data.length == query.getLimit() + 1) {
-      cursor.next = data[data.length - 1].id;
+      result.setCursor({
+        id: data[data.length - 1].id,
+      }, false);
       data.pop();
     }
-    const result = new PageDto(length, data);
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 

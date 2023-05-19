@@ -90,14 +90,8 @@ export class GameModel implements OnModuleInit {
       const { gameId, isLadder, players, createdAt, status } = game;
       const list = [];
 
-      if (
-        page.cursor && 
-        (order == 'desc' 
-          ? gameId > page.cursor.id 
-          : gameId < page.cursor.id
-        )
-      ) {
-        return;
+      if (!query.checkCursor(order, game)) {
+        return; 
       }
 
       if (page.take == query.getLimit()) { 
@@ -131,15 +125,16 @@ export class GameModel implements OnModuleInit {
     });
 
     const result = new PageDto(games.length, gamelist);
-    let cursor = { prev: null, next: null };
-
     if (prevIdx - query.getLimit() >= 0) {
-      cursor.prev = games[prevIdx - query.getLimit()].gameId;
+      result.setCursor({
+        id: games[prevIdx - query.getLimit()].gameId,
+      }, true);
     }
-    if (gamelist.length == query.getLimit()) {
-      cursor.next = gamelist[gamelist.length - 1].gameId;
+    if (gamelist.length == query.getLimit() && nextIdx + 1 <= games.length - 1) {
+      result.setCursor({
+        id: games[nextIdx + 1].gameId,
+      }, false);
     }
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 
@@ -198,7 +193,7 @@ export class GameModel implements OnModuleInit {
 
   async getGameAchievements(userId: number, gameResult) {
     const player = this.players.get(userId);
-    const userHistory = await this.getGameHistory(userId, new PageRequestDto(20, 1));
+    const userHistory = await this.getGameHistory(userId, new PageRequestDto(20));
     const userHistoryNormal = userHistory.data.filter((game) => !game.isLadder);
     const userHistoryLadder = userHistory.data.filter((game) => game.isLadder);
     const results = [];
@@ -679,11 +674,9 @@ export class GameModel implements OnModuleInit {
         OR: [{ loserId: userId }, { winnerId: userId }],
       },
       take: query.getLimit() + 1,
-			...(query.cursor && {
-				cursor: { id: Number(query.cursor) }
-			}),
+			...query.getCursor(),
       orderBy: {
-        id: query.getOrderBy(),
+        createdAt: 'desc',
       },
       select: {
         id: true,
@@ -730,24 +723,27 @@ export class GameModel implements OnModuleInit {
       },
       take: -1 * query.getLimit(),
       skip: 1,
-			...(query.cursor && {
-				cursor: { id: Number(query.cursor) }
-			}),
+      ...query.getCursor(),
+			// ...(query.cursor && {
+			// 	cursor: { id: Number(query.cursor) }
+			// }),
       orderBy: {
         id: query.getOrderBy(),
       },
     });
 
-    let cursor = { prev: null, next: null };
+    const result = new PageDto(length, data);
     if (query.cursor && prevHistory.length == query.getLimit()) {
-      cursor.prev = prevHistory[0].id;
+      result.setCursor({
+        id: prevHistory[0].id,
+      }, true);
     }
     if (data.length == query.getLimit() + 1) {
-      cursor.next = data[data.length - 1].id;
+      result.setCursor({
+        id: data[data.length - 1].id,
+      }, false);
       data.pop();
     }
-    const result = new PageDto(length, data);
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 }

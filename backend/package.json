@@ -47,6 +47,7 @@
     "connect-ensure-login": "^0.1.1",
     "cookie": "^0.5.0",
     "cookie-parser": "^1.4.6",
+    "crypto-js": "^4.1.1",
     "eslint-config-nestjs": "^0.3.1",
     "eslint-plugin-nestjs": "^1.2.3",
     "express-session": "^1.17.3",

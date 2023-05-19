@@ -59,6 +59,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["connect-ensure-login", "npm:0.1.1"],\
             ["cookie", "npm:0.5.0"],\
             ["cookie-parser", "npm:1.4.6"],\
+            ["crypto-js", "npm:4.1.1"],\
             ["eslint", "npm:8.36.0"],\
             ["eslint-config-nestjs", "npm:0.3.1"],\
             ["eslint-config-prettier", "virtual:469e801ddb2346773fdf67a919f80e466ea7085cd44905b52b60c32291fb9c59c9bf0169271e2afb851b9d7098483c4d455452de88fcebe3f87888f9be984edc#npm:8.7.0"],\
@@ -4746,6 +4747,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["path-key", "npm:3.1.1"],\
             ["shebang-command", "npm:2.0.0"],\
             ["which", "npm:2.0.2"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["crypto-js", [\
+        ["npm:4.1.1", {\
+          "packageLocation": "./.yarn/cache/crypto-js-npm-4.1.1-38a3b8c19d-b3747c12ee.zip/node_modules/crypto-js/",\
+          "packageDependencies": [\
+            ["crypto-js", "npm:4.1.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -9691,6 +9701,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["connect-ensure-login", "npm:0.1.1"],\
             ["cookie", "npm:0.5.0"],\
             ["cookie-parser", "npm:1.4.6"],\
+            ["crypto-js", "npm:4.1.1"],\
             ["eslint", "npm:8.36.0"],\
             ["eslint-config-nestjs", "npm:0.3.1"],\
             ["eslint-config-prettier", "virtual:469e801ddb2346773fdf67a919f80e466ea7085cd44905b52b60c32291fb9c59c9bf0169271e2afb851b9d7098483c4d455452de88fcebe3f87888f9be984edc#npm:8.7.0"],\

@@ -67,9 +67,10 @@ export class UsersService implements OnModuleInit {
       .findMany({
         where,
         take: query.getLimit() + 1,
-        ...(query.cursor && {
-          cursor: { id: Number(query.cursor) }
-        }),
+        ...query.getCursor(),
+        // ...(query.cursor && {
+        //   cursor: { id: Number(query.cursor) }
+        // }),
         orderBy: {
           id: query.getOrderBy()
         },
@@ -101,22 +102,25 @@ export class UsersService implements OnModuleInit {
         where,
         take: -1 * query.getLimit(),
         skip: 1,
-        ...(query.cursor && {
-          cursor: { id: Number(query.cursor) },
-        }),
+        ...query.getCursor(),
+        // ...(query.cursor && {
+        //   cursor: { id: Number(query.cursor) }
+        // }),
         orderBy: { id: query.getOrderBy() },
       });
   
-      let cursor = { prev: null, next: null };
+      const result = new PageDto(length, data);
       if (query.cursor && prevData.length == query.getLimit()) {
-        cursor.prev = prevData[0].id;
+        result.setCursor({
+          id: prevData[0].id
+        }, true);
       }
       if (data.length == query.getLimit() + 1) {
-        cursor.next = data[data.length - 1].id;
+        result.setCursor({
+          id: data[data.length - 1].id,
+        }, false);
         data.pop();
       }
-      const result = new PageDto(length, data);
-      result.setPaging(cursor.prev, cursor.next);
       return result;
   }
 
@@ -183,9 +187,10 @@ export class UsersService implements OnModuleInit {
           userId,
         },
         take: query.getLimit() + 1,
-        ...(query.cursor && {
-          cursor: { id: Number(query.cursor) }
-        }),
+        ...query.getCursor(),
+        // ...(query.cursor && {
+        //   cursor: { id: Number(query.cursor) }
+        // }),
         orderBy: {
           id: query.getOrderBy(),
         },
@@ -231,16 +236,18 @@ export class UsersService implements OnModuleInit {
       },
     });
 
-    let cursor = { prev: null, next: null };
+    const result = new PageDto(length, data);
     if (query.cursor && prevData.length == query.getLimit()) {
-      cursor.prev = prevData[0].id;
+      result.setCursor({
+        id: prevData[0].id,
+      }, true);
     }
     if (data.length == query.getLimit() + 1) {
-      cursor.next = data[data.length - 1].id;
+      result.setCursor({
+        id: data[data.length - 1].id,
+      }, false);
       data.pop();
     }
-    const result = new PageDto(length, data);
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 
