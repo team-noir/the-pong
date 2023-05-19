@@ -1,22 +1,32 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@tanstack/react-query';
-import { joinChannel } from 'api/rest.v1';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { getChannels, joinChannel } from 'api/rest.v1';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import ChannelList from 'components/molecule/ChannelList';
 import PasswordModal from 'components/molecule/PasswordModal';
+import Spinner from 'components/atoms/Spinner';
 import { ChannelType } from 'types';
 import ROUTES from 'constants/routes';
+import QUERY_KEYS from 'constants/queryKeys';
 
-interface Props {
-  channels: ChannelType[];
-}
-
-export default function ChannelBrowse({ channels }: Props) {
+export default function ChannelBrowse() {
   const [isShowPasswordInput, setIsShowPasswordInput] = useState(false);
   const [protectedChannelId, setProtectedChannelId] = useState<number | null>(
     null
   );
   const navigate = useNavigate();
+
+  const { data, fetchNextPage } = useInfiniteQuery({
+    queryKey: [QUERY_KEYS.CHANNELS_BROWSE],
+    queryFn: ({ pageParam = null }) =>
+      getChannels({ paging: { cursor: pageParam } }),
+    getNextPageParam: ({ paging }) => paging.nextCursor,
+    refetchInterval: 1000 * 60, // 1분
+  });
+
+  const channels = data?.pages.flatMap((page) => page.data) ?? [];
+  const hasMore = !!data?.pages[data.pages.length - 1].paging.nextCursor;
 
   const joinChannelMutation = useMutation(joinChannel);
   const joinProtectedChannelMutation = useMutation({
@@ -56,9 +66,16 @@ export default function ChannelBrowse({ channels }: Props) {
   return (
     <>
       {channels.length ? (
-        <ChannelList channels={channels} onClick={handleClickChannel} />
+        <InfiniteScroll
+          next={fetchNextPage}
+          hasMore={hasMore}
+          dataLength={channels.length}
+          loader={<Spinner className="flex justify-center pt-2 pb-8" />}
+        >
+          <ChannelList channels={channels} onClick={handleClickChannel} />
+        </InfiniteScroll>
       ) : (
-        <div>생성된 채널이 없습니다.</div>
+        <p className="text-center py-4">생성된 채널이 없습니다.</p>
       )}
       {isShowPasswordInput && (
         <PasswordModal

@@ -251,12 +251,15 @@ export const followUser = async (userId: number) => {
 export const getChannels = async ({
   enter,
   kind,
+  paging,
 }: {
   enter?: string;
   kind?: string[];
-}): Promise<ChannelType[]> => {
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<ChannelType>> => {
+  const { cursor, size, order } = paging;
   const res = await axiosWithInterceptors.get(`/channels/`, {
-    params: { enter, kind },
+    params: { enter, kind, cursor, size, order },
   });
 
   if (res.status !== StatusCodes.OK) {
