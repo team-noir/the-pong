@@ -186,8 +186,13 @@ export const checkProfile = async ({
 
 /** Block */
 
-export const getMyBlocks = async (): Promise<UserType[]> => {
-  const res = await axiosWithInterceptors.get(`/my/blocks`);
+export const getMyBlocks = async (
+  paging: PageParamsType
+): Promise<ListWithPagingType<UserType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(`/my/blocks`, {
+    params: { cursor, size, order },
+  });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
