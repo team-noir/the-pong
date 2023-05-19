@@ -73,6 +73,8 @@ export class PageRequestDto {
 			return true;
 		}
 
+		console.log(decryptedCursor);
+
 		const cursorKeys = Object.keys(decryptedCursor.cursor);
 
 		for (const key of cursorKeys) {

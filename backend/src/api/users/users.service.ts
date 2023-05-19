@@ -68,11 +68,8 @@ export class UsersService implements OnModuleInit {
         where,
         take: query.getLimit() + 1,
         ...query.getCursor(),
-        // ...(query.cursor && {
-        //   cursor: { id: Number(query.cursor) }
-        // }),
         orderBy: {
-          id: query.getOrderBy()
+          nickname: query.getOrderBy()
         },
         select: {
           id: true,
@@ -103,10 +100,7 @@ export class UsersService implements OnModuleInit {
         take: -1 * query.getLimit(),
         skip: 1,
         ...query.getCursor(),
-        // ...(query.cursor && {
-        //   cursor: { id: Number(query.cursor) }
-        // }),
-        orderBy: { id: query.getOrderBy() },
+        orderBy: { nickname: query.getOrderBy() },
       });
   
       const result = new PageDto(length, data);

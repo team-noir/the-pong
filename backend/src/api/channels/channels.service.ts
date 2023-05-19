@@ -137,7 +137,7 @@ export class ChannelsService {
       conditions.isPublic = true;
     }
 
-    channels.sort((a,b) => a.id - b.id);
+    channels.sort((a: Channel, b: Channel) => query.compare(a,b));
     if (order == 'desc') {
       channels.reverse();
     }
