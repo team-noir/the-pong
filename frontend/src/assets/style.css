@@ -20,6 +20,13 @@
     @apply container mx-auto max-w-xl;
     @apply fixed top-0 left-0 right-0;
     @apply backdrop-blur-md bg-gray-darker/50 z-50;
+    @apply drop-shadow-xl;
+  }
+  .header-backdrop {
+    @apply container mx-auto max-w-xl;
+    @apply fixed inset-0;
+    @apply bg-black/50 z-10;
+    @apply cursor-default;
   }
   .vh-center {
     @apply flex items-center justify-center;
