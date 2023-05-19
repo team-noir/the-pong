@@ -50,6 +50,7 @@ export class ChannelListDto extends PageRequestDto {
     example: ['public', 'private', 'dm'],
   })
   @IsArray()
+  @IsOptional()
   public kind: string[];
 
   getConditions() {
