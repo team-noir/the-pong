@@ -212,8 +212,13 @@ export const blockUser = async (userId: number) => {
 
 /** Follow */
 
-export const getMyFollowings = async (): Promise<UserType[]> => {
-  const res = await axiosWithInterceptors.get(`/my/following`);
+export const getMyFollowings = async (
+  paging: PageParamsType
+): Promise<ListWithPagingType<UserType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(`/my/following`, {
+    params: { cursor, size, order },
+  });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
