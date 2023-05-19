@@ -46,9 +46,10 @@ export class ChannelListDto extends PageRequestDto {
   @ApiProperty({
     name: 'kind',
     required: false,
+    type: [String],
+    example: ['public', 'private', 'dm'],
   })
-  @IsBoolean()
-  @IsOptional()
+  @IsArray()
   public kind: string[];
 
   getConditions() {
