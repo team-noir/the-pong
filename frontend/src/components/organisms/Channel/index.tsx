@@ -1,17 +1,29 @@
 import { useEffect, useState, useRef, useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useInfiniteQuery,
+  InfiniteData,
+} from '@tanstack/react-query';
 import { getMessages, sendMessage } from 'api/rest.v1';
 import { onMessage, onNotice, onUser } from 'api/socket.v1';
 import { SocketContext } from 'contexts/socket';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import Modal from 'components/templates/Modal';
 import ChannelDetail from 'components/organisms/Channel/ChannelDetail';
 import ChannelSetting from 'components/organisms/Channel/ChannelSetting';
 import ChannelInvite from 'components/organisms/Channel/ChannelInvite';
 import MessageList from 'components/molecule/MessageList';
 import Button from 'components/atoms/Button';
+import Spinner from 'components/atoms/Spinner';
 import TextInput from 'components/atoms/TextInput';
-import { ChannelType, MessageType, NoticeType } from 'types';
+import {
+  ChannelType,
+  ListWithPagingType,
+  MessageType,
+  NoticeType,
+} from 'types';
 import ROUTES from 'constants/routes';
 import { NOTICE_STATUS } from 'constants/index';
 import QUERY_KEYS from 'constants/queryKeys';
@@ -51,19 +63,22 @@ export default function Channel({
 
   const messageQueryKey = [QUERY_KEYS.MESSAGES, String(channel.id)];
 
-  const { data: messages } = useQuery<MessageType[]>({
+  const { data, isFetching, fetchNextPage } = useInfiniteQuery({
     queryKey: messageQueryKey,
-    queryFn: () => getMessages(channel.id),
+    queryFn: ({ pageParam = null }) =>
+      getMessages({
+        channelId: channel.id,
+        paging: { cursor: pageParam, size: 30 },
+      }),
+    getNextPageParam: ({ paging }) => paging.nextCursor,
     staleTime: Infinity,
+    suspense: false,
   });
 
-  const sendMessageMutation = useMutation(sendMessage);
+  const messages = data?.pages.flatMap((page) => page.data) ?? [];
+  const hasMore = !!data?.pages[data.pages.length - 1].paging.nextCursor;
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages]);
+  const sendMessageMutation = useMutation(sendMessage);
 
   useEffect(() => {
     if (!channel.users) return;
@@ -90,8 +105,20 @@ export default function Channel({
         createdAt: data.createdAt,
       };
       if (data.channelId !== channel.id) return;
-      queryClient.setQueryData<MessageType[]>(messageQueryKey, (oldData) =>
-        oldData ? [...oldData, newMessage] : oldData
+      queryClient.setQueryData<InfiniteData<ListWithPagingType<MessageType>>>(
+        messageQueryKey,
+        (oldData) => {
+          const newPages = oldData?.pages.map((page, index) =>
+            index === 0 ? { ...page, data: [newMessage, ...page.data] } : page
+          );
+          return (
+            oldData &&
+            ({
+              ...oldData,
+              pages: oldData.pages ? newPages : oldData.pages,
+            } as InfiniteData<ListWithPagingType<MessageType>>)
+          );
+        }
       );
     });
 
@@ -173,6 +200,10 @@ export default function Channel({
     });
 
     setFormData((prevState) => ({ ...prevState, message: '' }));
+
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   };
 
   return (
@@ -180,10 +211,24 @@ export default function Channel({
       <div
         id="message-list-wrapper"
         // NOTE: height: 100vh - upper padding - input bar
-        className="h-[calc(100vh-6rem-82px)] overflow-y-auto"
+        className="h-[calc(100vh-6rem-82px)] overflow-y-auto flex flex-col-reverse"
         ref={scrollRef}
       >
-        {messages && <MessageList messages={messages} myUserId={myUserId} />}
+        {isFetching && !data ? (
+          <Spinner className="flex justify-center mt-2 mb-8" />
+        ) : (
+          <InfiniteScroll
+            next={fetchNextPage}
+            hasMore={hasMore}
+            dataLength={messages.length}
+            loader={<Spinner className="flex justify-center pt-2 pb-4" />}
+            className="flex flex-col-reverse"
+            scrollableTarget="message-list-wrapper"
+            inverse
+          >
+            <MessageList messages={messages} myUserId={myUserId} />
+          </InfiniteScroll>
+        )}
       </div>
       <form
         onSubmit={handleSubmit}

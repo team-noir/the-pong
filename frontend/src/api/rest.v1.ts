@@ -304,10 +304,20 @@ export const getDmChannel = async (userId: number): Promise<ChannelType> => {
   return res.data;
 };
 
-export const getMessages = async (
-  channelId: number
-): Promise<MessageType[]> => {
-  const res = await axiosWithInterceptors.get(`/channels/${channelId}/message`);
+export const getMessages = async ({
+  channelId,
+  paging,
+}: {
+  channelId: number;
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<MessageType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(
+    `/channels/${channelId}/message`,
+    {
+      params: { cursor, size, order },
+    }
+  );
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
