@@ -524,13 +524,16 @@ export const joinGameLive = async (gameId: number) => {
   return res;
 };
 
-export const getGameHistories = async (
-  userId: number,
-  page = 1,
-  per_page = 30
-): Promise<GameHistoryType[]> => {
+export const getGameHistories = async ({
+  userId,
+  paging,
+}: {
+  userId: number;
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<GameHistoryType>> => {
+  const { cursor, size, order } = paging;
   const res = await axiosWithInterceptors.get(`/games/users/${userId}`, {
-    params: { page, per_page },
+    params: { cursor, size, order },
   });
   if (res.status !== 200) {
     throw new Error(res.statusText);
