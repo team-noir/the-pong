@@ -3,15 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { getGames } from 'api/rest.v1';
 import { ChevronRightIcon } from '@heroicons/react/20/solid';
 import GameButtons from 'components/organisms/GameButtons';
-import GameLives from 'components/organisms/GameLives';
+import GameList from 'components/organisms/GameList';
 import ChannelButtons from 'components/organisms/ChannelButtons';
 import QUERY_KEYS from 'constants/queryKeys';
 
 export default function Main() {
-  const { data: games, isSuccess } = useQuery({
-    queryKey: [QUERY_KEYS.GAMES],
-    // TODO: getGames with limit(after server-side pagination)
-    queryFn: getGames,
+  const { data } = useQuery({
+    queryKey: [QUERY_KEYS.GAMES, 'main'],
+    queryFn: () => getGames({ size: 3 }),
   });
 
   return (
@@ -31,7 +30,11 @@ export default function Main() {
             />
           </span>
         </div>
-        {isSuccess && <GameLives games={games} />}
+        {data?.data.length ? (
+          <GameList games={data.data} />
+        ) : (
+          <p className="text-center pt-4">진행중인 게임이 없습니다.</p>
+        )}
       </section>
       <section className="section">
         <h2 className="section-title">채널</h2>
