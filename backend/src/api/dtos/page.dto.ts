@@ -30,8 +30,6 @@ export class PageDto<T> {
 		}
 
 		const cryptedCursor = CryptoJS.AES.encrypt(JSON.stringify(cursor), process.env.CURSOR_SECRET).toString();
-
-		console.log(cryptedCursor);
 		if (isPrev) {
 			this.paging = {
 				...this.paging,
@@ -43,7 +41,5 @@ export class PageDto<T> {
 				nextCursor: cryptedCursor,
 			}
 		}
-
-		console.log(this.paging);
 	}
 }

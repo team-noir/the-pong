@@ -195,11 +195,15 @@ export class ChannelsService {
     const result = new PageDto(channels.length, data);
     if (prevIdx - query.getLimit() >= 0) {
       result.setCursor({
+        ...(query.sort == "created" && { createdAt: channels[prevIdx - query.getLimit()].createdAt }),
+        ...(query.sort == "users" && { userCount: channels[prevIdx - query.getLimit()].users.size }),
         id: channels[prevIdx - query.getLimit()].id,
       }, true);
     }
     if (data.length == query.getLimit() && nextIdx + 1 <= channels.length - 1) {
       result.setCursor({
+        ...(query.sort == "created" && { createdAt: channels[nextIdx + 1].createdAt }),
+        ...(query.sort == "users" && { userCount: channels[nextIdx + 1].users.size }),
         id: channels[nextIdx + 1].id,
       }, false);
     }
