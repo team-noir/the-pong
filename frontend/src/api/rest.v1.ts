@@ -130,10 +130,17 @@ export const getUserStatus = async (userId: number): Promise<UserType> => {
   return res.data;
 };
 
-export const getAchievements = async (
-  userId: number
-): Promise<AchievementType[]> => {
-  const res = await axiosWithInterceptors.get(`/users/${userId}/achievements`);
+export const getAchievements = async ({
+  userId,
+  paging,
+}: {
+  userId: number;
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<AchievementType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(`/users/${userId}/achievements`, {
+    params: { cursor, size, order },
+  });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
