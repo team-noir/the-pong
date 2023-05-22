@@ -106,12 +106,12 @@ export class UsersService implements OnModuleInit {
       const result = new PageDto(length, data);
       if (query.cursor && prevData.length == query.getLimit()) {
         result.setCursor({
-          id: prevData[0].id
+          nickname: prevData[0].nickname
         }, true);
       }
       if (data.length == query.getLimit() + 1) {
         result.setCursor({
-          id: data[data.length - 1].id,
+          nickname: data[data.length - 1].nickname,
         }, false);
         data.pop();
       }
