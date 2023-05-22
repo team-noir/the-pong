@@ -8,6 +8,7 @@ import {
 } from 'class-validator';
 import { Player } from './player.dto';
 import { Game } from './game.dto';
+import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
 
 export class AddUserToQueueDto {
   @ApiProperty()
@@ -25,6 +26,38 @@ export class AnswerInvitationDto {
   @ApiProperty()
   @IsBoolean()
   public isAccepted: boolean;
+}
+
+export class GameListDto extends PageRequestDto {
+  @ApiProperty({
+    name: 'sort',
+    required: false,
+    description: 'sort(created, viewers)\n- Default: `created`',
+  })
+  @IsOptional()
+  public sort?: 'created' | 'viewers';
+
+  compare(a: Game, b: Game) {
+    let result;
+
+    if (this.sort === 'viewers') {
+      result = a.getViewerCount() - b.getViewerCount();
+      if (result === 0) {
+        return a.gameId - b.gameId;
+      } else {
+        return result;
+      }
+    } else if (this.sort === 'created') {
+      result = a.createdAt.getTime() - b.createdAt.getTime();
+      if (result === 0) {
+        return a.gameId - b.gameId;
+      } else {
+        return result;
+      }
+    } else {
+      return a.gameId - b.gameId;
+    }
+  }
 }
 
 export class GameSettingPlayerDto {

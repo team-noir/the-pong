@@ -21,6 +21,7 @@ export class Game {
   private invitedId: userId;
 
   countPlayer: number;
+  countViewer: number;
 
   readyTimeout;
 
@@ -31,6 +32,7 @@ export class Game {
     this.mode = 0;
     this.theme = 0;
     this.countPlayer = 0;
+    this.countViewer = 0;
     this.players = [];
     this.viewers = [];
     this.viewerConnections = new Set<userId>();
@@ -247,6 +249,7 @@ export class Game {
       return false;
     });
     this.viewerConnections.delete(viewerId);
+    this.countViewer--;
     return this.getViewerCount();
   }
 
@@ -283,6 +286,7 @@ export class Game {
 
     viewer.game = this;
     viewer.socket.join(this.getName());
+    this.countViewer++;
 
     if (this.players[0].socket) {
       await this.players[0].socket.emit('rtcInit', {

@@ -16,6 +16,7 @@ import { PrismaClient } from '@prisma';
 import { GAME_STATUS } from '@const';
 import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
 import { PageDto } from '@/api/dtos/page.dto';
+import { GameListDto } from '../dtos/games.dto';
 
 type gameId = number;
 type playerId = number;
@@ -73,7 +74,7 @@ export class GameModel implements OnModuleInit {
     return this.games.get(gameId);
   }
 
-  getGameList(query) {
+  getGameList(query: GameListDto) {
     const gamelist = [];
     const page = query.getPageOptions();
     const games = [...this.games.values()];
@@ -81,7 +82,7 @@ export class GameModel implements OnModuleInit {
     let prevIdx = 0;
     let nextIdx = 0;
 
-    games.sort((a,b) => a.gameId - b.gameId);
+    games.sort((a,b) => query.compare(a, b));
     if (order == 'desc') {
       games.reverse();
     }
@@ -128,11 +129,15 @@ export class GameModel implements OnModuleInit {
     if (prevIdx - query.getLimit() >= 0) {
       result.setCursor({
         id: games[prevIdx - query.getLimit()].gameId,
+        ...(query.sort == "created" && { createdAt: games[prevIdx - query.getLimit()].createdAt }),
+        ...(query.sort == "viewers" && { countViewer: games[prevIdx - query.getLimit()].countViewer }),
       }, true);
     }
     if (gamelist.length == query.getLimit() && nextIdx + 1 <= games.length - 1) {
       result.setCursor({
         id: games[nextIdx + 1].gameId,
+        ...(query.sort == "created" && { createdAt: games[nextIdx + 1].createdAt }),
+        ...(query.sort == "viewers" && { countViewer: games[nextIdx + 1].countViewer }),
       }, false);
     }
     return result;
