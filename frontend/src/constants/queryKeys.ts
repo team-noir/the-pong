@@ -8,7 +8,7 @@ const QUERY_KEYS = {
   BLOCKS: 'blocks',
   ACHIEVEMENTS: 'achievements',
   GAME: 'game',
-  GAMES: 'gamesMain',
+  GAMES: 'games',
   GAME_SETTING: 'gameSetting',
   GAME_HISTORY: 'gameHistory',
   CHANNEL: 'channel',
