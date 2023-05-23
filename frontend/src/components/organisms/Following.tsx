@@ -63,17 +63,17 @@ export default function Following() {
             imageSize={52}
             hasStatus={true}
             buttons={[
-              <GameInviteButton key="button0" />,
+              <GameInviteButton key="gameInviteButton" />,
               <Button
                 onClick={handleClickDm}
-                key="button1"
+                key="dmButton"
                 primary
                 size="small"
               >
                 메시지 보내기
               </Button>,
               <Button
-                key="button2"
+                key="unfollowButton"
                 onClick={handleClickUnfollow}
                 linkStyle
                 className="text-red"
