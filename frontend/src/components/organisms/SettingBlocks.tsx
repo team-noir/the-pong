@@ -42,7 +42,7 @@ export default function SettingBlocks() {
             imageSize={52}
             buttons={[
               <Button
-                key="button0"
+                key="unblockButton"
                 onClick={handleClickUnblock}
                 secondary
                 size="small"
