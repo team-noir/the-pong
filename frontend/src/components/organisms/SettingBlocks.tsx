@@ -1,20 +1,24 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { unblockUser } from 'api/rest.v1';
+import { useInfiniteQuery, useMutation } from '@tanstack/react-query';
+import { getMyBlocks, unblockUser } from 'api/rest.v1';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import UserList from 'components/molecule/UserList';
 import Button from 'components/atoms/Button';
-import { UserType } from 'types';
+import Spinner from 'components/atoms/Spinner';
 import QUERY_KEYS from 'constants/queryKeys';
 
-interface Props {
-  users: UserType[];
-}
+export default function SettingBlocks() {
+  const { data, fetchNextPage, refetch } = useInfiniteQuery({
+    queryKey: [QUERY_KEYS.BLOCKS],
+    queryFn: ({ pageParam = null }) => getMyBlocks({ cursor: pageParam }),
+    getNextPageParam: ({ paging }) => paging.nextCursor,
+  });
 
-export default function SettingBlocks({ users }: Props) {
-  const queryClient = useQueryClient();
+  const users = data?.pages.flatMap((page) => page.data) ?? [];
+  const hasMore = !!data?.pages[data.pages.length - 1].paging.nextCursor;
 
   const unblockUserMutation = useMutation({
     mutationFn: unblockUser,
-    onSuccess: () => queryClient.invalidateQueries([QUERY_KEYS.BLOCKS]),
+    onSuccess: () => refetch(),
   });
 
   const handleClickUnblock = (e: React.MouseEvent<HTMLElement>) => {
@@ -27,22 +31,29 @@ export default function SettingBlocks({ users }: Props) {
   return (
     <>
       {users.length ? (
-        <UserList
-          users={users}
-          imageSize={52}
-          buttons={[
-            <Button
-              key="button0"
-              onClick={handleClickUnblock}
-              secondary
-              size="small"
-            >
-              차단 해제
-            </Button>,
-          ]}
-        />
+        <InfiniteScroll
+          next={fetchNextPage}
+          hasMore={hasMore}
+          dataLength={users.length}
+          loader={<Spinner className="flex justify-center pt-2 pb-8" />}
+        >
+          <UserList
+            users={users}
+            imageSize={52}
+            buttons={[
+              <Button
+                key="unblockButton"
+                onClick={handleClickUnblock}
+                secondary
+                size="small"
+              >
+                차단 해제
+              </Button>,
+            ]}
+          />
+        </InfiniteScroll>
       ) : (
-        <p>차단한 회원이 없습니다.</p>
+        <p className="text-center py-4">차단한 회원이 없습니다.</p>
       )}
     </>
   );

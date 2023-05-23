@@ -10,6 +10,8 @@ import {
   ChannelUserStatusType,
   ChannelFormType,
   MessageType,
+  ListWithPagingType,
+  PageParamsType,
 } from 'types';
 
 export const API_PREFIX = `/api/v1`;
@@ -103,13 +105,16 @@ export const getUser = async (userId: number): Promise<UserType> => {
   return res.data;
 };
 
-export const getUsers = async (
-  q: string,
-  page = 1,
-  per_page = 30
-): Promise<UserType[]> => {
+export const getUsers = async ({
+  q,
+  paging,
+}: {
+  q: string;
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<UserType>> => {
+  const { cursor, size, order } = paging;
   const res = await axios.get(`/users`, {
-    params: { q, page, per_page },
+    params: { q, cursor, size, order },
   });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
@@ -125,10 +130,17 @@ export const getUserStatus = async (userId: number): Promise<UserType> => {
   return res.data;
 };
 
-export const getAchievements = async (
-  userId: number
-): Promise<AchievementType[]> => {
-  const res = await axiosWithInterceptors.get(`/users/${userId}/achievements`);
+export const getAchievements = async ({
+  userId,
+  paging,
+}: {
+  userId: number;
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<AchievementType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(`/users/${userId}/achievements`, {
+    params: { cursor, size, order },
+  });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
@@ -181,8 +193,13 @@ export const checkProfile = async ({
 
 /** Block */
 
-export const getMyBlocks = async (): Promise<UserType[]> => {
-  const res = await axiosWithInterceptors.get(`/my/blocks`);
+export const getMyBlocks = async (
+  paging: PageParamsType
+): Promise<ListWithPagingType<UserType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(`/my/blocks`, {
+    params: { cursor, size, order },
+  });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
@@ -207,8 +224,13 @@ export const blockUser = async (userId: number) => {
 
 /** Follow */
 
-export const getMyFollowings = async (): Promise<UserType[]> => {
-  const res = await axiosWithInterceptors.get(`/my/following`);
+export const getMyFollowings = async (
+  paging: PageParamsType
+): Promise<ListWithPagingType<UserType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(`/my/following`, {
+    params: { cursor, size, order },
+  });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
@@ -236,12 +258,15 @@ export const followUser = async (userId: number) => {
 export const getChannels = async ({
   enter,
   kind,
+  paging,
 }: {
   enter?: string;
   kind?: string[];
-}): Promise<ChannelType[]> => {
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<ChannelType>> => {
+  const { cursor, size, order } = paging;
   const res = await axiosWithInterceptors.get(`/channels/`, {
-    params: { enter, kind },
+    params: { enter, kind, cursor, size, order },
   });
 
   if (res.status !== StatusCodes.OK) {
@@ -286,10 +311,20 @@ export const getDmChannel = async (userId: number): Promise<ChannelType> => {
   return res.data;
 };
 
-export const getMessages = async (
-  channelId: number
-): Promise<MessageType[]> => {
-  const res = await axiosWithInterceptors.get(`/channels/${channelId}/message`);
+export const getMessages = async ({
+  channelId,
+  paging,
+}: {
+  channelId: number;
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<MessageType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(
+    `/channels/${channelId}/message`,
+    {
+      params: { cursor, size, order },
+    }
+  );
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
@@ -400,8 +435,13 @@ export const getGame = async (gameId: number): Promise<GameType> => {
   return res.data;
 };
 
-export const getGames = async (): Promise<GameType[]> => {
-  const res = await axiosWithInterceptors.get(`/games`);
+export const getGames = async (
+  paging: PageParamsType
+): Promise<ListWithPagingType<GameType>> => {
+  const { cursor, size, order } = paging;
+  const res = await axiosWithInterceptors.get(`/games`, {
+    params: { cursor, size, order },
+  });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);
   }
@@ -491,13 +531,16 @@ export const joinGameLive = async (gameId: number) => {
   return res;
 };
 
-export const getGameHistories = async (
-  userId: number,
-  page = 1,
-  per_page = 30
-): Promise<GameHistoryType[]> => {
+export const getGameHistories = async ({
+  userId,
+  paging,
+}: {
+  userId: number;
+  paging: PageParamsType;
+}): Promise<ListWithPagingType<GameHistoryType>> => {
+  const { cursor, size, order } = paging;
   const res = await axiosWithInterceptors.get(`/games/users/${userId}`, {
-    params: { page, per_page },
+    params: { cursor, size, order },
   });
   if (res.status !== 200) {
     throw new Error(res.statusText);

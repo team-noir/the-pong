@@ -43,7 +43,7 @@ export default function ChannelInvite({
       return;
     }
 
-    debouncedGetUsers(nickname);
+    debouncedGetUsers({ q: nickname, paging: { size: 5 } });
   }, [nickname]);
 
   const handleClickInvite = () => {
@@ -56,7 +56,7 @@ export default function ChannelInvite({
   const handleSelect = (nickname: string) => {
     if (!getUsersMutation.isSuccess || !getUsersMutation.data) return;
 
-    const selectedUser = getUsersMutation.data.find(
+    const selectedUser = getUsersMutation.data.data.find(
       (user) => user.nickname === nickname
     );
     if (!selectedUser) return;
@@ -82,7 +82,7 @@ export default function ChannelInvite({
         <div className="mb-4 relative">
           <SearchCombobox
             placeholder="닉네임을 입력해주세요."
-            dataList={getUsersMutation.data ? getUsersMutation.data : []}
+            dataList={getUsersMutation.data ? getUsersMutation.data.data : []}
             channelUsers={channelUsers}
             setValue={(value) => setNickname(value)}
             onSelect={handleSelect}

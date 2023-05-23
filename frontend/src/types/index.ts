@@ -1,3 +1,22 @@
+export interface PagingType {
+  previousCursor: number | null;
+  nextCursor: number | null;
+}
+
+export type ListWithPagingType<T> = {
+  totalCount: number;
+  paging: PagingType;
+  data: T[];
+};
+
+export type OrderType = 'asc' | 'desc';
+
+export type PageParamsType = {
+  cursor?: number | null;
+  size?: number;
+  order?: OrderType;
+};
+
 /** User */
 
 type UserStatus = 'online' | 'offline' | 'game';

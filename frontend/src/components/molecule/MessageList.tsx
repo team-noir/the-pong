@@ -9,13 +9,13 @@ interface Props {
 
 export default function MessageList({ messages, myUserId }: Props) {
   return (
-    <ul className="flex flex-col">
+    <ul className="flex flex-col-reverse">
       {messages?.map((message, index) => {
         const isMyMessage = message.senderId === myUserId;
         const isContinuousMessage =
-          messages[index - 1]?.senderId === message.senderId;
+          messages[index + 1]?.senderId === message.senderId;
         const isShowDate =
-          formatDate(messages[index - 1]?.createdAt) !==
+          formatDate(messages[index + 1]?.createdAt) !==
           formatDate(message.createdAt);
         return (
           <MessageItem

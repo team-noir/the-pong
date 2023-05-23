@@ -14,7 +14,7 @@ export default function Channel({ channel, onClick }: Props) {
     <li
       onClick={() => onClick && onClick(channel)}
       className={classNames(
-        'pl-2 pr-2 pb-4 mb-4 border-b border-b-gray cursor-pointer',
+        'pl-2 pr-2 py-4 border-b border-b-gray cursor-pointer',
         channel.isDm && 'flex justify-between items-center'
       )}
     >

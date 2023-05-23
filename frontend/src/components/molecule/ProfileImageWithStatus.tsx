@@ -18,6 +18,7 @@ export default function ProfileImageWithStatus({
     queryKey: [QUERY_KEYS.STATUS, String(userId)],
     queryFn: () => getUserStatus(userId),
     staleTime: 0,
+    suspense: false,
   });
 
   return (

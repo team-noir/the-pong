@@ -13,19 +13,7 @@ interface Props {
   games: GameType[];
 }
 
-export default function GameLives({ games }: Props) {
-  return (
-    <>
-      {games.length ? (
-        <GameList games={games} />
-      ) : (
-        <p>진행중인 게임이 없습니다.</p>
-      )}
-    </>
-  );
-}
-
-function GameList({ games }: { games: GameType[] }) {
+export default function GameList({ games }: Props) {
   return (
     <ul className="flex flex-col ">
       {games.map((game) => (

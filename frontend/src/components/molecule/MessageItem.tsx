@@ -17,13 +17,8 @@ export default function MessageItem({
 }: Props) {
   return (
     <>
-      {isShowDate && (
-        <span className="self-center text-xs leading-3 mb-4">
-          {`${formatDate(message.createdAt)}`}
-        </span>
-      )}
       {message.isLog ? (
-        <div className="flex mb-4 vh-center">
+        <div className="flex my-2 vh-center">
           <span className="p-2 rounded bg-gray-dark text-text-light text-xs leading-3">
             {message.text}
           </span>
@@ -70,6 +65,11 @@ export default function MessageItem({
             </li>
           </div>
         </div>
+      )}
+      {isShowDate && (
+        <span className="self-center text-xs leading-3 my-2">
+          {`${formatDate(message.createdAt)}`}
+        </span>
       )}
     </>
   );
