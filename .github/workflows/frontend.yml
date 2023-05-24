@@ -24,10 +24,11 @@ jobs:
       - name: Build
         working-directory: ./frontend
         run: yarn run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
           branch: gh-pages
           folder: frontend/build
-        env:
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+
