@@ -14,7 +14,7 @@ import {
   PageParamsType,
 } from 'types';
 
-export const API_PREFIX = `/api/v1`;
+export const API_PREFIX = `${process.env.REACT_APP_API_URL}/api/v1`;
 
 axios.defaults.baseURL = API_PREFIX;
 axios.defaults.withCredentials = true;
