@@ -5,12 +5,13 @@
 <details open>
   <summary>Table of Contents</summary>
   <ul>
-    <li><a href="#summary">개요</a></li>
-    <li><a href="#team-members">팀원</a></li>
-    <li><a href="#key-features">주요 기능</a></li>
-    <li><a href="#stacks">기술 스택</a></li>
-    <li><a href="#how-to-run">실행 방법</a></li>
-    <li><a href="#development">개발 환경</a></li>
+    <li><a href="#%EA%B0%9C%EC%9A%94">개요</a></li>
+    <li><a href="#%ED%8C%80%EC%9B%90">팀원</a></li>
+    <li><a href="#%EC%A3%BC%EC%9A%94-%EA%B8%B0%EB%8A%A5-%EB%B0%8F-%EC%82%AC%EC%9A%A9-%EA%B8%B0%EC%88%A0">주요 기능</a></li>
+    <li><a href="#%EA%B8%B0%EC%88%A0-%EC%8A%A4%ED%83%9D">기술 스택</a></li>
+    <li><a href="#%EA%B0%9C%EB%B0%9C--%ED%8A%B8%EB%9F%AC%EB%B8%94%EC%8A%88%ED%8C%85-%EB%A1%9C%EA%B7%B8">개발 & 트러블슈팅 로그</a></li>
+    <li><a href="#%EC%8B%A4%ED%96%89-%EB%B0%A9%EB%B2%95">실행 방법</a></li>
+    <li><a href="#%EA%B0%9C%EB%B0%9C-%ED%99%98%EA%B2%BD">개발 환경</a></li>
   </ul>
 </details>
 
@@ -25,9 +26,9 @@ The Pong은 채팅과 1:1 게임 서비스를 제공하는 애플리케이션입
 
 ## 팀원
 
-- [@srngch](https://github.com/srngch): 팀 리더, 프론트엔드, 백엔드
-- [@hhkim0729](https://github.com/hhkim0729): 프론트엔드
-- [@PCHANUL](https://github.com/PCHANUL): 백엔드
+- 최사랑 [@srngch](https://github.com/srngch): 팀 리더, 프론트엔드, 백엔드
+- 김희현 [@hhkim0729](https://github.com/hhkim0729): 프론트엔드
+- 박찬울 [@PCHANUL](https://github.com/PCHANUL): 백엔드
 
 ## 주요 기능 및 사용 기술
 
@@ -110,10 +111,7 @@ The Pong은 채팅과 1:1 게임 서비스를 제공하는 애플리케이션입
 
 ## 개발 & 트러블슈팅 로그
 
-#### 제목 - @작성자 [👉 자세히 보러가기](#)
-
-- 문제 상황:
-- 문제 해결:
+- [FE 개발 로그] 무한 스크롤 구현하기 - 김희현(@hhkim0729) [👉 자세히 보러가기](https://github.com/team-noir/the-pong/wiki/%EB%AC%B4%ED%95%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0)
 
 ## 실행 방법
 
