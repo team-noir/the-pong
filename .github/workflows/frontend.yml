@@ -29,3 +29,5 @@ jobs:
         with:
           branch: gh-pages
           folder: frontend/build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
