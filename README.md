@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./readme-header.svg" width="800" height="400" alt="Header">
+  <img src="./readme-header.svg" alt="Header">
 </div>
 
 <details open>
