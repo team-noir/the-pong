@@ -15,8 +15,10 @@ jobs:
         with:
           node-version: 18.x
       - name: Install dependencies
+        working-directory: ./frontend
         run: yarn install --immutable --immutable-cache
       - name: Build
+        working-directory: ./frontend
         run: yarn run build
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
