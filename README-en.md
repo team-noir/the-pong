@@ -10,6 +10,7 @@
     <li><a href="#key-features">Key Features</a></li>
     <li><a href="#stacks">Stacks</a></li>
     <li><a href="#how-to-run">How to Run</a></li>
+    <li><a href="#development-and-troubleshooting-logsin-korean">Development and Troubleshooting Logs</a></li>
     <li><a href="#development">Development</a></li>
   </ul>
 </details>
@@ -27,9 +28,9 @@ The Pong is a application that provides a chat and 1:1 game service.
 
 ## Team Members
 
-- [@srngch](https://github.com/srngch): Team Leader, Frontend, Backend
-- [@hhkim0729](https://github.com/hhkim0729): Frontend
-- [@PCHANUL](https://github.com/PCHANUL): Backend
+- Sarang Choi [@srngch](https://github.com/srngch): Team Leader, Frontend, Backend
+- Heehyun Kim [@hhkim0729](https://github.com/hhkim0729): Frontend
+- Chanul Pak [@PCHANUL](https://github.com/PCHANUL): Backend
 
 ## Key Features
 
@@ -111,7 +112,7 @@ The Pong is a application that provides a chat and 1:1 game service.
 
 ## Development and Troubleshooting Logs(In Korean)
 
-- In progress
+- [FE Development Log] Implementing infinite scroll - Heehyun Kim(@hhkim0729) [👉 Go to read](https://github.com/team-noir/the-pong/wiki/%EB%AC%B4%ED%95%9C-%EC%8A%A4%ED%81%AC%EB%A1%A4-%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0)
 
 ## How to Run
 
