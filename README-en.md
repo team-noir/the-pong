@@ -55,12 +55,12 @@ hr {
 <details open>
   <summary>Table of Contents</summary>
   <ul>
-    <li><a href="#summary">개요</a></li>
-    <li><a href="#team-members">팀원</a></li>
-    <li><a href="#key-features">주요 기능</a></li>
-    <li><a href="#stacks">기술 스택</a></li>
-    <li><a href="#how-to-run">실행 방법</a></li>
-    <li><a href="#development">개발 환경</a></li>
+    <li><a href="#summary">Summary</a></li>
+    <li><a href="#team-members">Team Members</a></li>
+    <li><a href="#key-features">Key Features</a></li>
+    <li><a href="#stacks">Stacks</a></li>
+    <li><a href="#how-to-run">How to Run</a></li>
+    <li><a href="#development">Development</a></li>
   </ul>
 </details>
 
@@ -68,78 +68,77 @@ hr {
 
 [English](./README-en.md) | [한국어](./README.md)
 
-## 개요
+## Summary
 
-The Pong은 채팅과 1:1 게임 서비스를 제공하는 애플리케이션입니다.
+The Pong is a application that provides a chat and 1:1 game service.
 
-- 개발 기간: 2023.3 ~ 2023.5 (10주)
-- [Notion 문서](https://sarchoi42.notion.site/0ae56f9f11904eb68d6278f40a8d3cf5?v=5208282fc9504853ab15d475515b44ff)
+- Development period: 2023.3 ~ 2023.5 (10 weeks)
+- [Notion Document](https://sarchoi42.notion.site/0ae56f9f11904eb68d6278f40a8d3cf5?v=5208282fc9504853ab15d475515b44ff)
 
-## 팀원
+## Team Members
 
-- [@srngch](https://github.com/srngch): 팀 리더, 프론트엔드, 백엔드
-- [@hhkim0729](https://github.com/hhkim0729): 프론트엔드
-- [@PCHANUL](https://github.com/PCHANUL): 백엔드
+- [@srngch](https://github.com/srngch): Team Leader, Frontend, Backend
+- [@hhkim0729](https://github.com/hhkim0729): Frontend
+- [@PCHANUL](https://github.com/PCHANUL): Backend
 
-## 주요 기능 및 사용 기술
+## Key Features
 
-### 회원
+### User
 
-- OAuth 로그인
+- OAuth login
 - Two-Factor Authentication
-- 닉네임 및 프로필 이미지 설정 및 변경
-- 프로필 페이지
-- 팔로우와 언팔로우, 차단과 차단 해제
-- 회원 상태 표시: 온라인, 오프라인, 게임 중
+- Set and change nickname and profile image
+- Profile page
+- Follow/unfollow and block/unblock users
+- User status display: online, offline, in-game
 
-### 채팅
+### Chat
 
-- 채널 설정: 채널 이름, 타입 및 비밀번호 변경
-- 채널 타입:
-  - 공개 채널: 모든 사용자와 채팅할 수 있는 채널
-  - 비밀번호 채널: 비밀번호를 입력해야 입장할 수 있는 공개 채널
-  - 비공개 채널: 초대된 사용자와의 채팅
-  - DM: 다른 사용자와 1:1 채팅할 수 있는 채널
-- 채널 관리: 채널 생성, 채널 삭제, 채널에 사용자 초대, 채널 나가기
-- 채널 참여자 관리:
-  - 관리자 지정/해제
-  - 음소거: 30초 동안 메시지를 보낼 수 없음
-  - 내보내기: 채널에서 제거되지만 다시 입장할 수 있음
-  - 차단하기: 채널에서 차단되어 다시 입장할 수 없음
+- Channel settings: change channel name, type and password
+- Channel types:
+  - Public channels: Chat with all users
+  - Locked Channel: A public channel that requires a password to enter
+  - Private Channel: Chat with invited users
+  - DM: 1:1 chat with another user
+- Channel management: create channel, delete channel, invite users to the channel, leave channel
+- Manage channel participants:
+  - Grant/Revoke admin
+  - Mute: Unable to send messages for 30 seconds
+  - Kick: Removed from the channel but can re-enter
+  - Ban: Blocked from the channel, re-entry is not possible
 
-### 1:1 게임
+### 1:1 Game
 
-- 실시간 게임 플레이
-- 랜덤 플레이어 매칭
-- 게임 커스터마이징: 모드, 맵
-- 게임 결과 히스토리
-- 레벨 시스템
+- Random player matching
+- Game customization: mods, maps
+- Game result history
+- Level system
 
-## 기술 스택
+## Stacks
 
-### 프론트엔드
+### Frontend
 
 ![React](https://img.shields.io/badge/react-%2320232a.svg?style=for-the-badge&logo=react&logoColor=%2361DAFB)
 ![React Router](https://img.shields.io/badge/React_Router-CA4245?style=for-the-badge&logo=react-router&logoColor=white)
 ![Tanstack Query](https://img.shields.io/badge/-Tanstack%20Query-FF4154?style=for-the-badge&logo=react%20query&logoColor=white)
 ![Zustand](https://img.shields.io/badge/Zustand-433e38?style=for-the-badge&logo=zustand&logoColor=white)
 ![Axios](https://img.shields.io/badge/axios-5A29E4?style=for-the-badge&logo=axios&logoColor=white)
-![WebRTC](https://img.shields.io/badge/webrtc-333333?style=for-the-badge&logo=webrtc&logoColor=white)
 ![Mock Service Worker](https://img.shields.io/badge/Mock_Service_Worker-ff6933?style=for-the-badge&logoColor=white)
 ![Konva](https://img.shields.io/badge/konva-0D83CD?style=for-the-badge&logo=konva&logoColor=white)
 ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![HeadlessUI](https://img.shields.io/badge/headlessui-66E3FF?style=for-the-badge&logo=headlessui&logoColor=white)
 ![Heroicons](https://img.shields.io/badge/Heroicons-8B5CF6?style=for-the-badge&logoColor=white)
 
-### 백엔드
+### Backend
 
 ![NestJS](https://img.shields.io/badge/nestjs-%23E0234E.svg?style=for-the-badge&logo=nestjs&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/postgreSQL-%23316192.svg?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Passport](https://img.shields.io/badge/passport-34E27A?style=for-the-badge&logo=passport&logoColor=white)
 ![Socket.io](https://img.shields.io/badge/Socket.io-black?style=for-the-badge&logo=socket.io&badgeColor=010101)
+![WebRTC](https://img.shields.io/badge/webrtc-333333?style=for-the-badge&logo=webrtc&logoColor=white)
 
-### 개발
+### Development
 
 ![TypeScript](https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white)
 ![ESLint](https://img.shields.io/badge/ESLint-4B3263?style=for-the-badge&logo=eslint&logoColor=white)
@@ -148,30 +147,27 @@ The Pong은 채팅과 1:1 게임 서비스를 제공하는 애플리케이션입
 ![Git](https://img.shields.io/badge/git-F05032?style=for-the-badge&logo=git&logoColor=white)
 ![Visual Studio Code](https://img.shields.io/badge/Visual%20Studio%20Code-0078d7.svg?style=for-the-badge&logo=visual-studio-code&logoColor=white)
 
-### 데브옵스
+### DevOps
 
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![Make](https://img.shields.io/badge/Make-000000?style=for-the-badge&logo=make&logoColor=white)
 
-### 협업
+### Communication
 
 ![GitHub](https://img.shields.io/badge/github-%23121011.svg?style=for-the-badge&logo=github&logoColor=white)
 ![Notion](https://img.shields.io/badge/Notion-FFFFFF.svg?style=for-the-badge&logo=notion&logoColor=black)
 ![Slack](https://img.shields.io/badge/Slack-4A154B?style=for-the-badge&logo=slack&logoColor=white)
 ![Figma](https://img.shields.io/badge/figma-%23F24E1E.svg?style=for-the-badge&logo=figma&logoColor=white)
 
-## 개발 & 트러블슈팅 로그
+## Development and Troubleshooting Logs(In Korean)
 
-#### 제목 - @작성자 [👉 자세히 보러가기](#)
+- In progress
 
-- 문제 상황:
-- 문제 해결:
+## How to Run
 
-## 실행 방법
+### Requirements
 
-### 실행 환경 설정
-
-실행에 필요한 의존성을 설치합니다.
+Install dependencies with...
 
 - [Node.js(^18)](https://nodejs.org/)
 - [Yarn Berry(^3.4)](https://yarnpkg.com/getting-started/install)
@@ -186,36 +182,36 @@ $ yarn --version
 3.4.1
 ```
 
-### 외부 API 서비스 키 발급 받기
+### Set up OAuth Client
 
 #### Google OAuth
 
-1. [Google 개발자 문서](https://developers.google.com/identity/protocols/oauth2/web-server?hl=ko#creatingcred)를 참고하여 OAuth 2.0 클라이언트를 생성합니다.
-2. 양식을 작성하는 단계에서 `리디렉션 URI`의 내용은 `http://localhost/api/v1/auth/google/return`로 작성합니다.
-3. `.env` 혹은 `.env.example` 파일에 각 내용을 복사합니다.
-   - `GOOGLE_ID`: OAuth 클라이언트 ID
-   - `GOOGLE_SECRET`: OAuth 보안 비밀번호
-   - `GOOGLE_CB`: 리디렉션 URI (`http://localhost/api/v1/auth/google/return`)
+1. Create an OAuth 2.0 client by referring to the [Google Developer Docs](https://developers.google.com/identity/protocols/oauth2/web-server#creatingcred).
+2. In the form filling step, enter `http://localhost/api/v1/auth/google/return` as the value of the `redirect URI`.
+3. Copy each value to the `.env` or `.env.example` file.
+   - `GOOGLE_ID`: OAuth client ID
+   - `GOOGLE_SECRET`: OAuth client secret
+   - `GOOGLE_CB`: OAuth redirect URI (`http://localhost/api/v1/auth/google/return`)
 
-### 설치 및 실행
+### Installation & Run
 
 ```shell
 $ git clone https://github.com/team-noir/the-pong
 $ cd the-pong
 
-# env 파일을 작성합니다.
+# Set and edit env file
 $ cp .env.example .env
 $ vi .env
 
-# Docker Compose로 컨테이너를 빌드하고 실행합니다.
+# Run containers
 $ docker compose build --no-cache
 $ docker compose up -d
 
-# Docker Compose 대신 Makefile을 사용할 수도 있습니다.
+# Use Makefile instead of docker-compose
 $ make up
 ```
 
-## 개발 환경
+## Development
 
 ```shell
 $ git clone https://github.com/team-noir/the-pong
@@ -234,23 +230,23 @@ $ docker compose -f docker-compose-dev.yml --env-file .env.development up -d
 
 ```shell
 /
-├── .github    # Github 설정 파일
-├── .vscode    # vscode 설정 파일
+├── .github    # github settings
+├── .vscode    # vscode settings
 ├── backend
-│   ├── prisma # 데이터베이스 스키마
-│   ├── src    # 소스 코드
-│   └── test   # 테스트 파일
+│   ├── prisma # database schema
+│   ├── src    # source code
+│   └── test   # test code
 ├── frontend
-│   ├── public # 정적 파일
-│   └── src    # 소스 코드
-└── nginx      # Nginx 설정 파일
+│   ├── public # static files
+│   └── src    # source code
+└── nginx      # nginx config
 ```
 
-### 커밋 메시지 컨벤션
+### Commit Message Convention
 
 [.gitmessage](.gitmessage.txt)
 
-### 개발 포트 & URLs
+### Development Ports & URLs
 
 - Frontend: http://localhost:8080
 - Backend API: http://localhost:8080/api
