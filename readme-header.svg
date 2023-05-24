@@ -1,0 +1,40 @@
+<svg fill="none" viewBox="0 0 800 400" width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+	<style>
+		.header {
+			--color-dark-gray: #433C3F;
+			--color-text-light: #FBFBFB;
+			--google-font-playfair-display: 'Playfair Display', serif;
+			text-align: center;
+			font-size: 16px;
+		}
+
+		.title-container {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 2em 0;
+			margin-bottom: 2em;
+			font-family: var(--google-font-playfair-display);
+			font-weight: 700;
+			color: var(--color-text-light);
+			background-color: var(--color-dark-gray);
+		}
+
+		.title-container > h1 {
+			font-family: serif;
+			font-size: 3em;
+			margin: 0;
+			padding: 0;
+		}
+
+	</style>
+	<foreignObject width="100%" height="100%">
+		<div xmlns="http://www.w3.org/1999/xhtml">
+			<div class="header">
+				<div class="title-container">
+					<h1>The Pong</h1>
+				</div>
+			</div>
+		</div>
+	</foreignObject>
+</svg>

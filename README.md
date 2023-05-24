@@ -1,56 +1,6 @@
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap');
-
-:root {
-  --color-dark-gray: #433C3F;
-  --color-text-light: #FBFBFB;
-  --google-font-playfair-display: 'Playfair Display', serif;
-}
-
-.header {
-  text-align: center;
-  font-size: 16px;
-}
-
-.title-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2em 0;
-  margin-bottom: 2em;
-  font-family: var(--google-font-playfair-display);
-  font-weight: 700;
-  color: var(--color-text-light);
-  background-color: var(--color-dark-gray);
-}
-
-.title-container > img {
-  width: 3.25em;
-  height: auto;
-  margin-right: 1.125em;
-}
-
-.title-container > h1 {
-  font-family: serif;
-  font-size: 3em;
-  margin: 0;
-  padding: 0;
-}
-
-hr {
-  margin: 1em 0;
-  height: 1px;
-  background-color : var(--color-dark-gray);
-  border: none;
-}
-</style>
-
-<header class="header">
-  <div class="title-container">
-    <img src="./frontend/public/favicon.ico" alt="Logo">
-    <h1>The Pong</h1>
-  </div>
-</header>
+<div align="center">
+  <img src="./readme-header.svg" width="800" height="400" alt="Header">
+</div>
 
 <details open>
   <summary>Table of Contents</summary>
@@ -63,8 +13,6 @@ hr {
     <li><a href="#development">개발 환경</a></li>
   </ul>
 </details>
-
-<hr />
 
 [English](./README-en.md) | [한국어](./README.md)
 
