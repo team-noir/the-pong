@@ -1,5 +1,6 @@
 import { useRef } from 'react';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export default function useDebounce<T extends any[]>(
   callback: (...params: T) => void,
   time: number
