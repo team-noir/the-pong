@@ -6564,15 +6564,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"passport-google-oauth2@npm:^0.2.0":
-  version: 0.2.0
-  resolution: "passport-google-oauth2@npm:0.2.0"
-  dependencies:
-    passport-oauth2: ^1.1.2
-  checksum: b65c7b954c260e3a4f62210dcf37fff1739fad6b78569f9bb6f45555ab2cffb3f0868b620e9dee284b72426891d981af506f1eefd75f08381490903d7233829d
-  languageName: node
-  linkType: hard
-
 "passport-jwt@npm:^4.0.1":
   version: 4.0.1
   resolution: "passport-jwt@npm:4.0.1"
@@ -7762,7 +7753,6 @@ __metadata:
     otplib: ^12.0.1
     passport: ^0.6.0
     passport-42: ^1.2.6
-    passport-google-oauth2: ^0.2.0
     passport-google-oauth20: ^2.0.0
     passport-jwt: ^4.0.1
     passport-local: ^1.0.0
