@@ -31,6 +31,7 @@ import {
   AnswerInvitationDto,
   GameSettingInfoDto,
   SetGameSettingDto,
+  GameListDto,
 } from './dtos/games.dto';
 import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import { GamesService } from './games.service';
@@ -45,7 +46,7 @@ export class GamesController {
   @ApiOperation({ summary: 'Get game list.' })
   @UseGuards(AuthenticatedGuard)
   getGameList(
-    @Query() query: PageRequestDto,
+    @Query() query: GameListDto,
     @Res({ passthrough: true }) res
   ) {
     try {

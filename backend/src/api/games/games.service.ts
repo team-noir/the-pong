@@ -2,7 +2,7 @@ import { Injectable, HttpStatus } from '@nestjs/common';
 import { WebSocketServer } from '@nestjs/websockets';
 import { Player } from './dtos/player.dto';
 import { GameModel } from './models/game.model';
-import { GameSettingInfoDto } from './dtos/games.dto';
+import { GameListDto, GameSettingInfoDto } from './dtos/games.dto';
 import { GAME_STATUS } from '@/const';
 import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
 
@@ -24,7 +24,7 @@ export class GamesService {
     clearInterval(this.pingInterval);
   }
 
-  getGameList(query: PageRequestDto) {
+  getGameList(query: GameListDto) {
     return this.gameModel.getGameList(query);
   }
 

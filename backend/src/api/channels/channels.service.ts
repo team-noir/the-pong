@@ -137,7 +137,7 @@ export class ChannelsService {
       conditions.isPublic = true;
     }
 
-    channels.sort((a,b) => a.id - b.id);
+    channels.sort((a: Channel, b: Channel) => query.compare(a,b));
     if (order == 'desc') {
       channels.reverse();
     }
@@ -152,12 +152,7 @@ export class ChannelsService {
         return;
       }
 
-      if (
-        page.cursor && 
-        (order == 'desc' 
-          ? channel.id > page.cursor.id 
-          : channel.id < page.cursor.id)
-      ) { 
+      if (!query.checkCursor(order, channel)) {
         return; 
       } 
 
@@ -198,15 +193,20 @@ export class ChannelsService {
     });
 
     const result = new PageDto(channels.length, data);
-    let cursor = { prev: null, next: null };
-
     if (prevIdx - query.getLimit() >= 0) {
-      cursor.prev = channels[prevIdx - query.getLimit()].id;
+      result.setCursor({
+        ...(query.sort == "created" && { createdAt: channels[prevIdx - query.getLimit()].createdAt }),
+        ...(query.sort == "users" && { userCount: channels[prevIdx - query.getLimit()].users.size }),
+        id: channels[prevIdx - query.getLimit()].id,
+      }, true);
     }
     if (data.length == query.getLimit() && nextIdx + 1 <= channels.length - 1) {
-      cursor.next = channels[nextIdx + 1].id;
+      result.setCursor({
+        ...(query.sort == "created" && { createdAt: channels[nextIdx + 1].createdAt }),
+        ...(query.sort == "users" && { userCount: channels[nextIdx + 1].users.size }),
+        id: channels[nextIdx + 1].id,
+      }, false);
     }
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 
@@ -451,15 +451,9 @@ export class ChannelsService {
           : null;
 
         if (!sender || !user.isBlockUser(sender.id)) {
-
-          if (
-            page.cursor && 
-            (order == 'desc' 
-              ? message.id > page.cursor.id 
-              : message.id < page.cursor.id)
-          ) { 
+          if (!query.checkCursor(order, channel)) {
             return; 
-          } 
+          }
     
           if (page.take == query.getLimit()) { 
             prevIdx = idx; 
@@ -483,15 +477,16 @@ export class ChannelsService {
     });
 
     const result = new PageDto(messages.length, data);
-    let cursor = { prev: null, next: null };
-
     if (prevIdx - query.getLimit() >= 0) {
-      cursor.prev = messages[prevIdx - query.getLimit()].id;
+      result.setCursor({
+        id: messages[prevIdx - query.getLimit()].id,
+      }, true);
     }
-    if (data.length == query.getLimit()) {
-      cursor.next = data[data.length - 1].id;
+    if (data.length == query.getLimit() && nextIdx + 1 <= messages.length - 1) {
+      result.setCursor({
+        id: messages[nextIdx + 1].id,
+      }, false);
     }
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 

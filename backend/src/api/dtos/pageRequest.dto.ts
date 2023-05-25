@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsNumberString } from 'class-validator';
+import { IsOptional, IsNumberString, IsString } from 'class-validator';
+import * as CryptoJS from 'crypto-js'
 
 export class PageRequestDto {
 	@ApiProperty({
@@ -16,9 +17,9 @@ export class PageRequestDto {
 		required: false,
 		description: 'Cursor id\n- Default: `null`',
 	})
-	@IsNumberString()
+	@IsString()
 	@IsOptional()
-	public cursor?: number;
+	public cursor?: string | null;
 
 	@ApiProperty({
 		name: 'order',
@@ -28,9 +29,8 @@ export class PageRequestDto {
 	@IsOptional()
 	public order?: 'asc' | 'desc';
 
-	constructor(size: number, cursor?: number) {
+	constructor(size: number) {
 		this.size = size;
-		this.cursor = cursor;
 	}
 
 	getLimit(): number {
@@ -56,12 +56,43 @@ export class PageRequestDto {
 		return this.order;
 	}
 
+	getCursor(): { cursor: Object } | null {
+		if (!this.cursor) {
+			return null;
+		}
+
+		var bytes  = CryptoJS.AES.decrypt(this.cursor, process.env.CURSOR_SECRET);
+		var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+
+		return { cursor: decryptedData };
+	}
+
+	checkCursor(order: 'desc' | 'asc', item: Object | null) {
+		const decryptedCursor = this.getCursor();
+		if (!decryptedCursor) {
+			return true;
+		}
+
+		const cursorKeys = Object.keys(decryptedCursor.cursor);
+		for (const key of cursorKeys) {
+			if (order === 'asc') {
+				if (item[key] < decryptedCursor['cursor'][key]) {
+					return false;
+				}
+			} else {
+				if (item[key] > decryptedCursor['cursor'][key]) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	}
+
 	getPageOptions() {
 		return {
 			take: this.getLimit(),
-			...(this.cursor && {
-				cursor: { id: Number(this.cursor) }
-			}),
+			...(this.cursor && this.getCursor()),
 		}
 	}
 }

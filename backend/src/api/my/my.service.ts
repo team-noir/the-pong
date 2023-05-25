@@ -61,7 +61,6 @@ export class MyService {
     const user = await this.prismaService.user.findUnique({
       where: { [field]: value },
     });
-    // return true if there is no duplicate data
     return !user;
   }
 
@@ -94,7 +93,6 @@ export class MyService {
       }
       await rmdir(dir);
     } catch (e) {
-      // if there is no directory, do nothing
       if (e.code !== 'ENOENT') {
         throw e;
       }
@@ -123,12 +121,7 @@ export class MyService {
       .findMany({
         where: { followerId: myUserId },
         take: query.getLimit() + 1,
-        ...(query.cursor && {
-          cursor: { id: {
-            followerId: myUserId,
-            followeeId: Number(query.cursor)
-          }}
-        }),
+        ...query.getCursor(),
         orderBy: { followeeId: query.getOrderBy() },
         select: {
           follewee: { select: { id: true, nickname: true } },
@@ -149,28 +142,25 @@ export class MyService {
       where: { followerId: Number(myUserId) },
       take: -1 * query.getLimit(),
       skip: 1,
-      ...(query.cursor && {
-        cursor: { id: {
-          followerId: myUserId,
-          followeeId: Number(query.cursor)
-        }}
-      }),
+      ...query.getCursor(),
       orderBy: { followeeId: query.getOrderBy() },
       select: {
         follewee: { select: { id: true, nickname: true } },
       },
     });
 
-    let cursor = { prev: null, next: null };
+    const result = new PageDto(length, data);
     if (query.cursor && prevData.length == query.getLimit()) {
-      cursor.prev = prevData[0].follewee.id;
+      result.setCursor({
+        id: prevData[0].follewee.id,
+      }, true);
     }
     if (data.length == query.getLimit() + 1) {
-      cursor.next = data[data.length - 1].id;
+      result.setCursor({
+        id: data[data.length - 1].id,
+      }, false);
       data.pop();
     }
-    const result = new PageDto(length, data);
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 
@@ -181,7 +171,6 @@ export class MyService {
       throw new Error('not logged in');
     }
 
-    // check if user exists
     const { userId } = req.params;
     const user = await this.prismaService.user.findUnique({
       where: { id: Number(userId) },
@@ -215,7 +204,6 @@ export class MyService {
       throw new Error('not logged in');
     }
 
-    // check if user exists
     const { userId } = req.params;
     const user = await this.prismaService.user.findUnique({
       where: { id: Number(userId) },
@@ -253,12 +241,7 @@ export class MyService {
       .findMany({
         where: { blockerId: myUserId },
         take: query.getLimit() + 1,
-        ...(query.cursor && {
-          cursor: { id: {
-            blockerId: myUserId,
-            blockedId: Number(query.cursor)
-          }}
-        }),
+        ...query.getCursor(),
         orderBy: { blockedId: query.getOrderBy() },
         select: {
           blocked: { select: { id: true, nickname: true } },
@@ -274,28 +257,25 @@ export class MyService {
       where: { blockerId: Number(myUserId) },
       take: -1 * query.getLimit(),
       skip: 1,
-      ...(query.cursor && {
-        cursor: { id: {
-          blockerId: myUserId,
-          blockedId: Number(query.cursor)
-        }}
-      }),
+      ...query.getCursor(),
       orderBy: { blockedId: query.getOrderBy() },
       select: {
         blocked: { select: { id: true, nickname: true } },
       },
     });
 
-    let cursor = { prev: null, next: null };
+    const result = new PageDto(length, data);
     if (query.cursor && prevData.length == query.getLimit()) {
-      cursor.prev = prevData[0].blocked.id;
+      result.setCursor({
+        id: prevData[0].blocked.id,
+      }, true);
     }
     if (data.length == query.getLimit() + 1) {
-      cursor.next = data[data.length - 1].id;
+      result.setCursor({
+        id: data[data.length - 1].id,
+      }, false);
       data.pop();
     }
-    const result = new PageDto(length, data);
-    result.setPaging(cursor.prev, cursor.next);
     return result;
   }
 
@@ -304,7 +284,6 @@ export class MyService {
     if (!myUserId) {
       throw new Error('not logged in');
     }
-    // check if user exists
     const { userId } = req.params;
     const user = await this.prismaService.user.findUnique({
       where: { id: Number(userId) },
@@ -339,8 +318,6 @@ export class MyService {
     if (!myUserId) {
       throw new Error('not logged in');
     }
-
-    // check if user exists
     const { userId } = req.params;
     const user = await this.prismaService.user.findUnique({
       where: { id: Number(userId) },

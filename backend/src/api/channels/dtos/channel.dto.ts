@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 import { ChannelUser } from '../models/user.model';
 import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
+import { Channel } from '../models/channel.model';
 
 export class CreateChannelDto {
   @ApiProperty({
@@ -53,6 +54,14 @@ export class ChannelListDto extends PageRequestDto {
   @IsOptional()
   public kind: string[];
 
+  @ApiProperty({
+		name: 'sort',
+		required: false,
+		description: 'sort(created, users)\n- Default: `created`',
+	})
+	@IsOptional()
+	public sort?: 'created' | 'users';
+
   getConditions() {
     return {
       isEnter: this.enter != undefined,
@@ -60,6 +69,28 @@ export class ChannelListDto extends PageRequestDto {
       isPriv: this.kind && this.kind.includes('private'),
       isDm: this.kind && this.kind.includes('dm'),
     };
+  }
+
+  compare(a: Channel, b: Channel) {
+    let result;
+
+    if (this.sort === 'users') {
+      result = a.size() - b.size();
+      if (result === 0) {
+        return a.id - b.id;
+      } else {
+        return result;
+      }
+    } else if (this.sort === 'created') {
+      result = a.createdAt.getTime() - b.createdAt.getTime();
+      if (result === 0) {
+        return a.id - b.id;
+      } else {
+        return result;
+      }
+    } else {
+      return a.id - b.id;
+    }
   }
 }
 

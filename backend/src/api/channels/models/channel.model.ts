@@ -16,6 +16,7 @@ export class Channel {
   isPrivate: boolean;
   isDm: boolean;
   createdAt: Date;
+  userCount: number;
 
   owner?: userId;
   users: Set<userId>;
@@ -37,6 +38,7 @@ export class Channel {
     this.isPrivate = isPrivate;
     this.createdAt = new Date();
     this.password = password;
+    this.userCount = 0;
 
     this.owner = owner;
     this.users = new Set<number>();
@@ -47,11 +49,13 @@ export class Channel {
 
   join(user: ChannelUser) {
     this.users.add(user.id);
+    this.userCount++;
   }
 
   leave(user: ChannelUser) {
     this.users.delete(user.id);
     this.admin.delete(user.id);
+    this.userCount--;
   }
 
   set(user: ChannelUser, title: string, password: string) {
@@ -215,6 +219,7 @@ export class ChannelModel {
           channel.users.add(user.userId);
         }
       });
+      channel.userCount = channel.users.size;
       this.channelMap.set(channel.id, channel);
     });
   }
@@ -306,6 +311,7 @@ export class ChannelModel {
       owner ? owner.id : null,
       created.password
     );
+    newChannel.userCount = 0;
     this.channelMap.set(newChannel.id, newChannel);
     return newChannel;
   }
