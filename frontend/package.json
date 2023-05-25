@@ -2,7 +2,7 @@
   "name": "the-pong",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://team-noir.github.io/the-pong",
+  "homepage": "http://the-pong.srngch.com",
   "dependencies": {
     "@headlessui/react": "latest",
     "@heroicons/react": "^2.0.16",
