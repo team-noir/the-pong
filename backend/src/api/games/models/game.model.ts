@@ -729,9 +729,6 @@ export class GameModel implements OnModuleInit {
       take: -1 * query.getLimit(),
       skip: 1,
       ...query.getCursor(),
-			// ...(query.cursor && {
-			// 	cursor: { id: Number(query.cursor) }
-			// }),
       orderBy: {
         id: query.getOrderBy(),
       },

@@ -182,9 +182,6 @@ export class UsersService implements OnModuleInit {
         },
         take: query.getLimit() + 1,
         ...query.getCursor(),
-        // ...(query.cursor && {
-        //   cursor: { id: Number(query.cursor) }
-        // }),
         orderBy: {
           id: query.getOrderBy(),
         },

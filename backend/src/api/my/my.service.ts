@@ -124,12 +124,6 @@ export class MyService {
         where: { followerId: myUserId },
         take: query.getLimit() + 1,
         ...query.getCursor(),
-        // ...(query.cursor && {
-        //   cursor: { id: {
-        //     followerId: myUserId,
-        //     followeeId: Number(query.cursor)
-        //   }}
-        // }),
         orderBy: { followeeId: query.getOrderBy() },
         select: {
           follewee: { select: { id: true, nickname: true } },
@@ -151,12 +145,6 @@ export class MyService {
       take: -1 * query.getLimit(),
       skip: 1,
       ...query.getCursor(),
-      // ...(query.cursor && {
-      //   cursor: { id: {
-      //     followerId: myUserId,
-      //     followeeId: Number(query.cursor)
-      //   }}
-      // }),
       orderBy: { followeeId: query.getOrderBy() },
       select: {
         follewee: { select: { id: true, nickname: true } },
@@ -258,12 +246,6 @@ export class MyService {
         where: { blockerId: myUserId },
         take: query.getLimit() + 1,
         ...query.getCursor(),
-        // ...(query.cursor && {
-        //   cursor: { id: {
-        //     blockerId: myUserId,
-        //     blockedId: Number(query.cursor)
-        //   }}
-        // }),
         orderBy: { blockedId: query.getOrderBy() },
         select: {
           blocked: { select: { id: true, nickname: true } },
@@ -280,12 +262,6 @@ export class MyService {
       take: -1 * query.getLimit(),
       skip: 1,
       ...query.getCursor(),
-      // ...(query.cursor && {
-      //   cursor: { id: {
-      //     blockerId: myUserId,
-      //     blockedId: Number(query.cursor)
-      //   }}
-      // }),
       orderBy: { blockedId: query.getOrderBy() },
       select: {
         blocked: { select: { id: true, nickname: true } },
