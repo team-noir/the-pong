@@ -61,7 +61,6 @@ export class MyService {
     const user = await this.prismaService.user.findUnique({
       where: { [field]: value },
     });
-    // return true if there is no duplicate data
     return !user;
   }
 
@@ -94,7 +93,6 @@ export class MyService {
       }
       await rmdir(dir);
     } catch (e) {
-      // if there is no directory, do nothing
       if (e.code !== 'ENOENT') {
         throw e;
       }
@@ -173,7 +171,6 @@ export class MyService {
       throw new Error('not logged in');
     }
 
-    // check if user exists
     const { userId } = req.params;
     const user = await this.prismaService.user.findUnique({
       where: { id: Number(userId) },
@@ -207,7 +204,6 @@ export class MyService {
       throw new Error('not logged in');
     }
 
-    // check if user exists
     const { userId } = req.params;
     const user = await this.prismaService.user.findUnique({
       where: { id: Number(userId) },
@@ -288,7 +284,6 @@ export class MyService {
     if (!myUserId) {
       throw new Error('not logged in');
     }
-    // check if user exists
     const { userId } = req.params;
     const user = await this.prismaService.user.findUnique({
       where: { id: Number(userId) },
@@ -323,8 +318,6 @@ export class MyService {
     if (!myUserId) {
       throw new Error('not logged in');
     }
-
-    // check if user exists
     const { userId } = req.params;
     const user = await this.prismaService.user.findUnique({
       where: { id: Number(userId) },
