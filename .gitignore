@@ -183,6 +183,7 @@ backend/.yarn/*
 .DS_*
 **/*.backup.*
 **/*.back.*
+frontend/build
 
 node_modules
 
@@ -205,3 +206,4 @@ backend/prisma/*
 
 backend/uploads
 backend/dist
+
