@@ -12,32 +12,32 @@ datasource db {
 }
 
 model User {
-  id                    Int           @id @default(autoincrement())
-  imageUrl              String?
-  nickname              String?       @unique
-  level                 Int           @default(1)
-  exp                   Int           @default(0)
-  isTwoFactor           Boolean       @default(false)
-  twoFactorSecret       String?
-  ftId                  String        @unique
-  ftUsername            String?
-  ftAccessToken         String?       @unique
-  ftRefreshToken        String?       @unique
-  ftAccessExpiresAt     DateTime?
-  ftRefreshExpiresAt    DateTime?
-  createdAt             DateTime      @default(now())
-  updatedAt             DateTime?
-  deletedAt             DateTime?
+  id                      Int           @id @default(autoincrement())
+  imageUrl                String?
+  nickname                String?       @unique
+  level                   Int           @default(1)
+  exp                     Int           @default(0)
+  isTwoFactor             Boolean       @default(false)
+  twoFactorSecret         String?
+  googleId                String        @unique
+  googleEmail             String?
+  googleAccessToken       String?       @unique
+  googleRefreshToken      String?       @unique
+  googleAccessExpiresAt   DateTime?
+  googleRefreshExpiresAt  DateTime?
+  createdAt               DateTime      @default(now())
+  updatedAt               DateTime?
+  deletedAt               DateTime?
 
-  winLogs               GameResult[]  @relation("WinLog")
-  loseLogs              GameResult[]  @relation("LoseLog")
-  followers             FollowUser[]  @relation("Follower")
-  followees             FollowUser[]  @relation("Followee")
-  blockers              BlockUser[]   @relation("Blocker")
-  blockeds              BlockUser[]   @relation("Blocked")
-  channels              Channel_User[]
-  achievements          Achievement_User[]
-  messages              Message[]
+  winLogs                 GameResult[]  @relation("WinLog")
+  loseLogs                GameResult[]  @relation("LoseLog")
+  followers               FollowUser[]  @relation("Follower")
+  followees               FollowUser[]  @relation("Followee")
+  blockers                BlockUser[]   @relation("Blocker")
+  blockeds                BlockUser[]   @relation("Blocked")
+  channels                Channel_User[]
+  achievements            Achievement_User[]
+  messages                Message[]
 }
 
 model GameResult {

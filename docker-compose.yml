@@ -42,9 +42,9 @@ services:
       - postgres
     environment:
       DATABASE_URL: ${DATABASE_URL}
-      FT_UID: ${FT_UID}
-      FT_SECRET: ${FT_SECRET}
-      FT_CB: ${FT_CB}
+      GOOGLE_ID: ${GOOGLE_ID}
+      GOOGLE_SECRET: ${GOOGLE_SECRET}
+      GOOGLE_CB: ${GOOGLE_CB}
       JWT_SECRET: ${JWT_SECRET}
       CLIENT_APP_URL: ${CLIENT_APP_URL}
     volumes:

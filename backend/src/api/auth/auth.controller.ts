@@ -10,7 +10,7 @@ import {
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import { FtOauthGuard } from '@/guards/ft-oauth.guard';
+import { GoogleOAuthGuard } from '@/guards/google.oauth.guard';
 import { AuthenticatedGuard } from '@/guards/authenticated.guard';
 import {
   ApiOperation,
@@ -32,22 +32,22 @@ import { twoFaDto } from './dtos/auth.dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  @Get('42')
+  @Get('google')
   @ApiOkResponse({
-    description: 'Redirect to 42 api. Set cookie.',
+    description: 'Redirect to Google api. Set cookie.',
   })
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Sign in 42 api' })
-  @UseGuards(FtOauthGuard)
-  ftAuth() {
+  @ApiOperation({ summary: 'Sign in Google api' })
+  @UseGuards(GoogleOAuthGuard)
+  googleAuth() {
     return;
   }
 
-  @Get('42/return')
-  @ApiOperation({ summary: '42 api callback' })
+  @Get('google/return')
+  @ApiOperation({ summary: 'Google api callback' })
   @ApiOkResponse({ description: 'Get access token' })
   @ApiHeader({ name: 'Authorization', description: 'jwt' })
-  @UseGuards(FtOauthGuard)
+  @UseGuards(GoogleOAuthGuard)
   async auth(@Req() req, @Res({ passthrough: true }) res) {
     try {
       return this.authService.auth(req, res);
