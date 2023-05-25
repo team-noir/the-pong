@@ -26,6 +26,7 @@ jobs:
         run: yarn run build
         env:
           REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          PUBLIC_URL: ${{ secrets.PUBLIC_URL }}
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.4.1
         with:
