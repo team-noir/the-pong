@@ -13,7 +13,7 @@
     "prisma:studio": "yarn pnpify prisma studio --port=5555",
     "prebuild": "yarn prisma:generate && yarn prisma:seed",
     "build": "yarn prebuild && nest build && yarn tsc",
-    "start": "yarn build && nest start",
+    "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
