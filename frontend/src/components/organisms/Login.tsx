@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { anonymousLogin, API_LOGIN_FT } from 'api/rest.v1';
+import { anonymousLogin, API_LOGIN_GOOGLE } from 'api/rest.v1';
 import Button from 'components/atoms/Button';
 import Background from 'components/atoms/Background';
 import Spinner from 'components/atoms/Spinner';
 import { BACKGROUND_IMAGES } from 'constants/index';
 import QUERY_KEYS from 'constants/queryKeys';
-import logo42 from 'assets/images/logo_42.svg';
+import logoGoogle from 'assets/images/logo_google.svg';
 
 export default function Login() {
-  const [is42LoginClicked, setIs42LoginClicked] = useState(false);
+  const [isGoogleLoginClicked, setIsGoogleLoginClicked] = useState(false);
   const queryClient = useQueryClient();
 
   const anonymousLoginMutation = useMutation(anonymousLogin, {
@@ -25,21 +25,21 @@ export default function Login() {
           <p>게임와 대화 그리고 복수</p>
         </div>
         <div className="flex-col vh-center gap-2 w-full">
-          {is42LoginClicked ? (
+          {isGoogleLoginClicked ? (
             <Button primary fullLength disabled>
               <Spinner className="h-7" />
             </Button>
           ) : (
             <Button
-              logoImageUrl={logo42}
+              logoImageUrl={logoGoogle}
               onClick={() => {
-                setIs42LoginClicked(true);
-                window.location.href = API_LOGIN_FT;
+                setIsGoogleLoginClicked(true);
+                window.location.href = API_LOGIN_GOOGLE;
               }}
               primary
               fullLength
             >
-              42로 로그인하기
+              구글로 로그인하기
             </Button>
           )}
           {/* TODO: 익명 로그인 버튼 삭제 */}
