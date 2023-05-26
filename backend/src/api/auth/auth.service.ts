@@ -63,22 +63,11 @@ export class AuthService {
   }
 
   async login(@Res() res) {
-    // TODO: 임시로 익명 회원의 id는 10000번부터 시작
-    let userId = 10000;
-    let find;
-
-    while (
-      (find = await this.prismaService.user.findUnique({
-        where: { id: userId },
-      }))
-    ) {
-      userId++;
-    }
+    const length = await this.prismaService.user.count();
 
     const user = await this.prismaService.user.create({
       data: {
-        id: userId,
-        googleId: `${userId}`,
+        googleId: `${length}`,
         nickname: this.generateRandomString(10),
       },
     });

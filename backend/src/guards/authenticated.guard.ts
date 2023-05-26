@@ -24,19 +24,6 @@ export class AuthenticatedGuard implements CanActivate {
       return false;
     }
 
-    // TODO: 임시로 익명 회원의 id는 10000번부터 시작
-    if (user && user.id >= 10000) {
-      req.user = user;
-      const newJwt = this.authService.signJwt({
-        id: user.id,
-        nickname: user.nickname,
-        isTwoFactor: false,
-        isVerifiedTwoFactor: false,
-      });
-      this.authService.setJwt(res, newJwt);
-      return true;
-    }
-
     if (user.isTwoFactor && !payload.isVerifiedTwoFactor) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
@@ -53,6 +40,7 @@ export class AuthenticatedGuard implements CanActivate {
         console.log(err);
       }
     }
+
     req.user = user;
     const newJwt = this.authService.signJwt({
       id: user.id,
