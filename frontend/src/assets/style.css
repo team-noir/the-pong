@@ -6,7 +6,7 @@
   }
 
   #root {
-    @apply container mx-auto max-w-xl min-h-screen;
+    @apply container mx-auto max-w-xl min-h-screen h-screen overflow-auto;
     @apply bg-gradient-to-b from-gray-darker to-[#433c3f] bg-cover bg-center;
     @apply text-text-light;
     @apply break-keep;
@@ -20,6 +20,13 @@
     @apply container mx-auto max-w-xl;
     @apply fixed top-0 left-0 right-0;
     @apply backdrop-blur-md bg-gray-darker/50 z-50;
+    @apply drop-shadow-xl;
+  }
+  .header-backdrop {
+    @apply container mx-auto max-w-xl;
+    @apply fixed inset-0;
+    @apply bg-black/50 z-10;
+    @apply cursor-default;
   }
   .vh-center {
     @apply flex items-center justify-center;
@@ -33,10 +40,10 @@
   }
   .modal-panel-wrapper {
     @apply fixed inset-0 z-10 overflow-y-auto;
-    @apply flex min-h-full justify-center p-4 items-center sm:p-0;
+    @apply flex min-h-full justify-center items-center sm:p-0;
   }
   .modal-panel {
-    @apply relative container mx-auto max-w-xl h-screen text-text-light;
+    @apply relative container mx-auto max-w-xl text-text-light;
     @apply px-4 pt-4 pb-6 overflow-hidden;
     @apply rounded-lg shadow-lg;
     @apply bg-gradient-to-b from-[#484649] to-[#433c3f] bg-cover bg-center;
