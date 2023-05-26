@@ -1,6 +1,6 @@
 export interface PagingType {
-  previousCursor: number | null;
-  nextCursor: number | null;
+  previousCursor: string | null;
+  nextCursor: string | null;
 }
 
 export type ListWithPagingType<T> = {
@@ -10,11 +10,13 @@ export type ListWithPagingType<T> = {
 };
 
 export type OrderType = 'asc' | 'desc';
+export type SortType = 'created' | 'users';
 
 export type PageParamsType = {
-  cursor?: number | null;
+  cursor?: string | null;
   size?: number;
   order?: OrderType;
+  sort?: SortType;
 };
 
 /** User */
