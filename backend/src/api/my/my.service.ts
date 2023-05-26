@@ -249,9 +249,9 @@ export class MyService {
       })
       .then((follows) => follows.map((follow) => follow.blocked));
 
-      const length = await this.prismaService.blockUser.count({
-        where: { blockerId: myUserId },
-      });
+    const length = await this.prismaService.blockUser.count({
+      where: { blockerId: myUserId },
+    });
   
     const prevData = await this.prismaService.blockUser.findMany({
       where: { blockerId: Number(myUserId) },

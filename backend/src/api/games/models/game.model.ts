@@ -91,20 +91,6 @@ export class GameModel implements OnModuleInit {
       const { gameId, isLadder, players, createdAt, status } = game;
       const list = [];
 
-      if (!query.checkCursor(order, game)) {
-        return; 
-      }
-
-      if (page.take == query.getLimit()) { 
-        prevIdx = idx; 
-        nextIdx = idx;
-      } else if (page.take > 0) {  
-        nextIdx = idx;
-      } else { 
-        return;
-      }
-      page.take -= 1;
-
       for (const player of players) {
         list.push({
           id: player.userId,
@@ -125,7 +111,24 @@ export class GameModel implements OnModuleInit {
       });
     });
 
-    const result = new PageDto(games.length, gamelist);
+    const thisPage = gamelist.filter((game, idx) => {
+      if (!query.checkCursor(order, game)) {
+        return false; 
+      }
+
+      if (page.take == query.getLimit()) { 
+        prevIdx = idx; 
+        nextIdx = idx;
+      } else if (page.take > 0) {  
+        nextIdx = idx;
+      } else { 
+        return false;
+      }
+      page.take -= 1;
+      return true;
+    });
+
+    const result = new PageDto(gamelist.length, thisPage);
     if (prevIdx - query.getLimit() >= 0) {
       result.setCursor({
         id: games[prevIdx - query.getLimit()].gameId,
