@@ -40,7 +40,7 @@ export const healthCheck = async () => {
 
 /** Auth */
 
-export const API_LOGIN_FT = `${API_PREFIX}/auth/42`;
+export const API_LOGIN_GOOGLE = `${API_PREFIX}/auth/google`;
 
 export const anonymousLogin = async () => {
   const res = await axiosWithInterceptors.post(`/auth/login/anonymous`);
