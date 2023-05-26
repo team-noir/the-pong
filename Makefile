@@ -1,6 +1,6 @@
 YML = ./docker-compose.yml
-YML_API = ./docker-compose-api.yml
 YML_AWS = ./docker-compose-aws.yml
+YML_DEV = ./docker-compose-dev.yml
 DOCKER_COMPOSE = docker compose --file $(YML)
 DOCKER_COMPOSE_AWS = docker compose --file $(YML_AWS)
 DOCKER_COMPOSE_DEV = docker compose --file $(YML_DEV) --env-file .env.development
