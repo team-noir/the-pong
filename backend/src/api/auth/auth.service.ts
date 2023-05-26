@@ -68,7 +68,6 @@ export class AuthService {
     const user = await this.prismaService.user.create({
       data: {
         googleId: `${length}`,
-        nickname: this.generateRandomString(10),
       },
     });
 
