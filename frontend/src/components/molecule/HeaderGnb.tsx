@@ -12,11 +12,11 @@ import { classNames } from 'utils';
 import ROUTES from 'constants/routes';
 
 const navigation = [
-  { name: '게임', href: '/game', current: false },
-  { name: '채널', href: '/channel', current: false },
-  { name: '팔로잉', href: '/following', current: false },
-  { name: '회원 검색', href: '/search', current: false },
-  { name: '설정', href: '/setting', current: false },
+  { name: '게임', href: ROUTES.GAME.INDEX, current: false },
+  { name: '채널', href: ROUTES.CHANNEL.INDEX, current: false },
+  { name: '팔로잉', href: ROUTES.FOLLOWING, current: false },
+  { name: '회원 검색', href: ROUTES.SEARCH, current: false },
+  { name: '설정', href: ROUTES.SETTING.INDEX, current: false },
 ];
 
 export default function HeaderGnb() {
@@ -83,8 +83,8 @@ export default function HeaderGnb() {
                       leaveFrom="transform opacity-100 scale-100"
                       leaveTo="transform opacity-0 scale-95"
                     >
-                      <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-gray-darker py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {myUserId && (
+                      {myUserId && (
+                        <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded bg-gray-darker py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                           <Menu.Item>
                             {({ active }) => (
                               <Link
@@ -98,35 +98,35 @@ export default function HeaderGnb() {
                               </Link>
                             )}
                           </Menu.Item>
-                        )}
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              to="/setting"
-                              className={classNames(
-                                active ? 'bg-gray-dark' : '',
-                                'block px-4 py-2 text-sm text-text-light'
-                              )}
-                            >
-                              설정
-                            </Link>
-                          )}
-                        </Menu.Item>
-                        <Menu.Item>
-                          {({ active }) => (
-                            <span
-                              role="button"
-                              onClick={() => postLogoutMutation.mutate()}
-                              className={classNames(
-                                active ? 'bg-gray-dark' : '',
-                                'block px-4 py-2 text-sm text-text-light cursor-pointer'
-                              )}
-                            >
-                              로그아웃
-                            </span>
-                          )}
-                        </Menu.Item>
-                      </Menu.Items>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <Link
+                                to={`${ROUTES.SETTING.INDEX}`}
+                                className={classNames(
+                                  active ? 'bg-gray-dark' : '',
+                                  'block px-4 py-2 text-sm text-text-light'
+                                )}
+                              >
+                                설정
+                              </Link>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <span
+                                role="button"
+                                onClick={() => postLogoutMutation.mutate()}
+                                className={classNames(
+                                  active ? 'bg-gray-dark' : '',
+                                  'block px-4 py-2 text-sm text-text-light cursor-pointer'
+                                )}
+                              >
+                                로그아웃
+                              </span>
+                            )}
+                          </Menu.Item>
+                        </Menu.Items>
+                      )}
                     </Transition>
                   </Menu>
                 </div>
