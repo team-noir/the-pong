@@ -32,16 +32,13 @@ const queryClient = new QueryClient({
   },
 });
 
-const basename = process.env.PUBLIC_URL;
-
 export function App() {
   const { isLoggedIn, isOnboarded, isTwoFactor, isVerifiedTwoFactor } = useUser(
     (state) => state
   );
 
   const router = createBrowserRouter(
-    routes(isLoggedIn, isOnboarded, isTwoFactor, isVerifiedTwoFactor),
-    { basename }
+    routes(isLoggedIn, isOnboarded, isTwoFactor, isVerifiedTwoFactor)
   );
 
   return (

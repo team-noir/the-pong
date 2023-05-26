@@ -1,0 +1,5 @@
+FROM nginx:stable-alpine
+
+COPY ./proxy-aws.conf /etc/nginx/conf.d/proxy.conf
+
+CMD ["nginx", "-g", "daemon off;"]
