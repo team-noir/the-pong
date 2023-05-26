@@ -5,7 +5,7 @@ services:
     container_name: the-pong_nginx
     build:
       context: ./nginx
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.aws
     restart: unless-stopped
     ports:
       - 80:80
