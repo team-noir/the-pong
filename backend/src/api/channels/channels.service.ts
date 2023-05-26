@@ -142,7 +142,7 @@ export class ChannelsService {
       channels.reverse();
     }
 
-    channels.forEach((channel, idx) => {
+    channels.forEach((channel) => {
       if (
         channel.banned.has(userId) ||
         !this.channelModel.checkCanListed(channel, user.id) ||
@@ -151,20 +151,6 @@ export class ChannelsService {
       ) {
         return;
       }
-
-      if (!query.checkCursor(order, channel)) {
-        return; 
-      } 
-
-      if (page.take == query.getLimit()) { 
-        prevIdx = idx; 
-        nextIdx = idx;
-      } else if (page.take > 0) {  
-        nextIdx = idx;
-      } else { 
-        return;
-      }
-      page.take -= 1;
 
       const info = {
         id: channel.id,
@@ -192,7 +178,24 @@ export class ChannelsService {
       data.push(info);
     });
 
-    const result = new PageDto(channels.length, data);
+    const thisPage = data.filter((channel, idx) => {
+      if (!query.checkCursor(order, channel)) {
+        return false; 
+      } 
+
+      if (page.take == query.getLimit()) { 
+        prevIdx = idx; 
+        nextIdx = idx;
+      } else if (page.take > 0) {  
+        nextIdx = idx;
+      } else { 
+        return false;
+      }
+      page.take -= 1;
+      return true;
+    })
+
+    const result = new PageDto(data.length, thisPage);
     if (prevIdx - query.getLimit() >= 0) {
       result.setCursor({
         ...(query.sort == "created" && { createdAt: channels[prevIdx - query.getLimit()].createdAt }),
@@ -444,30 +447,17 @@ export class ChannelsService {
       messages.reverse();
     }
     
-    messages.forEach((message, idx) => {
+    messages.forEach((message) => {
       if (message.channelId == channel.id) {
         const sender = message.senderId
           ? this.userModel.getUser(message.senderId)
           : null;
 
         if (!sender || !user.isBlockUser(sender.id)) {
-          if (!query.checkCursor(order, channel)) {
-            return; 
-          }
-    
-          if (page.take == query.getLimit()) { 
-            prevIdx = idx; 
-            nextIdx = idx;
-          } else if (page.take > 0) {  
-            nextIdx = idx;
-          } else { 
-            return;
-          }
-          page.take -= 1;
-
           const tarMessage = new ChannelMessageDto(
             message.id,
             message.text,
+            message.createdAt,
             sender,
             message.isLog
           );
@@ -476,7 +466,24 @@ export class ChannelsService {
       }
     });
 
-    const result = new PageDto(messages.length, data);
+    const thisPage = data.filter((message, idx) => {
+      if (!query.checkCursor(order, message)) {
+        return false; 
+      }
+
+      if (page.take == query.getLimit()) { 
+        prevIdx = idx; 
+        nextIdx = idx;
+      } else if (page.take > 0) {  
+        nextIdx = idx;
+      } else { 
+        return false;
+      }
+      page.take -= 1;
+      return true;
+    })
+
+    const result = new PageDto(data.length, thisPage);
     if (prevIdx - query.getLimit() >= 0) {
       result.setCursor({
         id: messages[prevIdx - query.getLimit()].id,

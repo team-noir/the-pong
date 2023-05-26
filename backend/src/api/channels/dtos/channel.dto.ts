@@ -250,11 +250,11 @@ export class ChannelMessageDto {
   @ApiProperty()
   public createdAt: Date;
 
-  constructor(id: number, text: string, sender?: ChannelUser, isLog?: boolean) {
+  constructor(id: number, text: string, createdAt: Date, sender?: ChannelUser, isLog?: boolean) {
     this.id = id;
     this.text = text;
     this.isLog = isLog;
-    this.createdAt = new Date();
+    this.createdAt = createdAt;
 
     if (sender) {
       this.senderId = sender.id;
