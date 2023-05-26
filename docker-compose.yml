@@ -46,7 +46,9 @@ services:
       GOOGLE_SECRET: ${GOOGLE_SECRET}
       GOOGLE_CB: ${GOOGLE_CB}
       JWT_SECRET: ${JWT_SECRET}
+      CURSOR_SECRET: ${CURSOR_SECRET}
       CLIENT_APP_URL: ${CLIENT_APP_URL}
+      SALT_ROUNDS: ${SALT_ROUNDS}
     volumes:
       - backend-uploads:/usr/src/app/uploads
 
