@@ -468,6 +468,7 @@ export class ChannelsService {
           const tarMessage = new ChannelMessageDto(
             message.id,
             message.text,
+            message.createdAt,
             sender,
             message.isLog
           );
@@ -476,7 +477,7 @@ export class ChannelsService {
       }
     });
 
-    const result = new PageDto(messages.length, data);
+    const result = new PageDto(data.length, data);
     if (prevIdx - query.getLimit() >= 0) {
       result.setCursor({
         id: messages[prevIdx - query.getLimit()].id,
