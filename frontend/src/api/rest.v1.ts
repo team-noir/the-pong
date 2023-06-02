@@ -264,9 +264,9 @@ export const getChannels = async ({
   kind?: string[];
   paging: PageParamsType;
 }): Promise<ListWithPagingType<ChannelType>> => {
-  const { cursor, size, order } = paging;
+  const { cursor, size, order, sort } = paging;
   const res = await axiosWithInterceptors.get(`/channels/`, {
-    params: { enter, kind, cursor, size, order },
+    params: { enter, kind, cursor, size, order, sort },
   });
 
   if (res.status !== StatusCodes.OK) {

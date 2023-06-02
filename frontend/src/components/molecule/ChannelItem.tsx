@@ -9,7 +9,7 @@ interface Props {
   onClick?: (channel: ChannelType) => void;
 }
 
-export default function Channel({ channel, onClick }: Props) {
+export default function ChannelItem({ channel, onClick }: Props) {
   return (
     <li
       onClick={() => onClick && onClick(channel)}

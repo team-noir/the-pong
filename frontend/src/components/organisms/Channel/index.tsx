@@ -68,7 +68,7 @@ export default function Channel({
     queryFn: ({ pageParam = null }) =>
       getMessages({
         channelId: channel.id,
-        paging: { cursor: pageParam, size: 30 },
+        paging: { cursor: pageParam, size: 20 },
       }),
     getNextPageParam: ({ paging }) => paging.nextCursor,
     staleTime: Infinity,
