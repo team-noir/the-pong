@@ -136,7 +136,7 @@ export class GameModel implements OnModuleInit {
         ...(query.sort == "viewers" && { countViewer: games[prevIdx - query.getLimit()].countViewer }),
       }, true);
     }
-    if (gamelist.length == query.getLimit() && nextIdx + 1 <= games.length - 1) {
+    if (thisPage.length == query.getLimit() && nextIdx + 1 <= games.length - 1) {
       result.setCursor({
         id: games[nextIdx + 1].gameId,
         ...(query.sort == "created" && { createdAt: games[nextIdx + 1].createdAt }),
