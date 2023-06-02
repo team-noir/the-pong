@@ -81,7 +81,7 @@ clean: ## Stop and remove running containers, networks, images, and volumes
 	docker image prune
 
 .PHONY: clean-aws
-clean-dev: ## [dev] Stop and remove running containers, networks, images, and volumes
+clean-aws: ## [dev] Stop and remove running containers, networks, images, and volumes
 	$(DOCKER_COMPOSE_AWS) down --rmi all --volumes --remove-orphans
 	docker image prune
 
