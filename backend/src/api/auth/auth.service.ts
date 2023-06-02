@@ -90,7 +90,10 @@ export class AuthService {
   }
 
   async setJwt(@Res() res: Response, jwt: string) {
-    await res.cookie('Authorization', jwt);
+    await res.cookie('Authorization', jwt, { 
+      maxAge: 30 * 60 * 1000, // 30m
+      httpOnly: true 
+    });
   }
 
   async verifyJwt(@Res() res: Response, jwt: string): Promise<boolean> {
