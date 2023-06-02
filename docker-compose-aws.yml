@@ -40,12 +40,14 @@ services:
     depends_on:
       - postgres
     environment:
+      CLIENT_APP_URL: ${PUBLIC_URL}
+      SALT_ROUNDS: ${SALT_ROUNDS}
+      CURSOR_SECRET: ${CURSOR_SECRET}
+      JWT_SECRET: ${JWT_SECRET}
       DATABASE_URL: ${DATABASE_URL}
       GOOGLE_ID: ${GOOGLE_ID}
       GOOGLE_SECRET: ${GOOGLE_SECRET}
       GOOGLE_CB: ${GOOGLE_CB}
-      JWT_SECRET: ${JWT_SECRET}
-      CLIENT_APP_URL: ${CLIENT_APP_URL}
     volumes:
       - backend-uploads:/usr/src/app/uploads
 
@@ -58,11 +60,8 @@ services:
     networks:
       - the-pong-net
     environment:
-      REACT_APP_API_URL: ${REACT_APP_API_URL}
       PUBLIC_URL: ${PUBLIC_URL}
-      REACT_APP_AUTHOR: ${REACT_APP_AUTHOR}
-      REACT_APP_NAME: ${REACT_APP_NAME}
-      REACT_APP_DESCRIPTION: ${REACT_APP_DESCRIPTION}
+      REACT_APP_API_URL: ${REACT_APP_API_URL}
     depends_on:
       - backend
 
