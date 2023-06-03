@@ -106,8 +106,8 @@ export class AuthService {
     }
   }
 
-  async removeJwt(@Res() res) {
-    await res.clearCookie('Authorization', { path: '/' });
+  async removeJwt(@Req() req) {
+    await req.clearCookie('Authorization', { path: '/' });
   }
 
   getJwtPayload(jwt: string) {
