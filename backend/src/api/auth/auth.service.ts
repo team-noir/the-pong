@@ -96,12 +96,11 @@ export class AuthService {
     });
   }
 
-  async verifyJwt(@Res() res: Response, jwt: string): Promise<boolean> {
+  async verifyJwt(jwt: string): Promise<boolean> {
     try {
       await this.jwtService.verify(jwt);
       return true;
     } catch (error) {
-      await this.removeJwt(res);
       return false;
     }
   }
