@@ -1,9 +1,10 @@
-YML = ./docker-compose.yml
-YML_AWS = ./docker-compose-aws.yml
-YML_DEV = ./docker-compose-dev.yml
-DOCKER_COMPOSE = docker compose --file $(YML)
-DOCKER_COMPOSE_AWS = docker compose --file $(YML_AWS)
-DOCKER_COMPOSE_DEV = docker compose --file $(YML_DEV) --env-file .env.development
+YML := ./docker-compose.yml
+YML_AWS := ./docker-compose-aws.yml
+YML_DEV := ./docker-compose-dev.yml
+ENV_DEV := ./.env.development
+DOCKER_COMPOSE := docker compose --file $(YML)
+DOCKER_COMPOSE_AWS := docker compose --file $(YML_AWS)
+DOCKER_COMPOSE_DEV := docker compose --file $(YML_DEV) --env-file $(ENV_DEV)
 
 # HELP
 # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
@@ -17,19 +18,19 @@ build: ## Build containers
 
 .PHONY: build-aws
 build-aws: ## [AWS] Build containers
-	export NODE_OPTIONS="--max-old-space-size=2048"
-	yarn install --cwd ./frontend
-	yarn --cwd ./frontend build
+	export NODE_OPTIONS="--max-old-space-size=2048" ; \
+	cd ./frontend && yarn install ; \
+	yarn build
 	$(DOCKER_COMPOSE_AWS) build
 
 .PHONY: build-dev
 build-dev: ## [dev] Build containers
-	yarn install --cwd ./backend
+	cd ./backend && yarn install
 	$(DOCKER_COMPOSE_DEV) build
 
 .PHONY: build-dev-no
 build-dev-no: ## [dev] Build containers no cache
-	yarn install --cwd ./backend
+	cd ./backend && yarn install
 	$(DOCKER_COMPOSE_DEV) build --no-cache
 
 .PHONY: up
@@ -75,22 +76,24 @@ show: ## Show containers, images, and logs
 logs: ## Show logs
 	$(DOCKER_COMPOSE) logs -f
 
+DOCKER_COMPOSE_DOWN_OPTIONS := --rmi all --volumes --remove-orphans
+DOCKER_PRUNE := docker system prune --volumes
+
 .PHONY: clean
 clean: ## Stop and remove running containers, networks, images, and volumes
-	$(DOCKER_COMPOSE) down --rmi all --volumes --remove-orphans
-	docker image prune
+	$(DOCKER_COMPOSE) down $(DOCKER_COMPOSE_DOWN_OPTIONS)
+	$(DOCKER_PRUNE)
 
 .PHONY: clean-aws
-clean-dev: ## [dev] Stop and remove running containers, networks, images, and volumes
-	$(DOCKER_COMPOSE_AWS) down --rmi all --volumes --remove-orphans
-	docker image prune
+clean-aws: ## [AWS] Stop and remove running containers, networks, images, and volumes
+	$(DOCKER_COMPOSE_AWS) down $(DOCKER_COMPOSE_DOWN_OPTIONS)
+	$(DOCKER_PRUNE)
 
 .PHONY: clean-dev
 clean-dev: ## [dev] Stop and remove running containers, networks, images, and volumes
-	$(DOCKER_COMPOSE_DEV) down --rmi all --volumes --remove-orphans
-	docker image prune
+	$(DOCKER_COMPOSE_DEV) down $(DOCKER_COMPOSE_DOWN_OPTIONS)
+	$(DOCKER_PRUNE)
 
 .PHONY: re
-re: clean ## clean & build
-	make build
+re: clean build ## clean & build
 
