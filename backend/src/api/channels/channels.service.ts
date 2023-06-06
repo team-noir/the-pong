@@ -203,7 +203,7 @@ export class ChannelsService {
         id: channels[prevIdx - query.getLimit()].id,
       }, true);
     }
-    if (data.length == query.getLimit() && nextIdx + 1 <= channels.length - 1) {
+    if (thisPage.length == query.getLimit() && nextIdx + 1 <= channels.length - 1) {
       result.setCursor({
         ...(query.sort == "created" && { createdAt: channels[nextIdx + 1].createdAt }),
         ...(query.sort == "users" && { userCount: channels[nextIdx + 1].users.size }),
@@ -489,7 +489,7 @@ export class ChannelsService {
         id: messages[prevIdx - query.getLimit()].id,
       }, true);
     }
-    if (data.length == query.getLimit() && nextIdx + 1 <= messages.length - 1) {
+    if (thisPage.length == query.getLimit() && nextIdx + 1 <= messages.length - 1) {
       result.setCursor({
         id: messages[nextIdx + 1].id,
       }, false);
