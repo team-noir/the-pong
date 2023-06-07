@@ -17,14 +17,16 @@ export class AuthenticatedGuard implements CanActivate {
 
     const user: User = await this.authService.getUserFromJwt(req);
     const payload = await this.authService.getJwtPayloadFromReq(req);
+    const jwt = this.authService.getJwt(req);
     const now: Date = new Date(Date.now());
 
-    if (!user || !payload) {
+    if (await this.authService.verifyJwt(jwt) == false) {
+      this.authService.removeJwt(req);
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     }
 
-    if (user.isTwoFactor && !payload.isVerifiedTwoFactor) {
+    if (!user || !payload || (user.isTwoFactor && !payload.isVerifiedTwoFactor)) {
       res.status(HttpStatus.UNAUTHORIZED).send();
       return false;
     }

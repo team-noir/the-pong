@@ -90,21 +90,23 @@ export class AuthService {
   }
 
   async setJwt(@Res() res: Response, jwt: string) {
-    await res.cookie('Authorization', jwt);
+    await res.cookie('Authorization', jwt, { 
+      maxAge: 29 * 60 * 1000, // 30m
+      httpOnly: true 
+    });
   }
 
-  async verifyJwt(@Res() res: Response, jwt: string): Promise<boolean> {
+  async verifyJwt(jwt: string): Promise<boolean> {
     try {
       await this.jwtService.verify(jwt);
       return true;
     } catch (error) {
-      await this.removeJwt(res);
       return false;
     }
   }
 
-  async removeJwt(@Res() res) {
-    await res.clearCookie('Authorization', { path: '/' });
+  async removeJwt(@Req() req) {
+    await req.clearCookie('Authorization', { path: '/' });
   }
 
   getJwtPayload(jwt: string) {
