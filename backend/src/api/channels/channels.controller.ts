@@ -129,14 +129,14 @@ export class ChannelsController {
     description: 'You do not have permission to change settings.',
   })
   @UseGuards(AuthenticatedGuard)
-  setChannelInfo(
+  async setChannelInfo(
     @Req() req,
     @Body() data: SettingChannelDto,
     @Param('channelId') channelId: number,
     @Res({ passthrough: true }) res
   ) {
     try {
-      this.channelsService.setChannelInfo(req.user.id, channelId, data);
+      await this.channelsService.setChannelInfo(req.user.id, channelId, data);
       res.status(HttpStatus.NO_CONTENT);
       return;
     } catch (error) {

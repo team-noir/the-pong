@@ -13,6 +13,8 @@ import { NOTICE_STATUS, NOTICE_STATUS_MESSAGE } from '@const';
 import { PageRequestDto } from '../dtos/pageRequest.dto';
 import { PageDto } from '../dtos/page.dto';
 
+import * as bcrypt from 'bcryptjs';
+
 @Injectable()
 export class ChannelsService {
   @WebSocketServer() server: Server;
@@ -258,14 +260,23 @@ export class ChannelsService {
     return channelInfo;
   }
 
-  setChannelInfo(userId: number, channelId: number, data) {
+  async setChannelInfo(userId: number, channelId: number, data) {
     const channel: Channel = this.channelModel.get(channelId);
     const settedBy: ChannelUser = this.userModel.getUser(userId);
 
     channel.assertCanUserEditChannel(settedBy, data.password);
 
     channel.title = data.title ? data.title : channel.title;
-    channel.password = data.password ? data.password : null;
+    channel.password = data.password ? bcrypt.hashSync(data.password, parseInt(process.env.SALT_ROUNDS, 10)) : null;
+
+    await this.prismaService.channel.update({
+      where: { id: channel.id },
+      data: {
+        title: channel.title,
+        password: channel.password,
+      }
+    })
+
     return;
   }
 

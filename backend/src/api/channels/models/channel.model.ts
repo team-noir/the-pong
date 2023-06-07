@@ -292,7 +292,7 @@ export class ChannelModel {
 
   async createChannel(data, owner?: ChannelUser) {
     if (data.password) {
-      data.password = bcrypt.hashSync(data.password, process.env.SALT_ROUNDS);
+      data.password = bcrypt.hashSync(data.password, parseInt(process.env.SALT_ROUNDS, 10));
     }
     const created = await this.prismaService.channel.create({
       data: {
