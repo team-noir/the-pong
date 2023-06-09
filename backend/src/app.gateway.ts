@@ -362,7 +362,7 @@ export class AppGateway
 
   @SubscribeMessage('disconnectPlayer')
   async disconnectPlayer(@ConnectedSocket() socket: Socket) {
-    this.gamesService.gameModel.disconnectPlayer(socket.data.userId);
+    await this.gamesService.gameModel.disconnectPlayer(socket.data.userId);
     socket.emit('disconnectPlayer');
   }
 

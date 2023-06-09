@@ -240,13 +240,13 @@ export class Game {
   }
 
   removeViewer(viewerId: number): number {
-    this.viewers = this.viewers.filter(async (viewer) => {
+    this.viewers = this.viewers.filter((viewer) => {
       if (viewer.userId == viewerId) {
         viewer.socket.leave(this.getName());
         viewer.leaveGame();
-        return true;
+        return false;
       }
-      return false;
+      return true;
     });
     this.viewerConnections.delete(viewerId);
     this.countViewer--;
