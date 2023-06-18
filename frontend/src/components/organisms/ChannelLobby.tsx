@@ -1,17 +1,12 @@
-import { useNavigate } from 'react-router-dom';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { getChannels } from 'api/rest.v1';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import ChannelButtons from 'components/organisms/ChannelButtons';
 import ChannelList from 'components/molecule/ChannelList';
 import Spinner from 'components/atoms/Spinner';
-import { ChannelType } from 'types';
-import ROUTES from 'constants/routes';
 import QUERY_KEYS from 'constants/queryKeys';
 
 export default function ChannelLobby() {
-  const navigate = useNavigate();
-
   const { data, isFetching, fetchNextPage } = useInfiniteQuery({
     queryKey: [QUERY_KEYS.CHANNELS],
     queryFn: ({ pageParam = null }) =>
@@ -26,10 +21,6 @@ export default function ChannelLobby() {
 
   const channels = data?.pages.flatMap((page) => page.data) ?? [];
   const hasMore = !!data?.pages[data.pages.length - 1].paging.nextCursor;
-
-  const handleClickChannel = (channel: ChannelType) => {
-    navigate(ROUTES.CHANNEL.ROOM(channel.id));
-  };
 
   return (
     <>
@@ -48,7 +39,7 @@ export default function ChannelLobby() {
             dataLength={channels.length}
             loader={<Spinner className="flex justify-center pt-2 pb-8" />}
           >
-            <ChannelList channels={channels} onClick={handleClickChannel} />
+            <ChannelList channels={channels} />
           </InfiniteScroll>
         ) : (
           <p className="text-center py-4">입장 중인 채널이 없습니다.</p>
