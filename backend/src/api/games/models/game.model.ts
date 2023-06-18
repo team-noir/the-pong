@@ -12,7 +12,6 @@ import { Game } from '../dtos/game.dto';
 import { Socket } from 'socket.io';
 import { PrismaService } from '@/prisma/prisma.service';
 import { AppGateway } from '@/app.gateway';
-import { PrismaClient } from '@prisma';
 import { GAME_STATUS } from '@const';
 import { PageRequestDto } from '@/api/dtos/pageRequest.dto';
 import { PageDto } from '@/api/dtos/page.dto';
@@ -31,7 +30,7 @@ export class GameModel implements OnModuleInit {
   private pongRecords = new Set<playerId>();
   private readyRecords = new Set<playerId>();
 
-  private appGateway: AppGateway;
+  public appGateway: AppGateway;
   private readyTime = 60000;
   private gameId = 1;
 
@@ -225,74 +224,50 @@ export class GameModel implements OnModuleInit {
     return results;
   }
 
-  async getUserAchievements(userId: number) {
-    return await this.prismaService.achievement_User
-      .findMany({
-        where: {
-          userId,
-        },
-        select: {
-          achievement: {
-            select: {
-              id: true,
-            },
-          },
-        },
-      })
-      .then((achievements) =>
-        achievements.map((achievement) => achievement.achievement.id)
-      );
-  }
-
-  async checkUserAchievements(player: Player, gameResult) {
-    const userId = player.userId;
+  async setUserAchievements(userId: number, gameResult) {
     const achievementIds: number[] = await this.getGameAchievements(
       userId,
       gameResult
     );
-    const userAchievements = await this.getUserAchievements(userId);
-    const uesrSocket = this.appGateway.getUserSocket(userId);
-    const results = [];
 
+    const createdAt = new Date();
     for (const achievementId of achievementIds) {
-      if (!userAchievements.includes(achievementId)) {
-        const achievement_user =
-          await this.prismaService.achievement_User.upsert({
-            where: {
-              unique: {
-                userId,
-                achievementId,
-              },
-            },
-            update: {},
-            create: {
+      const achievement_user =
+        await this.prismaService.achievement_User.upsert({
+          where: {
+            unique: {
               userId,
               achievementId,
             },
-          });
-
-        const achievement = await this.prismaService.achievement.findUnique({
-          where: {
-            id: achievementId,
+          },
+          update: {},
+          create: {
+            userId,
+            achievementId,
+            createdAt,
           },
           select: {
-            title: true,
-            description: true,
-          },
+            id: true,
+            achievement: {
+              select: {
+                title: true,
+                description: true
+              }
+            },
+            createdAt: true
+          }
         });
-
-        if (player.socket) {
-          await player.socket.emit('achievement', {
-            id: achievement_user.id,
-            title: achievement.title,
-            description: achievement.description,
-            createdAt: achievement_user.createdAt,
-          });
-        }
+      
+      const userSocket = this.appGateway.getUserSocket(userId);
+      if (createdAt.getTime() == achievement_user.createdAt.getTime() && userSocket) {
+        await userSocket.emit('achievement', {
+          id: achievement_user.id,
+          title: achievement_user.achievement.title,
+          description: achievement_user.achievement.description,
+          createdAt: achievement_user.createdAt,
+        });
       }
     }
-
-    return results;
   }
 
   async setGameOver(game: Game, giveupId?: number) {
@@ -304,14 +279,9 @@ export class GameModel implements OnModuleInit {
     if (gameResult.isLadder) {
       await this.setUserLadderScore(gameResult.winner.id);
     }
-    await this.checkUserAchievements(
-      game.getPlayer(gameResult.winner.id),
-      gameResult
-    );
-    await this.checkUserAchievements(
-      game.getPlayer(gameResult.loser.id),
-      gameResult
-    );
+
+    await this.setUserAchievements(gameResult.winner.id, gameResult);
+    await this.setUserAchievements(gameResult.loser.id, gameResult);
     await game.noticeToPlayers('gameOver', gameResult);
   }
 
