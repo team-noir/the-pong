@@ -256,7 +256,7 @@ export default function Game({ game }: Props) {
         </div>
       )}
 
-      <div className="flex items-center flex-end py-1 text-s text-gray-light">
+      <div className="flex items-center justify-end py-1 text-s text-gray-light">
         <EyeIcon className="block h-4 w-4" aria-hidden="true" />
         <span className="ml-1">{game.viewerCount}</span>
       </div>
