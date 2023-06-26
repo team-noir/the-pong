@@ -438,9 +438,9 @@ export const getGame = async (gameId: number): Promise<GameType> => {
 export const getGames = async (
   paging: PageParamsType
 ): Promise<ListWithPagingType<GameType>> => {
-  const { cursor, size, order } = paging;
+  const { cursor, size, order, sort } = paging;
   const res = await axiosWithInterceptors.get(`/games`, {
-    params: { cursor, size, order },
+    params: { cursor, size, order, sort },
   });
   if (res.status !== StatusCodes.OK) {
     throw new Error(res.statusText);

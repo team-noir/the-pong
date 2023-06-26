@@ -10,7 +10,7 @@ export type ListWithPagingType<T> = {
 };
 
 export type OrderType = 'asc' | 'desc';
-export type SortType = 'created' | 'users';
+export type SortType = 'created' | 'users' | 'viewers';
 
 export type PageParamsType = {
   cursor?: string | null;

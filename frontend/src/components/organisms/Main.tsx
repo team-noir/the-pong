@@ -12,7 +12,7 @@ import ChannelList from 'components/molecule/ChannelList';
 export default function Main() {
   const { data: games } = useQuery({
     queryKey: [QUERY_KEYS.GAMES, 'main'],
-    queryFn: () => getGames({ size: 3 }),
+    queryFn: () => getGames({ size: 3, sort: 'viewers' }),
   });
 
   const { data: channels } = useQuery({
